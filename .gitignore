@@ -1,0 +1,13 @@
+# файл содержит список масок для исключения генерируемых Qt файлов
+debug
+release
+*.o
+*.a
+*.exe
+*.lib
+*.user
+Makefile
+*.Debug
+*.Release
+moc_*.cpp
+ui_*.h
