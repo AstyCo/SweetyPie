@@ -15,12 +15,19 @@ GanttGraphicsHeader::GanttGraphicsHeader(QDateTime begin, QDateTime end, Scale s
     QGraphicsLinearLayout *upper = new QGraphicsLinearLayout(headerLayout);
     QGraphicsLinearLayout *lower = new QGraphicsLinearLayout(headerLayout);
 
+
+
     m_begin = begin;
     m_end = end;
 
     int lowHeight = 20;
     int lowWidth = 20; //TODO //почему при ScaleMinute и lowWidth>15 происходит наложение блоков
     int lowCount = lowItemsCount(begin, end, scale);
+
+    QRectF lowRect(0,0,lowWidth*lowCount, lowHeight);
+    lower->setGeometry(lowRect);
+    upper->setGeometry(lowRect);
+
     //int upCount = 0;
     int lowPerUpCount = 0;
     QDateTime currentDT = begin;

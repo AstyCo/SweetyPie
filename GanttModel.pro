@@ -21,11 +21,11 @@ SOURCES += main.cpp \
     ganttview.cpp \
     ganttgraphicsview.cpp \
     gantttreeview.cpp \
-    ganttitemstage.cpp \
+#    ganttitemstage.cpp \
     ganttgraphicsscene.cpp \
     ganttgraphicsitem.cpp \
     ganttgraphicsitemstage.cpp \
-    ganttdatetimegrid.cpp \
+#    ganttdatetimegrid.cpp \
     ganttgraphicsheader.cpp \
     ganttgraphicsheaderrectitem.cpp
 #    ganttwidget.cpp
@@ -36,14 +36,17 @@ HEADERS += \
     ganttview.h \
     ganttgraphicsview.h \
     gantttreeview.h \
-    ganttitemstage.h \
+#    ganttitemstage.h \
     ganttgraphicsscene.h \
     ganttgraphicsitem.h \
     ganttgraphicsitemstage.h \
-    ganttdatetimegrid.h \
+#    ganttdatetimegrid.h \
     ganttgraphicsheader.h \
     ganttgraphicsheaderrectitem.h
 #    ganttwidget.h
 
 #FORMS += \
 #    ganttwidget.ui
+
+RESOURCES += \
+    images.qrc

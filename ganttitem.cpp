@@ -127,11 +127,7 @@ GanttItem::GanttItem(const QString &name, QDateTime begin, QDateTime end, bool d
         m_parent->addChild(this);
     m_commonBegin = begin;
     m_commonEnd = end;
-    /*
-    QDateTime dtBegin = QDateTime::fromString("28.01.2015", "dd.MM.yyyy");
-    QDateTime dtEnd = QDateTime::fromString("30.01.2015", "dd.MM.yyyy");
-    */
-    addStage(begin, end);
+    m_commonDuration = m_commonBegin.secsTo(m_commonEnd);
 }
 
 
@@ -167,6 +163,48 @@ int GanttItem::minutesForTask(bool onlyForToday) const
     return minutes;
 }
 
+int GanttItem::commonDuration() const
+{
+    return m_commonDuration;
+}
+
+void GanttItem::setCommonDuration(int commonDuration)
+{
+    m_commonDuration = commonDuration;
+}
+
+//int GanttItem::commonDuration() const
+//{
+//    m_commonDuration = m_commonBegin.secsTo(m_commonEnd);
+//    return m_commonDuration;
+//}
+
+//void GanttItem::setCommonDuration(const int &commonDuration)
+//{
+//    m_commonDuration = commonDuration;
+//}
+
+QDateTime GanttItem::commonEnd() const
+{
+    return m_commonEnd;
+}
+
+void GanttItem::setCommonEnd(const QDateTime &commonEnd)
+{
+    m_commonEnd = commonEnd;
+}
+
+QDateTime GanttItem::commonBegin() const
+{
+    return m_commonBegin;
+}
+
+void GanttItem::setCommonBegin(const QDateTime &commonBegin)
+{
+    m_commonBegin = commonBegin;
+}
+
+
 void GanttItem::incrementLastEndTime(int msec)
 {
     QDateTime &endTime = m_dateTimes.last().second;
@@ -194,27 +232,24 @@ QString GanttItem::end()
     return m_commonEnd.toString("dd.MM.yyyy hh:mm:ss");
 }
 
-QString GanttItem::duration() const
+QString GanttItem::duration()
 {
     //m_commonDuration = QDateTime::fromTime_t(m_commonBegin.secsTo(m_commonEnd));
-    qreal secs = m_commonBegin.secsTo(m_commonEnd)/86400;
+
+    qreal secs = m_commonDuration/86400;
     QString string = QString::number(secs, 'f', 1) + " " + QObject::trUtf8("дней");
     //return QString::number(secs);
-    qDebug()<<"sex"<<secs;
+    qDebug()<<"secs"<<secs;
     return string;
 }
 
-void GanttItem::addStage(QDateTime begin, QDateTime end)
-{
-    m_stage = new GanttItemStage(begin, end);
-    m_stageList.append(m_stage);
-    if (begin<m_commonBegin)
-        m_commonBegin = begin;
-    if (end>m_commonEnd)
-        m_commonEnd = end;
-}
-
-//void GanttItem::createGraphicsItem(QList<GanttItemStage *> stages)
+//void GanttItem::addStage(QDateTime begin, QDateTime end)
 //{
-//    m_graphicsItem = new GanttGraphicsItem(stages);
+//    m_stage = new GanttItemStage(begin, end);
+//    m_stageList.append(m_stage);
+//    if (begin<m_commonBegin)
+//        m_commonBegin = begin;
+//    if (end>m_commonEnd)
+//        m_commonEnd = end;
 //}
+

@@ -5,7 +5,6 @@
 #include <QVariant>
 #include <QVector>
 #include "ganttitemstage.h"
-//#include "ganttgraphicsitem.h"
 
 #include <QDateTime>
 #include <QPair>
@@ -72,9 +71,9 @@ public:
     void setTitle(const QString &title) { m_title = title; }
     QString begin();// { return m_commonBegin; }
     QString end();// { return m_commonEnd; }
-    QString duration() const;// { return m_commonDuration; }
+    QString duration();// { return m_commonDuration; }
 
-    QList<GanttItemStage*> stageList() { return m_stageList; }
+    //QList<GanttItemStage*> stageList() { return m_stageList; }
 
 
     //GanttItem(QDateTime begin, QDateTime end, GanttItem::ItemType type);
@@ -83,9 +82,20 @@ public:
                    Union,          // элемент объединяет детей и зависит от них
                    Multiunion};    // элемент состоит из частей, каждая из которых объединяет детей и зависит от них
 
-    void addStage(QDateTime begin, QDateTime end);
-    //void createGraphicsItem(QList<GanttItemStage*> stages);
+    //void addStage(QDateTime begin, QDateTime end);
 
+
+    QDateTime commonBegin() const;
+    void setCommonBegin(const QDateTime &commonBegin);
+
+    QDateTime commonEnd() const;
+    void setCommonEnd(const QDateTime &commonEnd);
+
+//    int commonDuration() const;
+//    void setCommonDuration(const int &commonDuration);
+
+    int commonDuration() const;
+    void setCommonDuration(int commonDuration);
 
 private:
     //=======etm==========
@@ -105,14 +115,10 @@ private:
     QList<GanttItem*> m_children;
     //===============
 
-    QList<GanttItemStage*> m_stageList;
-    //QList<GanttGraphicsItemStage*> m_stageList;
-    GanttItemStage *       m_stage;
-    //GanttGraphicsItem *    m_graphicsItem;
     QString                m_title;
     QDateTime              m_commonBegin;
     QDateTime              m_commonEnd;
-    QDateTime              m_commonDuration;
+    int                    m_commonDuration;
 
 
 

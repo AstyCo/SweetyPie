@@ -34,14 +34,14 @@ GanttGraphicsItemStage::GanttGraphicsItemStage(QDateTime begin, QDateTime end, q
 }
 */
 
-GanttGraphicsItemStage::GanttGraphicsItemStage(GanttItemStage *stage, Scale scale, qreal durationTillBegin, QGraphicsItem *parent)
+GanttGraphicsItemStage::GanttGraphicsItemStage(GanttItem *item, Scale scale, qreal durationTillBegin, QGraphicsItem *parent)
     : QGraphicsRectItem(parent)//: QGraphicsLayoutItem()//, QGraphicsItem(parent)
 {
     setGraphicsItem(this);
 
-    m_begin = stage->begin();
-    m_end = stage->end();
-    m_duration = stage->duration();
+    m_begin = item->commonBegin();
+    m_end = item->commonEnd();
+    m_duration = item->commonDuration();
 
     qreal secWidth = 20;
     m_width = m_duration*secWidth;
@@ -73,15 +73,12 @@ GanttGraphicsItemStage::GanttGraphicsItemStage(GanttItemStage *stage, Scale scal
 
 
     m_height = 15;
-    m_text = "";
-    this->setToolTip("test");
+    m_text = "text";
+    this->setToolTip("tip");
     m_color = QColor(Qt::green);
     //m_color = QColor(206,206,206);
     this->setBrush(QBrush(m_color));
 
-    //TODO
-    //QGraphicsRectItem * testRect = new QGraphicsRectItem(0, 0, m_width, m_height, parent);
-    //QGraphicsRectItem(0, 0, m_width, m_height, parent);
     setRect(durationTillBegin,0,m_width,m_height);
 
     qDebug()<<durationTillBegin;
@@ -129,12 +126,11 @@ void GanttGraphicsItemStage::paint(QPainter *painter, const QStyleOptionGraphics
     QString dateStr;
 
     dateStr = m_text;
-    qDebug()<<"drawing stage";
 
     QPen oldPen = painter->pen();
     QPen newPen(oldPen);
 
-    newPen.setColor(m_color);
+    newPen.setColor(QColor(Qt::black));
     painter->setPen(newPen);
     bRect.adjust(0, 1, 0, -1);
     painter->drawText(bRect, Qt::AlignCenter/*Qt::AlignVCenter|Qt::AlignLeft*/, dateStr);

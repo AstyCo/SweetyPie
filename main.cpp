@@ -12,7 +12,6 @@ int main(int argc, char *argv[])
     QApplication a(argc, argv);
 
     GanttView * view = new GanttView;
-    //QTreeView * view = new QTreeView;
     GanttModel * model = new GanttModel;
     //model->insertRows(0,4);
 
@@ -34,7 +33,7 @@ int main(int argc, char *argv[])
     {
         begin = QDateTime::fromString("04.02.2015", "dd.MM.yyyy");
         end = QDateTime::fromString("07.02.2015", "dd.MM.yyyy");
-        model->addItem(i,"lol2",begin,end);
+        model->addItem(i,"lol"+QString::number(i),begin,end);
     }
 
 

@@ -44,46 +44,31 @@ GanttGraphicsItem::~GanttGraphicsItem()
     delete m_graphicsStage;
 }
 
+
 void GanttGraphicsItem::setGraphicsStages()
 {
-    qreal spacer = 0;
+    //qreal spacer = 0;
     //setGeometry();
-    for(int i = 0; i < m_ganttItem->stageList().count(); i++)
-    {
-        qreal durationTillBegin = m_headerBegin.secsTo(m_ganttItem->stageList().at(i)->begin());
+    //for(int i = 0; i < m_ganttItem->stageList().count(); i++)
+    //{
+        qreal durationTillBegin = m_headerBegin.secsTo(m_ganttItem->commonBegin());//->stageList().at(i)->begin());
 
-//        switch (m_scale) {
-//        case ScaleSecond:
-//            //durationTillBegin = durationTillBegin;
-//            break;
-//        case ScaleMinute:
-//            durationTillBegin = durationTillBegin/60;
-//            break;
-//        case ScaleHour:
-//            durationTillBegin = durationTillBegin/3600;
-//            break;
-//        case ScaleDay:
-//            durationTillBegin = durationTillBegin/86400;
-//            break;
-//        case ScaleMonth:
-//            //durationTillBegin = durationTillBegin/86400;
-//            break;
-//        default:
-//            break;
-//        }
         qDebug()<<durationTillBegin;
 
-        m_graphicsStage = new GanttGraphicsItemStage(m_ganttItem->stageList().at(i), m_scale, durationTillBegin);
+        m_graphicsStage = new GanttGraphicsItemStage(m_ganttItem/*->stageList().at(i)*/, m_scale, durationTillBegin);
 
 
         addItem(m_graphicsStage);
-        if ( i+1 < m_ganttItem->stageList().count() )
-        {
-            spacer = m_ganttItem->stageList().at(i)->end().secsTo(m_ganttItem->stageList().at(i+1)->begin())*20; // 20 ширина одной секунды
-            setItemSpacing(i, spacer);
-        }
-        qDebug()<<"stages"<<this->count();
-    }
+
+        //устаналиваем промежуток после блока
+//        if ( i+1 < m_ganttItem->stageList().count() )
+//        {
+//            spacer = m_ganttItem->stageList().at(i)->end().secsTo(m_ganttItem->stageList().at(i+1)->begin())*20; // 20 ширина одной секунды
+//            setItemSpacing(i, spacer);
+//        }
+
+        //qDebug()<<"stages"<<this->count();
+    //}
 }
 
 //void GanttGraphicsItem::createGraphicsStage(GanttItemStage *stage)

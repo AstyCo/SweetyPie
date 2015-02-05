@@ -25,6 +25,8 @@ public:
     void setEnd(const QDateTime &end);
 
 private:
+
+
     QDateTime increaseDateTime(QDateTime dateTime, Scale scale, int increment);
     int lowItemsCount(QDateTime begin, QDateTime end, Scale scale);
     QString formatOverDateTime(Scale scale);

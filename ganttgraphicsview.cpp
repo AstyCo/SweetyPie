@@ -21,6 +21,7 @@ GanttGraphicsView::GanttGraphicsView(QWidget *parent) :
 //    this->setLayout(gridLayout);
 
 
+
     this->setAlignment(Qt::AlignLeft | Qt::AlignTop); // устанавливает начало координат сцены в левый верхний угол
     this->setTransformationAnchor(QGraphicsView::NoAnchor); // не изменяет сцену при изменении размера представления
 }

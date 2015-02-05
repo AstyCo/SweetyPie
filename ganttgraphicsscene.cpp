@@ -29,11 +29,12 @@ GanttGraphicsScene::GanttGraphicsScene(GanttModel *model, /*QDateTime begin, QDa
 
     //QDateTime begin = QDateTime::currentDateTime();
     QDateTime begin = QDateTime::fromString("29.01.2015", "dd.MM.yyyy");
-    QDateTime end = begin.addMonths(1);
+    QDateTime end = begin.addMonths(2);
     m_begin = begin;
     m_end = end;
     m_header = new GanttGraphicsHeader(begin, end, ScaleDay);
     m_header->setPos(0,0);
+    m_header->setZValue(1.0);
 
     m_layout->addItem(m_header);
 

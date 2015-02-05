@@ -15,6 +15,7 @@ public:
     ~GanttGraphicsItem();
 
 private:
+
     //QList<GanttGraphicsItemStage*> m_graphicsStageList;
     GanttGraphicsItemStage * m_graphicsStage;
     GanttItem * m_ganttItem;

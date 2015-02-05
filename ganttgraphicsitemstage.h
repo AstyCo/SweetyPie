@@ -3,7 +3,7 @@
 
 #include <QGraphicsItem>
 #include <QGraphicsLayoutItem>
-#include "ganttitemstage.h"
+#include "ganttitem.h"
 #include "ganttgraphicsheader.h"
 
 #define TM_DATE_FONT_SIZE 8
@@ -13,7 +13,9 @@ class GanttGraphicsItemStage : public QGraphicsLayoutItem, public QGraphicsRectI
 public:
 //    explicit GanttGraphicsItemStage(QDateTime begin, QDateTime end,
 //                                    qreal x, qreal y, qreal w, qreal h, QGraphicsItem *parent = 0);
-    GanttGraphicsItemStage(GanttItemStage * stage, Scale scale, qreal durationTillBegin, QGraphicsItem * parent = 0);
+
+    //GanttGraphicsItemStage(GanttItemStage * stage, Scale scale, qreal durationTillBegin, QGraphicsItem * parent = 0);
+    GanttGraphicsItemStage(GanttItem * item, Scale scale, qreal durationTillBegin, QGraphicsItem * parent = 0);
 
     // Inherited from QGraphicsLayoutItem
     void setGeometry(const QRectF &geom);
