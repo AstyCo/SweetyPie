@@ -62,13 +62,20 @@ QAction *createAction(const QString &icon, const QString &text,
 GanttView::GanttView(QWidget *parent) :
     QWidget(parent)
 {
+
+    Q_INIT_RESOURCE(images);
+
     m_splitter = new QSplitter(this);
 
     m_treeview = new GanttTreeView();
     m_graphicsview = new GanttGraphicsView();
 
+
+
     m_splitter->addWidget(m_treeview);
     m_splitter->addWidget(m_graphicsview);
+
+    m_splitter->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Expanding);
 
     //m_graphicsview->horizontalScrollBar()->setMinimum(5);
     connect(m_graphicsview->verticalScrollBar(),SIGNAL(valueChanged(int)),this,SLOT(holdHeaderOnTop()));
@@ -314,6 +321,8 @@ void GanttView::editAdd()
         //setDirty();
         updateUi();
     }
+
+   // emit mySignal();
 }
 
 void GanttView::editDelete()
@@ -343,6 +352,8 @@ void GanttView::editDelete()
     updateUi();
 
     setModel(m_model);
+
+    //connect(this,SIGNAL(mySignal()),SLOT(editDelete()));
 }
 
 void GanttView::editCut()

@@ -8,10 +8,9 @@
 
 #include <QtCore/QXmlStreamReader>
 #include <QtCore/QXmlStreamWriter>
+#include "ganttmodel_global.h"
 
-//class GanttItem;
-
-class GanttModel : public QAbstractItemModel
+class GANTTMODELSHARED_EXPORT  GanttModel : public QAbstractItemModel
 {
     Q_OBJECT
 public:

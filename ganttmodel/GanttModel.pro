@@ -4,18 +4,16 @@
 #
 #-------------------------------------------------
 
-QT       += core
-
 QT       += gui
 
-TARGET = GanttModel
-CONFIG   += console
-CONFIG   -= app_bundle
+Debug:TARGET = GanttModeld
+Release:TARGET = GanttModel
 
-TEMPLATE = app
+TEMPLATE = lib
 
+DEFINES += GANTTMODEL_LIBRARY
 
-SOURCES += main.cpp \
+SOURCES += \
     ganttmodel.cpp \
     ganttitem.cpp \
     ganttview.cpp \
@@ -42,7 +40,8 @@ HEADERS += \
     ganttgraphicsitemstage.h \
 #    ganttdatetimegrid.h \
     ganttgraphicsheader.h \
-    ganttgraphicsheaderrectitem.h
+    ganttgraphicsheaderrectitem.h \
+    ganttmodel_global.h
 #    ganttwidget.h
 
 #FORMS += \

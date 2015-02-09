@@ -5,8 +5,10 @@
 #include "gantttreeview.h"
 #include "ganttgraphicsview.h"
 #include "ganttgraphicsscene.h"
+#include "QVBoxLayout"
+#include "ganttmodel_global.h"
 
-class GanttView : public QWidget//QSplitter
+class GANTTMODELSHARED_EXPORT GanttView : public QWidget//QSplitter
 {
     Q_OBJECT
 public:
@@ -46,6 +48,8 @@ private:
     //==================
 
 signals:
+    //void mySignal();
+
 
 public slots:
 

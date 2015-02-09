@@ -9,8 +9,9 @@
 #include <QDateTime>
 #include <QPair>
 #include <QString>
+#include "ganttmodel_global.h"
 
-class GanttItem
+class GANTTMODELSHARED_EXPORT  GanttItem
 {
 public:
     //========etm==============
