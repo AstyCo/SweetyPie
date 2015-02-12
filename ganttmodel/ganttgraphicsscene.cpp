@@ -21,36 +21,33 @@ GanttGraphicsScene::GanttGraphicsScene(GanttModel *model, /*QDateTime begin, QDa
 {
     QGraphicsWidget * test = new QGraphicsWidget;
     m_layout = new QGraphicsLinearLayout(Qt::Vertical);
+    //m_layout->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+    //test->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
+    //m_layout->setSpacing(0);
 
-//    QGraphicsTextItem * pText = new QGraphicsTextItem("Test");
-//    pText->setFlags(QGraphicsItem::ItemIsMovable);
-//    addItem(pText);
 
-
-    //QDateTime begin = QDateTime::currentDateTime();
     QDateTime begin = QDateTime::fromString("29.01.2015", "dd.MM.yyyy");
     QDateTime end = begin.addMonths(2);
     m_begin = begin;
     m_end = end;
-    m_header = new GanttGraphicsHeader(begin, end, ScaleDay);
+    m_scale = ScaleDay;
+    m_header = new GanttGraphicsHeader(begin, end, m_scale);
     m_header->setPos(0,0);
     m_header->setZValue(1.0);
 
     m_layout->addItem(m_header);
 
-    /*
-    GanttGraphicsHeaderRectItem * gRect = new GanttGraphicsHeaderRectItem(QDateTime::currentDateTime(), GanttGraphicsHeaderRectItem::Lower, ScaleDay, 100,0,100,15);
-    m_layout->addItem(gRect);
-    */
+    m_model = model;
 
-    setItems(model);
+
+    setItems(m_model);
 
     m_layout->setContentsMargins(0,0,0,0);
     m_layout->setSpacing(5);
+
     test->setLayout(m_layout);
     this->addItem(test);
 
-    qDebug()<< "count:"<<m_layout->count();
 }
 
 GanttGraphicsScene::~GanttGraphicsScene()
@@ -96,18 +93,31 @@ void GanttGraphicsScene::setInterval(QDateTime begin, QDateTime end)
     m_end = end;
 }
 
+void GanttGraphicsScene::updateItems(QModelIndex index)
+{
+
+//    for(int i=1; i<=m_layout->count()-1; i++)
+//    {
+//        delete m_layout->itemAt(index.row());
+//        //m_layout->removeAt(i);
+//    }
+
+    m_layout->addStretch(1);
+    qDebug()<<m_layout->itemAt(index.row()+1)->contentsRect();
+
+    delete m_layout->itemAt(index.row()+1);
+    //qDebug()<<m_layout->itemAt(index.row()+1)->contentsRect();
+
+    //setItems(m_model);
+
+}
+
 
 void GanttGraphicsScene::setItems(GanttModel *model)
 {
-
-    //m_index = new QModelIndex(1,5);
-    //m_item = model->data(m_index,Qt::UserRole);
-    //m_layout->addItem(m_item);
     GanttItem * newItem;
-    Scale graphicsScale = ScaleDay;
     foreach (newItem, model->itemlist()) {
-        m_item = new GanttGraphicsItem(newItem, graphicsScale, m_begin, m_end);
-        //m_item->
+        m_item = new GanttGraphicsItem(newItem, m_scale, m_begin, m_end);
         m_layout->addItem(m_item);
     }
 }

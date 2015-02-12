@@ -75,13 +75,21 @@ GanttGraphicsItemStage::GanttGraphicsItemStage(GanttItem *item, Scale scale, qre
     m_height = 15;
     m_text = "text";
     this->setToolTip("tip");
-    m_color = QColor(Qt::green);
+
+    //QTime midnight(0,0,0);
+    //qsrand(midnight.secsTo(QTime::currentTime()));
+
+    m_color = QColor(qrand()/*Qt::green*/);
+    //m_color = QColor(qrand(),qrand(),qrand()/*Qt::green*/);
     //m_color = QColor(206,206,206);
     this->setBrush(QBrush(m_color));
 
     setRect(durationTillBegin,0,m_width,m_height);
+}
 
-    qDebug()<<durationTillBegin;
+GanttGraphicsItemStage::~GanttGraphicsItemStage()
+{
+
 }
 
 void GanttGraphicsItemStage::setGeometry(const QRectF &geom)

@@ -239,7 +239,6 @@ QString GanttItem::duration()
     qreal secs = m_commonDuration/86400;
     QString string = QString::number(secs, 'f', 1) + " " + QObject::trUtf8("дней");
     //return QString::number(secs);
-    qDebug()<<"secs"<<secs;
     return string;
 }
 

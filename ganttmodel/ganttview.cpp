@@ -70,6 +70,9 @@ GanttView::GanttView(QWidget *parent) :
     m_treeview = new GanttTreeView();
     m_graphicsview = new GanttGraphicsView();
 
+    //QTime midnight(11,8,43);
+    //qsrand(midnight.secsTo(QTime::currentTime()));
+
 
 
     m_splitter->addWidget(m_treeview);
@@ -91,6 +94,11 @@ GanttView::GanttView(QWidget *parent) :
 
     //====================
 
+    m_treeview->setDragDropMode(QAbstractItemView::InternalMove);
+
+    m_treeview->setAllColumnsShowFocus(true);
+    //m_treeview->setItemDelegateForColumn(1, new QDateTimeEdit);
+
 }
 
 //====================================================
@@ -100,6 +108,7 @@ void GanttView::setModel(GanttModel *model)
     m_model = model;
     m_graphicsscene = new GanttGraphicsScene(model);
     m_graphicsview->setScene(m_graphicsscene);
+    connect(this, SIGNAL(treeSignal(QModelIndex)),m_graphicsscene,SLOT(updateItems(QModelIndex)));
 }
 GanttGraphicsScene *GanttView::graphicsscene() const
 {
@@ -234,10 +243,10 @@ void GanttView::createMenusAndToolBar()
 
 void GanttView::createConnections()
 {
-    connect(m_treeview->selectionModel(),
-            SIGNAL(currentChanged(const QModelIndex&,
-                                  const QModelIndex&)),
-            this, SLOT(updateUi()));
+//    connect(m_treeview->selectionModel(),
+//            SIGNAL(currentChanged(const QModelIndex&,
+//                                  const QModelIndex&)),
+//            this, SLOT(updateUi()));
 
 //    connect(m_model,
 //        SIGNAL(dataChanged(const QModelIndex&, const QModelIndex&)),
@@ -249,11 +258,7 @@ void GanttView::createConnections()
 //    connect(m_model, SIGNAL(modelReset()), this, SLOT(setDirty()));
 
     QHash<QAction*, QString> slotForAction;
-    //slotForAction[fileNewAction] = SLOT(fileNew());
-    //slotForAction[fileOpenAction] = SLOT(fileOpen());
-    //slotForAction[fileSaveAction] = SLOT(fileSave());
-    //slotForAction[fileSaveAsAction] = SLOT(fileSaveAs());
-    //slotForAction[fileQuitAction] = SLOT(close());
+
     slotForAction[editAddAction] = SLOT(editAdd());
     slotForAction[editDeleteAction] = SLOT(editDelete());
 
@@ -282,6 +287,8 @@ void GanttView::createConnections()
     m_treeview->verticalScrollBar()->setStyleSheet("QScrollBar {width:0px;}");
     //m_treeview->verticalScrollBar()->hide();//setVisible(false);
     connect(m_graphicsview->verticalScrollBar(),SIGNAL(valueChanged(int)),m_treeview->verticalScrollBar(),SLOT(setValue(int)));
+
+
 }
 
 void GanttView::updateUi()
@@ -299,8 +306,14 @@ void GanttView::updateUi()
         action->setEnabled(enable);
 
    // editStartOrStopAction->setEnabled(rows);
-    editPasteAction->setEnabled(m_model->hasCutItem());
+    //editPasteAction->setEnabled(m_model->hasCutItem());
 
+}
+
+void GanttView::updateScene()
+{
+    m_graphicsscene = new GanttGraphicsScene(m_model);
+    m_graphicsview->setScene(m_graphicsscene);
 }
 
 void GanttView::setCurrentIndex(const QModelIndex &index)
@@ -322,7 +335,7 @@ void GanttView::editAdd()
         updateUi();
     }
 
-   // emit mySignal();
+   emit treeSignal(index);
 }
 
 void GanttView::editDelete()
@@ -351,9 +364,8 @@ void GanttView::editDelete()
     //setDirty();
     updateUi();
 
-    setModel(m_model);
-
-    //connect(this,SIGNAL(mySignal()),SLOT(editDelete()));
+    emit treeSignal(index);
+    //m_graphicsview->update();
 }
 
 void GanttView::editCut()
@@ -363,6 +375,7 @@ void GanttView::editCut()
 //        stopTiming();
     setCurrentIndex(m_model->cut(index));
     editPasteAction->setEnabled(m_model->hasCutItem());
+    emit treeSignal(m_treeview->currentIndex());
 }
 
 
@@ -371,6 +384,7 @@ void GanttView::editPaste()
     setCurrentIndex(m_model->paste(m_treeview->currentIndex()));
 //    editHideOrShowDoneTasks(
 //            editHideOrShowDoneTasksAction->isChecked());
+    emit treeSignal(m_treeview->currentIndex());
 }
 
 
@@ -380,6 +394,7 @@ void GanttView::editMoveUp()
             m_model->moveUp(m_treeview->currentIndex()));
 //    editHideOrShowDoneTasks(
 //            editHideOrShowDoneTasksAction->isChecked());
+    emit treeSignal(m_treeview->currentIndex());
 }
 
 
@@ -389,6 +404,7 @@ void GanttView::editMoveDown()
             m_model->moveDown(m_treeview->currentIndex()));
 //    editHideOrShowDoneTasks(
 //            editHideOrShowDoneTasksAction->isChecked());
+    emit treeSignal(m_treeview->currentIndex());
 }
 
 
@@ -400,6 +416,7 @@ void GanttView::editPromote()
     setCurrentIndex(m_model->promote(index));
 //    editHideOrShowDoneTasks(
 //            editHideOrShowDoneTasksAction->isChecked());
+    emit treeSignal(m_treeview->currentIndex());
 }
 
 
@@ -411,9 +428,14 @@ void GanttView::editDemote()
     m_treeview->setCurrentIndex(m_model->demote(index));
 //    editHideOrShowDoneTasks(
 //            editHideOrShowDoneTasksAction->isChecked());
+    emit treeSignal(m_treeview->currentIndex());
 }
 
 //====================================================
+//void GanttView::treeSignal()
+//{
+//    //SOMETHING IS HERE
+//}
 
 //====================================================
 

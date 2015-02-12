@@ -49,6 +49,7 @@ private:
 
 signals:
     //void mySignal();
+    void treeSignal(QModelIndex);
 
 
 public slots:
@@ -67,6 +68,8 @@ private slots:
     void editDemote();
     void updateUi();
     //======================
+
+    void updateScene();
 
 };
 

@@ -26,6 +26,8 @@ signals:
 
 public slots:
 
+    void updateItems(QModelIndex index);
+
     //void setGrid(bool flag);
     //void setHeaderItem(QGraphicsItemGroup * header);
 
@@ -39,6 +41,8 @@ private:
 
     QDateTime m_begin;
     QDateTime m_end;
+
+    Scale m_scale;
 
 
 };

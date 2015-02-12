@@ -16,6 +16,7 @@ public:
 
     //GanttGraphicsItemStage(GanttItemStage * stage, Scale scale, qreal durationTillBegin, QGraphicsItem * parent = 0);
     GanttGraphicsItemStage(GanttItem * item, Scale scale, qreal durationTillBegin, QGraphicsItem * parent = 0);
+    ~GanttGraphicsItemStage();
 
     // Inherited from QGraphicsLayoutItem
     void setGeometry(const QRectF &geom);

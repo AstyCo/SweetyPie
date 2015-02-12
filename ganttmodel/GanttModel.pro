@@ -22,7 +22,7 @@ SOURCES += \
 #    ganttitemstage.cpp \
     ganttgraphicsscene.cpp \
     ganttgraphicsitem.cpp \
-    ganttgraphicsitemstage.cpp \
+#    ganttgraphicsitemstage.cpp \
 #    ganttdatetimegrid.cpp \
     ganttgraphicsheader.cpp \
     ganttgraphicsheaderrectitem.cpp
@@ -37,7 +37,7 @@ HEADERS += \
 #    ganttitemstage.h \
     ganttgraphicsscene.h \
     ganttgraphicsitem.h \
-    ganttgraphicsitemstage.h \
+#    ganttgraphicsitemstage.h \
 #    ganttdatetimegrid.h \
     ganttgraphicsheader.h \
     ganttgraphicsheaderrectitem.h \
