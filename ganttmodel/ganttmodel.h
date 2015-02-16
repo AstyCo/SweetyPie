@@ -116,6 +116,8 @@ public:
     QList<GanttItem *> itemlist() const;
     void setItemlist(const QList<GanttItem *> &itemlist);
 
+    GanttItem *itemForIndex(const QModelIndex &index) const;
+
 private:
     //=======editabletreemodel===========
     //    void setupModelData(const QStringList &lines, GanttItem *parent);
@@ -123,7 +125,7 @@ private:
 
 //=====================
 //======timelog2=======
-    GanttItem *itemForIndex(const QModelIndex &index) const;
+    
 
     void readTasks(QXmlStreamReader *reader, GanttItem *task);
     void writeTaskAndChildren(QXmlStreamWriter *writer,

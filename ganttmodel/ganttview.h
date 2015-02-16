@@ -49,7 +49,7 @@ private:
 
 signals:
     //void mySignal();
-    void treeSignal(QModelIndex);
+    void treeSignal(GanttModel*);
 
 
 public slots:

@@ -26,10 +26,24 @@ signals:
 
 public slots:
 
-    void updateItems(QModelIndex index);
+    void deleteGraphicsItem(QModelIndex index);
+    void updateItems(GanttModel * model);
 
     //void setGrid(bool flag);
     //void setHeaderItem(QGraphicsItemGroup * header);
+
+    void editAdd(QModelIndex index);
+    void editDelete(QModelIndex index);
+    //void editCut();
+    //void editPaste();
+    void editMoveUp(QModelIndex index);
+    //void editMoveDown();
+    //void editPromote();
+    //void editDemote();
+
+private slots:
+
+
 
 private:
     GanttModel * m_model;
@@ -37,6 +51,7 @@ private:
     void setItems(GanttModel * model);
 
     QGraphicsLinearLayout * m_layout;
+    QGraphicsLinearLayout * m_itemLayout;
     GanttGraphicsItem * m_item;
 
     QDateTime m_begin;
