@@ -70,8 +70,8 @@ public:
     //==========================
     QString title() const { return m_title; }
     void setTitle(const QString &title) { m_title = title; }
-    QString begin();// { return m_commonBegin; }
-    QString end();// { return m_commonEnd; }
+    QDateTime begin();// { return m_commonBegin; }
+    QDateTime end();// { return m_commonEnd; }
     QString duration();// { return m_commonDuration; }
 
     //QList<GanttItemStage*> stageList() { return m_stageList; }

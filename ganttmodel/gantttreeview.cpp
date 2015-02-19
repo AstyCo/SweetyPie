@@ -1,5 +1,6 @@
 #include "gantttreeview.h"
 #include "QDebug"
+#include "ganttdatetimedelegate.h"
 
 GanttTreeView::GanttTreeView(QWidget *parent) :
     QTreeView(parent)
@@ -16,4 +17,6 @@ GanttTreeView::GanttTreeView(QWidget *parent) :
     //    gridLayout->addWidget(this->viewport(),1);
 
     //    this->setLayout(gridLayout);
+
+
 }

@@ -117,15 +117,28 @@ void GanttGraphicsScene::updateItems(GanttModel *model)
 
 void GanttGraphicsScene::editAdd(QModelIndex index)
 {
+    qDebug()<<"parent"<<index;
+
     GanttItem * newItem;
-    newItem = m_model->itemForIndex(m_model->index(index.row(),0));
+    QModelIndex itemIndex = m_model->index(0,0, index);
+    int row = itemIndex.row();
+    newItem = m_model->itemForIndex(itemIndex);
     m_item = new GanttGraphicsItem(newItem, m_scale, m_begin, m_end);
-    m_itemLayout->insertItem(index.row(), m_item);
+//TODO index.parent
+    while(itemIndex.parent().isValid())
+    {
+        row += itemIndex.parent().row()+1;
+        itemIndex = itemIndex.parent();
+        qDebug()<<"row"<<row;
+    }
+    m_itemLayout->insertItem(/*index.parent().row()+1*/row, m_item);
 }
 
 void GanttGraphicsScene::editDelete(QModelIndex index)
 {
+    //qDebug()<<index;
     delete m_itemLayout->itemAt(index.row());
+    //m_itemLayout->itemAt(index.row())->graphicsItem()->hide();
 }
 
 void GanttGraphicsScene::editMoveUp(QModelIndex index)

@@ -824,6 +824,10 @@ Qt::ItemFlags GanttModel::flags(const QModelIndex &index) const
         if (index.column() == Title)
             theFlags |= Qt::ItemIsUserCheckable|Qt::ItemIsEditable|
                         Qt::ItemIsDragEnabled|Qt::ItemIsDropEnabled;
+        if (index.column() == Begin)
+            theFlags |= Qt::ItemIsEditable;
+        if (index.column() == End)
+            theFlags |= Qt::ItemIsEditable;
     }
     return theFlags;
     //-------------------
@@ -847,15 +851,28 @@ bool GanttModel::setData(const QModelIndex &index, const QVariant &value,
     //---------------------
 
     //------timelog2--------
-    if (!index.isValid() || index.column() != Title)
+
+    if (!index.isValid() || index.column() == Duration )
         return false;
+
     if (GanttItem *item = itemForIndex(index)) {
         if (role == Qt::EditRole)
-            item->setName(value.toString());
+            if (index.column() == Title)
+                item->setName(value.toString());
+            else if (index.column() == Begin)
+                item->setCommonBegin(value.toDateTime());
+            else if (index.column() == End)
+                item->setCommonEnd(value.toDateTime());
         else if (role == Qt::CheckStateRole)
             item->setDone(value.toBool());
         else
             return false;
+
+//        if (index.isValid() && index.column() == Begin)
+//        {
+
+//        }
+
         emit dataChanged(index, index);
         return true;
     }

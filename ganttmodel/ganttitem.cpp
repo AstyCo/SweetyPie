@@ -220,16 +220,21 @@ GanttItem* GanttItem::takeChild(int row)
     return item;
 }
 //=====================================
-QString GanttItem::begin()
+QDateTime GanttItem::begin()
 {
     //m_commonBegin = QDateTime::fromString("01.11.2014", "dd.MM.yyyy");
-    return m_commonBegin.toString("dd.MM.yyyy hh:mm:ss");
+
+    return m_commonBegin;//.toString("dd.MM.yyyy hh:mm:ss");
+    //return m_commonBegin.toString("yyyy-MM-ddThh:mm:ss");
 }
 
-QString GanttItem::end()
+QDateTime GanttItem::end()
 {
     //m_commonEnd = QDateTime::currentDateTime();
-    return m_commonEnd.toString("dd.MM.yyyy hh:mm:ss");
+
+
+    //return m_commonEnd.toString("dd.MM.yyyy hh:mm:ss");
+    return m_commonEnd;//.toString("yyyy-MM-ddThh:mm:ss");
 }
 
 QString GanttItem::duration()

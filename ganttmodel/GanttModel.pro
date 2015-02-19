@@ -25,7 +25,8 @@ SOURCES += \
 #    ganttgraphicsitemstage.cpp \
 #    ganttdatetimegrid.cpp \
     ganttgraphicsheader.cpp \
-    ganttgraphicsheaderrectitem.cpp
+    ganttgraphicsheaderrectitem.cpp \
+    ganttdatetimedelegate.cpp
 #    ganttwidget.cpp
 
 HEADERS += \
@@ -41,7 +42,8 @@ HEADERS += \
 #    ganttdatetimegrid.h \
     ganttgraphicsheader.h \
     ganttgraphicsheaderrectitem.h \
-    ganttmodel_global.h
+    ganttmodel_global.h \
+    ganttdatetimedelegate.h
 #    ganttwidget.h
 
 #FORMS += \

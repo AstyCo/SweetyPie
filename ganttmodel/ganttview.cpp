@@ -2,6 +2,8 @@
 #include <QDebug>
 #include "QScrollBar"
 
+#include "ganttdatetimedelegate.h"
+
 
 //#include "alt_key.hpp"
 //#include "aqp.hpp"
@@ -73,7 +75,9 @@ GanttView::GanttView(QWidget *parent) :
     //QTime midnight(11,8,43);
     //qsrand(midnight.secsTo(QTime::currentTime()));
 
-
+    GanttDateTimeDelegate * delegate = new GanttDateTimeDelegate(m_treeview);
+    m_treeview->setItemDelegateForColumn(1, delegate);
+    m_treeview->setItemDelegateForColumn(2, delegate);
 
     m_splitter->addWidget(m_treeview);
     m_splitter->addWidget(m_graphicsview);
@@ -97,6 +101,10 @@ GanttView::GanttView(QWidget *parent) :
     m_treeview->setDragDropMode(QAbstractItemView::InternalMove);
 
     m_treeview->setAllColumnsShowFocus(true);
+
+
+
+    //m_treeview->setItemDelegate(&delegate);
     //m_treeview->setItemDelegateForColumn(1, new QDateTimeEdit);
 
 }
@@ -108,6 +116,8 @@ void GanttView::setModel(GanttModel *model)
     m_model = model;
     m_graphicsscene = new GanttGraphicsScene(model);
     m_graphicsview->setScene(m_graphicsscene);
+
+
     //connect(this, SIGNAL(treeSignal(QModelIndex)),m_graphicsscene,SLOT(deleteGraphicsItem(QModelIndex)));
     //connect(this, SIGNAL(treeSignal(GanttModel*)),m_graphicsscene,SLOT(updateItems(GanttModel*)));
 }
@@ -330,6 +340,7 @@ void GanttView::editAdd()
 {
     QModelIndex index = m_treeview->currentIndex();
     if (m_model->insertRow(0, index)) {
+        m_graphicsscene->editAdd(index);
         index = m_model->index(0, 0, index);
         setCurrentIndex(index);
         m_treeview->edit(index);
@@ -337,7 +348,7 @@ void GanttView::editAdd()
         updateUi();
     }
 
-    m_graphicsscene->editAdd(index);
+
 
    //emit treeSignal(m_model);
 }
