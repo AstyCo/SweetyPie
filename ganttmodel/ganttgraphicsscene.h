@@ -22,6 +22,8 @@ public:
 
     void setInterval(QDateTime begin, QDateTime end);
 
+    void calcRowFromIndex();
+
 signals:
 
 public slots:
@@ -33,7 +35,7 @@ public slots:
     //void setHeaderItem(QGraphicsItemGroup * header);
 
     void editAdd(QModelIndex index);
-    void editDelete(QModelIndex index);
+    void editDelete(QModelIndex parent);
     //void editCut();
     //void editPaste();
     void editMoveUp(QModelIndex index);
@@ -41,14 +43,20 @@ public slots:
     //void editPromote();
     //void editDemote();
 
+
+
 private slots:
-
-
+    void onExpanded(QModelIndex index);
+    void onCollapsed(QModelIndex index);
+    //void onDataChanged(const QModelIndex & topLeft, QModelIndex & bottomRight);
+    void onRowsInserted(const QModelIndex & parent, int start, int end );
+    void onRowsRemoved(const QModelIndex & parent, int start, int end );
+    void onRowsAboutToBeRemoved(const QModelIndex & parent, int start, int end);
 
 private:
     GanttModel * m_model;
     QModelIndex * m_index;
-    void setItems(GanttModel * model);
+    int setItems(QModelIndex parent, int rowIndex);
 
     QGraphicsLinearLayout * m_layout;
     QGraphicsLinearLayout * m_itemLayout;
@@ -58,6 +66,13 @@ private:
     QDateTime m_end;
 
     Scale m_scale;
+
+
+    QList<QPersistentModelIndex> m_proxyList;
+
+    int m_beginDeleteRow;
+    int m_endDeleteRow;
+
 
 
 };

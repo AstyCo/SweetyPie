@@ -35,14 +35,14 @@ public:
 //=======================
 //======timelog2=========
     explicit GanttModel(QObject *parent=0)
-        : QAbstractItemModel(parent), rootItem(0), cutItem(0) {}
-    ~GanttModel() { delete rootItem; delete cutItem; }
+        : QAbstractItemModel(parent), cutItem(0) {}
+    ~GanttModel() { delete cutItem; }
 
     QVariant data(const QModelIndex &index, int role=Qt::DisplayRole) const;
     bool setHeaderData(int, Qt::Orientation, const QVariant&,
                        int=Qt::EditRole) { return false; }
-    bool insertRows(int row, int count,
-                    const QModelIndex &parent=QModelIndex());
+//    bool insertRows(int row, int count,
+//                    const QModelIndex &parent=QModelIndex());
     bool removeRows(int row, int count,
                     const QModelIndex &parent=QModelIndex());
 
@@ -64,10 +64,10 @@ public:
 
     QModelIndex moveUp(const QModelIndex &index);
     QModelIndex moveDown(const QModelIndex &index);
-    QModelIndex cut(const QModelIndex &index);
-    QModelIndex paste(const QModelIndex &index);
-    QModelIndex promote(const QModelIndex &index);
-    QModelIndex demote(const QModelIndex &index);
+//    QModelIndex cut(const QModelIndex &index);
+//    QModelIndex paste(const QModelIndex &index);
+//    QModelIndex promote(const QModelIndex &index);
+//    QModelIndex demote(const QModelIndex &index);
 
 //    void setTimedItem(const QModelIndex &index);
 //    void clearTimedItem();
@@ -101,17 +101,19 @@ public:
     bool setData(const QModelIndex &index, const QVariant &value,
                  int role = Qt::EditRole);
 
+    bool hasChildren(const QModelIndex &parent) const;
+
 
 //    void addItem(QDateTime begin, QDateTime end, GanttItem::ItemType type);
 //    void addItem(QDateTime begin, QDateTime duration, GanttItem::ItemType type);
 //    void addItem(QDateTime end, QDateTime duration, GanttItem::ItemType type);
     //void addItem(QString title, QDateTime begin, QDateTime end, GanttItem::ItemType type);
 
-    bool addItem(int row, QString title, QDateTime begin, QDateTime end,
+    bool addItem(/*int row,*/ QString title, QDateTime begin, QDateTime end,
                              /*GanttItem::ItemType type,*/ const QModelIndex &parent = QModelIndex());
 
-//    bool insertRow(int row, QString title, QDateTime begin, QDateTime, end,
-//                   GanttItem::ItemType type, const QModelIndex &parent = QModelIndex());
+    bool insertRow(int row, QString title, QDateTime begin, QDateTime end,
+                  const QModelIndex &parent = QModelIndex());
 
     QList<GanttItem *> itemlist() const;
     void setItemlist(const QList<GanttItem *> &itemlist);
@@ -141,12 +143,17 @@ private:
     GanttItem *cutItem;
     //GanttItem *timedItem;
 //=====================
-    GanttItem *rootItem;
     QList<GanttItem*> m_itemlist;
 
+    int findRow(const GanttItem *nodeInfo) const;
 signals:
+    void expanded(QModelIndex);
+    void collapsed(QModelIndex);
+    void rowInserted(QModelIndex, int, int);
 
 public slots:
+    void onExpanded(QModelIndex index);
+    void onCollapsed(QModelIndex index);
 
 };
 

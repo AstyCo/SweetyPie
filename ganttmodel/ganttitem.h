@@ -98,6 +98,9 @@ public:
     int commonDuration() const;
     void setCommonDuration(int commonDuration);
 
+    bool isExpanded() const;
+    void setIsExpanded(bool isExpanded);
+
 private:
     //=======etm==========
     //    QList<GanttItem*> childItems;
@@ -120,6 +123,9 @@ private:
     QDateTime              m_commonBegin;
     QDateTime              m_commonEnd;
     int                    m_commonDuration;
+
+
+    bool m_isExpanded;
 
 
 

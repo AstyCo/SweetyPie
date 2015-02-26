@@ -22,12 +22,7 @@ QWidget *GanttDateTimeDelegate::createEditor(QWidget *parent,
 void GanttDateTimeDelegate::setEditorData(QWidget *editor, const QModelIndex &index) const
 {
 
-    QDateTime value = index.model()->data(index, Qt::EditRole).toDateTime();//.fromString(
-                //index.model()->data(index, Qt::EditRole).toDateTime().toString("dd.MM.yyyy hh:mm:ss"), "dd.MM.yyyy hh:mm:ss");
-
-    //QString str = index.model()->data(index, Qt::EditRole).toDateTime().toString("dd.MM.yyyy hh:mm:ss");
-
-
+    QDateTime value = index.model()->data(index, Qt::EditRole).toDateTime();
     QDateTimeEdit *dtEdit = static_cast<QDateTimeEdit*>(editor);
     dtEdit->setDateTime(value);
 
@@ -39,7 +34,6 @@ void GanttDateTimeDelegate::setModelData(QWidget *editor, QAbstractItemModel *mo
     QDateTimeEdit *dtEdit = static_cast<QDateTimeEdit*>(editor);
     //dtEdit->dateTimeChanged();
     QDateTime value = dtEdit->dateTime();
-qDebug()<<"value"<<value;
     model->setData(index, value, Qt::EditRole);
 
 }

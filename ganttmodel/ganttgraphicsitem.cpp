@@ -80,13 +80,13 @@ GanttGraphicsItem::GanttGraphicsItem(GanttItem *item, Scale scale, QDateTime hea
 
 
     m_height = 15;
-    m_text = "text";
+    m_text = "";
     this->setToolTip("tip");
 
     //QTime midnight(0,0,0);
     //qsrand(midnight.secsTo(QTime::currentTime()));
 
-    m_color = QColor(qrand()/*Qt::green*/);
+    m_color = QColor(qrand()%255, qrand()%255, qrand()%255);
     //m_color = QColor(qrand(),qrand(),qrand()/*Qt::green*/);
     //m_color = QColor(206,206,206);
     this->setBrush(QBrush(m_color));
@@ -96,8 +96,8 @@ GanttGraphicsItem::GanttGraphicsItem(GanttItem *item, Scale scale, QDateTime hea
 
 GanttGraphicsItem::~GanttGraphicsItem()
 {
-    delete m_ganttItem;
-    //delete m_graphicsStage;
+    //delete m_ganttItem;
+
 }
 
 

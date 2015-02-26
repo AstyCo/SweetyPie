@@ -18,5 +18,4 @@ GanttTreeView::GanttTreeView(QWidget *parent) :
 
     //    this->setLayout(gridLayout);
 
-
 }

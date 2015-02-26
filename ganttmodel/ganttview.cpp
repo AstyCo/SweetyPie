@@ -72,7 +72,7 @@ GanttView::GanttView(QWidget *parent) :
     m_treeview = new GanttTreeView();
     m_graphicsview = new GanttGraphicsView();
 
-    //QTime midnight(11,8,43);
+    //QTime midnight(0,0,0);
     //qsrand(midnight.secsTo(QTime::currentTime()));
 
     GanttDateTimeDelegate * delegate = new GanttDateTimeDelegate(m_treeview);
@@ -114,12 +114,23 @@ void GanttView::setModel(GanttModel *model)
 {
     m_treeview->setModel(model);
     m_model = model;
-    m_graphicsscene = new GanttGraphicsScene(model);
+    m_graphicsscene = new GanttGraphicsScene(m_model);
     m_graphicsview->setScene(m_graphicsscene);
 
 
     //connect(this, SIGNAL(treeSignal(QModelIndex)),m_graphicsscene,SLOT(deleteGraphicsItem(QModelIndex)));
     //connect(this, SIGNAL(treeSignal(GanttModel*)),m_graphicsscene,SLOT(updateItems(GanttModel*)));
+
+    connect(m_treeview, SIGNAL(expanded(QModelIndex)), m_model, SLOT(onExpanded(QModelIndex)));
+    connect(m_treeview, SIGNAL(collapsed(QModelIndex)), m_model, SLOT(onCollapsed(QModelIndex)));
+
+    connect(m_model, SIGNAL(expanded(QModelIndex)), m_graphicsscene, SLOT(onExpanded(QModelIndex)));
+    connect(m_model, SIGNAL(collapsed(QModelIndex)), m_graphicsscene, SLOT(onCollapsed(QModelIndex)));
+
+    QAbstractItemModel * abModel = (QAbstractItemModel*)m_model;
+    connect(abModel, SIGNAL(rowsAboutToBeRemoved(const QModelIndex &, int, int)), m_graphicsscene, SLOT(onRowsAboutToBeRemoved(QModelIndex &,int,int)));
+    connect(abModel, SIGNAL(rowsRemoved(const QModelIndex &, int, int)), m_graphicsscene, SLOT(onRowsRemoved(QModelIndex,int,int)));
+    connect(m_model, SIGNAL(rowInserted(QModelIndex, int, int)), m_graphicsscene, SLOT(onRowsInserted(QModelIndex,int,int)));
 }
 
 GanttGraphicsScene *GanttView::graphicsscene() const
@@ -339,18 +350,16 @@ void GanttView::setCurrentIndex(const QModelIndex &index)
 void GanttView::editAdd()
 {
     QModelIndex index = m_treeview->currentIndex();
-    if (m_model->insertRow(0, index)) {
-        m_graphicsscene->editAdd(index);
-        index = m_model->index(0, 0, index);
-        setCurrentIndex(index);
-        m_treeview->edit(index);
-        //setDirty();
-        updateUi();
-    }
-
-
-
-   //emit treeSignal(m_model);
+    m_model->addItem("lol", QDateTime::currentDateTime(),QDateTime::currentDateTime().addDays(2), index);
+//    if ()
+//    {
+//        m_graphicsscene->editAdd(index);
+//        index = m_model->index(0, 0, index);
+//        setCurrentIndex(index);
+//        m_treeview->edit(index);
+//        //setDirty();
+//        updateUi();
+//    }
 }
 
 void GanttView::editDelete()
@@ -361,8 +370,6 @@ void GanttView::editDelete()
 
     QString name = m_model->data(index).toString();
     int rows = m_model->rowCount(index);
-//    if (m_model->isTimedItem(index))
-//        stopTiming();
 
     QString message;
     if (rows == 0)
@@ -373,33 +380,31 @@ void GanttView::editDelete()
     else if (rows > 1)
         message = tr("<p>Delete '%1' and its %2 children (and "
                      "grandchildren etc.)").arg(name).arg(rows);
-//    if (!AQP::okToDelete(this, tr("Delete"), message))
-//        return;
+
+    m_graphicsscene->editDelete(index);
+
     m_model->removeRow(index.row(), index.parent());
-    //setDirty();
+
     updateUi();
 
 
-
-    m_graphicsscene->editDelete(index);
-    //emit treeSignal(m_model);
 }
 
 void GanttView::editCut()
 {
-    QModelIndex index = m_treeview->currentIndex();
-//    if (m_model->isTimedItem(index))
-//        stopTiming();
-    setCurrentIndex(m_model->cut(index));
-    editPasteAction->setEnabled(m_model->hasCutItem());
+//    QModelIndex index = m_treeview->currentIndex();
+////    if (m_model->isTimedItem(index))
+////        stopTiming();
+//    setCurrentIndex(m_model->cut(index));
+//    editPasteAction->setEnabled(m_model->hasCutItem());
 }
 
 
 void GanttView::editPaste()
 {
-    setCurrentIndex(m_model->paste(m_treeview->currentIndex()));
-//    editHideOrShowDoneTasks(
-//            editHideOrShowDoneTasksAction->isChecked());
+//    setCurrentIndex(m_model->paste(m_treeview->currentIndex()));
+////    editHideOrShowDoneTasks(
+////            editHideOrShowDoneTasksAction->isChecked());
 }
 
 
@@ -428,7 +433,7 @@ void GanttView::editPromote()
     QModelIndex index = m_treeview->currentIndex();
 //    if (m_model->isTimedItem(index))
 //        stopTiming();
-    setCurrentIndex(m_model->promote(index));
+ //   setCurrentIndex(m_model->promote(index));
 //    editHideOrShowDoneTasks(
 //            editHideOrShowDoneTasksAction->isChecked());
 }
@@ -439,7 +444,7 @@ void GanttView::editDemote()
     QModelIndex index = m_treeview->currentIndex();
 //    if (m_model->isTimedItem(index))
 //        stopTiming();
-    m_treeview->setCurrentIndex(m_model->demote(index));
+   // m_treeview->setCurrentIndex(m_model->demote(index));
 //    editHideOrShowDoneTasks(
 //            editHideOrShowDoneTasksAction->isChecked());
 }

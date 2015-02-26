@@ -128,6 +128,7 @@ GanttItem::GanttItem(const QString &name, QDateTime begin, QDateTime end, bool d
     m_commonBegin = begin;
     m_commonEnd = end;
     m_commonDuration = m_commonBegin.secsTo(m_commonEnd);
+    m_isExpanded = false;
 }
 
 
@@ -162,6 +163,16 @@ int GanttItem::minutesForTask(bool onlyForToday) const
         minutes += child->minutesForTask(onlyForToday);
     return minutes;
 }
+bool GanttItem::isExpanded() const
+{
+    return m_isExpanded;
+}
+
+void GanttItem::setIsExpanded(bool isExpanded)
+{
+    m_isExpanded = isExpanded;
+}
+
 
 int GanttItem::commonDuration() const
 {

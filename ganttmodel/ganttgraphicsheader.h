@@ -31,16 +31,19 @@ private:
     int lowItemsCount(QDateTime begin, QDateTime end, Scale scale);
     QString formatOverDateTime(Scale scale);
 
-    QGraphicsLinearLayout * m_lower;
-    QGraphicsLinearLayout * m_upper;
+    QGraphicsLinearLayout * lower;
+    QGraphicsLinearLayout * upper;
     GanttGraphicsHeaderRectItem * m_rectItem;
     QColor m_color;
     QDateTime m_begin;
     QDateTime m_end;
+    Scale m_scale;
 
 signals:
 
 public slots:
+    void createHeader();
+    void clearHeader();
 
 };
 

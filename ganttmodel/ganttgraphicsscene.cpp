@@ -41,7 +41,29 @@ GanttGraphicsScene::GanttGraphicsScene(GanttModel *model, /*QDateTime begin, QDa
     m_itemLayout->setContentsMargins(0,0,0,0);
     m_itemLayout->setSpacing(5);
     m_model = model;
-    setItems(m_model);
+
+//    for(int i = 0; i<m_model->rowCount(); ++i)
+//    {
+//        GanttItem * newItem = m_model->itemForIndex(m_model->index(i,0));
+//        if (newItem->begin() < m_begin)
+//            m_begin = newItem->begin();
+
+//        if (newItem->end() > m_end)
+//            m_end = newItem->end();
+
+//        m_header->setBegin(m_begin);
+//        m_header->setEnd(m_end);
+//        m_item = new GanttGraphicsItem(newItem, m_scale, m_begin, m_end);
+//        m_itemLayout->addItem(m_item);
+
+//        QPersistentModelIndex persIndex(m_model->index(i,0));
+//        m_proxyList.append(index2row(persIndex, m_itemLayout->count()-1));
+
+//        setItems(m_model->index(i,0));
+//    }
+
+    setItems(QModelIndex(), 0);
+
     m_itemLayout->addStretch(1);
     m_layout->addItem(m_itemLayout);
 
@@ -51,6 +73,8 @@ GanttGraphicsScene::GanttGraphicsScene(GanttModel *model, /*QDateTime begin, QDa
 
     test->setLayout(m_layout);
     this->addItem(test);
+
+    //connect(m_model, SIGNAL(dataChanged(QModelIndex,QModelIndex)), this, SLOT(updateItems(m_model)));
 
 }
 
@@ -98,6 +122,11 @@ void GanttGraphicsScene::setInterval(QDateTime begin, QDateTime end)
     m_end = end;
 }
 
+void GanttGraphicsScene::calcRowFromIndex()
+{
+    //m_model->
+}
+
 void GanttGraphicsScene::deleteGraphicsItem(QModelIndex index)
 {
     delete m_itemLayout->itemAt(index.row());
@@ -105,13 +134,12 @@ void GanttGraphicsScene::deleteGraphicsItem(QModelIndex index)
 
 void GanttGraphicsScene::updateItems(GanttModel *model)
 {
-    qDebug()<<"layout count"<<m_itemLayout->count();
-    for(int row = m_itemLayout->count()-1; row >= 0; row--)
+    for(int row = /*model->rowCount()*/m_itemLayout->count()-1; row >= 0; --row)
     {
-        qDebug()<<"row"<<row;
+        //qDebug()<<"row"<<row;
         delete m_itemLayout->itemAt(row);
     }
-    setItems(model);
+    //setItems(model);
     m_itemLayout->addStretch(1);
 }
 
@@ -136,33 +164,241 @@ void GanttGraphicsScene::editAdd(QModelIndex index)
 
 void GanttGraphicsScene::editDelete(QModelIndex index)
 {
-    //qDebug()<<index;
-    delete m_itemLayout->itemAt(index.row());
-    //m_itemLayout->itemAt(index.row())->graphicsItem()->hide();
+//    int row = m_proxyList.indexOf(index);
+//    if(m_model->hasChildren(index))
+//    {
+//        for(int i = m_model->rowCount(index)-1; i>=0; --i)
+//        {
+//            QModelIndex childIndex = index.child(i,0);
+//            editDelete(childIndex);
+//            //delete m_itemLayout->itemAt(row+i);
+//        }
+//    }
+//    delete m_itemLayout->itemAt(row);
+
+
 }
 
 void GanttGraphicsScene::editMoveUp(QModelIndex index)
 {
     m_itemLayout->removeAt(index.row());
-   // m_itemLayout->insertItem(index.row()-1, m_itemLayout->itemAt(index.row()));
+    // m_itemLayout->insertItem(index.row()-1, m_itemLayout->itemAt(index.row()));
+}
+
+void GanttGraphicsScene::onExpanded(QModelIndex index)
+{
+
+    if(!index.isValid())
+        return;
+
+
+    int rowIndex = -1;
+    for(int i = 0; i < m_proxyList.size(); ++i)
+    {
+        if(m_proxyList.at(i) == index)
+        {
+            rowIndex = i+1;
+            break;
+        }
+        else
+        {
+            rowIndex = m_proxyList.size();
+        }
+    }
+    if(rowIndex == -1)
+        return;
+
+    setItems(index, rowIndex);
+
+}
+
+void GanttGraphicsScene::onCollapsed(QModelIndex index)
+{
+
+    if(!index.isValid())
+        return;
+
+    int rowIndex = m_proxyList.size();
+    int rowSibling = 0;
+
+
+
+    for(int i = 0; i < m_proxyList.size(); ++i)
+    {
+        if(index == m_proxyList.at(i))
+        {
+            rowIndex = i;
+            break;
+        }
+    }
+
+
+    QModelIndex sibIndex = index.sibling(index.row()+1,0);
+    if(sibIndex.isValid())
+    {
+        rowSibling = m_proxyList.indexOf(sibIndex, rowIndex);
+    }
+    else
+    {
+        while(index.parent().isValid()&& (!sibIndex.isValid()))
+        {
+            index = index.parent();
+            sibIndex = index.sibling(index.row()+1,0);
+        }
+        if(sibIndex.isValid())
+            rowSibling = m_proxyList.indexOf(sibIndex, rowIndex);
+        else
+            rowSibling = m_proxyList.size()-1;
+    }
+
+        for(int i = rowSibling-1; i > rowIndex; --i)
+        {
+            delete m_itemLayout->itemAt(i);
+            m_proxyList.removeAt(i);
+            qDebug()<<"i:"<<i;
+        }
+}
+
+//void GanttGraphicsScene::onDataChanged(QModelIndex &topLeft, QModelIndex &bottomRight)
+//{
+
+//}
+
+void GanttGraphicsScene::onRowsInserted(const QModelIndex &parent, int start, int end)
+{
+    GanttItem * newItem;
+    int rowIndex;
+
+    if(parent.isValid())
+    {
+        newItem = m_model->itemForIndex(parent);
+        if(!newItem->isExpanded())
+            return;
+        else
+        {
+            rowIndex = m_proxyList.indexOf(parent, 0);
+            rowIndex +=start+1;
+        }
+    }
+    else
+    {
+        rowIndex = start;
+    }
+
+    for(int row = start; row <= end; ++row)
+    {
+
+        QModelIndex childIndex = m_model->index(row,0,parent);
+
+
+        newItem = m_model->itemForIndex(childIndex);
+
+        if (newItem->begin() < m_begin)
+            m_begin = newItem->begin();
+
+        if (newItem->end() > m_end)
+            m_end = newItem->end();
+
+        m_header->setBegin(m_begin);
+        m_header->setEnd(m_end);
+        m_item = new GanttGraphicsItem(newItem, m_scale, m_begin, m_end);
+        m_itemLayout->insertItem(rowIndex,m_item);
+
+        qDebug()<<"insert item at:"<<rowIndex;
+
+        QPersistentModelIndex persIndex(childIndex);
+        m_proxyList.insert(rowIndex, persIndex);
+        rowIndex += 1;
+
+        //if(m_model->hasChildren(childIndex))
+        //    setItems(childIndex, rowIndex);
+    }
+    m_header->createHeader();
+    m_header->update();
+}
+
+void GanttGraphicsScene::onRowsRemoved(const QModelIndex &parent, int start, int end)
+{
+    //    int row = m_proxyList.indexOf(index);
+    //    if(m_model->hasChildren(index))
+    //    {
+    //        for(int i = m_model->rowCount(index)-1; i>=0; --i)
+    //        {
+    //            QModelIndex childIndex = index.child(i,0);
+    //            editDelete(childIndex);
+    //            //delete m_itemLayout->itemAt(row+i);
+    //        }
+    //    }
+    //    delete m_itemLayout->itemAt(row);
+
+    if(!parent.isValid())
+    {
+
+    }
+    else
+    {
+        int row = m_proxyList.indexOf(parent.child(end,0));
+        for(int i = end; i>start; --i)
+        {
+            //QModelIndex childIndex = parent.onRowsRemoved(parent.);
+            delete m_itemLayout->itemAt(row);
+            row--;
+        }
+    }
+}
+
+void GanttGraphicsScene::onRowsAboutToBeRemoved(const QModelIndex &parent, int start, int end)
+{
+
 }
 
 
 
 
-void GanttGraphicsScene::setItems(GanttModel *model)
+int GanttGraphicsScene::setItems(QModelIndex parent, int rowIndex)
 {
-//    GanttItem * newItem;
-//    foreach (newItem, model->itemlist()) {
-//        m_item = new GanttGraphicsItem(newItem, m_scale, m_begin, m_end);
-//        m_itemLayout->addItem(m_item);
-//    }
-
     GanttItem * newItem;
-    for(int row = 0; row < model->rowCount(QModelIndex()); ++row)
+
+    if(parent.isValid())
     {
-        newItem = model->itemForIndex(model->index(row,0));
-        m_item = new GanttGraphicsItem(newItem, m_scale, m_begin, m_end);
-        m_itemLayout->addItem(m_item);
+        newItem = m_model->itemForIndex(parent);
+        if(!newItem->isExpanded())
+            return rowIndex;
     }
+    else
+    {
+        rowIndex = m_proxyList.size();
+    }
+
+    for(int row = 0; row < m_model->rowCount(parent); ++row)
+    {
+
+        QModelIndex childIndex = m_model->index(row,0,parent);
+
+
+        newItem = m_model->itemForIndex(childIndex);
+        if (newItem->begin() < m_begin)
+            m_begin = newItem->begin();
+
+        if (newItem->end() > m_end)
+            m_end = newItem->end();
+
+        m_header->setBegin(m_begin);
+        m_header->setEnd(m_end);
+        m_item = new GanttGraphicsItem(newItem, m_scale, m_begin, m_end);
+        m_itemLayout->insertItem(rowIndex,m_item);
+
+        qDebug()<<"new i:"<<rowIndex;
+
+        QPersistentModelIndex persIndex(childIndex);
+        m_proxyList.insert(rowIndex, persIndex);
+        rowIndex += 1;
+
+        if(m_model->hasChildren(childIndex))
+            rowIndex = setItems(childIndex, rowIndex);
+    }
+    m_header->createHeader();
+    m_header->update();
+
+    return rowIndex;
 }

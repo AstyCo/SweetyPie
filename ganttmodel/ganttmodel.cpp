@@ -185,8 +185,7 @@ void GanttModel::setupModelData(const QStringList &lines, GanttItem *parent)
 //==========timelog2=================
 QVariant GanttModel::data(const QModelIndex &index, int role) const
 {
-    if (!rootItem || !index.isValid() || index.column() < 0 ||
-        index.column() >= ColumnCount)
+    if(!index.isValid())
         return QVariant();
     if (GanttItem *item = itemForIndex(index)) {
         if (role == Qt::DisplayRole || role == Qt::EditRole) {
@@ -217,7 +216,7 @@ QVariant GanttModel::data(const QModelIndex &index, int role) const
     return QVariant();
 }
 
-
+/*
 bool GanttModel::insertRows(int row, int count,
                            const QModelIndex &parent)
 {
@@ -234,21 +233,26 @@ bool GanttModel::insertRows(int row, int count,
     endInsertRows();
     return true;
 }
-
+*/
 
 bool GanttModel::removeRows(int row, int count,
                            const QModelIndex &parent)
 {
-    if (!rootItem)
-        return false;
+
     GanttItem *item = parent.isValid() ? itemForIndex(parent)
-                                      : rootItem;
+                                      : NULL;
     beginRemoveRows(parent, row, row + count - 1);
     for (int i = 0; i < count; ++i)
-        delete item->takeChild(row);
+    {
+        if(parent.isValid())
+            delete item->takeChild(row);
+        else
+            m_itemlist.removeAt(row);
+    }
     endRemoveRows();
     return true;
 }
+
 
 /*
 QStringList GanttModel::mimeTypes() const
@@ -359,7 +363,7 @@ QModelIndex GanttModel::moveDown(const QModelIndex &index)
     return moveItem(parent, index.row(), newRow);
 }
 
-
+/*
 QModelIndex GanttModel::cut(const QModelIndex &index)
 {
     if (!index.isValid())
@@ -453,6 +457,7 @@ QModelIndex GanttModel::demote(const QModelIndex &index)
     emit dataChanged(newIndex, newIndex);
     return newIndex;
 }
+*/
 
 GanttItem *GanttModel::itemForIndex(const QModelIndex &index) const
 {
@@ -461,7 +466,7 @@ GanttItem *GanttModel::itemForIndex(const QModelIndex &index) const
                 index.internalPointer()))
             return item;
     }
-    return rootItem;
+    return NULL;
 }
 
 
@@ -537,8 +542,6 @@ void GanttModel::incrementEndTimeForTimedItem(int msec)
 
 void GanttModel::clear()
 {
-    delete rootItem;
-    rootItem = 0;
     delete cutItem;
     cutItem = 0;
     //timedItem = 0;
@@ -735,47 +738,43 @@ QModelIndex GanttModel::index(int row, int column, const QModelIndex &parent) co
     //---------------
 
     //-----timelog2------
-    if (!rootItem || row < 0 || column < 0 || column >= ColumnCount
-        || (parent.isValid() && parent.column() != 0))
+    if (!hasIndex(row, column, parent)) {
         return QModelIndex();
+    }
+
+    if (!parent.isValid()) { // запрашивают индексы корневых узлов
+        return createIndex(row, column, m_itemlist.at(row));
+    }
+
     GanttItem *parentItem = itemForIndex(parent);
-    Q_ASSERT(parentItem);
-    if (GanttItem *item = parentItem->childAt(row))
-        return createIndex(row, column, item);
-    return QModelIndex();
+    return createIndex(row, column, parentItem->childAt(row));
+
+
+//    if (!rootItem || row < 0 || column < 0 || column >= ColumnCount
+//        || (parent.isValid() && parent.column() != 0))
+//        return QModelIndex();
+//    GanttItem *parentItem = itemForIndex(parent);
+//    Q_ASSERT(parentItem);
+//    if (GanttItem *item = parentItem->childAt(row))
+//        return createIndex(row, column, item);
+//    return QModelIndex();
     //----------------
 }
 
 QModelIndex GanttModel::parent(const QModelIndex &index) const
 {
-    //-------etm---------
-//    if (!index.isValid())
-//        return QModelIndex();
-
-//    GanttItem *childItem = getItem(index);
-//    GanttItem *parentItem = childItem->parent();
-
-//    if (parentItem == rootItem)
-//        return QModelIndex();
-
-//    return createIndex(parentItem->childNumber(), 0, parentItem);
-    //--------------------
-
-    //-----timelog2--------
-    if (!index.isValid())
+    if (!index.isValid()) {
         return QModelIndex();
-    if (GanttItem *childItem = itemForIndex(index)) {
-        if (GanttItem *parentItem = childItem->parent()) {
-            if (parentItem == rootItem)
-                return QModelIndex();
-            if (GanttItem *grandParentItem = parentItem->parent()) {
-                int row = grandParentItem->rowOfChild(parentItem);
-                return createIndex(row, 0, parentItem);
-            }
-        }
     }
-    return QModelIndex();
-    //--------------
+
+    GanttItem* childInfo = static_cast<GanttItem*>(index.internalPointer());
+    GanttItem* parentInfo = childInfo->parent();
+    if (parentInfo != 0) { // parent запрашивается не у корневого элемента
+        return createIndex(findRow(parentInfo), 0, parentInfo);
+    }
+    else {
+        return QModelIndex();
+    }
 }
 
 
@@ -788,8 +787,8 @@ int GanttModel::rowCount(const QModelIndex &parent) const
     //----------------
 
     //----timelog2--------
-    if (parent.isValid() && parent.column() != 0)
-        return 0;
+    if (!parent.isValid())
+        return m_itemlist.size();//return 0;
     GanttItem *parentItem = itemForIndex(parent);
     return parentItem ? parentItem->childCount() : 0;
     //-----------------
@@ -880,31 +879,77 @@ bool GanttModel::setData(const QModelIndex &index, const QVariant &value,
     //-------------------
 }
 
-bool GanttModel::addItem(int row, QString title, QDateTime begin, QDateTime end,
-                         /*GanttItem::ItemType type,*/ const QModelIndex &parent)
+bool GanttModel::hasChildren(const QModelIndex &parent) const
 {
-    if (!rootItem)
-        rootItem = new GanttItem;
-    GanttItem *parentItem = parent.isValid() ? itemForIndex(parent)
-                                            : rootItem;
-    beginInsertRows(parent, row, row);
-        GanttItem *item = new GanttItem(title, begin, end, false);
-        parentItem->insertChild(row, item);
-        m_itemlist.append(item); // потом убрать; непонятно, где этот список в модели используется
-    endInsertRows();
-    return true;
+    return rowCount(parent)>0;
 }
 
-//bool GanttModel::insertRow(int row, QString title, QDateTime begin, QDateTime, end, GanttItem::ItemType type, const QModelIndex &parent)
-//{
-//    if (!rootItem)
-//        rootItem = new GanttItem;
-//    GanttItem *parentItem = parent.isValid() ? itemForIndex(parent)
-//                                            : rootItem;
-//    beginInsertRows(parent, row, row);
-//        GanttItem *item = new GanttItem(title, begin, end, type, false);
-//        parentItem->insertChild(row, item);
-//    endInsertRows();
-//    return true;
-//}
+bool GanttModel::addItem(/*int row, */QString title, QDateTime begin, QDateTime end,
+                         /*GanttItem::ItemType type,*/ const QModelIndex &parent)
+{
+
+//    if(!parent.isValid())
+//    {
+//        GanttItem *item = new GanttItem(title, begin, end, false);
+//        m_itemlist.append(item);
+//    }
+//    else
+//    {
+//        GanttItem *item = new GanttItem(title, begin, end, false);
+//        GanttItem * parentItem = itemForIndex(parent);
+//        parentItem->addChild(item);
+//    }
+
+    return insertRow(this->rowCount(parent), title, begin, end, parent);
+}
+
+int GanttModel::findRow(const GanttItem *nodeInfo) const
+{
+    if(nodeInfo == NULL)
+        qDebug()<<"findRow nodeInfo = 0";
+    const QList<GanttItem*> parentInfoChildren = nodeInfo->parent() != 0 ? nodeInfo->parent()->children(): m_itemlist;
+    QList<GanttItem*>::const_iterator position = qFind(parentInfoChildren, nodeInfo);
+    return std::distance(parentInfoChildren.begin(), position);
+}
+
+void GanttModel::onExpanded(QModelIndex index)
+{
+    if(index.isValid())
+    {
+        GanttItem * item = itemForIndex(index);
+        if(!item->isExpanded())
+            item->setIsExpanded(true);
+
+        emit expanded(index);
+    }
+}
+
+void GanttModel::onCollapsed(QModelIndex index)
+{
+    if(index.isValid())
+    {
+        GanttItem * item = itemForIndex(index);
+        if(item->isExpanded())
+            item->setIsExpanded(false);
+
+        emit collapsed(index);
+    }
+}
+
+bool GanttModel::insertRow(int row, QString title, QDateTime begin, QDateTime end, const QModelIndex &parent)
+{
+    GanttItem *parentItem = parent.isValid() ? itemForIndex(parent)
+                                            : NULL;
+
+    beginInsertRows(parent, row, row);
+        GanttItem *item = new GanttItem(title, begin, end, false);
+        if(parent.isValid())
+            parentItem->insertChild(row, item);
+        else
+            m_itemlist.insert(row,item);
+    endInsertRows();
+
+    emit rowInserted(parent, row, row);
+    return true;
+}
 //===============================

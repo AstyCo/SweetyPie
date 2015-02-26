@@ -1,5 +1,5 @@
 #include "ganttgraphicsheader.h"
-
+#include <QDebug>
 
 //==================konus==================
 #include <QBrush>
@@ -12,14 +12,16 @@ GanttGraphicsHeader::GanttGraphicsHeader(QDateTime begin, QDateTime end, Scale s
     //setVisible(false);
 
     QGraphicsLinearLayout *headerLayout = new QGraphicsLinearLayout(Qt::Vertical);
-    QGraphicsLinearLayout *upper = new QGraphicsLinearLayout(headerLayout);
-    QGraphicsLinearLayout *lower = new QGraphicsLinearLayout(headerLayout);
-
-
+    /*QGraphicsLinearLayout **/upper = new QGraphicsLinearLayout(headerLayout);
+    /*QGraphicsLinearLayout **/lower = new QGraphicsLinearLayout(headerLayout);
 
     m_begin = begin;
     m_end = end;
+    m_scale = scale;
 
+    createHeader();
+
+/*
     int lowHeight = 20;
     int lowWidth = 20; //TODO //почему при ScaleMinute и lowWidth>15 происходит наложение блоков
     int lowCount = lowItemsCount(begin, end, scale);
@@ -50,7 +52,7 @@ GanttGraphicsHeader::GanttGraphicsHeader(QDateTime begin, QDateTime end, Scale s
         }
         currentDT = bufferDT;
     }
-
+*/
     upper->setSpacing(0);
     upper->addStretch(1);
 
@@ -68,8 +70,8 @@ GanttGraphicsHeader::GanttGraphicsHeader(QDateTime begin, QDateTime end, Scale s
 
 GanttGraphicsHeader::~GanttGraphicsHeader()
 {
-    delete m_lower;
-    delete m_upper;
+    delete lower;
+    delete upper;
     delete m_rectItem;
 }
 
@@ -156,6 +158,52 @@ QString GanttGraphicsHeader::formatOverDateTime(Scale scale)
     }
     return format;
 }
+
+void GanttGraphicsHeader::createHeader()
+{
+    clearHeader();
+
+    int lowHeight = 20;
+    int lowWidth = 20; //TODO //почему при ScaleMinute и lowWidth>15 происходит наложение блоков
+    int lowCount = lowItemsCount(m_begin, m_end, m_scale);
+
+
+    //int upCount = 0;
+    int lowPerUpCount = 0;
+    QDateTime currentDT = m_begin;
+    QDateTime bufferDT;
+    for(int i = 0; i < lowCount; i++)
+    {
+        m_rectItem = new GanttGraphicsHeaderRectItem(currentDT, GanttGraphicsHeaderRectItem::Lower, m_scale,
+                                                     0, 0, lowWidth, lowHeight);
+        lower->addItem(m_rectItem);
+        lowPerUpCount++;
+        bufferDT = increaseDateTime(currentDT, m_scale, 1);
+        int a = currentDT.toString(formatOverDateTime(m_scale)).toInt();
+        int b = bufferDT.toString(formatOverDateTime(m_scale)).toInt();
+        if ((b!=a) || (i == lowCount-1))
+        {
+            m_rectItem = new GanttGraphicsHeaderRectItem(currentDT, GanttGraphicsHeaderRectItem::Upper, m_scale,
+                                                         0, 0, lowWidth * lowPerUpCount, lowHeight);
+            upper->addItem(m_rectItem);
+            lowPerUpCount = 0;
+        }
+        currentDT = bufferDT;
+    }
+}
+
+void GanttGraphicsHeader::clearHeader()
+{
+    for(int i = lower->count()-1; i >= 0; --i)
+    {
+        delete lower->itemAt(i);
+    }
+    for(int j = upper->count()-1; j >= 0; --j)
+    {
+        delete upper->itemAt(j);
+    }
+}
+
 QDateTime GanttGraphicsHeader::end() const
 {
     return m_end;
