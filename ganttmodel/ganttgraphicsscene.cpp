@@ -331,25 +331,78 @@ void GanttGraphicsScene::onRowsRemoved(const QModelIndex &parent, int start, int
     //    }
     //    delete m_itemLayout->itemAt(row);
 
-    if(!parent.isValid())
-    {
 
-    }
-    else
+
+//    if(!parent.isValid())
+//    {
+
+//    }
+//    else
+//    {
+//        int row = m_proxyList.indexOf(parent.child(end,0));
+//        for(int i = end; i>start; --i)
+//        {
+//            //QModelIndex childIndex = parent.onRowsRemoved(parent.);
+//            delete m_itemLayout->itemAt(row);
+//            row--;
+//        }
+//    }
+
+
+    for(int i = m_endDeleteRow-1; i >= m_beginDeleteRow; --i)
     {
-        int row = m_proxyList.indexOf(parent.child(end,0));
-        for(int i = end; i>start; --i)
-        {
-            //QModelIndex childIndex = parent.onRowsRemoved(parent.);
-            delete m_itemLayout->itemAt(row);
-            row--;
-        }
+        delete m_itemLayout->itemAt(i);
+        m_proxyList.removeAt(i);
     }
 }
 
-void GanttGraphicsScene::onRowsAboutToBeRemoved(const QModelIndex &parent, int start, int end)
+void GanttGraphicsScene::onRowsAboutToBeRemoved(const QModelIndex & parent, int start, int end)
 {
+    //QModelIndex index = parent;
 
+    if(!parent.isValid())
+    {
+
+        QModelIndex startIndex = m_model->index(start,0);
+        m_beginDeleteRow = m_proxyList.indexOf(startIndex, 0);
+        if(startIndex.sibling(startIndex.row()+1,0).isValid())
+        {
+            m_endDeleteRow = m_proxyList.indexOf(startIndex.sibling(startIndex.row()+1,0), m_beginDeleteRow);
+        }
+        else
+        {
+            m_endDeleteRow = m_proxyList.size();
+        }
+        return;
+    }
+
+    QModelIndex index = parent.child(start,0);
+    for(int i = 0; i < m_proxyList.size(); ++i)
+    {
+        if(index == m_proxyList.at(i))
+        {
+            m_beginDeleteRow = i;
+            break;
+        }
+    }
+
+    QModelIndex sibIndex = index.sibling(index.row()+1,0);
+    if(sibIndex.isValid())
+    {
+        m_endDeleteRow = m_proxyList.indexOf(sibIndex, m_beginDeleteRow);
+    }
+    else
+    {
+        while(index.parent().isValid()&& (!sibIndex.isValid()))
+        {
+            index = index.parent();
+            sibIndex = index.sibling(index.row()+1,0);
+        }
+        if(sibIndex.isValid())
+            m_endDeleteRow = m_proxyList.indexOf(sibIndex, m_beginDeleteRow);
+        else
+            m_endDeleteRow = m_proxyList.size()-1;
+    }
 }
 
 

@@ -128,8 +128,8 @@ void GanttView::setModel(GanttModel *model)
     connect(m_model, SIGNAL(collapsed(QModelIndex)), m_graphicsscene, SLOT(onCollapsed(QModelIndex)));
 
     QAbstractItemModel * abModel = (QAbstractItemModel*)m_model;
-    connect(abModel, SIGNAL(rowsAboutToBeRemoved(const QModelIndex &, int, int)), m_graphicsscene, SLOT(onRowsAboutToBeRemoved(QModelIndex &,int,int)));
-    connect(abModel, SIGNAL(rowsRemoved(const QModelIndex &, int, int)), m_graphicsscene, SLOT(onRowsRemoved(QModelIndex,int,int)));
+    connect(abModel, SIGNAL(rowsAboutToBeRemoved(const QModelIndex &, int, int)), m_graphicsscene, SLOT(onRowsAboutToBeRemoved(const QModelIndex &,int,int)));
+    connect(abModel, SIGNAL(rowsRemoved(QModelIndex, int, int)), m_graphicsscene, SLOT(onRowsRemoved(QModelIndex,int,int)));
     connect(m_model, SIGNAL(rowInserted(QModelIndex, int, int)), m_graphicsscene, SLOT(onRowsInserted(QModelIndex,int,int)));
 }
 
