@@ -50,6 +50,8 @@ GanttGraphicsItem::GanttGraphicsItem(GanttItem *item, Scale scale, QDateTime hea
     m_end = item->commonEnd();
     m_duration = item->commonDuration();
 
+    qDebug()<<m_begin<<m_end;
+
     qreal secWidth = 20;
     m_width = m_duration*secWidth;
 
@@ -86,7 +88,9 @@ GanttGraphicsItem::GanttGraphicsItem(GanttItem *item, Scale scale, QDateTime hea
     //QTime midnight(0,0,0);
     //qsrand(midnight.secsTo(QTime::currentTime()));
 
-    m_color = QColor(qrand()%255, qrand()%255, qrand()%255);
+    //m_color = QColor(qrand()%255, qrand()%255, qrand()%255);
+    m_color = m_ganttItem->color();
+
     //m_color = QColor(qrand(),qrand(),qrand()/*Qt::green*/);
     //m_color = QColor(206,206,206);
     this->setBrush(QBrush(m_color));

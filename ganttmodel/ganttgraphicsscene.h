@@ -35,7 +35,7 @@ public slots:
     //void setHeaderItem(QGraphicsItemGroup * header);
 
     void editAdd(QModelIndex index);
-    void editDelete(QModelIndex parent);
+    //void editDelete(QModelIndex parent);
     //void editCut();
     //void editPaste();
     void editMoveUp(QModelIndex index);
@@ -48,10 +48,11 @@ public slots:
 private slots:
     void onExpanded(QModelIndex index);
     void onCollapsed(QModelIndex index);
-    //void onDataChanged(const QModelIndex & topLeft, QModelIndex & bottomRight);
+    void onDataChanged(const QModelIndex & topLeft, const QModelIndex & bottomRight);
     void onRowsInserted(const QModelIndex & parent, int start, int end );
     void onRowsRemoved(const QModelIndex & parent, int start, int end );
     void onRowsAboutToBeRemoved(const QModelIndex & parent, int start, int end);
+    void onMoveUp(QModelIndex index);
 
 private:
     GanttModel * m_model;

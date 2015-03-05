@@ -127,6 +127,8 @@ void GanttView::setModel(GanttModel *model)
     connect(m_model, SIGNAL(expanded(QModelIndex)), m_graphicsscene, SLOT(onExpanded(QModelIndex)));
     connect(m_model, SIGNAL(collapsed(QModelIndex)), m_graphicsscene, SLOT(onCollapsed(QModelIndex)));
 
+    connect(m_model, SIGNAL(dataChanged(QModelIndex,QModelIndex)), m_graphicsscene, SLOT(onDataChanged(QModelIndex,QModelIndex)));
+
     QAbstractItemModel * abModel = (QAbstractItemModel*)m_model;
     connect(abModel, SIGNAL(rowsAboutToBeRemoved(const QModelIndex &, int, int)), m_graphicsscene, SLOT(onRowsAboutToBeRemoved(const QModelIndex &,int,int)));
     connect(abModel, SIGNAL(rowsRemoved(QModelIndex, int, int)), m_graphicsscene, SLOT(onRowsRemoved(QModelIndex,int,int)));
@@ -350,16 +352,12 @@ void GanttView::setCurrentIndex(const QModelIndex &index)
 void GanttView::editAdd()
 {
     QModelIndex index = m_treeview->currentIndex();
-    m_model->addItem("lol", QDateTime::currentDateTime(),QDateTime::currentDateTime().addDays(2), index);
-//    if ()
-//    {
-//        m_graphicsscene->editAdd(index);
-//        index = m_model->index(0, 0, index);
-//        setCurrentIndex(index);
-//        m_treeview->edit(index);
-//        //setDirty();
-//        updateUi();
-//    }
+    if (m_model->addItem("lol", QDateTime::currentDateTime().addDays(-20),QDateTime::currentDateTime().addDays(-18), index)) {
+        index = m_model->index(0, 0, index);
+        setCurrentIndex(index);
+        m_treeview->edit(index);
+        updateUi();
+    }
 }
 
 void GanttView::editDelete()
@@ -380,8 +378,6 @@ void GanttView::editDelete()
     else if (rows > 1)
         message = tr("<p>Delete '%1' and its %2 children (and "
                      "grandchildren etc.)").arg(name).arg(rows);
-
-    m_graphicsscene->editDelete(index);
 
     m_model->removeRow(index.row(), index.parent());
 
@@ -415,7 +411,7 @@ void GanttView::editMoveUp()
 //    editHideOrShowDoneTasks(
 //            editHideOrShowDoneTasksAction->isChecked());
 
-    m_graphicsscene->editMoveUp(index);
+    //m_graphicsscene->editMoveUp(index);
 }
 
 

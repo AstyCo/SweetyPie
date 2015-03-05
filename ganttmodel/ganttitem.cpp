@@ -129,6 +129,7 @@ GanttItem::GanttItem(const QString &name, QDateTime begin, QDateTime end, bool d
     m_commonEnd = end;
     m_commonDuration = m_commonBegin.secsTo(m_commonEnd);
     m_isExpanded = false;
+    m_color = QColor(qrand()%255, qrand()%255, qrand()%255);
 }
 
 
@@ -163,6 +164,16 @@ int GanttItem::minutesForTask(bool onlyForToday) const
         minutes += child->minutesForTask(onlyForToday);
     return minutes;
 }
+QColor GanttItem::color() const
+{
+    return m_color;
+}
+
+void GanttItem::setColor(const QColor &color)
+{
+    m_color = color;
+}
+
 bool GanttItem::isExpanded() const
 {
     return m_isExpanded;

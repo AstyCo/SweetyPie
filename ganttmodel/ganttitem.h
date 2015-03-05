@@ -101,6 +101,9 @@ public:
     bool isExpanded() const;
     void setIsExpanded(bool isExpanded);
 
+    QColor color() const;
+    void setColor(const QColor &color);
+
 private:
     //=======etm==========
     //    QList<GanttItem*> childItems;
@@ -123,7 +126,7 @@ private:
     QDateTime              m_commonBegin;
     QDateTime              m_commonEnd;
     int                    m_commonDuration;
-
+    QColor                 m_color;
 
     bool m_isExpanded;
 

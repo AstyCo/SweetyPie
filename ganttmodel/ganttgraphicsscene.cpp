@@ -162,8 +162,8 @@ void GanttGraphicsScene::editAdd(QModelIndex index)
     m_itemLayout->insertItem(/*index.parent().row()+1*/row, m_item);
 }
 
-void GanttGraphicsScene::editDelete(QModelIndex index)
-{
+//void GanttGraphicsScene::editDelete(QModelIndex index)
+//{
 //    int row = m_proxyList.indexOf(index);
 //    if(m_model->hasChildren(index))
 //    {
@@ -175,9 +175,7 @@ void GanttGraphicsScene::editDelete(QModelIndex index)
 //        }
 //    }
 //    delete m_itemLayout->itemAt(row);
-
-
-}
+//}
 
 void GanttGraphicsScene::editMoveUp(QModelIndex index)
 {
@@ -259,10 +257,23 @@ void GanttGraphicsScene::onCollapsed(QModelIndex index)
         }
 }
 
-//void GanttGraphicsScene::onDataChanged(QModelIndex &topLeft, QModelIndex &bottomRight)
-//{
+void GanttGraphicsScene::onDataChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight)
+{
 
-//}
+
+    GanttItem * newItem;
+    int rowIndex;
+    QModelIndex treeIndex = m_model->index(topLeft.row(),0, topLeft.parent());
+
+    newItem = m_model->itemForIndex(treeIndex);
+    //qDebug()<<"Changed!"<<topLeft<<bottomRight<<newItem->begin()<<newItem->end();
+    rowIndex = m_proxyList.indexOf(treeIndex, 0);
+    delete m_itemLayout->itemAt(rowIndex);
+    m_item = new GanttGraphicsItem(newItem, m_scale, m_begin, m_end);
+    qDebug()<<"Changed!"<<m_begin<<m_end;
+    m_itemLayout->insertItem(rowIndex,m_item);
+
+}
 
 void GanttGraphicsScene::onRowsInserted(const QModelIndex &parent, int start, int end)
 {
@@ -319,36 +330,6 @@ void GanttGraphicsScene::onRowsInserted(const QModelIndex &parent, int start, in
 
 void GanttGraphicsScene::onRowsRemoved(const QModelIndex &parent, int start, int end)
 {
-    //    int row = m_proxyList.indexOf(index);
-    //    if(m_model->hasChildren(index))
-    //    {
-    //        for(int i = m_model->rowCount(index)-1; i>=0; --i)
-    //        {
-    //            QModelIndex childIndex = index.child(i,0);
-    //            editDelete(childIndex);
-    //            //delete m_itemLayout->itemAt(row+i);
-    //        }
-    //    }
-    //    delete m_itemLayout->itemAt(row);
-
-
-
-//    if(!parent.isValid())
-//    {
-
-//    }
-//    else
-//    {
-//        int row = m_proxyList.indexOf(parent.child(end,0));
-//        for(int i = end; i>start; --i)
-//        {
-//            //QModelIndex childIndex = parent.onRowsRemoved(parent.);
-//            delete m_itemLayout->itemAt(row);
-//            row--;
-//        }
-//    }
-
-
     for(int i = m_endDeleteRow-1; i >= m_beginDeleteRow; --i)
     {
         delete m_itemLayout->itemAt(i);
@@ -403,6 +384,11 @@ void GanttGraphicsScene::onRowsAboutToBeRemoved(const QModelIndex & parent, int 
         else
             m_endDeleteRow = m_proxyList.size()-1;
     }
+}
+
+void GanttGraphicsScene::onMoveUp(QModelIndex index)
+{
+
 }
 
 

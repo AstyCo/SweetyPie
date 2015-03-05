@@ -319,6 +319,7 @@ QModelIndex GanttModel::moveUp(const QModelIndex &index)
     GanttItem *item = itemForIndex(index);
     Q_ASSERT(item);
     GanttItem *parent = item->parent();
+    qDebug()<<parent;
     Q_ASSERT(parent);
     return moveItem(parent, index.row(), index.row() - 1);
 }
@@ -693,12 +694,6 @@ QModelIndex GanttModel::indexForPath(const QModelIndex &parent,
 QVariant GanttModel::headerData(int section, Qt::Orientation orientation,
                                int role) const
 {
-//----etm-----
-//    if (orientation == Qt::Horizontal && role == Qt::DisplayRole)
-//        return rootItem->data(section);
-//    return QVariant();
-//--------
-
 //---timelog2---
     if (orientation == Qt::Horizontal && role == Qt::DisplayRole) {
         if (section == Title)
@@ -887,19 +882,6 @@ bool GanttModel::hasChildren(const QModelIndex &parent) const
 bool GanttModel::addItem(/*int row, */QString title, QDateTime begin, QDateTime end,
                          /*GanttItem::ItemType type,*/ const QModelIndex &parent)
 {
-
-//    if(!parent.isValid())
-//    {
-//        GanttItem *item = new GanttItem(title, begin, end, false);
-//        m_itemlist.append(item);
-//    }
-//    else
-//    {
-//        GanttItem *item = new GanttItem(title, begin, end, false);
-//        GanttItem * parentItem = itemForIndex(parent);
-//        parentItem->addChild(item);
-//    }
-
     return insertRow(this->rowCount(parent), title, begin, end, parent);
 }
 
