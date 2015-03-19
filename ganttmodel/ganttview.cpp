@@ -102,11 +102,21 @@ GanttView::GanttView(QWidget *parent) :
 
     m_treeview->setAllColumnsShowFocus(true);
 
+    //setEditable(false);
+
 
 
     //m_treeview->setItemDelegate(&delegate);
     //m_treeview->setItemDelegateForColumn(1, new QDateTimeEdit);
 
+}
+
+GanttView::~GanttView()
+{
+    delete m_editToolBar;
+    delete m_graphicsview;
+    //delete m_graphicsscene;
+    delete m_splitter;
 }
 
 //====================================================
@@ -145,15 +155,24 @@ void GanttView::setGraphicsscene(GanttGraphicsScene *graphicsscene)
     m_graphicsscene = graphicsscene;
 }
 
+void GanttView::setEditable(bool flag)
+{
+    if (!flag)
+        m_editToolBar->hide();
+    else
+        m_editToolBar->show();
+
+}
+
 
 void GanttView::holdHeaderOnTop()
 {
     //int maxY = _list.list().count()*60+60;
     if(m_graphicsview->verticalScrollBar()->isVisible())
-        m_graphicsscene->m_header->setPos(0,m_graphicsview->verticalScrollBar()->value()-
+        m_graphicsscene->m_header->setPos(m_graphicsscene->m_header->x(),m_graphicsview->verticalScrollBar()->value()-
                           m_graphicsview->verticalScrollBar()->minimum());
     else
-        m_graphicsscene->m_header->setPos(0, 0);
+        m_graphicsscene->m_header->setPos(m_graphicsscene->m_header->x(), 0);
 
     m_graphicsscene->update();
 }
@@ -237,7 +256,7 @@ void GanttView::createMenusAndToolBar()
 
     QAction *emptyAction = 0;
     //QMenu *editMenu = menuBar()->addMenu(tr("Edit"));
-    QToolBar *editToolBar = new QToolBar(tr("Edit"));//addToolBar(tr("Edit"));
+    m_editToolBar = new QToolBar(tr("Edit"));//addToolBar(tr("Edit"));
 
 
     foreach (QAction *action, QList<QAction*>() << editAddAction
@@ -249,21 +268,19 @@ void GanttView::createMenusAndToolBar()
     {
         if (action == emptyAction) {
             //editMenu->addSeparator();
-            editToolBar->addSeparator();
+            m_editToolBar->addSeparator();
             continue;
         }
 //        if (action != editHideOrShowDoneTasksAction)
-            editToolBar->addAction(action);
+            m_editToolBar->addAction(action);
 //        else
 //            editMenu->addSeparator();
 //        editMenu->addAction(action);
     }
 
     vlayout->addWidget(m_splitter, 0);
-    vlayout->addWidget(editToolBar, 1);
+    vlayout->addWidget(m_editToolBar, 1);
     setLayout(vlayout);
-
-
 }
 
 void GanttView::createConnections()

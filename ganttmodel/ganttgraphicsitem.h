@@ -11,7 +11,7 @@ class GanttGraphicsItem : public QGraphicsLayoutItem, public QGraphicsRectItem/*
 {
 public:
     //(GanttItem * item, Scale scale, QDateTime headerBegin, QDateTime headerEnd, QGraphicsItem * parent = 0)
-    GanttGraphicsItem(GanttItem * item, Scale scale, QDateTime headerBegin, QDateTime headerEnd, QGraphicsItem * parent = 0);
+    GanttGraphicsItem(GanttItem * item, Scale scale, GanttGraphicsHeader * header,/*QDateTime headerBegin, QDateTime headerEnd,*/ QGraphicsItem * parent = 0);
     ~GanttGraphicsItem();
 
 
@@ -31,6 +31,7 @@ private:
     Scale m_scale;
     QDateTime m_headerBegin;
     QDateTime m_headerEnd;
+    GanttGraphicsHeader * m_header;
 
 
     QDateTime m_begin;

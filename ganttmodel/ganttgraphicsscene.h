@@ -6,6 +6,7 @@
 #include "ganttmodel.h"
 
 #include "ganttgraphicsheader.h"
+#include "ganttgraphicsheaderitem.h"
 #include "ganttgraphicsitem.h"
 
 class GanttGraphicsScene : public QGraphicsScene
@@ -18,6 +19,8 @@ public:
     void drawBackground(QPainter *painter, const QRectF &_rect);
 
     GanttGraphicsHeader * m_header;
+
+    GanttGraphicsHeaderItem * m_headerItem;
     //GanttGraphicsItem * createGraphicsItem(GanttItem * item);
 
     void setInterval(QDateTime begin, QDateTime end);
@@ -59,6 +62,7 @@ private:
     QModelIndex * m_index;
     int setItems(QModelIndex parent, int rowIndex);
 
+    QGraphicsWidget * test;
     QGraphicsLinearLayout * m_layout;
     QGraphicsLinearLayout * m_itemLayout;
     GanttGraphicsItem * m_item;
@@ -67,6 +71,7 @@ private:
     QDateTime m_end;
 
     Scale m_scale;
+    Zoom m_zoom;
 
 
     QList<QPersistentModelIndex> m_proxyList;

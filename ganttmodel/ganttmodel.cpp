@@ -204,7 +204,7 @@ QVariant GanttModel::data(const QModelIndex &index, int role) const
             if (index.column() == Title)
                 return static_cast<int>(Qt::AlignVCenter|
                                         Qt::AlignLeft);
-            return static_cast<int>(Qt::AlignVCenter|Qt::AlignRight);
+            return static_cast<int>(Qt::AlignVCenter|Qt::AlignLeft/*Right*/);
         }
 
         if (role == Qt::SizeHintRole) {
@@ -709,6 +709,7 @@ QVariant GanttModel::headerData(int section, Qt::Orientation orientation,
     if (role == Qt::SizeHintRole) {
         QSize defSize ;
         defSize.setHeight(ROW_HEIGHT+ROW_HEIGHT);
+        //defSize.setWidth(200);
         return defSize ;
     }
 
@@ -851,12 +852,14 @@ bool GanttModel::setData(const QModelIndex &index, const QVariant &value,
 
     if (GanttItem *item = itemForIndex(index)) {
         if (role == Qt::EditRole)
+        {
             if (index.column() == Title)
                 item->setName(value.toString());
             else if (index.column() == Begin)
                 item->setCommonBegin(value.toDateTime());
             else if (index.column() == End)
                 item->setCommonEnd(value.toDateTime());
+        }
         else if (role == Qt::CheckStateRole)
             item->setDone(value.toBool());
         else

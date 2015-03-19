@@ -25,32 +25,27 @@ GanttGraphicsItem::GanttGraphicsItem(QList<GanttGraphicsItemStage *> stages)
 }
 */
 
-GanttGraphicsItem::GanttGraphicsItem(GanttItem *item, Scale scale, QDateTime headerBegin, QDateTime headerEnd, QGraphicsItem *parent)
+GanttGraphicsItem::GanttGraphicsItem(GanttItem *item, Scale scale, GanttGraphicsHeader * header,/*QDateTime headerBegin, QDateTime headerEnd,*/ QGraphicsItem *parent)
     : QGraphicsRectItem(parent)
 {
     //setOrientation(Qt::Horizontal);
 
     m_scale = scale;
 
-    m_headerBegin = headerBegin;
-    m_headerEnd = headerEnd;
+    m_header = header;
+    m_headerBegin = m_header->begin()/*headerBegin*/;
+    m_headerEnd = m_header->end()/*headerEnd*/;
 
     m_ganttItem = item;
-    //setGraphicsStages();
 
     qreal durationTillBegin = m_headerBegin.secsTo(m_ganttItem->commonBegin());
-
-
-
 
 
     setGraphicsItem(this);
 
     m_begin = item->commonBegin();
     m_end = item->commonEnd();
-    m_duration = item->commonDuration();
-
-    qDebug()<<m_begin<<m_end;
+    m_duration = m_begin.secsTo(m_end);
 
     qreal secWidth = 20;
     m_width = m_duration*secWidth;
@@ -80,22 +75,23 @@ GanttGraphicsItem::GanttGraphicsItem(GanttItem *item, Scale scale, QDateTime hea
         break;
     }
 
-
-    m_height = 15;
-    m_text = "";
-    this->setToolTip("tip");
-
-    //QTime midnight(0,0,0);
-    //qsrand(midnight.secsTo(QTime::currentTime()));
-
-    //m_color = QColor(qrand()%255, qrand()%255, qrand()%255);
     m_color = m_ganttItem->color();
+    m_height = 10;
+    m_text = "";
+    QPen testPen;
+    if(m_ganttItem->hasChildren())
+    {
+        //m_text = "parent";
+        m_color.setAlpha(0);
+        //testPen.setWidth(-1);
+    }
+    this->setToolTip(m_ganttItem->name());
 
-    //m_color = QColor(qrand(),qrand(),qrand()/*Qt::green*/);
-    //m_color = QColor(206,206,206);
+    this->setPen(testPen);
     this->setBrush(QBrush(m_color));
 
-    setRect(durationTillBegin,0,m_width,m_height);
+    setRect(m_header->x()+durationTillBegin,0,m_width,m_height);
+
 }
 
 GanttGraphicsItem::~GanttGraphicsItem()
@@ -160,6 +156,7 @@ void GanttGraphicsItem::paint(QPainter *painter, const QStyleOptionGraphicsItem 
     dateStr = m_text;
 
     QPen oldPen = painter->pen();
+    oldPen.setWidth(12);
     QPen newPen(oldPen);
 
     newPen.setColor(QColor(Qt::black));

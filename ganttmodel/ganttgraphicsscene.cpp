@@ -19,27 +19,39 @@ inline qreal round(qreal val, int step) {
 GanttGraphicsScene::GanttGraphicsScene(GanttModel *model, /*QDateTime begin, QDateTime end,*/ QObject *parent) :
     QGraphicsScene(parent)
 {
-    QGraphicsWidget * test = new QGraphicsWidget;
+    /*QGraphicsWidget * */test = new QGraphicsWidget;
     m_layout = new QGraphicsLinearLayout(Qt::Vertical);
-    //m_layout->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+    m_layout->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
     //test->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
-    //m_layout->setSpacing(0);
+    m_layout->setSpacing(0);
 
+    test->setPos(0,0);
 
-    QDateTime begin = QDateTime::fromString("29.01.2015", "dd.MM.yyyy");
-    QDateTime end = begin.addMonths(2);
+    QDateTime begin = QDateTime::fromString("28.01.2015", "dd.MM.yyyy");
+    QDateTime end = begin.addDays(2);
     m_begin = begin;
     m_end = end;
     m_scale = ScaleDay;
+
+    m_zoom = ZoomDay;
+
     m_header = new GanttGraphicsHeader(begin, end, m_scale);
     m_header->setPos(0,0);
-    m_header->setZValue(1.0);
+    m_header->setZValue(1.1);
+    //m_header->setFlags(QGraphicsItem::ItemIsMovable);
+    this->addItem(m_header);
 
-    m_layout->addItem(m_header);
+
+    m_headerItem = new GanttGraphicsHeaderItem(begin, begin.addDays(2), m_zoom);
+    m_headerItem->setPos(0,0);
+    m_headerItem->setZValue(1.0);
+    //m_headerItem->setFlags(QGraphicsItem::ItemIsMovable);
+    m_layout->addItem(m_headerItem);
+
 
     m_itemLayout = new QGraphicsLinearLayout(Qt::Vertical);
     m_itemLayout->setContentsMargins(0,0,0,0);
-    m_itemLayout->setSpacing(5);
+    m_itemLayout->setSpacing(10);
     m_model = model;
 
 //    for(int i = 0; i<m_model->rowCount(); ++i)
@@ -85,6 +97,7 @@ GanttGraphicsScene::~GanttGraphicsScene()
     delete m_layout;
     delete m_item;
     delete m_itemLayout;
+    delete test;
 }
 
 void GanttGraphicsScene::drawBackground(QPainter *painter, const QRectF &rect)
@@ -113,6 +126,13 @@ void GanttGraphicsScene::drawBackground(QPainter *painter, const QRectF &rect)
       x += stepV;
       painter->drawLine(x, rect.top(), x, rect.bottom());
    }
+
+   //оси координат сцены
+//   QPen zeroPen(Qt::SolidLine);
+//   zeroPen.setColor(QColor(Qt::red));
+//   painter->setPen(zeroPen);
+//   painter->drawLine(0,rect.top(),0,rect.bottom());
+//   painter->drawLine(rect.left(),0,rect.right(),0);
 
 }
 
@@ -151,7 +171,7 @@ void GanttGraphicsScene::editAdd(QModelIndex index)
     QModelIndex itemIndex = m_model->index(0,0, index);
     int row = itemIndex.row();
     newItem = m_model->itemForIndex(itemIndex);
-    m_item = new GanttGraphicsItem(newItem, m_scale, m_begin, m_end);
+    m_item = new GanttGraphicsItem(newItem, m_scale, m_header);
 //TODO index.parent
     while(itemIndex.parent().isValid())
     {
@@ -253,7 +273,7 @@ void GanttGraphicsScene::onCollapsed(QModelIndex index)
         {
             delete m_itemLayout->itemAt(i);
             m_proxyList.removeAt(i);
-            qDebug()<<"i:"<<i;
+            //qDebug()<<"i:"<<i;
         }
 }
 
@@ -269,8 +289,54 @@ void GanttGraphicsScene::onDataChanged(const QModelIndex &topLeft, const QModelI
     //qDebug()<<"Changed!"<<topLeft<<bottomRight<<newItem->begin()<<newItem->end();
     rowIndex = m_proxyList.indexOf(treeIndex, 0);
     delete m_itemLayout->itemAt(rowIndex);
-    m_item = new GanttGraphicsItem(newItem, m_scale, m_begin, m_end);
-    qDebug()<<"Changed!"<<m_begin<<m_end;
+
+    qreal durationTillBegin;
+
+    bool flag = true;
+    if (flag == (newItem->begin() < m_header->begin()))
+    {
+        //==something for header pos======
+
+        durationTillBegin = newItem->begin().secsTo(m_header->begin());
+        qreal secWidth = 20;
+        m_header->setBegin(newItem->begin());
+        qreal newDuration = m_header->begin().secsTo(newItem->begin());
+        durationTillBegin = (durationTillBegin+newDuration)*secWidth;
+
+        switch (m_scale) {
+        case ScaleSecond:
+            break;
+        case ScaleMinute:
+            durationTillBegin = durationTillBegin/60;
+            break;
+        case ScaleHour:
+            durationTillBegin = durationTillBegin/3600;
+            break;
+        case ScaleDay:
+            durationTillBegin = durationTillBegin/86400;
+            break;
+        case ScaleMonth:
+            //m_width = m_width/86400;
+            break;
+        default:
+            break;
+        }
+
+    }
+    else if (flag == (newItem->end() > m_header->end()))
+    {
+        //m_end = newItem->end();
+        m_header->setEnd(newItem->end());
+    }
+    else flag = false;
+
+    if(flag)
+    {
+        m_header->createHeader();
+        m_header->moveBy(-durationTillBegin,0);
+    }
+
+    m_item = new GanttGraphicsItem(newItem, m_scale, m_header);
     m_itemLayout->insertItem(rowIndex,m_item);
 
 }
@@ -304,18 +370,18 @@ void GanttGraphicsScene::onRowsInserted(const QModelIndex &parent, int start, in
 
         newItem = m_model->itemForIndex(childIndex);
 
-        if (newItem->begin() < m_begin)
-            m_begin = newItem->begin();
+        if (newItem->begin() < m_header->begin())
+            m_header->setBegin(m_begin);
 
-        if (newItem->end() > m_end)
-            m_end = newItem->end();
+        if (newItem->end() > m_header->end())
+            m_header->setEnd(m_end);
 
-        m_header->setBegin(m_begin);
-        m_header->setEnd(m_end);
-        m_item = new GanttGraphicsItem(newItem, m_scale, m_begin, m_end);
+//        m_header->setBegin(m_begin);
+//        m_header->setEnd(m_end);
+        m_item = new GanttGraphicsItem(newItem, m_scale, m_header);
         m_itemLayout->insertItem(rowIndex,m_item);
 
-        qDebug()<<"insert item at:"<<rowIndex;
+        //qDebug()<<"insert item at:"<<rowIndex;
 
         QPersistentModelIndex persIndex(childIndex);
         m_proxyList.insert(rowIndex, persIndex);
@@ -382,7 +448,7 @@ void GanttGraphicsScene::onRowsAboutToBeRemoved(const QModelIndex & parent, int 
         if(sibIndex.isValid())
             m_endDeleteRow = m_proxyList.indexOf(sibIndex, m_beginDeleteRow);
         else
-            m_endDeleteRow = m_proxyList.size()-1;
+            m_endDeleteRow = m_proxyList.size()/*-1*/;
     }
 }
 
@@ -409,35 +475,70 @@ int GanttGraphicsScene::setItems(QModelIndex parent, int rowIndex)
         rowIndex = m_proxyList.size();
     }
 
+    //int rowIndex1 = rowIndex;
     for(int row = 0; row < m_model->rowCount(parent); ++row)
     {
 
         QModelIndex childIndex = m_model->index(row,0,parent);
-
-
         newItem = m_model->itemForIndex(childIndex);
-        if (newItem->begin() < m_begin)
-            m_begin = newItem->begin();
 
-        if (newItem->end() > m_end)
+        if (newItem->begin() < m_header->begin())
+        {
+
+            //==something for header pos======
+            qreal durationTillBegin = newItem->begin().secsTo(m_header->begin());
+            qreal secWidth = 20;
+
+            m_header->setBegin(newItem->begin());
+            qreal newDuration = m_header->begin().secsTo(newItem->begin());
+            durationTillBegin = (durationTillBegin+newDuration)*secWidth;
+
+
+
+            //durationTillBegin = durationTillBegin*secWidth;
+
+            switch (m_scale) {
+            case ScaleSecond:
+                break;
+            case ScaleMinute:
+                durationTillBegin = durationTillBegin/60;
+                break;
+            case ScaleHour:
+                durationTillBegin = durationTillBegin/3600;
+                break;
+            case ScaleDay:
+                durationTillBegin = durationTillBegin/86400;
+                break;
+            case ScaleMonth:
+                //m_width = m_width/86400;
+                break;
+            default:
+                break;
+            }
+            m_header->setX(m_header->x()-durationTillBegin);
+            //=====================
+            m_begin = newItem->begin();
+        }
+
+        if (newItem->end() > m_header->end())
             m_end = newItem->end();
 
         m_header->setBegin(m_begin);
         m_header->setEnd(m_end);
-        m_item = new GanttGraphicsItem(newItem, m_scale, m_begin, m_end);
-        m_itemLayout->insertItem(rowIndex,m_item);
 
-        qDebug()<<"new i:"<<rowIndex;
+        m_item = new GanttGraphicsItem(newItem, m_scale, m_header);
+        m_itemLayout->insertItem(rowIndex,m_item);
 
         QPersistentModelIndex persIndex(childIndex);
         m_proxyList.insert(rowIndex, persIndex);
-        rowIndex += 1;
+        rowIndex/*1*/ += 1;
 
         if(m_model->hasChildren(childIndex))
-            rowIndex = setItems(childIndex, rowIndex);
+            rowIndex/*1*/ = setItems(childIndex, rowIndex/*1*/);
     }
+
     m_header->createHeader();
     m_header->update();
 
-    return rowIndex;
+    return rowIndex/*2*/;
 }

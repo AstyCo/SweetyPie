@@ -15,9 +15,10 @@ GanttGraphicsHeader::GanttGraphicsHeader(QDateTime begin, QDateTime end, Scale s
     /*QGraphicsLinearLayout **/upper = new QGraphicsLinearLayout(headerLayout);
     /*QGraphicsLinearLayout **/lower = new QGraphicsLinearLayout(headerLayout);
 
-    m_begin = begin;
-    m_end = end;
     m_scale = scale;
+    setBegin(begin);
+    setEnd(end);
+
 
     createHeader();
 
@@ -204,6 +205,12 @@ void GanttGraphicsHeader::clearHeader()
     }
 }
 
+void GanttGraphicsHeader::zoom(Scale scale)
+{
+    m_scale = scale;
+    createHeader();
+}
+
 QDateTime GanttGraphicsHeader::end() const
 {
     return m_end;
@@ -211,7 +218,7 @@ QDateTime GanttGraphicsHeader::end() const
 
 void GanttGraphicsHeader::setEnd(const QDateTime &end)
 {
-    m_end = end;
+    m_end = end.addDays(2);
 }
 
 QDateTime GanttGraphicsHeader::begin() const
@@ -222,6 +229,31 @@ QDateTime GanttGraphicsHeader::begin() const
 void GanttGraphicsHeader::setBegin(const QDateTime &begin)
 {
     m_begin = begin;
+    QTime time;
+    QDate date;
+    switch (m_scale) {
+    case ScaleSecond:
+        break;
+    case ScaleMinute:
+        time.setHMS(begin.time().hour(),begin.time().minute(),0);
+        m_begin.setTime(time);
+        break;
+    case ScaleHour:
+        time.setHMS(begin.time().hour(),0,0);
+        m_begin.setTime(time);
+        break;
+    case ScaleDay:
+        time.setHMS(0,0,0);
+        m_begin.setTime(time);
+        qDebug()<<"wtf"<<m_begin;
+        break;
+    case ScaleMonth:
+        date.setDate(begin.date().year(),begin.date().month(),1);
+        m_begin.setDate(date);
+        break;
+    default:
+        break;
+    }
 }
 
 
