@@ -11,6 +11,8 @@ Release:TARGET = GanttModel
 
 TEMPLATE = lib
 
+#VERSION = 0.0.1
+
 DEFINES += GANTTMODEL_LIBRARY
 
 SOURCES += \

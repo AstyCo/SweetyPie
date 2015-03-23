@@ -86,6 +86,7 @@ GanttView::GanttView(QWidget *parent) :
 
     //m_graphicsview->horizontalScrollBar()->setMinimum(5);
     connect(m_graphicsview->verticalScrollBar(),SIGNAL(valueChanged(int)),this,SLOT(holdHeaderOnTop()));
+    //connect(m_treeview->verticalScrollBar(),SIGNAL(valueChanged(int)),this,SLOT(holdHeaderOnTop()));
     //holdHeaderOnTop();
 
     //======timelog2==========
@@ -327,7 +328,7 @@ void GanttView::createConnections()
 //            this, SLOT(updateIcon(int)));
 
     m_treeview->verticalScrollBar()->setStyleSheet("QScrollBar {width:0px;}");
-    //m_treeview->verticalScrollBar()->hide();//setVisible(false);
+    //connect(m_treeview->verticalScrollBar(),SIGNAL(valueChanged(int)),m_graphicsview->verticalScrollBar(),SLOT(setValue(int)));
     connect(m_graphicsview->verticalScrollBar(),SIGNAL(valueChanged(int)),m_treeview->verticalScrollBar(),SLOT(setValue(int)));
 
 
@@ -369,8 +370,9 @@ void GanttView::setCurrentIndex(const QModelIndex &index)
 void GanttView::editAdd()
 {
     QModelIndex index = m_treeview->currentIndex();
-    if (m_model->addItem("lol", QDateTime::currentDateTime().addDays(-20),QDateTime::currentDateTime().addDays(-18), index)) {
-        index = m_model->index(0, 0, index);
+    if (m_model->addItem("lol", QDateTime::currentDateTime().addDays(-20),QDateTime::currentDateTime().addDays(-18), index))
+    {
+        index = m_model->index(m_model->rowCount(index)-1, 0, index);
         setCurrentIndex(index);
         m_treeview->edit(index);
         updateUi();

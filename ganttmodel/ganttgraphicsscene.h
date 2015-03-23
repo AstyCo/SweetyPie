@@ -57,6 +57,8 @@ private slots:
     void onRowsAboutToBeRemoved(const QModelIndex & parent, int start, int end);
     void onMoveUp(QModelIndex index);
 
+    void onTimer();
+
 private:
     GanttModel * m_model;
     QModelIndex * m_index;
@@ -73,6 +75,7 @@ private:
     Scale m_scale;
     Zoom m_zoom;
 
+    int m_cursor;
 
     QList<QPersistentModelIndex> m_proxyList;
 

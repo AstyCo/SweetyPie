@@ -1,5 +1,7 @@
 #include "ganttgraphicsscene.h"
 
+#include "ganttgraphicsview.h"
+
 #include <QPainter>
 #include <QGraphicsTextItem>
 #include <QRect>
@@ -7,6 +9,7 @@
 #include <QLabel>
 
 #include "QDebug"
+#include "QTimer"
 
 static const int GRID_STEP = 20;
 
@@ -27,10 +30,20 @@ GanttGraphicsScene::GanttGraphicsScene(GanttModel *model, /*QDateTime begin, QDa
 
     test->setPos(0,0);
 
-    QDateTime begin = QDateTime::fromString("28.01.2015", "dd.MM.yyyy");
-    QDateTime end = begin.addDays(2);
-    m_begin = begin;
-    m_end = end;
+    QDateTime begin, end;
+    QModelIndex seed = model->index(0,0);
+    if (seed.isValid())
+    {
+        begin = model->itemForIndex(model->index(0,0))->begin();
+        end = model->itemForIndex(model->index(0,0))->end();
+    }
+    else
+    {
+        begin = QDateTime::currentDateTime();
+        end = begin.addDays(2);
+    }
+//    m_begin = begin;
+//    m_end = end;
     m_scale = ScaleDay;
 
     m_zoom = ZoomDay;
@@ -47,7 +60,6 @@ GanttGraphicsScene::GanttGraphicsScene(GanttModel *model, /*QDateTime begin, QDa
     m_headerItem->setZValue(1.0);
     //m_headerItem->setFlags(QGraphicsItem::ItemIsMovable);
     m_layout->addItem(m_headerItem);
-
 
     m_itemLayout = new QGraphicsLinearLayout(Qt::Vertical);
     m_itemLayout->setContentsMargins(0,0,0,0);
@@ -88,6 +100,10 @@ GanttGraphicsScene::GanttGraphicsScene(GanttModel *model, /*QDateTime begin, QDa
 
     //connect(m_model, SIGNAL(dataChanged(QModelIndex,QModelIndex)), this, SLOT(updateItems(m_model)));
 
+    m_cursor = 0;
+    QTimer * timer; timer = new QTimer();
+    connect(timer, SIGNAL(timeout()), this, SLOT(onTimer()));
+    timer->start(10);
 }
 
 GanttGraphicsScene::~GanttGraphicsScene()
@@ -112,12 +128,15 @@ void GanttGraphicsScene::drawBackground(QPainter *painter, const QRectF &rect)
    if (start > rect.top()) {
       start -= step;
    }
-   for (qreal y = start - step; y < rect.bottom(); ) {
+
+   qreal y = start - step;
+   //for (qreal y = start - step; y < rect.bottom(); ) {
+   for (int i = 0; i < m_proxyList.count()+3; ++i ) {
       y += step;
       painter->drawLine(rect.left(), y, rect.right(), y);
    }
    // now draw vertical grid
-   int stepV = 20;
+   int stepV = GRID_STEP;
    start = round(rect.left(), stepV);
    if (start > rect.left()) {
       start -= stepV;
@@ -127,19 +146,38 @@ void GanttGraphicsScene::drawBackground(QPainter *painter, const QRectF &rect)
       painter->drawLine(x, rect.top(), x, rect.bottom());
    }
 
+   //qDebug()<<"header Left"<<m_header->rect().left()<<"header Right"<<m_header->rect().right()<<"  scene Left"<<rect.left()<<"scene Right"<<rect.right();
+   //qDebug()<<"header Left"<<m_header->pos().x()<<"header Right"<<m_header->rect().right()<<"  scene Left"<<rect.left()<<"scene Right"<<rect.right();
+
+//   if(m_header->pos().x() < 0)
+//   {
+//       if(m_header->rect().width()+m_header->pos().x() == rect.right())
+//       {
+//           m_header->setEnd(m_header->end().addDays(2));
+//           m_header->createHeader();
+//       }
+//   }
+
    //оси координат сцены
 //   QPen zeroPen(Qt::SolidLine);
 //   zeroPen.setColor(QColor(Qt::red));
 //   painter->setPen(zeroPen);
+
 //   painter->drawLine(0,rect.top(),0,rect.bottom());
 //   painter->drawLine(rect.left(),0,rect.right(),0);
 
 }
 
+void GanttGraphicsScene::onTimer()
+{
+    m_cursor += 1;
+    update();
+}
+
 void GanttGraphicsScene::setInterval(QDateTime begin, QDateTime end)
 {
-    m_begin = begin;
-    m_end = end;
+    //m_begin = begin;
+    //m_end = end;
 }
 
 void GanttGraphicsScene::calcRowFromIndex()
@@ -228,6 +266,7 @@ void GanttGraphicsScene::onExpanded(QModelIndex index)
 
     setItems(index, rowIndex);
 
+    update();
 }
 
 void GanttGraphicsScene::onCollapsed(QModelIndex index)
@@ -238,8 +277,6 @@ void GanttGraphicsScene::onCollapsed(QModelIndex index)
 
     int rowIndex = m_proxyList.size();
     int rowSibling = 0;
-
-
 
     for(int i = 0; i < m_proxyList.size(); ++i)
     {
@@ -266,15 +303,18 @@ void GanttGraphicsScene::onCollapsed(QModelIndex index)
         if(sibIndex.isValid())
             rowSibling = m_proxyList.indexOf(sibIndex, rowIndex);
         else
-            rowSibling = m_proxyList.size()-1;
+            rowSibling = m_proxyList.size()/*-1*/;
     }
 
-        for(int i = rowSibling-1; i > rowIndex; --i)
-        {
-            delete m_itemLayout->itemAt(i);
-            m_proxyList.removeAt(i);
-            //qDebug()<<"i:"<<i;
-        }
+    for(int i = rowSibling-1; i > rowIndex; --i)
+    {
+        //use this someday to show stacking items
+        //m_itemLayout->itemAt(i)->graphicsItem()->setY(m_itemLayout->itemAt(rowIndex)->graphicsItem()->y());
+
+        delete m_itemLayout->itemAt(i);
+        m_proxyList.removeAt(i);
+    }
+    update();
 }
 
 void GanttGraphicsScene::onDataChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight)
@@ -371,10 +411,10 @@ void GanttGraphicsScene::onRowsInserted(const QModelIndex &parent, int start, in
         newItem = m_model->itemForIndex(childIndex);
 
         if (newItem->begin() < m_header->begin())
-            m_header->setBegin(m_begin);
+            m_header->setBegin(newItem->begin());
 
         if (newItem->end() > m_header->end())
-            m_header->setEnd(m_end);
+            m_header->setEnd(newItem->end());
 
 //        m_header->setBegin(m_begin);
 //        m_header->setEnd(m_end);
@@ -392,6 +432,7 @@ void GanttGraphicsScene::onRowsInserted(const QModelIndex &parent, int start, in
     }
     m_header->createHeader();
     m_header->update();
+    update();
 }
 
 void GanttGraphicsScene::onRowsRemoved(const QModelIndex &parent, int start, int end)
@@ -401,6 +442,7 @@ void GanttGraphicsScene::onRowsRemoved(const QModelIndex &parent, int start, int
         delete m_itemLayout->itemAt(i);
         m_proxyList.removeAt(i);
     }
+    update();
 }
 
 void GanttGraphicsScene::onRowsAboutToBeRemoved(const QModelIndex & parent, int start, int end)
@@ -456,6 +498,8 @@ void GanttGraphicsScene::onMoveUp(QModelIndex index)
 {
 
 }
+
+
 
 
 
@@ -517,14 +561,16 @@ int GanttGraphicsScene::setItems(QModelIndex parent, int rowIndex)
             }
             m_header->setX(m_header->x()-durationTillBegin);
             //=====================
-            m_begin = newItem->begin();
+            //m_begin = newItem->begin();
+            m_header->setBegin(newItem->begin());
         }
 
         if (newItem->end() > m_header->end())
-            m_end = newItem->end();
+            //m_end = newItem->end();
+            m_header->setEnd(newItem->end());
 
-        m_header->setBegin(m_begin);
-        m_header->setEnd(m_end);
+        //m_header->setBegin(m_begin);
+        //m_header->setEnd(m_end);
 
         m_item = new GanttGraphicsItem(newItem, m_scale, m_header);
         m_itemLayout->insertItem(rowIndex,m_item);

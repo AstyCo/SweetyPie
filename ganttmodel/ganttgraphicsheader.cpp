@@ -245,7 +245,6 @@ void GanttGraphicsHeader::setBegin(const QDateTime &begin)
     case ScaleDay:
         time.setHMS(0,0,0);
         m_begin.setTime(time);
-        qDebug()<<"wtf"<<m_begin;
         break;
     case ScaleMonth:
         date.setDate(begin.date().year(),begin.date().month(),1);

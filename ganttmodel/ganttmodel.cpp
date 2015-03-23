@@ -856,9 +856,15 @@ bool GanttModel::setData(const QModelIndex &index, const QVariant &value,
             if (index.column() == Title)
                 item->setName(value.toString());
             else if (index.column() == Begin)
+            {
                 item->setCommonBegin(value.toDateTime());
+                item->duration();
+            }
             else if (index.column() == End)
+            {
                 item->setCommonEnd(value.toDateTime());
+                item->duration();
+            }
         }
         else if (role == Qt::CheckStateRole)
             item->setDone(value.toBool());
