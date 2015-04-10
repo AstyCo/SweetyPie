@@ -60,7 +60,7 @@ GanttGraphicsHeaderRectItem::GanttGraphicsHeaderRectItem(QDateTime dateTime, Hea
             m_text = m_dateTime.toString("ddd d MMM yy, hh:mm");
             break;
         case ScaleMinute:
-            m_text = m_dateTime.toString("ddd d MMM yy, hh:00");
+            m_text = m_dateTime.toString("ddd d MMM yy, hh" + QObject::trUtf8(" час"));
             break;
         case ScaleHour:
             m_text = m_dateTime.toString("ddd d MMM yy");
@@ -89,6 +89,8 @@ GanttGraphicsHeaderRectItem::GanttGraphicsHeaderRectItem(QDateTime dateTime, Hea
     m_width = w;
     m_height = h;
     m_delimiter = true;
+
+    //setRect(0,0,m_width,m_height);
 }
 
 void GanttGraphicsHeaderRectItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)

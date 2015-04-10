@@ -7,11 +7,12 @@
 #include "ganttitem.h"
 #include "ganttgraphicsheader.h"
 
-class GanttGraphicsItem : public QGraphicsLayoutItem, public QGraphicsRectItem/*public QGraphicsLinearLayout*/
+class GanttGraphicsItem : public QObject, public QGraphicsLayoutItem, public QGraphicsRectItem/*public QGraphicsLinearLayout*/
 {
+    Q_OBJECT
 public:
     //(GanttItem * item, Scale scale, QDateTime headerBegin, QDateTime headerEnd, QGraphicsItem * parent = 0)
-    GanttGraphicsItem(GanttItem * item, Scale scale, GanttGraphicsHeader * header,/*QDateTime headerBegin, QDateTime headerEnd,*/ QGraphicsItem * parent = 0);
+    GanttGraphicsItem(GanttItem * item, GanttGraphicsHeader * header,/*QDateTime headerBegin, QDateTime headerEnd,*/ QGraphicsItem * parent = 0);
     ~GanttGraphicsItem();
 
 
@@ -23,14 +24,17 @@ public:
     //QRectF boundingRect() const;
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
 
+public slots:
+
+    void calcSizeSlot();
+
 private:
 
     //GanttGraphicsItemStage * m_graphicsStage;
     GanttItem * m_ganttItem;
-    void setGraphicsStages();
-    Scale m_scale;
-    QDateTime m_headerBegin;
-    QDateTime m_headerEnd;
+    //Scale m_scale;
+    //QDateTime m_headerBegin;
+    //QDateTime m_headerEnd;
     GanttGraphicsHeader * m_header;
 
 

@@ -2,6 +2,7 @@
 #define GANTTGRAPHICSVIEW_H
 
 #include <QGraphicsView>
+#include <QSlider>
 
 //==================================
 #include <QMouseEvent>
@@ -249,10 +250,12 @@ public:
     explicit GanttGraphicsView(QWidget *parent = 0);
     QDRuler * mHorzRuler;
     QDRuler * mVertRuler;
+    QSlider * zoomSlider;
 
 signals:
 
 public slots:
+    void setupMatrix();
 };
 
 #endif // GANTTGRAPHICSVIEW_H

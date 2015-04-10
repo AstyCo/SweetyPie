@@ -27,6 +27,10 @@ public:
 
     void calcRowFromIndex();
 
+    int setItems(QModelIndex parent, int rowIndex);
+
+    QRectF m_backgroundRect;
+
 signals:
 
 public slots:
@@ -46,6 +50,9 @@ public slots:
     //void editPromote();
     //void editDemote();
 
+    void onScaleChanged(Scale zoom);
+
+
 
 
 private slots:
@@ -59,10 +66,12 @@ private slots:
 
     void onTimer();
 
+    void shrinkScene();
+
 private:
     GanttModel * m_model;
     QModelIndex * m_index;
-    int setItems(QModelIndex parent, int rowIndex);
+
 
     QGraphicsWidget * test;
     QGraphicsLinearLayout * m_layout;
@@ -81,8 +90,6 @@ private:
 
     int m_beginDeleteRow;
     int m_endDeleteRow;
-
-
 
 };
 
