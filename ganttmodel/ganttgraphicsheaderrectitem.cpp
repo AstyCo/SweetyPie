@@ -4,6 +4,8 @@
 #include <QBrush>
 #include <QPen>
 
+#include <QDebug>
+
 GanttGraphicsHeaderRectItem::GanttGraphicsHeaderRectItem(QDateTime dateTime, HeaderType headerType, Scale scale, qreal x, qreal y, qreal w, qreal h, QGraphicsItem *parent) :
     QGraphicsRectItem(x, y, w, h, parent)
 {
@@ -90,6 +92,8 @@ GanttGraphicsHeaderRectItem::GanttGraphicsHeaderRectItem(QDateTime dateTime, Hea
     m_height = h;
     m_delimiter = true;
 
+    //qDebug()<<"text"<<m_text;
+
     //setRect(0,0,m_width,m_height);
 }
 
@@ -113,6 +117,8 @@ void GanttGraphicsHeaderRectItem::paint(QPainter *painter, const QStyleOptionGra
     QPen oldPen = painter->pen();
     QPen newPen(oldPen);
 
+
+    //qDebug()<<"dateStr"<<dateStr;
 
     newPen.setColor(m_color);
     painter->setPen(newPen);

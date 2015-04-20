@@ -44,7 +44,7 @@ GanttGraphicsView::GanttGraphicsView(QWidget *parent) :
 //    zoomSlider->setMaximum(1000);
 //    zoomSlider->setValue(250);
 
-    zoomSlider->setMinimum(1);
+    zoomSlider->setMinimum(2);
     zoomSlider->setMaximum(5);
     zoomSlider->setValue(5);
     zoomSlider->setSingleStep(1);
@@ -95,7 +95,7 @@ void GanttGraphicsView::setupMatrix()
         break;
     }
     myScene->m_header->createHeader();
-    //myScene->update();
+    myScene->update();
 
 }
 

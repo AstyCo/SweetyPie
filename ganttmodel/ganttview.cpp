@@ -4,6 +4,8 @@
 
 #include "ganttdatetimedelegate.h"
 
+#include "ganttplayer.h"
+
 
 //#include "alt_key.hpp"
 //#include "aqp.hpp"
@@ -279,8 +281,12 @@ void GanttView::createMenusAndToolBar()
 //        editMenu->addAction(action);
     }
 
+
+    GanttPlayer * myPlayer = new GanttPlayer;
+
     vlayout->addWidget(m_splitter, 0);
-    vlayout->addWidget(m_editToolBar, 1);
+    vlayout->addWidget(m_editToolBar, 0);
+    vlayout->addWidget(myPlayer, 0);
     setLayout(vlayout);
 }
 

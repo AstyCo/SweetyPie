@@ -84,7 +84,7 @@ private:
     Scale m_scale;
     Zoom m_zoom;
 
-    int m_cursor;
+    qreal m_cursor;
 
     QList<QPersistentModelIndex> m_proxyList;
 

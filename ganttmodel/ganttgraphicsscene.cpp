@@ -82,12 +82,12 @@ GanttGraphicsScene::GanttGraphicsScene(GanttModel *model, /*QDateTime begin, QDa
 
     m_cursor = 0;
     QTimer * timer; timer = new QTimer();
-    connect(timer, SIGNAL(timeout()), this, SLOT(onTimer()));
-    timer->start(10);
+    //connect(timer, SIGNAL(timeout()), this, SLOT(onTimer()));
+    timer->start(100);
 
     //setItemIndexMethod(NoIndex);
 
-    connect(this, SIGNAL(changed(QList<QRectF>)),this, SLOT(shrinkScene()));
+    //connect(this, SIGNAL(changed(QList<QRectF>)),this, SLOT(shrinkScene()));
 }
 
 GanttGraphicsScene::~GanttGraphicsScene()
@@ -131,18 +131,18 @@ void GanttGraphicsScene::drawBackground(QPainter *painter, const QRectF &rect)
    }
 
 
-
    m_header->m_backgroundRect = rect;
    m_header->createHeader();
+   setSceneRect(m_header->m_fullHeaderRect.x(),m_header->m_fullHeaderRect.y(),/*itemsBoundingRect().width()*/m_header->m_fullHeaderRect.width(), itemsBoundingRect().height());
 
 
    //оси координат сцены
-//   QPen zeroPen(Qt::SolidLine);
-//   zeroPen.setColor(QColor(Qt::red));
-//   painter->setPen(zeroPen);
+   QPen zeroPen(Qt::SolidLine);
+   zeroPen.setColor(QColor(Qt::red));
+   painter->setPen(zeroPen);
 
-//   painter->drawLine(0,rect.top(),0,rect.bottom());
-//   painter->drawLine(rect.left(),0,rect.right(),0);
+   painter->drawLine(/*m_cursor*/0,rect.top(),/*m_cursor*/0,rect.bottom());
+   painter->drawLine(rect.left(),0,rect.right(),0);
 }
 
 void GanttGraphicsScene::onTimer()
@@ -155,7 +155,9 @@ void GanttGraphicsScene::shrinkScene()
 {
     //Calculates and returns the bounding rect of all items on the scene.
     //This function works by iterating over all items, and because if this, it can be slow for large scenes.
-    QRectF rect = this->itemsBoundingRect();
+    QRectF rect = //this->itemsBoundingRect();
+                    //m_itemLayout->geometry();
+                  m_header->m_fullHeaderRect;
     this->setSceneRect(rect);
 }
 
@@ -362,8 +364,9 @@ void GanttGraphicsScene::onDataChanged(const QModelIndex &topLeft, const QModelI
 
     if(flag)
     {
+
+        m_header->m_fullHeaderRect.setX(m_header->m_fullHeaderRect.x()-durationTillBegin);
         m_header->createHeader();
-        m_header->moveBy(-durationTillBegin,0);
     }
 
     m_item = new GanttGraphicsItem(newItem, m_header);

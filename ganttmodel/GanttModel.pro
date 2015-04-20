@@ -11,7 +11,7 @@ Release:TARGET = GanttModel
 
 TEMPLATE = lib
 
-#VERSION = 0.0.1
+VERSION = 0.0.2
 
 DEFINES += GANTTMODEL_LIBRARY
 
@@ -29,7 +29,8 @@ SOURCES += \
     ganttgraphicsheader.cpp \
     ganttgraphicsheaderrectitem.cpp \
     ganttdatetimedelegate.cpp \
-    ganttgraphicsheaderitem.cpp
+    ganttgraphicsheaderitem.cpp \
+    ganttplayer.cpp
 #    ganttwidget.cpp
 
 HEADERS += \
@@ -47,7 +48,8 @@ HEADERS += \
     ganttgraphicsheaderrectitem.h \
     ganttmodel_global.h \
     ganttdatetimedelegate.h \
-    ganttgraphicsheaderitem.h
+    ganttgraphicsheaderitem.h \
+    ganttplayer.h
 #    ganttwidget.h
 
 #FORMS += \

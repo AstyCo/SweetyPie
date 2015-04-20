@@ -30,6 +30,7 @@ GanttGraphicsHeader::GanttGraphicsHeader(QDateTime begin, QDateTime end, Scale s
     lowHeight = 20;
     lowCount = lowItemsCount(m_begin, m_end, m_scale);
     m_fullHeaderRect.setRect(0,0,m_lowWidth*lowCount,lowHeight*2);
+    //m_actualHeaderRect.setRect(0,0,m_lowWidth,lowHeight*2);
 
     createHeader();
 
@@ -100,17 +101,19 @@ int GanttGraphicsHeader::lowItemsCount(QDateTime begin, QDateTime end, Scale sca
     case ScaleMonth:
         {
         //TODO
-        //считает неправильно
+        //считает неправильно?
+        //====================
 
-        int a = begin.toString("MM").toInt();
-        int b = end.toString("MM").toInt();
-        count = b - a;
-//        if (count == 0)
-//        {
-//            count = 1;
-//            setEnd(end);
-//        }
-        count++;
+        if(end.date().year() == begin.date().year())
+        {
+            count = end.date().month()-begin.date().month()+1;
+        }
+        else
+        {
+            count = (12-begin.date().month()) +
+                    (end.date().year()-begin.date().year()-1) +
+                     end.date().month();
+        }
         break;
         }
     default:
@@ -238,7 +241,7 @@ void GanttGraphicsHeader::createHeader()
 
 
     QDateTime actualBegin;
-    QDateTime actualEnd;
+    //QDateTime actualEnd;
     m_fullHeaderRect.setRect(m_fullHeaderRect.x(),0,m_lowWidth*lowCount,lowHeight*2);
     int countTillBeginAHR = qFloor((m_backgroundRect.x()-m_fullHeaderRect.x())/lowWidth());
     m_actualHeaderRect.setX(m_fullHeaderRect.x() + lowWidth()*countTillBeginAHR);
@@ -246,12 +249,11 @@ void GanttGraphicsHeader::createHeader()
     m_actualHeaderRect.setHeight(lowHeight*2);
     actualBegin = increaseDateTime(m_begin, m_scale, countTillBeginAHR);
     int countTillEndAHR = qCeil((m_backgroundRect.x()+m_backgroundRect.width()-m_fullHeaderRect.x())/lowWidth());
-    m_actualHeaderRect.setWidth(m_fullHeaderRect.x()+lowWidth()*countTillEndAHR - m_actualHeaderRect.x());
-    actualEnd = increaseDateTime(m_begin, m_scale, countTillEndAHR);
+    //m_actualHeaderRect.setWidth(m_fullHeaderRect.x()+lowWidth()*countTillEndAHR - m_actualHeaderRect.x());
     int actualLowCount = countTillEndAHR - countTillBeginAHR;
 //    qDebug()<<"BGR"<<m_backgroundRect
-//    <<"FHR"<<m_fullHeaderRect
-//    <<"AHR"<<m_actualHeaderRect;
+//            <<"FHR"<<m_fullHeaderRect
+//            <<"AHR"<<m_actualHeaderRect;
 
 
 
@@ -262,7 +264,7 @@ void GanttGraphicsHeader::createHeader()
     for(int i = 0; i < actualLowCount/*lowCount*/; i++)
     {
         m_rectItem = new GanttGraphicsHeaderRectItem(currentDT, GanttGraphicsHeaderRectItem::Lower, m_scale,
-                                                     m_actualHeaderRect.x()+lowWidth()*i/*0*/, 20, m_lowWidth, lowHeight);
+                                                     m_actualHeaderRect.x()+lowWidth()*i, 20, m_lowWidth, lowHeight);
         lower->addItem(m_rectItem);
         lowPerUpCount++;
         bufferDT = increaseDateTime(currentDT, m_scale, 1);
@@ -271,7 +273,7 @@ void GanttGraphicsHeader::createHeader()
         if ((b!=a) || (i == actualLowCount/*lowCount*/-1))
         {
             m_rectItem = new GanttGraphicsHeaderRectItem(currentDT, GanttGraphicsHeaderRectItem::Upper, m_scale,
-                                                         firstLowItemPerUp/*0*/, 0, m_lowWidth * lowPerUpCount, lowHeight);
+                                                         firstLowItemPerUp, 0, m_lowWidth * lowPerUpCount, lowHeight);
             upper->addItem(m_rectItem);
             firstLowItemPerUp = firstLowItemPerUp + lowWidth()*lowPerUpCount;
             lowPerUpCount = 0;
@@ -302,7 +304,9 @@ QDateTime GanttGraphicsHeader::end() const
 
 void GanttGraphicsHeader::setEnd(const QDateTime &end)
 {
-    m_end = increaseDateTime(end,m_scale,1);/*end.addDays(2);*/
+   // m_end = increaseDateTime(end,m_scale,1);/*end.addDays(2);*/
+
+    m_end = end.addDays(2);;
 
 }
 
