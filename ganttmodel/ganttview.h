@@ -8,6 +8,7 @@
 #include "ganttgraphicsscene.h"
 #include "QVBoxLayout"
 #include "ganttmodel_global.h"
+#include "ganttplayer.h"
 
 class GANTTMODELSHARED_EXPORT GanttView : public QWidget//QSplitter
 {
@@ -16,12 +17,18 @@ public:
     explicit GanttView(QWidget *parent = 0);
     ~GanttView();
 
-    void setModel(GanttModel * model);
+    //void setModel(GanttModel * model);
 
 
     GanttGraphicsScene *graphicsscene() const;
     void setGraphicsscene(GanttGraphicsScene *graphicsscene);
     void setEditable(bool flag);
+
+    GanttModel *model() const;
+    void setModel(GanttModel *model);
+
+    GanttTreeView *treeview() const;
+    void setTreeview(GanttTreeView *treeview);
 
 private:
     //QGraphicsScene * createScene(QAbstractItemModel * model); // тут будет происходить отрисовка сцены на основе данных модели
@@ -32,6 +39,7 @@ private:
     GanttGraphicsScene * m_graphicsscene;
     GanttModel         * m_model;
     QSplitter          * m_splitter;
+    GanttPlayer * m_player;
 
 
     QToolBar * m_editToolBar;

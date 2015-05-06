@@ -4,7 +4,6 @@
 
 #include "ganttdatetimedelegate.h"
 
-#include "ganttplayer.h"
 
 
 //#include "alt_key.hpp"
@@ -117,9 +116,11 @@ GanttView::GanttView(QWidget *parent) :
 GanttView::~GanttView()
 {
     delete m_editToolBar;
-    delete m_graphicsview;
+    delete m_player;
+    delete m_graphicsview;    
     //delete m_graphicsscene;
     delete m_splitter;
+
 }
 
 //====================================================
@@ -146,7 +147,24 @@ void GanttView::setModel(GanttModel *model)
     connect(abModel, SIGNAL(rowsAboutToBeRemoved(const QModelIndex &, int, int)), m_graphicsscene, SLOT(onRowsAboutToBeRemoved(const QModelIndex &,int,int)));
     connect(abModel, SIGNAL(rowsRemoved(QModelIndex, int, int)), m_graphicsscene, SLOT(onRowsRemoved(QModelIndex,int,int)));
     connect(m_model, SIGNAL(rowInserted(QModelIndex, int, int)), m_graphicsscene, SLOT(onRowsInserted(QModelIndex,int,int)));
+
+    connect(m_player, SIGNAL(currentValueChanged(qreal)), m_graphicsscene, SLOT(onCurrentValueChanged(qreal)));
+    m_player->setSeedDT(m_graphicsscene->m_header->begin());
+    m_player->setEndDT(m_graphicsscene->m_header->end());
+    connect(m_graphicsscene, SIGNAL(cursorChanged(qreal)), m_graphicsview, SLOT(onCursorChanged(qreal)));
+
+    connect(m_graphicsview->zoomSlider, SIGNAL(valueChanged(int)), m_player, SLOT(scaleSlot()));
 }
+GanttTreeView *GanttView::treeview() const
+{
+    return m_treeview;
+}
+
+void GanttView::setTreeview(GanttTreeView *treeview)
+{
+    m_treeview = treeview;
+}
+
 
 GanttGraphicsScene *GanttView::graphicsscene() const
 {
@@ -165,6 +183,10 @@ void GanttView::setEditable(bool flag)
     else
         m_editToolBar->show();
 
+}
+GanttModel *GanttView::model() const
+{
+    return m_model;
 }
 
 
@@ -282,11 +304,15 @@ void GanttView::createMenusAndToolBar()
     }
 
 
-    GanttPlayer * myPlayer = new GanttPlayer;
+    m_player = new GanttPlayer;
 
     vlayout->addWidget(m_splitter, 0);
-    vlayout->addWidget(m_editToolBar, 0);
-    vlayout->addWidget(myPlayer, 0);
+    QHBoxLayout * toolLayout = new QHBoxLayout;
+    toolLayout->addWidget(m_editToolBar);
+    toolLayout->addWidget(m_player);
+    vlayout->addLayout(toolLayout);
+    //vlayout->addWidget(m_editToolBar, 0);
+    //vlayout->addWidget(m_player, 0);
     setLayout(vlayout);
 }
 

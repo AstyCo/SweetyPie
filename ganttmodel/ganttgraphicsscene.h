@@ -17,6 +17,7 @@ public:
     ~GanttGraphicsScene();
 
     void drawBackground(QPainter *painter, const QRectF &_rect);
+    void drawForeground(QPainter *painter, const QRectF &rect);
 
     GanttGraphicsHeader * m_header;
 
@@ -31,7 +32,11 @@ public:
 
     QRectF m_backgroundRect;
 
+    qreal cursor() const;
+    void setCursor(const qreal &cursor);
+
 signals:
+    void cursorChanged(qreal);
 
 public slots:
 
@@ -67,6 +72,8 @@ private slots:
     void onTimer();
 
     void shrinkScene();
+
+    void onCurrentValueChanged(qreal currentValue);
 
 private:
     GanttModel * m_model;

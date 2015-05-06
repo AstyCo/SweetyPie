@@ -6,12 +6,15 @@
 
 QT       += gui
 
+unix:{
+VERSION = 0.1.0
+}
 Debug:TARGET = GanttModeld
 Release:TARGET = GanttModel
 
 TEMPLATE = lib
 
-VERSION = 0.0.2
+
 
 DEFINES += GANTTMODEL_LIBRARY
 
@@ -31,7 +34,6 @@ SOURCES += \
     ganttdatetimedelegate.cpp \
     ganttgraphicsheaderitem.cpp \
     ganttplayer.cpp
-#    ganttwidget.cpp
 
 HEADERS += \
     ganttmodel.h \
@@ -50,10 +52,7 @@ HEADERS += \
     ganttdatetimedelegate.h \
     ganttgraphicsheaderitem.h \
     ganttplayer.h
-#    ganttwidget.h
 
-#FORMS += \
-#    ganttwidget.ui
 
 RESOURCES += \
     images.qrc

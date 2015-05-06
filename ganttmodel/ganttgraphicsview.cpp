@@ -5,6 +5,7 @@
 #include "QDebug"
 #include <QVBoxLayout>
 #include <QSlider>
+#include <QScrollBar>
 
 #include <qmath.h>
 
@@ -63,11 +64,11 @@ GanttGraphicsView::GanttGraphicsView(QWidget *parent) :
     this->setLayout(hLayout);
 
 
-    connect(zoomSlider, SIGNAL(valueChanged(int)), this, SLOT(setupMatrix()));
+    connect(zoomSlider, SIGNAL(valueChanged(int)), this, SLOT(setupMatrix(int)));
 
 }
 
-void GanttGraphicsView::setupMatrix()
+void GanttGraphicsView::setupMatrix(int value)
 {
 //    qreal scale = qPow(qreal(2), (zoomSlider->value() - 250) / qreal(50));
 //    QMatrix matrix;
@@ -75,7 +76,7 @@ void GanttGraphicsView::setupMatrix()
 //    setMatrix(matrix);
 
     GanttGraphicsScene * myScene = (GanttGraphicsScene*)this->scene();
-    switch (zoomSlider->value()) {
+    switch (value) {
     case 1:
         myScene->m_header->setZoom(ScaleSecond);
         break;
@@ -89,13 +90,23 @@ void GanttGraphicsView::setupMatrix()
         myScene->m_header->setZoom(ScaleDay);
         break;
     case 5:
-        myScene->m_header->setZoom(ScaleMonth);
+        myScene->m_header->setZoom(ScaleMonth);        
         break;
     default:
         break;
     }
     myScene->m_header->createHeader();
     myScene->update();
+    //qDebug()<<horizontalScrollBar()->maximum()<<value;
 
+}
+
+void GanttGraphicsView::onCursorChanged(qreal cursor)
+{
+    GanttGraphicsScene * myScene = (GanttGraphicsScene*)this->scene();
+    if(cursor >= myScene->m_header->m_backgroundRect.right())
+        horizontalScrollBar()->setValue(horizontalScrollBar()->value()+horizontalScrollBar()->pageStep()/*singleStep()/10*/);
+    if(cursor < myScene->m_header->m_backgroundRect.left())
+        horizontalScrollBar()->setValue(horizontalScrollBar()->value()-horizontalScrollBar()->pageStep()/*singleStep()/10*/);
 }
 

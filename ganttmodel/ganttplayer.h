@@ -5,6 +5,9 @@
 #include <QToolBar>
 #include <QAction>
 #include <QTimer>
+#include <QSpinBox>
+#include <QDateTimeEdit>
+#include <QSlider>
 
 class GanttPlayer : public QWidget
 {
@@ -13,12 +16,35 @@ public:
     explicit GanttPlayer(QWidget *parent = 0);
     ~GanttPlayer();
 
+
+    QDateTime seedDT() const;
+    void setSeedDT(const QDateTime &seedDT);
+
+    qreal playerEndValue() const;
+    void setPlayerEndValue(const qreal &playerEndValue);
+
+    QDateTime endDT() const;
+    void setEndDT(const QDateTime &endDT);
+
+
+    QDateTime currentDT() const;
+    void setCurrentDT(const QDateTime &currentDT);
+
 private:
     QToolBar * m_playerToolBar;
+    QSlider * m_slider;
     qreal m_playerCurrentValue;
     qreal m_playerEndValue;
     qreal m_playerBeginValue;
+    qreal m_secWidth; //pixels
+    int m_speed;
+    int m_timeInc; //time increment in msecs
+    QSpinBox * m_spinBox;
+    QDateTimeEdit * m_dtEdit;
     QTimer * m_timer;
+    QDateTime m_seedDT;
+    QDateTime m_currentDT;
+    QDateTime m_endDT;
 
     QAction * m_playAction;
     QAction * m_pauseAction;
@@ -45,7 +71,7 @@ private:
     bool m_playbackIsClicked;
 
 signals:
-
+    void currentValueChanged(qreal currentValue);
 
 public slots:
 
@@ -55,6 +81,11 @@ public slots:
     void playerStop();
     void playerPlayback();
     void timerPlaybackSlot();
+    void spinBoxSlot(int speed);
+    void dt2pix(QDateTime dt);
+    void sliderSlot(int value);
+    void scaleSlot();
+
 
 };
 

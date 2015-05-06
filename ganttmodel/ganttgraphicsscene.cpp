@@ -88,6 +88,8 @@ GanttGraphicsScene::GanttGraphicsScene(GanttModel *model, /*QDateTime begin, QDa
     //setItemIndexMethod(NoIndex);
 
     //connect(this, SIGNAL(changed(QList<QRectF>)),this, SLOT(shrinkScene()));
+
+
 }
 
 GanttGraphicsScene::~GanttGraphicsScene()
@@ -99,6 +101,7 @@ GanttGraphicsScene::~GanttGraphicsScene()
     delete m_itemLayout;
     delete test;
 }
+
 
 void GanttGraphicsScene::drawBackground(QPainter *painter, const QRectF &rect)
 {
@@ -137,12 +140,23 @@ void GanttGraphicsScene::drawBackground(QPainter *painter, const QRectF &rect)
 
 
    //оси координат сцены
-   QPen zeroPen(Qt::SolidLine);
-   zeroPen.setColor(QColor(Qt::red));
-   painter->setPen(zeroPen);
+//   QPen zeroPen(Qt::SolidLine);
+//   zeroPen.setColor(QColor(Qt::red));
+//   painter->setPen(zeroPen);
+//   painter->drawLine(m_cursor,rect.top(),m_cursor,rect.bottom());
+//   painter->drawLine(rect.left(),0,rect.right(),0);
+//   update();
+}
 
-   painter->drawLine(/*m_cursor*/0,rect.top(),/*m_cursor*/0,rect.bottom());
-   painter->drawLine(rect.left(),0,rect.right(),0);
+void GanttGraphicsScene::drawForeground(QPainter *painter, const QRectF &rect)
+{
+    //оси координат сцены
+    QPen zeroPen(Qt::SolidLine);
+    zeroPen.setColor(QColor(Qt::red));
+    painter->setPen(zeroPen);
+
+    painter->drawLine(m_cursor,rect.top(),m_cursor,rect.bottom());
+    update();
 }
 
 void GanttGraphicsScene::onTimer()
@@ -160,6 +174,44 @@ void GanttGraphicsScene::shrinkScene()
                   m_header->m_fullHeaderRect;
     this->setSceneRect(rect);
 }
+
+void GanttGraphicsScene::onCurrentValueChanged(qreal currentValue)
+{
+    m_cursor = currentValue;
+    switch (m_header->zoom()) {
+    case ScaleSecond:
+        break;
+    case ScaleMinute:
+        m_cursor = m_cursor/60;
+        break;
+    case ScaleHour:
+        m_cursor = m_cursor/3600;
+        break;
+    case ScaleDay:
+        m_cursor = m_cursor/86400;
+        break;
+    case ScaleMonth:
+        m_cursor = m_cursor/(86400*30.4);
+        break;
+    default:
+        break;
+    }
+    if(m_cursor >= m_header->m_backgroundRect.right()/*-m_header->m_backgroundRect.width()/2*/)
+        emit cursorChanged(m_cursor);
+    if(m_cursor < m_header->m_backgroundRect.left()/*-m_header->m_backgroundRect.width()/2*/)
+        emit cursorChanged(m_cursor);
+}
+
+qreal GanttGraphicsScene::cursor() const
+{
+    return m_cursor;
+}
+
+void GanttGraphicsScene::setCursor(const qreal &cursor)
+{
+    m_cursor = cursor;
+}
+
 
 void GanttGraphicsScene::setInterval(QDateTime begin, QDateTime end)
 {

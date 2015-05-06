@@ -255,7 +255,8 @@ public:
 signals:
 
 public slots:
-    void setupMatrix();
+    void setupMatrix(int value);
+    void onCursorChanged(qreal cursor);
 };
 
 #endif // GANTTGRAPHICSVIEW_H
