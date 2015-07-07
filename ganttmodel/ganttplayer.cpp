@@ -87,6 +87,16 @@ void GanttPlayer::setCurrentDT(const QDateTime &currentDT)
 {
     m_currentDT = currentDT;
 }
+QDateTimeEdit *GanttPlayer::dtEdit() const
+{
+    return m_dtEdit;
+}
+
+void GanttPlayer::setDtEdit(QDateTimeEdit *dtEdit)
+{
+    m_dtEdit = dtEdit;
+}
+
 
 
 
@@ -183,7 +193,6 @@ void GanttPlayer::dt2pix(QDateTime dt)
     emit currentValueChanged(m_playerCurrentValue);
     m_currentDT = m_dtEdit->dateTime();
     m_slider->setValue((m_playerCurrentValue * m_slider->maximum()) / m_playerEndValue);
-    qDebug()<<"dt2pix";
 }
 
 void GanttPlayer::sliderSlot(int value)
@@ -192,7 +201,6 @@ void GanttPlayer::sliderSlot(int value)
     emit currentValueChanged(m_playerCurrentValue);
     m_currentDT = m_seedDT.addMSecs((m_playerCurrentValue * m_timeInc) / m_secWidth);
     m_dtEdit->setDateTime(m_currentDT);
-    qDebug()<<"slider Slot";
 }
 
 void GanttPlayer::scaleSlot()

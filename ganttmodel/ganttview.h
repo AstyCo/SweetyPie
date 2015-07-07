@@ -10,6 +10,16 @@
 #include "ganttmodel_global.h"
 #include "ganttplayer.h"
 
+//enum Options
+//{
+//    All,
+//    OnlyPlayer,
+//    OnlyTree,
+//    OnlyGraphics,
+//    WithoutToolbar,
+//    WithoutPlayer
+//};
+
 class GANTTMODELSHARED_EXPORT GanttView : public QWidget//QSplitter
 {
     Q_OBJECT
@@ -30,6 +40,11 @@ public:
     GanttTreeView *treeview() const;
     void setTreeview(GanttTreeView *treeview);
 
+    void ShowOnlyPlayer(bool flag);
+
+    GanttPlayer *player() const;
+    void setPlayer(GanttPlayer *player);
+
 private:
     //QGraphicsScene * createScene(QAbstractItemModel * model); // тут будет происходить отрисовка сцены на основе данных модели
                                                             // хотя решил передавать указатель на модель в сам конструктор сцены
@@ -39,7 +54,7 @@ private:
     GanttGraphicsScene * m_graphicsscene;
     GanttModel         * m_model;
     QSplitter          * m_splitter;
-    GanttPlayer * m_player;
+    GanttPlayer        * m_player;
 
 
     QToolBar * m_editToolBar;

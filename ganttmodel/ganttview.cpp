@@ -80,6 +80,7 @@ GanttView::GanttView(QWidget *parent) :
     m_treeview->setItemDelegateForColumn(1, delegate);
     m_treeview->setItemDelegateForColumn(2, delegate);
 
+
     m_splitter->addWidget(m_treeview);
     m_splitter->addWidget(m_graphicsview);
 
@@ -106,10 +107,15 @@ GanttView::GanttView(QWidget *parent) :
 
     //setEditable(false);
 
-
-
     //m_treeview->setItemDelegate(&delegate);
     //m_treeview->setItemDelegateForColumn(1, new QDateTimeEdit);
+
+    QList<int> splSizes;
+    splSizes<<58<<100;
+    m_splitter->setSizes(splSizes);
+
+    //this->setFixedHeight(200);
+
 
 }
 
@@ -164,6 +170,32 @@ void GanttView::setTreeview(GanttTreeView *treeview)
 {
     m_treeview = treeview;
 }
+
+void GanttView::ShowOnlyPlayer(bool flag)
+{
+    if(flag)
+    {
+        m_treeview->hide();
+        m_graphicsview->hide();
+        m_editToolBar->hide();
+    }
+    else
+    {
+        m_treeview->show();
+        m_graphicsview->show();
+        m_editToolBar->show();
+    }
+}
+GanttPlayer *GanttView::player() const
+{
+    return m_player;
+}
+
+void GanttView::setPlayer(GanttPlayer *player)
+{
+    m_player = player;
+}
+
 
 
 GanttGraphicsScene *GanttView::graphicsscene() const

@@ -48,6 +48,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
     ui->setupUi(this);
     ui->ganttWidget->setModel(model);
+    //ui->ganttWidget->ShowOnlyPlayer(true);
 }
 
 MainWindow::~MainWindow()

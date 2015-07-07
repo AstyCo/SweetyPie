@@ -8,8 +8,9 @@
 #include <QSpinBox>
 #include <QDateTimeEdit>
 #include <QSlider>
+#include "ganttmodel_global.h"
 
-class GanttPlayer : public QWidget
+class GANTTMODELSHARED_EXPORT GanttPlayer : public QWidget
 {
     Q_OBJECT
 public:
@@ -29,6 +30,9 @@ public:
 
     QDateTime currentDT() const;
     void setCurrentDT(const QDateTime &currentDT);
+
+    QDateTimeEdit *dtEdit() const;
+    void setDtEdit(QDateTimeEdit *dtEdit);
 
 private:
     QToolBar * m_playerToolBar;
