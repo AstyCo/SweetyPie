@@ -27,7 +27,7 @@ make clean -f Makefile.release
 mkdir -p $RPM_BUILD_ROOT/usr/lib64
 
 cd release
-install libganttmodel*.so* $RPM_BUILD_ROOT/usr/lib64
+cp -d  libganttmodel*.so* $RPM_BUILD_ROOT/usr/lib64
 
 
 %files
