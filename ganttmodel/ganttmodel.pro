@@ -4,15 +4,57 @@
 #
 #-------------------------------------------------
 
-QT       += gui
+QT       += core gui
 
-unix:{
+
 VERSION = 0.1.0
-}
-Debug:TARGET = GanttModeld
-Release:TARGET = GanttModel
 
 TEMPLATE = lib
+
+unix:{
+    # убираем не очевидную директиву
+    CONFIG -= debug_and_release
+    # проверяем, если debug сборка, то убираем флаг release, который устанавливается всегда
+    CONFIG( debug, debug|release )  {
+      CONFIG -= release
+    }
+    else {
+    # если release, на всякий случаем убираем debug и добавляем release
+      CONFIG -= debug
+      CONFIG += release
+    }
+
+    # теперь точно поддерживается проверка на release и debug флаги
+    # все дополнительные файлы раскидаем по директориям
+    release:{
+            DESTDIR = release
+            OBJECTS_DIR=$(DESTDIR)
+            MOC_DIR = release/.moc
+            RCC_DIR = release/.qrc
+            UI_DIR = release/.ui
+        } else {
+            DESTDIR = debug
+            OBJECTS_DIR=$(DESTDIR)
+            MOC_DIR = debug/.moc
+            RCC_DIR = debug/.qrc
+            UI_DIR = debug/.ui
+        }
+}
+ # выведем сообщение компилятора в каком режиме собираем (для проверки)
+ release:message(Building in release mode.)
+ debug:message(Building in debug mode.)
+
+# подключить библиотеки и *.h файлы
+win32:{
+
+    Release:TARGET = ganttmodel
+    Debug:TARGET = ganttmodeld
+}
+
+unix:{
+    release:TARGET = ganttmodel
+    debug:TARGET = ganttmodeld
+}
 
 
 
