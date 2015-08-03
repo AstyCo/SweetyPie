@@ -18,77 +18,49 @@ public:
     ~GanttPlayer();
 
 
-    QDateTime seedDT() const;
-    void setSeedDT(const QDateTime &seedDT);
+    QDateTime beginDt() const;
+    void setBeginDt(const QDateTime &beginDt);
 
-    qreal playerEndValue() const;
-    void setPlayerEndValue(const qreal &playerEndValue);
-
-    QDateTime endDT() const;
-    void setEndDT(const QDateTime &endDT);
+    QDateTime endDt() const;
+    void setEndDt(const QDateTime &endDt);
 
 
-    QDateTime currentDT() const;
-    void setCurrentDT(const QDateTime &currentDT);
-
-    QDateTimeEdit *dtEdit() const;
-    void setDtEdit(QDateTimeEdit *dtEdit);
+    QDateTime currentDt() const;
+    void setCurrentDt(const QDateTime &currentDt);
 
 private:
     QToolBar * m_playerToolBar;
     QSlider * m_slider;
-    qreal m_playerCurrentValue;
-    qreal m_playerEndValue;
-    qreal m_playerBeginValue;
-    qreal m_secWidth; //pixels
-    int m_speed;
-    int m_timeInc; //time increment in msecs
     QSpinBox * m_spinBox;
     QDateTimeEdit * m_dtEdit;
     QTimer * m_timer;
-    QDateTime m_seedDT;
-    QDateTime m_currentDT;
-    QDateTime m_endDT;
 
     QAction * m_playAction;
     QAction * m_pauseAction;
     QAction * m_stopAction;
     QAction * m_playbackAction;
-    QAction * m_stepBackAction;
-    QAction * m_stepForwardAction;
-    QAction * m_listFirstAction;
-    QAction * m_listLastAction;
     QAction * m_toBeginAction;
     QAction * m_toEndAction;
-    QAction * m_repeatAction;
-    QAction * m_recAction;
-    QAction * m_turnOffAction;
-    QAction * m_nextAction;
-    QAction * m_previousAction;
-    QAction * m_pullAction;
 
     void createActions();
     void createMenusAndToolBar();
     void createConnections();
-
-    bool m_playIsClicked;
-    bool m_playbackIsClicked;
 
 signals:
     void currentValueChanged(qreal currentValue);
 
 public slots:
 
-    void playerPlay();
+    void playerPlay(bool b);
     void timerPlaySlot();
     void playerPause();
     void playerStop();
-    void playerPlayback();
+    void playerPlayback(bool b);
     void timerPlaybackSlot();
     void spinBoxSlot(int speed);
-    void dt2pix(QDateTime dt);
+    void dtEditSlot(const QDateTime &dt);
     void sliderSlot(int value);
-    void scaleSlot();
+
 
 
 };

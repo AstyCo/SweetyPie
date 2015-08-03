@@ -888,8 +888,8 @@ bool GanttModel::hasChildren(const QModelIndex &parent) const
     return rowCount(parent)>0;
 }
 
-bool GanttModel::addItem(/*int row, */QString title, QDateTime begin, QDateTime end,
-                         /*GanttItem::ItemType type,*/ const QModelIndex &parent)
+bool GanttModel::addItem(const QString &title,const QDateTime &begin,const QDateTime &end,
+                         const QModelIndex &parent)
 {
     return insertRow(this->rowCount(parent), title, begin, end, parent);
 }

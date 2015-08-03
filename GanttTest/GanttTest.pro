@@ -9,10 +9,12 @@ QT       += core gui
 TARGET = GanttTest
 TEMPLATE = app
 
-Debug:LIBS += -L"../ganttmodel/debug" -lGanttModeld
-Release:LIBS += -L"../ganttmodel/release" -lGanttModel
+Debug:LIBS += -L"../ganttmodel/debug" -lganttmodeld0
+Release:LIBS += -L"../ganttmodel/release" -lganttmodel0
 
 INCLUDEPATH += "../ganttmodel"
+INCLUDEPATH += "../../../lib/include"
+INCLUDEPATH += "../../../src/src_ballistics_lib/ballistics_lib"
 
 SOURCES += main.cpp\
         mainwindow.cpp

@@ -7,7 +7,7 @@ MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
 {
-    GanttModel * model; model = new GanttModel();
+    GanttModel * model = new GanttModel();
 
     QDateTime begin = QDateTime::fromString("16.02.2015", "dd.MM.yyyy");
     QDateTime end = QDateTime::fromString("24.02.2015 15:30:43", "dd.MM.yyyy hh:mm:ss");

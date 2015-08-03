@@ -35,4 +35,13 @@
         <file>images/to-end.png</file>
         <file>images/turn-off.png</file>
     </qresource>
+    <qresource prefix="/icons">
+        <file>icons/clear.png</file>
+        <file>icons/find.png</file>
+        <file>icons/grid.png</file>
+        <file>icons/interval.png</file>
+        <file>icons/interval_visible.png</file>
+        <file>icons/max_min.png</file>
+        <file>icons/selection_interval.png</file>
+    </qresource>
 </RCC>

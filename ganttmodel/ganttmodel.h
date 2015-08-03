@@ -109,8 +109,8 @@ public:
 //    void addItem(QDateTime end, QDateTime duration, GanttItem::ItemType type);
     //void addItem(QString title, QDateTime begin, QDateTime end, GanttItem::ItemType type);
 
-    bool addItem(/*int row,*/ QString title, QDateTime begin, QDateTime end,
-                             /*GanttItem::ItemType type,*/ const QModelIndex &parent = QModelIndex());
+    bool addItem(const QString &title,const QDateTime &begin,const QDateTime &end,
+                 const QModelIndex &parent = QModelIndex());
 
     bool insertRow(int row, QString title, QDateTime begin, QDateTime end,
                   const QModelIndex &parent = QModelIndex());

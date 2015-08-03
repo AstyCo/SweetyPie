@@ -3,4 +3,5 @@ TEMPLATE = subdirs
 CONFIG +=  ordered
 
 SUBDIRS += ganttmodel \
-           gantttest
+           gantttest \
+            chartwidget

@@ -7,9 +7,11 @@
 QT       += core gui
 
 
-VERSION = 0.1.0
+VERSION = 0.2.0
 
 TEMPLATE = lib
+
+DEFINES += QWT_DLL
 
 unix:{
     # убираем не очевидную директиву
@@ -49,13 +51,28 @@ win32:{
 
     Release:TARGET = ganttmodel
     Debug:TARGET = ganttmodeld
+
+
+    Debug:LIBS += -L"../../../lib/win32"  -lqwtd
+    Release:LIBS += -L"../../../lib/win32"  -lqwt
+
+    Debug:LIBS += -L"../../../src/ballistics/ballistics_lib/debug" -lballisticsd0
+    Release:LIBS += -L"../../../src/ballistics/ballistics_lib/release" -lballistics0
 }
 
 unix:{
     release:TARGET = ganttmodel
     debug:TARGET = ganttmodeld
+
+    debug:LIBS += -L"../../../lib/msvs5"  -lqwt
+    release:LIBS += -L"../../../lib/msvs5"  -lqwt
+
+    debug:LIBS += -lballisticsd0
+    release:LIBS += -lballistics0
 }
 
+INCLUDEPATH += "../../../lib/include"
+INCLUDEPATH += "../../../src/src_ballistics_lib/ballistics_lib"
 
 
 DEFINES += GANTTMODEL_LIBRARY
@@ -75,7 +92,13 @@ SOURCES += \
     ganttgraphicsheaderrectitem.cpp \
     ganttdatetimedelegate.cpp \
     ganttgraphicsheaderitem.cpp \
-    ganttplayer.cpp
+    ganttplayer.cpp \
+    chartwidget.cpp \
+    curvedetailsgroupbox.cpp \
+    intervalslider.cpp \
+    plotinterval.cpp \
+    plotmagnifierx.cpp \
+    plotkeyeventhander.cpp
 
 HEADERS += \
     ganttmodel.h \
@@ -93,8 +116,18 @@ HEADERS += \
     ganttmodel_global.h \
     ganttdatetimedelegate.h \
     ganttgraphicsheaderitem.h \
-    ganttplayer.h
+    ganttplayer.h \
+    chartwidget.h \
+    curvedetailsgroupbox.h \
+    intervalslider.h \
+    plotinterval.h \
+    plotmagnifierx.h \
+    plotkeyeventhander.h
 
 
 RESOURCES += \
     images.qrc
+
+FORMS += \
+    chartwidget.ui \
+    curvedetailsgroupbox.ui

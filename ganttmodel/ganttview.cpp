@@ -155,8 +155,8 @@ void GanttView::setModel(GanttModel *model)
     connect(m_model, SIGNAL(rowInserted(QModelIndex, int, int)), m_graphicsscene, SLOT(onRowsInserted(QModelIndex,int,int)));
 
     connect(m_player, SIGNAL(currentValueChanged(qreal)), m_graphicsscene, SLOT(onCurrentValueChanged(qreal)));
-    m_player->setSeedDT(m_graphicsscene->m_header->begin());
-    m_player->setEndDT(m_graphicsscene->m_header->end());
+    m_player->setBeginDt(m_graphicsscene->m_header->begin());
+    m_player->setEndDt(m_graphicsscene->m_header->end());
     connect(m_graphicsscene, SIGNAL(cursorChanged(qreal)), m_graphicsview, SLOT(onCursorChanged(qreal)));
 
     connect(m_graphicsview->zoomSlider, SIGNAL(valueChanged(int)), m_player, SLOT(scaleSlot()));
