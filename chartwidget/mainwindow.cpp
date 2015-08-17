@@ -21,6 +21,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->widget->setLeftAxis("111111",0,0);
     ui->widget->setRightAxis("222222",0,800);
 
+    ui->widget->setCountLastPoints(30);
 
     ui->widget->addInterval(data[0].x(), data[30].x(), QColor(229, 229, 229), QColor(187, 187, 187));
 

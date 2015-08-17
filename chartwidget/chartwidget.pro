@@ -57,11 +57,16 @@ win32{
 Debug:LIBS += -L"../../../lib/win32" -lganttmodeld0
 Release:LIBS += -L"../../../lib/win32" -lganttmodel0
 
+Debug:LIBS += -L"../../../lib/win32" -lballisticsd0
+Release:LIBS += -L"../../../lib/win32" -lballistics0
 }
 unix{
 
 debug:LIBS += -L"../../../lib/msvs5" -lganttmodeld
 release:LIBS += -L"../../../lib/msvs5" -lganttmodel
+
+debug:LIBS += -L"../../../lib/msvs5" -lballisticsd
+release:LIBS += -L"../../../lib/msvs5" -lballistics
 
 }
 

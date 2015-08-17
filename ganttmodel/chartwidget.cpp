@@ -110,6 +110,13 @@ ChartWidget::ChartWidget(QWidget * parent) :
   QList<int> spliterSizes;
   spliterSizes<<60<<40;
   ui->splitter->setSizes(spliterSizes);
+
+  _countLastPoints = 0;
+  _timerOnline = new QTimer(this);
+  _timerOnline->setInterval(1000);
+  connect(_timerOnline,SIGNAL(timeout()),this,SLOT(fullReplot()));
+
+
 }
 
 ChartWidget::~ChartWidget()
@@ -613,10 +620,30 @@ void ChartWidget::setIntervalSelectionByState(QPointF pos)
   m_pIntervalMarker[markerIdx]->show();
   ui->m_plot->replot();
 }
+int ChartWidget::countLastPoints() const
+{
+    return _countLastPoints;
+}
+
+void ChartWidget::setCountLastPoints(int countLastPoints)
+{
+    _countLastPoints = countLastPoints;
+}
+
 
 QList<QwtPlotCurve *> ChartWidget::curves() const
 {
     return m_curves;
+}
+
+void ChartWidget::startOnlineReplot()
+{
+    _timerOnline->start();
+}
+
+void ChartWidget::stopOnlineReplot()
+{
+    _timerOnline->stop();
 }
 
 QList<PlotInterval *> ChartWidget::intervals() const
@@ -917,7 +944,14 @@ void ChartWidget::setData(const QString &title, const QColor &defaultColor, cons
 
     curve->setTitle(title);
 
-    curve->setSamples(data);
+    if(_countLastPoints==0)
+        curve->setSamples(data);
+    else
+    {
+        QVector<QPointF> tmp;
+        tmp = data.mid(data.size()-_countLastPoints);
+        curve->setSamples(tmp);
+    }
     curve->setYAxis(axis);
     curve->setPen(QPen(defaultColor));
 
@@ -959,6 +993,21 @@ void ChartWidget::setData(const QString &title, const QColor &defaultColor, cons
     m_curves.append(curve);
 
     fullReplot();
+}
+
+void ChartWidget::updateData(int indexCurve, const QVector<QPointF> &data)
+{
+    if(_countLastPoints==0)
+        m_curves[indexCurve]->setSamples(data);
+    else
+    {
+        QVector<QPointF> tmp;
+        tmp = data.mid(data.size()-_countLastPoints);
+        m_curves[indexCurve]->setSamples(tmp);
+    }
+
+    if(!_timerOnline->isActive())
+        fullReplot();
 }
 
 void ChartWidget::clearChart()

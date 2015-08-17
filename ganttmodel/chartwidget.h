@@ -27,6 +27,8 @@
 #include "plotinterval.h"
 #include "curvedetailsgroupbox.h"
 #include "ganttmodel_global.h"
+#include <QTimer>
+
 
 enum ChartSelectionState
 {
@@ -159,6 +161,9 @@ private:
   TimeSpan m_selInterval;
   ChartSelectionState m_selectionState;
 
+  QTimer * _timerOnline;
+  int _countLastPoints;
+
   QPointF getTransformedPoint(const CurveIndex &index) const;
   QPointF getTransformedPoint(int indexCurve, int indexPoint) const;
 
@@ -245,6 +250,8 @@ public:
                QwtPlot::Axis axis = QwtPlot::yLeft ///< Привязанность к оси
           );
 
+  void updateData(int indexCurve, const QVector<QPointF> &data);
+
   /// Дата и время начала выделенного интервала
   UtcDateTime getSelIntervalBeginDt() { return m_curStartDt; }
   /// Дата и время конца выделенного интервала
@@ -268,6 +275,14 @@ public:
   /// Список графиков
   QList<QwtPlotCurve *> curves() const;
 
+
+  /// Запускает таймер для перерисовки графика
+  void startOnlineReplot();
+  /// Останавливает таймер для перерисовки графика
+  void stopOnlineReplot();
+
+  int countLastPoints() const;
+  void setCountLastPoints(int countLastPoints);
 
 signals:
   /// Когда выбрана точка
