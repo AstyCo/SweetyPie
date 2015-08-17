@@ -9,8 +9,54 @@ QT       += core gui
 TARGET = GanttTest
 TEMPLATE = app
 
-Debug:LIBS += -L"../ganttmodel/debug" -lganttmodeld0
-Release:LIBS += -L"../ganttmodel/release" -lganttmodel0
+
+unix:{
+    # убираем не очевидную директиву
+    CONFIG -= debug_and_release
+    # проверяем, если debug сборка, то убираем флаг release, который устанавливается всегда
+    CONFIG( debug, debug|release )  {
+      CONFIG -= release
+    }
+    else {
+    # если release, на всякий случаем убираем debug и добавляем release
+      CONFIG -= debug
+      CONFIG += release
+    }
+
+    # теперь точно поддерживается проверка на release и debug флаги
+    # все дополнительные файлы раскидаем по директориям
+    release:{
+            DESTDIR = release
+            OBJECTS_DIR=$(DESTDIR)
+            MOC_DIR = release/.moc
+            RCC_DIR = release/.qrc
+            UI_DIR = release/.ui
+        } else {
+            DESTDIR = debug
+            OBJECTS_DIR=$(DESTDIR)
+            MOC_DIR = debug/.moc
+            RCC_DIR = debug/.qrc
+            UI_DIR = debug/.ui
+        }
+}
+ # выведем сообщение компилятора в каком режиме собираем (для проверки)
+ release:message(Building in release mode.)
+ debug:message(Building in debug mode.)
+
+
+# подключить библиотеки и *.h файлы
+win32{
+
+Debug:LIBS += -L"../../../lib/win32" -lganttmodeld0
+Release:LIBS += -L"../../../lib/win32" -lganttmodel0
+
+}
+unix{
+
+debug:LIBS += -L"../../../lib/msvs5" -lganttmodeld
+release:LIBS += -L"../../../lib/msvs5" -lganttmodel
+
+}
 
 INCLUDEPATH += "../ganttmodel"
 INCLUDEPATH += "../../../lib/include"

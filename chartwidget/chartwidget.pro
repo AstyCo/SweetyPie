@@ -54,22 +54,15 @@ unix:{
 # подключить библиотеки и *.h файлы
 win32{
 
-Debug:LIBS += -L"../ganttmodel/debug" -lganttmodeld0
-Release:LIBS += -L"../ganttmodel/release" -lganttmodel0
-
-Debug:LIBS += -L"../../../src/ballistics/ballistics_lib/debug" -lballisticsd0
-Release:LIBS += -L"../../../src/ballistics/ballistics_lib/release" -lballistics0
-
+Debug:LIBS += -L"../../../lib/win32" -lganttmodeld0
+Release:LIBS += -L"../../../lib/win32" -lganttmodel0
 
 }
 unix{
 
-Debug:LIBS += -L"../ganttmodel/debug" -lganttmodeld
-Release:LIBS += -L"../ganttmodel/release" -lganttmodel
+debug:LIBS += -L"../../../lib/msvs5" -lganttmodeld
+release:LIBS += -L"../../../lib/msvs5" -lganttmodel
 
-
-debug:LIBS += -lballisticsd0
-release:LIBS += -lballistics0
 }
 
 INCLUDEPATH += "../ganttmodel"
