@@ -114,7 +114,7 @@ ChartWidget::ChartWidget(QWidget * parent) :
 
 ChartWidget::~ChartWidget()
 {
-
+    clearChart();
 }
 
 void ChartWidget::fullReplot()
@@ -132,7 +132,8 @@ void ChartWidget::fullReplot()
     ui->m_plot->replot();
     // установить новый масштаб в качестве базового
     m_zoomer[0]->SetZoomBase(true);
-    m_zoomer[1]->SetZoomBase(true);
+    if(m_zoomer[1]!=0)
+        m_zoomer[1]->SetZoomBase(true);
 }
 
 void ChartWidget::autoZoom()
@@ -962,7 +963,18 @@ void ChartWidget::setData(const QString &title, const QColor &defaultColor, cons
 
 void ChartWidget::clearChart()
 {
-  m_curves.clear();
+    for(int i=0; i<m_curves.count(); i++)
+        m_curves[i]->detach();
+    m_curves.clear();
+
+    for(int i=0; i<m_intervals.count(); i++)
+        m_intervals[i]->detach();
+    m_intervals.clear();
+
+    for(int i=0; i<m_detaildPanels.count(); i++)
+        delete m_detaildPanels[i];
+    m_detaildPanels.clear();
+
   m_selectedPointIndex = CurveIndex();
   m_selectionState = chartNoSelection;
   m_curStartPointIdx = CurveIndex();
@@ -1118,9 +1130,11 @@ void ChartWidget::selectIntervalByDates(UtcDateTime beginDt, UtcDateTime endDt)
     beginDt = endDt;
     endDt = tmpDt;
   }
+  if(!m_beginLimit.isValid() || !m_endLimit.isValid())
+      return;
+
   if (beginDt.toBshvTime() < m_curves[m_beginLimit.indexCurve]->sample(m_beginLimit.indexPoint).x())
   {
-
     beginDt.setBshvTime(m_curves[m_beginLimit.indexCurve]->sample(m_beginLimit.indexPoint).x());
   }
   if (endDt.toBshvTime() > m_curves[m_endLimit.indexCurve]->sample(m_endLimit.indexPoint).x())

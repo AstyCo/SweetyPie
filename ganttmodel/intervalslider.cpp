@@ -20,7 +20,7 @@ IntervalSlider::IntervalSlider(QWidget *parent) :
 
     _eventHandle = NoHandle;
 
-    connect(this,SIGNAL(valueChanged(EventHandle,long)),this,SLOT(repaint()));
+    connect(this,SIGNAL(valueChanged(IntervalSlider::EventHandle,long)),this,SLOT(repaint()));
 }
 int IntervalSlider::endValue() const
 {
@@ -40,7 +40,8 @@ void IntervalSlider::setEndValue(int endValue)
 //        _endValue=getValue(QPoint(getPoint(_beginValue)+_handleSize,0));
 //    }
 
-    emit valueChanged(EndHandle,_endValue);
+    emit valueChanged(IntervalSlider::EndHandle,_endValue);
+    repaint();
 }
 long IntervalSlider::beginValue() const
 {
@@ -60,7 +61,8 @@ void IntervalSlider::setBeginValue(long beginValue)
         _beginValue=_minValue;
     }
 
-    emit valueChanged(BeginHandle,_beginValue);
+    emit valueChanged(IntervalSlider::BeginHandle,_beginValue);
+    repaint();
 }
 long IntervalSlider::maxValue() const
 {
@@ -74,7 +76,8 @@ void IntervalSlider::setMaxValue(long maxValue)
     if(_endValue>_maxValue)
     {
         _endValue=_maxValue;
-        emit valueChanged(EndHandle,_endValue);
+        emit valueChanged(IntervalSlider::EndHandle,_endValue);
+        repaint();
     }
 //    if((getPoint(_beginValue)+_handleSize/2)>(getPoint(_endValue)-_handleSize/2))
 //    {
@@ -96,7 +99,8 @@ void IntervalSlider::setMinValue(long minValue)
     if(_beginValue<_minValue)
     {
         _beginValue=_minValue;
-        emit valueChanged(BeginHandle,_beginValue);
+        emit valueChanged(IntervalSlider::BeginHandle,_beginValue);
+        repaint();
     }
 //    if((getPoint(_endValue)-_handleSize/2)<(getPoint(_beginValue)+_handleSize/2))
 //    {
@@ -200,7 +204,7 @@ void IntervalSlider::mouseMoveEvent(QMouseEvent *e)
             else if((getPoint(val)+_handleSize/2)>(getPoint(_endValue)-_handleSize/2)) return;
             else if(val>_maxValue) _beginValue = _maxValue;
             else _beginValue =val;
-            emit valueChanged(BeginHandle,_beginValue);
+            emit valueChanged(IntervalSlider::BeginHandle,_beginValue);
 
         }
         else if(_eventHandle==EndHandle)
@@ -209,7 +213,7 @@ void IntervalSlider::mouseMoveEvent(QMouseEvent *e)
             else if((getPoint(val)-_handleSize/2)<(getPoint(_beginValue)+_handleSize/2)) return;
             else if(val<_minValue) _endValue = _minValue;
             else _endValue = val;
-            emit valueChanged(EndHandle,_endValue);
+            emit valueChanged(IntervalSlider::EndHandle,_endValue);
         }
 }
 

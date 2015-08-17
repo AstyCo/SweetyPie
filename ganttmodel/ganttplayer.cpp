@@ -50,8 +50,8 @@ QDateTime GanttPlayer::beginDt() const
 
 void GanttPlayer::setBeginDt(const QDateTime &beginDt)
 {
+    m_dtEdit->setMinimumDateTime(beginDt.toUTC());
     m_slider->setMinimum(beginDt.toTime_t());
-    m_dtEdit->setMinimumDateTime(beginDt);
 }
 
 QDateTime GanttPlayer::endDt() const
@@ -61,8 +61,8 @@ QDateTime GanttPlayer::endDt() const
 
 void GanttPlayer::setEndDt(const QDateTime &endDt)
 {
+    m_dtEdit->setMaximumDateTime(endDt.toUTC());
     m_slider->setMaximum(endDt.toTime_t());
-    m_dtEdit->setMaximumDateTime(endDt);
 }
 QDateTime GanttPlayer::currentDt() const
 {
@@ -74,8 +74,10 @@ void GanttPlayer::setCurrentDt(const QDateTime &currentDT)
     m_dtEdit->setDateTime(currentDT);
 }
 
-
-
+QDateTimeEdit *GanttPlayer::dtEdit() const
+{
+    return m_dtEdit;
+}
 
 void GanttPlayer::createActions()
 {
@@ -124,6 +126,7 @@ void GanttPlayer::createMenusAndToolBar()
     hlayout->addWidget(m_playerToolBar, 0);
     m_dtEdit = new QDateTimeEdit;
     m_dtEdit->setMaximumHeight(m_playerToolBar->height());
+    m_dtEdit->setTimeSpec(Qt::UTC);
     hlayout->addWidget(m_dtEdit);
     QVBoxLayout * vlayout = new QVBoxLayout;
     m_slider = new QSlider(Qt::Horizontal);
@@ -147,20 +150,21 @@ void GanttPlayer::createConnections()
 
 void GanttPlayer::dtEditSlot(const QDateTime &dt)
 {
-    if(dt.toTime_t()!=(uint)m_slider->value())
-    {
-        m_slider->setValue(dt.toTime_t());
-        emit currentValueChanged(m_slider->value());
-    }
+    m_slider->blockSignals(true);
+    m_slider->setValue(dt.toTime_t());
+    emit currentValueChanged(m_slider->value());
+    emit currentDtChanged(dt);
+    m_slider->blockSignals(false);
+
 }
 
 void GanttPlayer::sliderSlot(int value)
 {
-    if(m_dtEdit->dateTime() != QDateTime::fromTime_t(value))
-    {
-        m_dtEdit->setDateTime(QDateTime::fromTime_t(value));
-        emit currentValueChanged(value);
-    }
+    m_dtEdit->blockSignals(true);
+    m_dtEdit->setDateTime(QDateTime::fromTime_t(value).toUTC());
+    emit currentValueChanged(value);
+    emit currentDtChanged(m_dtEdit->dateTime());
+    m_dtEdit->blockSignals(false);
 }
 
 
@@ -189,8 +193,6 @@ void GanttPlayer::timerPlaySlot()
         return;
     }
     m_slider->setValue(m_slider->value()+1);
-    m_slider->repaint();
-
 }
 
 void GanttPlayer::playerPause()
@@ -232,7 +234,6 @@ void GanttPlayer::timerPlaybackSlot()
     }
 
     m_slider->setValue(m_slider->value()-1);
-    m_slider->repaint();
 }
 
 void GanttPlayer::spinBoxSlot(int speed)

@@ -28,6 +28,9 @@ public:
     QDateTime currentDt() const;
     void setCurrentDt(const QDateTime &currentDt);
 
+    QDateTimeEdit *dtEdit() const;
+
+
 private:
     QToolBar * m_playerToolBar;
     QSlider * m_slider;
@@ -47,7 +50,8 @@ private:
     void createConnections();
 
 signals:
-    void currentValueChanged(qreal currentValue);
+    void currentValueChanged(int currentValue);
+    void currentDtChanged(const QDateTime &dt);
 
 public slots:
 

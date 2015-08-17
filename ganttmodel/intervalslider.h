@@ -53,7 +53,7 @@ private:
     virtual void mousePressEvent( QMouseEvent *e );
 
 signals:
-    void valueChanged(EventHandle ev, long value);
+    void valueChanged(IntervalSlider::EventHandle ev, long value);
 
 private slots:
 
