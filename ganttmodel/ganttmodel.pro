@@ -26,28 +26,32 @@ unix:{
       CONFIG += release
     }
 
-    # теперь точно поддерживается проверка на release и debug флаги
-    # все дополнительные файлы раскидаем по директориям
-    release:{
-            DESTDIR = release
-            OBJECTS_DIR=$(DESTDIR)
-            MOC_DIR = release/.moc
-            RCC_DIR = release/.qrc
-            UI_DIR = release/.ui
-        } else {
-            DESTDIR = debug
-            OBJECTS_DIR=$(DESTDIR)
-            MOC_DIR = debug/.moc
-            RCC_DIR = debug/.qrc
-            UI_DIR = debug/.ui
-        }
+#    # теперь точно поддерживается проверка на release и debug флаги
+#    # все дополнительные файлы раскидаем по директориям
+#    release:{
+#            DESTDIR = release
+#            OBJECTS_DIR=$(DESTDIR)
+#            MOC_DIR = release/.moc
+#            RCC_DIR = release/.qrc
+#            UI_DIR = release/.ui
+#        } else {
+#            DESTDIR = debug
+#            OBJECTS_DIR=$(DESTDIR)
+#            MOC_DIR = debug/.moc
+#            RCC_DIR = debug/.qrc
+#            UI_DIR = debug/.ui
+#        }
 }
  # выведем сообщение компилятора в каком режиме собираем (для проверки)
  release:message(Building in release mode.)
  debug:message(Building in debug mode.)
 
+DLLDESTDIR = $$OUT_PWD/
+
 # подключить библиотеки и *.h файлы
 win32:{
+
+    DESTDIR = ../../../lib/win32
 
     Release:TARGET = ganttmodel
     Debug:TARGET = ganttmodeld
@@ -56,19 +60,22 @@ win32:{
     Debug:LIBS += -L"../../../lib/win32"  -lqwtd
     Release:LIBS += -L"../../../lib/win32"  -lqwt
 
-    Debug:LIBS += -L"../../../src/ballistics/ballistics_lib/debug" -lballisticsd0
-    Release:LIBS += -L"../../../src/ballistics/ballistics_lib/release" -lballistics0
+    Debug:LIBS += -L"../../../lib/win32" -lballisticsd0
+    Release:LIBS += -L"../../../lib/win32" -lballistics0
 }
 
 unix:{
+
+    DESTDIR  = ../../../lib/msvs5
+
     release:TARGET = ganttmodel
     debug:TARGET = ganttmodeld
 
     debug:LIBS += -L"../../../lib/msvs5"  -lqwt
     release:LIBS += -L"../../../lib/msvs5"  -lqwt
 
-    debug:LIBS += -lballisticsd0
-    release:LIBS += -lballistics0
+    debug:LIBS += -L"../../../lib/msvs5" -lballisticsd
+    release:LIBS += -L"../../../lib/msvs5" -lballistics
 }
 
 INCLUDEPATH += "../../../lib/include"
