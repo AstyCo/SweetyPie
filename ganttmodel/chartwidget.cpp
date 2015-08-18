@@ -15,6 +15,12 @@ ChartWidget::ChartWidget(QWidget * parent) :
     Q_INIT_RESOURCE(images);
   ui->setupUi(this);
 
+  setChartActons(caScale|
+                 caGrid|
+                 caPaintIntervals|
+                 caSelectIntervals|
+                 caMaxMinLines);
+
   ui->m_plot->setCanvasBackground( Qt::white );
 
   ui->m_plot->setAxisTitle(QwtPlot::xBottom,tr(" Дата и время"));
@@ -154,14 +160,17 @@ void ChartWidget::autoZoom()
 
 void ChartWidget::setGrid(bool b)
 {
+    if(!(_chartActons & caGrid))
+    {
+        qWarning()<<"grid is bloks. use setChartActions()";
+        return;
+    }
+
     if(b)
-    {
         m_pGrid->attach(ui->m_plot);
-    }
     else
-    {
         m_pGrid->detach();
-    }
+
     ui->m_plot->replot();
 }
 
@@ -185,24 +194,42 @@ void ChartWidget::ShowSelectionPoint(QwtText xLbl, QwtText yLbl, QPointF point, 
 
 void ChartWidget::ShowSelectionInterval(QPointF start, QPointF end)
 {
-  m_pIntervalMarker[0]->setValue(start);
-  m_pIntervalMarker[0]->show();
-  m_pIntervalMarker[1]->setValue(end);
-  m_pIntervalMarker[1]->show();
-  ui->m_plot->replot();
+    if(!(_chartActons & caSelectIntervals))
+    {
+        qWarning()<<"select intervals is bloks. use setChartActions()";
+        return;
+    }
+
+    m_pIntervalMarker[0]->setValue(start);
+    m_pIntervalMarker[0]->show();
+    m_pIntervalMarker[1]->setValue(end);
+    m_pIntervalMarker[1]->show();
+    ui->m_plot->replot();
 }
 void ChartWidget::ShowSelectionIntervalStart(QPointF start)
 {
-  m_pIntervalMarker[0]->setValue(start);
-  m_pIntervalMarker[0]->show();
-  ui->m_plot->replot();
+    if(!(_chartActons & caSelectIntervals))
+    {
+        qWarning()<<"select intervals is bloks. use setChartActions()";
+        return;
+    }
+
+    m_pIntervalMarker[0]->setValue(start);
+    m_pIntervalMarker[0]->show();
+    ui->m_plot->replot();
 }
 
 void ChartWidget::ShowSelectionIntervalEnd(QPointF end)
 {
-  m_pIntervalMarker[1]->setValue(end);
-  m_pIntervalMarker[1]->show();
-  ui->m_plot->replot();
+    if(!(_chartActons & caSelectIntervals))
+    {
+        qWarning()<<"select intervals is bloks. use setChartActions()";
+        return;
+    }
+
+    m_pIntervalMarker[1]->setValue(end);
+    m_pIntervalMarker[1]->show();
+    ui->m_plot->replot();
 }
 
 CurveIndex ChartWidget::FindPointIndexByPos(const QPointF &pos, SearchDirection direction)
@@ -508,6 +535,50 @@ QPointF ChartWidget::DtToPoint(UtcDateTime dt)
     return QPointF(offsetMin , 0);
 }
 
+QVector<QPointF> ChartWidget::limittedData(const QVector<QPointF> data) const
+{
+    if(_countLastPoints==0 || _countLastPoints>data.size())
+        return data;
+    else
+    {
+        QVector<QPointF> tmp;
+        tmp = data.mid(data.size()-_countLastPoints);
+        return tmp;
+
+    }
+}
+int ChartWidget::chartActons() const
+{
+    return _chartActons;
+}
+
+void ChartWidget::setChartActons(int chartActons)
+{
+    ui->pushButtonAutoZoom->setVisible(false);
+    ui->pushButtonGrid->setVisible(false);
+    ui->toolButtonIntervalVisibled->setVisible(false);
+    ui->pushButtonSelectInterval->setVisible(false);
+    ui->toolButtonIntervalVisibled->setVisible(false);
+    ui->pushButtonTimerOnline->setVisible(false);
+
+    _chartActons = chartActons;
+
+    // TODO блокировки самих элементов и функций на графике
+    if(_chartActons & caScale)
+        ui->pushButtonAutoZoom->setVisible(true);
+    if(_chartActons & caGrid)
+        ui->pushButtonGrid->setVisible(true);
+    if(_chartActons & caPaintIntervals)
+        ui->toolButtonIntervalVisibled->setVisible(true);
+    if(_chartActons & caSelectIntervals)
+        ui->pushButtonSelectInterval->setVisible(true);
+    if(_chartActons & caMaxMinLines)
+        ui->toolButtonIntervalVisibled->setVisible(true);
+    if(_chartActons & caTimer)
+        ui->pushButtonTimerOnline->setVisible(true);
+}
+
+
 //void ChartWidget::updateLabelAxisY()
 //{
 
@@ -638,12 +709,12 @@ QList<QwtPlotCurve *> ChartWidget::curves() const
 
 void ChartWidget::startOnlineReplot()
 {
-    _timerOnline->start();
+    on_pushButtonTimerOnline_toggled(true);
 }
 
 void ChartWidget::stopOnlineReplot()
 {
-    _timerOnline->stop();
+    on_pushButtonTimerOnline_toggled(false);
 }
 
 QList<PlotInterval *> ChartWidget::intervals() const
@@ -680,6 +751,12 @@ double ChartWidget::calcDistance(const QPointF &p1, const QPointF &p2)
 
 void ChartWidget::createMenuIitervals()
 {
+
+    if(!(_chartActons & caPaintIntervals))
+    {
+        qWarning()<<"intervals is bloks. use setChartActions()";
+        return;
+    }
     if(ui->toolButtonIntervalVisibled->menu()!=0)
         delete ui->toolButtonIntervalVisibled->menu();
 
@@ -714,6 +791,12 @@ void ChartWidget::createMenuIitervals()
 
 void ChartWidget::createMenuMaxMin()
 {
+    if(!(_chartActons & caMaxMinLines))
+    {
+        qWarning()<<"select intervals is bloks. use setChartActions()";
+        return;
+    }
+
     if(ui->toolButtonMaxMinValues->menu()!=0)
         delete ui->toolButtonMaxMinValues->menu();
 
@@ -944,17 +1027,10 @@ void ChartWidget::setData(const QString &title, const QColor &defaultColor, cons
 
     curve->setTitle(title);
 
-    if(_countLastPoints==0)
-        curve->setSamples(data);
-    else
-    {
-        QVector<QPointF> tmp;
-        tmp = data.mid(data.size()-_countLastPoints);
-        curve->setSamples(tmp);
-    }
+
     curve->setYAxis(axis);
     curve->setPen(QPen(defaultColor));
-
+    curve->setSamples(limittedData(data));
     curve->attach(ui->m_plot);
 
     CurveDetailsGroupBox * details = new CurveDetailsGroupBox(curve,this);
@@ -997,14 +1073,8 @@ void ChartWidget::setData(const QString &title, const QColor &defaultColor, cons
 
 void ChartWidget::updateData(int indexCurve, const QVector<QPointF> &data)
 {
-    if(_countLastPoints==0)
-        m_curves[indexCurve]->setSamples(data);
-    else
-    {
-        QVector<QPointF> tmp;
-        tmp = data.mid(data.size()-_countLastPoints);
-        m_curves[indexCurve]->setSamples(tmp);
-    }
+
+    m_curves[indexCurve]->setSamples(limittedData(data));
 
     if(!_timerOnline->isActive())
         fullReplot();
@@ -1118,6 +1188,12 @@ void ChartWidget::setRightAxis(const QString &title, int minLine, int maxLine, c
 
 void ChartWidget::setLeftMinMaxValues(int minLine, int maxLine, const QColor &defaultColor)
 {
+    if(!(_chartActons & caPaintIntervals))
+    {
+        qWarning()<<"intervals is bloks. use setChartActions()";
+        return;
+    }
+
     if(minLine!=0 || maxLine!=0)
     {
         m_pMinLeftMarker = new QwtPlotMarker();
@@ -1145,6 +1221,12 @@ void ChartWidget::setLeftMinMaxValues(int minLine, int maxLine, const QColor &de
 
 void ChartWidget::setRightMinMaxValues(int minLine, int maxLine, const QColor &defaultColor)
 {
+    if(!(_chartActons & caMaxMinLines))
+    {
+        qWarning()<<"min max lines is bloks. use setChartActions()";
+        return;
+    }
+
     if((minLine!=0 || maxLine!=0) && ui->m_plot->axisEnabled(QwtPlot::yRight ))
     {
         m_pMinRightMarker = new QwtPlotMarker();
@@ -1173,43 +1255,46 @@ void ChartWidget::setRightMinMaxValues(int minLine, int maxLine, const QColor &d
 
 void ChartWidget::selectIntervalByDates(UtcDateTime beginDt, UtcDateTime endDt)
 {
-  if (beginDt > endDt)
-  {
-    UtcDateTime tmpDt(beginDt);
-    beginDt = endDt;
-    endDt = tmpDt;
-  }
-  if(!m_beginLimit.isValid() || !m_endLimit.isValid())
-      return;
 
-  if (beginDt.toBshvTime() < m_curves[m_beginLimit.indexCurve]->sample(m_beginLimit.indexPoint).x())
-  {
-    beginDt.setBshvTime(m_curves[m_beginLimit.indexCurve]->sample(m_beginLimit.indexPoint).x());
-  }
-  if (endDt.toBshvTime() > m_curves[m_endLimit.indexCurve]->sample(m_endLimit.indexPoint).x())
-  {
-    endDt.setBshvTime(m_curves[m_endLimit.indexCurve]->sample(m_endLimit.indexPoint).x());
-  }
+    if(!(_chartActons & caSelectIntervals))
+    {
+        qWarning()<<"select intervals is bloks. use setChartActions()";
+        return;
+    }
 
-  m_selectionState = chartIntervalSelected;
+    if (beginDt > endDt)
+    {
+        UtcDateTime tmpDt(beginDt);
+        beginDt = endDt;
+        endDt = tmpDt;
+    }
+    if(!m_beginLimit.isValid() || !m_endLimit.isValid())
+        return;
 
-  QPointF startP = DtToPoint(beginDt);
-  QPointF endP = DtToPoint(endDt);
+    if (beginDt.toBshvTime() < m_curves[m_beginLimit.indexCurve]->sample(m_beginLimit.indexPoint).x())
+    {
+        beginDt.setBshvTime(m_curves[m_beginLimit.indexCurve]->sample(m_beginLimit.indexPoint).x());
+    }
+    if (endDt.toBshvTime() > m_curves[m_endLimit.indexCurve]->sample(m_endLimit.indexPoint).x())
+    {
+        endDt.setBshvTime(m_curves[m_endLimit.indexCurve]->sample(m_endLimit.indexPoint).x());
+    }
 
-  m_curStartPointIdx = FindPointIndexByPos(startP, sdRight);
-  m_curEndPointIdx = FindPointIndexByPos(endP, sdLeft);
+    m_selectionState = chartIntervalSelected;
 
-  //SetMinMeanMaxLbls(true);
-  ShowSelectionInterval(startP, endP);
+    QPointF startP = DtToPoint(beginDt);
+    QPointF endP = DtToPoint(endDt);
 
-  calcDetailsPanel();
+    m_curStartPointIdx = FindPointIndexByPos(startP, sdRight);
+    m_curEndPointIdx = FindPointIndexByPos(endP, sdLeft);
 
-  //this->HideEditIntervalButtons();
+    ShowSelectionInterval(startP, endP);
+
+    calcDetailsPanel();
 }
 
 void ChartWidget::clearSelectedInterval()
 {
-
   m_selectionState = chartNoSelection;
   m_pIntervalMarker[0]->hide();
   m_pIntervalMarker[1]->hide();
@@ -1218,6 +1303,12 @@ void ChartWidget::clearSelectedInterval()
 
 void ChartWidget::setIntervalSelectionStart(QPointF pos)
 {
+    if(!(_chartActons & caSelectIntervals))
+    {
+        qWarning()<<"select intervals is bloks. use setChartActions()";
+        return;
+    }
+
     m_selectionState = chartStartSelection;
     setIntervalSelectionByState(pos);
     m_selectionState = chartEndSelection;
@@ -1226,6 +1317,12 @@ void ChartWidget::setIntervalSelectionStart(QPointF pos)
 
 void ChartWidget::setIntervalSelectionEnd(QPointF pos)
 {
+    if(!(_chartActons & caSelectIntervals))
+    {
+        qWarning()<<"select intervals is bloks. use setChartActions()";
+        return;
+    }
+
     m_selectionState = chartEndSelection;
     setIntervalSelectionByState(pos);
     m_selectionState = chartIntervalSelected;
@@ -1236,6 +1333,12 @@ void ChartWidget::setIntervalSelectionEnd(QPointF pos)
 
 void ChartWidget::addInterval(long beginX, long endX, const QColor &c1, const QColor &c2)
 {
+    if(!(_chartActons & caPaintIntervals))
+    {
+        qWarning()<<"intervals is bloks. use setChartActions()";
+        return;
+    }
+
     PlotInterval * interval = new PlotInterval();
 
     if(!c2.isValid())
@@ -1258,6 +1361,32 @@ void ChartWidget::addInterval(const UtcDateTime &begin, const UtcDateTime &endX,
 
 void ChartWidget::beginIntervalSelection()
 {
+    if(!(_chartActons & caSelectIntervals))
+    {
+        qWarning()<<"select intervals is bloks. use setChartActions()";
+        return;
+    }
+
     clearSelectedInterval();
     m_selectionState = chartStartSelection;
+}
+
+void ChartWidget::on_pushButtonTimerOnline_toggled(bool checked)
+{
+    if(!(_chartActons & caTimer))
+    {
+        qWarning()<<"timer is bloks. use setChartActions()";
+        return;
+    }
+
+    if(checked)
+    {
+        ui->pushButtonTimerOnline->setIcon(QIcon(":/icons/icons/stop.png"));
+        _timerOnline->start();
+    }
+    else
+    {
+        ui->pushButtonTimerOnline->setIcon(QIcon(":/icons/icons/start.png"));
+        _timerOnline->stop();
+    }
 }

@@ -43,5 +43,7 @@
         <file>icons/interval_visible.png</file>
         <file>icons/max_min.png</file>
         <file>icons/selection_interval.png</file>
+        <file>icons/start.png</file>
+        <file>icons/stop.png</file>
     </qresource>
 </RCC>

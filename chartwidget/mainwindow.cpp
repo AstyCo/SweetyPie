@@ -18,10 +18,12 @@ MainWindow::MainWindow(QWidget *parent) :
         data.append(QPointF(QDateTime::currentDateTime().toTime_t()+(i*60),(rand() % 100)));
         data2.append(QPointF(QDateTime::currentDateTime().toTime_t()+(i*65),(rand() % 1000)+100));
     }
+
+    //ui->widget->setChartActons(caScale|caGrid);
     ui->widget->setLeftAxis("111111",0,0);
     ui->widget->setRightAxis("222222",0,800);
 
-    ui->widget->setCountLastPoints(30);
+    ui->widget->setCountLastPoints(111);
 
     ui->widget->addInterval(data[0].x(), data[30].x(), QColor(229, 229, 229), QColor(187, 187, 187));
 

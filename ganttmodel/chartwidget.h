@@ -45,22 +45,15 @@ enum SearchDirection
   sdAny
 };
 
-#define LABEL_MAX_VALUE       0
-#define LABEL_MEAN_VALUE      1
-#define LABEL_MIN_VALUE       2
-#define LABEL_MAX_INT_VALUE   3
-#define LABEL_MEAN_INT_VALUE  4
-#define LABEL_MIN_INT_VALUE   5
-#define LABEL_DIFF_INT_VALUE  6
-
-#define LABEL_X_VALUE         7
-#define LABEL_TIME_REF_VALUE  8
-#define LABEL_TIME_TEST_VALUE 9
-
-#define LABEL_Y_REF_VALUE     10
-#define LABEL_Y_TEST_VALUE    11
-#define LABEL_Y_VALUE         12
-#define LABELS_COUNT          13
+enum ChartActions{
+    caNo=0,
+    caScale=2,
+    caGrid=4,
+    caPaintIntervals=8,
+    caSelectIntervals=16,
+    caMaxMinLines=24,
+    caTimer=32
+};
 
 /// Класс для нижней временной оси
 class TimeScaleDraw: public QwtScaleDraw
@@ -185,6 +178,9 @@ private:
 
   QPointF DtToPoint(UtcDateTime dt);
 
+  QVector<QPointF> limittedData(const QVector<QPointF> data) const;
+
+  int _chartActons;
 public:
   /// Конструктор класса
   ChartWidget(QWidget *parent = 0 ///< Указатель на родительский объект
@@ -192,6 +188,7 @@ public:
 
   /// Деструктор класса
   ~ChartWidget();
+
 
 
 
@@ -250,6 +247,7 @@ public:
                QwtPlot::Axis axis = QwtPlot::yLeft ///< Привязанность к оси
           );
 
+  /// Обновляет данные графика. Если таймер запущен то график не перерисовывается.
   void updateData(int indexCurve, const QVector<QPointF> &data);
 
   /// Дата и время начала выделенного интервала
@@ -283,6 +281,9 @@ public:
 
   int countLastPoints() const;
   void setCountLastPoints(int countLastPoints);
+
+  int chartActons() const;
+  void setChartActons(int chartActons);
 
 signals:
   /// Когда выбрана точка
@@ -327,6 +328,7 @@ private slots:
   /// По выбору текущей точки
   void onCurvePointSelected(const QPointF& pos);
 
+  void on_pushButtonTimerOnline_toggled(bool checked);
 };
 
 #endif // CHARTWIDGET_H
