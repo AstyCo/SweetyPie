@@ -47,11 +47,11 @@ enum SearchDirection
 
 enum ChartActions{
     caNo=0,
-    caScale=2,
-    caGrid=4,
-    caPaintIntervals=8,
-    caSelectIntervals=16,
-    caMaxMinLines=24,
+    caScale=1,
+    caGrid=2,
+    caPaintIntervals=4,
+    caSelectIntervals=8,
+    caMaxMinLines=16,
     caTimer=32
 };
 

@@ -19,7 +19,8 @@ MainWindow::MainWindow(QWidget *parent) :
         data2.append(QPointF(QDateTime::currentDateTime().toTime_t()+(i*65),(rand() % 1000)+100));
     }
 
-    //ui->widget->setChartActons(caScale|caGrid);
+    qDebug()<<int(caScale|caGrid|caMaxMinLines|caTimer);
+    ui->widget->setChartActons(caScale|caGrid|caMaxMinLines|caTimer);
     ui->widget->setLeftAxis("111111",0,0);
     ui->widget->setRightAxis("222222",0,800);
 

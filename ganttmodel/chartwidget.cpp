@@ -558,7 +558,7 @@ void ChartWidget::setChartActons(int chartActons)
     ui->pushButtonGrid->setVisible(false);
     ui->toolButtonIntervalVisibled->setVisible(false);
     ui->pushButtonSelectInterval->setVisible(false);
-    ui->toolButtonIntervalVisibled->setVisible(false);
+    ui->toolButtonMaxMinValues->setVisible(false);
     ui->pushButtonTimerOnline->setVisible(false);
 
     _chartActons = chartActons;
@@ -573,7 +573,7 @@ void ChartWidget::setChartActons(int chartActons)
     if(_chartActons & caSelectIntervals)
         ui->pushButtonSelectInterval->setVisible(true);
     if(_chartActons & caMaxMinLines)
-        ui->toolButtonIntervalVisibled->setVisible(true);
+        ui->toolButtonMaxMinValues->setVisible(true);
     if(_chartActons & caTimer)
         ui->pushButtonTimerOnline->setVisible(true);
 }
@@ -1020,9 +1020,6 @@ void ChartWidget::onPlotPanned()
 
 void ChartWidget::setData(const QString &title, const QColor &defaultColor, const QVector<QPointF> &data, QwtPlot::Axis axis)
 {
-    if(data.isEmpty())
-        return;
-
     QwtPlotCurve * curve = new QwtPlotCurve();
 
     curve->setTitle(title);
