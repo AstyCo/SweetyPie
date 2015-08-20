@@ -38,12 +38,12 @@ void CurveDetailsGroupBox::setCurve(QwtPlotCurve *curve)
     m_curve = curve;
     updateData();
 }
-long CurveDetailsGroupBox::minValue() const
+double CurveDetailsGroupBox::minValue() const
 {
     return m_minValue;
 }
 
-void CurveDetailsGroupBox::setMinMaxValue(long minValue,long maxValue)
+void CurveDetailsGroupBox::setMinMaxValue(double minValue,double maxValue)
 {
     m_minValue = minValue;
     m_maxValue = maxValue;
@@ -64,7 +64,7 @@ void CurveDetailsGroupBox::setMinMaxValue(long minValue,long maxValue)
     }
 
 }
-long CurveDetailsGroupBox::maxValue() const
+double CurveDetailsGroupBox::maxValue() const
 {
     return m_maxValue;
 }
@@ -115,10 +115,13 @@ void CurveDetailsGroupBox::setCurrentIndex(int currentIndex)
     {
         ui->labelCurentValue->setVisible(true);
         ui->labelCurentCaption->setVisible(true);
-        ui->labelForMaxCapture->setVisible(true);
-        ui->labelForMaxValue->setVisible(true);
-        ui->labelForMinCapture->setVisible(true);
-        ui->labelForMinValue->setVisible(true);
+        if(m_minValue!=0 || m_maxValue!=0)
+        {
+            ui->labelForMaxCapture->setVisible(true);
+            ui->labelForMaxValue->setVisible(true);
+            ui->labelForMinCapture->setVisible(true);
+            ui->labelForMinValue->setVisible(true);
+        }
         calcCurrentValuesData();
     }
     else

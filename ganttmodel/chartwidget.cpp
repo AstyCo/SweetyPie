@@ -3,6 +3,8 @@
 #include "curvedetailsgroupbox.h"
 #include "math.h"
 #include "plotinterval.h"
+#include "QScrollBar"
+#include "QSplitter"
 
 #include <QColorDialog>
 #include <QMenu>
@@ -422,6 +424,21 @@ void ChartWidget::onCurvePointSelected(const QPointF &pos)
     DrawMarkerOnCurve((QwtPlot::Axis)m_curves[m_selectedPointIndex.indexCurve]->yAxis());
 
     calcDetailsPanel();
+
+    ui->m_detailsPanel->verticalScrollBar()->setValue(0);
+    int scrolldy=ui->pushButtonClear->height();
+    for(int i=0; i<m_detaildPanels.count(); i++)
+    {
+        if(i!=m_selectedPointIndex.indexCurve)
+        {
+            scrolldy+=m_detaildPanels[i]->geometry().height();
+            qDebug()<<"33 "<<m_detaildPanels[i]->geometry().height();
+        }
+        else
+            break;
+    }
+    qDebug()<<scrolldy;
+    ui->m_detailsPanel->verticalScrollBar()->setValue(scrolldy);
 
     emit pointSelected(m_selectedPointIndex);
   }
@@ -1034,11 +1051,14 @@ void ChartWidget::setData(const QString &title, const QColor &defaultColor, cons
     connect(details,SIGNAL(colorChanged(QColor)),ui->m_plot,SLOT(replot()));
     connect(details,SIGNAL(visibledChanged(bool)),this,SLOT(setCurveVisible(bool)));
     QVBoxLayout* lay = (QVBoxLayout*) ui->widgetDetail->layout();
-    lay->insertWidget(1,details);
+    lay->insertWidget(lay->count()-1,details);
 
     m_detaildPanels.append(details);
 
     calcDetailsPanel();
+
+    ui->splitter->setStretchFactor(0, 0);
+    ui->splitter->setStretchFactor(1, 1);
 
     if(m_curves.isEmpty())
     {
@@ -1095,6 +1115,31 @@ void ChartWidget::clearChart()
   m_selectionState = chartNoSelection;
   m_curStartPointIdx = CurveIndex();
   m_curEndPointIdx = CurveIndex();
+
+  if(m_pMinLeftMarker!=0)
+  {
+      m_pMinLeftMarker->detach();
+      delete m_pMinLeftMarker;
+      m_pMinLeftMarker = 0;
+  }
+  if(m_pMaxLeftMarker!=0)
+  {
+      m_pMaxLeftMarker->detach();
+      delete m_pMaxLeftMarker;
+      m_pMaxLeftMarker = 0;
+  }
+  if(m_pMinRightMarker!=0)
+  {
+      m_pMinRightMarker->detach();
+      delete m_pMinRightMarker;
+      m_pMinRightMarker = 0;
+  }
+  if(m_pMaxRightMarker!=0)
+  {
+      m_pMaxRightMarker->detach();
+      delete m_pMaxRightMarker;
+      m_pMaxRightMarker=0;
+  }
   ui->m_plot->replot();
 }
 
@@ -1157,7 +1202,7 @@ UtcDateTime ChartWidget::maximumDt()
     return rez;
 }
 
-void ChartWidget::setLeftAxis(const QString &title, int minLine, int maxLine, const QColor &defaultColor)
+void ChartWidget::setLeftAxis(const QString &title, double minLine, double maxLine, const QColor &defaultColor)
 {
     ui->m_plot->setAxisTitle(QwtPlot::yLeft,title);
     ui->m_plot->setAxisLabelRotation(QwtPlot::yLeft, -50.0);
@@ -1168,7 +1213,7 @@ void ChartWidget::setLeftAxis(const QString &title, int minLine, int maxLine, co
 
 }
 
-void ChartWidget::setRightAxis(const QString &title, int minLine, int maxLine, const QColor &defaultColor)
+void ChartWidget::setRightAxis(const QString &title, double minLine, double maxLine, const QColor &defaultColor)
 {
     ui->m_plot->enableAxis( QwtPlot::yRight );
     ui->m_plot->setAxisTitle(QwtPlot::yRight,title);
@@ -1183,7 +1228,7 @@ void ChartWidget::setRightAxis(const QString &title, int minLine, int maxLine, c
     m_zoomer[1]->setYAxis(QwtPlot::yRight);
 }
 
-void ChartWidget::setLeftMinMaxValues(int minLine, int maxLine, const QColor &defaultColor)
+void ChartWidget::setLeftMinMaxValues(double minLine, double maxLine, const QColor &defaultColor)
 {
     if(!(_chartActons & caPaintIntervals))
     {
@@ -1216,7 +1261,7 @@ void ChartWidget::setLeftMinMaxValues(int minLine, int maxLine, const QColor &de
     }
 }
 
-void ChartWidget::setRightMinMaxValues(int minLine, int maxLine, const QColor &defaultColor)
+void ChartWidget::setRightMinMaxValues(double minLine, double maxLine, const QColor &defaultColor)
 {
     if(!(_chartActons & caMaxMinLines))
     {

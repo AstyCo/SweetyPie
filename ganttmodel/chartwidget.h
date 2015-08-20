@@ -199,27 +199,27 @@ public:
 
   /// Устанавливает настройки левой оси (Если значения обеих линий равно 0 то они не рисуются)
   void setLeftAxis(const QString &title, ///< Заголовок
-                   int minLine=0, ///< Линия минимума
-                   int maxLine=0, ///< Линия максимума
+                   double minLine=0, ///< Линия минимума
+                   double maxLine=0, ///< Линия максимума
                    const QColor &defaultColor=Qt::red ///< Начальный цвет линий макс. и мин.
           );
 
   /// Создает и устанавливает настройки правой оси (Если значения обеих линий равно 0 то они не рисуются)
   void setRightAxis(const QString &title, ///< Заголовок
-                    int minLine=0, ///< Линия минимума
-                    int maxLine=0, ///< Линия максимума
+                    double minLine=0, ///< Линия минимума
+                    double maxLine=0, ///< Линия максимума
                     const QColor &defaultColor=Qt::red ///< Начальный цвет линий макс. и мин.
            );
 
   /// Устанавливает настройки линий макс. и мин. (Если значения обеих линий равно 0 то они не рисуются)
-  void setLeftMinMaxValues(int minLine=0, ///< Линия минимума
-                           int maxLine=0, ///< Линия максимума
+  void setLeftMinMaxValues(double minLine=0, ///< Линия минимума
+                           double maxLine=0, ///< Линия максимума
                            const QColor &defaultColor=Qt::red ///< Начальный цвет линий макс. и мин.
           );
 
   /// Устанавливает настройки линий макс. и мин. (Если правая ось создана и значения обеих линий равно 0 то они не рисуются)
-  void setRightMinMaxValues(int minLine=0, ///< Линия минимума
-                            int maxLine=0, ///< Линия максимума
+  void setRightMinMaxValues(double minLine=0, ///< Линия минимума
+                            double maxLine=0, ///< Линия максимума
                             const QColor &defaultColor=Qt::red ///< Начальный цвет линий макс. и мин.
           );
 

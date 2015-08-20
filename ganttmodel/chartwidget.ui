@@ -19,14 +19,7 @@
      <property name="orientation">
       <enum>Qt::Horizontal</enum>
      </property>
-     <widget class="QwtPlot" name="m_plot" native="true">
-      <property name="sizePolicy">
-       <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
-        <horstretch>0</horstretch>
-        <verstretch>0</verstretch>
-       </sizepolicy>
-      </property>
-     </widget>
+     <widget class="QwtPlot" name="m_plot" native="true"/>
      <widget class="QScrollArea" name="m_detailsPanel">
       <property name="widgetResizable">
        <bool>true</bool>
@@ -36,7 +29,7 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>754</width>
+         <width>778</width>
          <height>532</height>
         </rect>
        </property>

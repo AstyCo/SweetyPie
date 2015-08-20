@@ -22,9 +22,9 @@ public:
     QwtPlotCurve *curve() const;
     void setCurve(QwtPlotCurve *curve);
 
-    long minValue() const;
-    long maxValue() const;
-    void setMinMaxValue(long minValue,long maxValue);
+    double minValue() const;
+    double maxValue() const;
+    void setMinMaxValue(double minValue, double maxValue);
 
     long endInterval() const;
     long beginInterval() const;
@@ -38,8 +38,8 @@ private:
 
     int m_currentIndex;
 
-    long m_minValue;
-    long m_maxValue;
+    double m_minValue;
+    double m_maxValue;
 
     long m_beginInterval;
     long m_endInterval;

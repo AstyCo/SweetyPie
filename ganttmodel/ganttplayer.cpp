@@ -126,6 +126,7 @@ void GanttPlayer::createMenusAndToolBar()
     hlayout->addWidget(m_playerToolBar, 0);
     m_dtEdit = new QDateTimeEdit;
     m_dtEdit->setMaximumHeight(m_playerToolBar->height());
+    m_dtEdit->setDisplayFormat("dd.MM.yyyy hh:mm:ss");
     m_dtEdit->setTimeSpec(Qt::UTC);
     hlayout->addWidget(m_dtEdit);
     QVBoxLayout * vlayout = new QVBoxLayout;
