@@ -6,36 +6,42 @@ Group: nk/kpohi
 License: proprietary
 Source0: ../src/ganttmodel.tar.gz
 BuildArch: x86_64
-Requires: LukyanchikovLib
 BuildRoot: %{_tmppath}/ganttmodel-root
 
 %description
 Библиотека для построения диаграммы Ганта
 
+%package dev
+Summary:Библиотека для построения диаграммы Ганта для разработки
+Group: nk/kpohi 
 
-
+%description dev
+иблиотека для построения диаграммы Ганта для разработки
 
 %prep
 %setup -q -n ganttmodel
 
 %build
-qmake4 ganttmodel.pro -o Makefile.release
-make -f Makefile.release
-make clean -f Makefile.release
+qmake4 CONFIG+=build_all ganttmodel.pro
+make all
+
 
 %install
-mkdir -p $RPM_BUILD_ROOT/usr/lib64
-
-cd release
-cp -d  libganttmodel*.so* $RPM_BUILD_ROOT/usr/lib64
-
+INSTALL_ROOT=$RPM_BUILD_ROOT make install
 
 %files
 %defattr(-,root,root)
-/usr/lib64/libganttmodel*.so*
+/usr/lib64/libganttmodel.so*
+
+%files dev
+%defattr(-,root,root)
+/usr/lib64/libganttmodeld.so*
+/usr/include/*
 
 %clean
+make clean
 rm -rf $RPM_BUILD_ROOT
+
 %post
 ldconfig
 

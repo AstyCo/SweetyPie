@@ -54,11 +54,11 @@ unix:{
 # подключить библиотеки и *.h файлы
 win32{
 
-Debug:LIBS += -L"../../../lib/win32" -lganttmodeld0
-Release:LIBS += -L"../../../lib/win32" -lganttmodel0
+Debug:LIBS += -L"../../../lib/win32" -lganttmodeld
+Release:LIBS += -L"../../../lib/win32" -lganttmodel
 
-Debug:LIBS += -L"../../../lib/win32" -lballisticsd0
-Release:LIBS += -L"../../../lib/win32" -lballistics0
+Debug:LIBS += -L"../../../lib/win32" -lballisticsd
+Release:LIBS += -L"../../../lib/win32" -lballistics
 }
 unix{
 

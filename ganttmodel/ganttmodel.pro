@@ -13,74 +13,35 @@ TEMPLATE = lib
 
 DEFINES += QWT_DLL
 
-unix:{
-    # убираем не очевидную директиву
-    CONFIG -= debug_and_release
-    # проверяем, если debug сборка, то убираем флаг release, который устанавливается всегда
-    CONFIG( debug, debug|release )  {
-      CONFIG -= release
-    }
-    else {
-    # если release, на всякий случаем убираем debug и добавляем release
-      CONFIG -= debug
-      CONFIG += release
-    }
-
-#    # теперь точно поддерживается проверка на release и debug флаги
-#    # все дополнительные файлы раскидаем по директориям
-    release:{
-            DESTDIR = release
-            OBJECTS_DIR=$(DESTDIR)
-            MOC_DIR = release/.moc
-            RCC_DIR = release/.qrc
-            UI_DIR = release/.ui
-        } else {
-            DESTDIR = debug
-            OBJECTS_DIR=$(DESTDIR)
-            MOC_DIR = debug/.moc
-            RCC_DIR = debug/.qrc
-            UI_DIR = debug/.ui
-        }
-}
- # выведем сообщение компилятора в каком режиме собираем (для проверки)
- release:message(Building in release mode.)
- debug:message(Building in debug mode.)
-
 #DLLDESTDIR = $$OUT_PWD/
+TARGET = ganttmodel
 
 # подключить библиотеки и *.h файлы
 win32:{
 
     #DESTDIR = ../../../lib/win32
 
-    Release:TARGET = ganttmodel
-    Debug:TARGET = ganttmodeld
-
-
     Debug:LIBS += -L"../../../lib/win32"  -lqwtd
     Release:LIBS += -L"../../../lib/win32"  -lqwt
 
-    Debug:LIBS += -L"../../../lib/win32" -lballisticsd0
-    Release:LIBS += -L"../../../lib/win32" -lballistics0
+    Debug:LIBS += -L"../../src_ballistics_lib/ballistics_lib" -lballisticsd0
+    Release:LIBS += -L"../../src_ballistics_lib/ballistics_lib" -lballistics0
 }
 
 unix:{
 
     #DESTDIR  = ../../../lib/msvs5
 
-    release:TARGET = ganttmodel
-    debug:TARGET = ganttmodeld
-
     debug:LIBS += -L"../../../lib/msvs5"  -lqwt
     release:LIBS += -L"../../../lib/msvs5"  -lqwt
 
-    debug:LIBS += -L"../../../lib/msvs5" -lballisticsd
-    release:LIBS += -L"../../../lib/msvs5" -lballistics
+    debug:LIBS += -L"/usr/lib64" -lballisticsd
+    release:LIBS += -L"/usr/lib64" -lballistics
 }
 
 INCLUDEPATH += "../../../lib/include"
 INCLUDEPATH += "../../../src/src_ballistics_lib/ballistics_lib"
-INCLUDEPATH += "../../../workspace/src_ballistics_lib/ballistics_lib"
+unix:INCLUDEPATH += "/usr/include/ballistics"
 
 
 DEFINES += GANTTMODEL_LIBRARY
@@ -139,3 +100,5 @@ RESOURCES += \
 FORMS += \
     chartwidget.ui \
     curvedetailsgroupbox.ui
+
+include(build_config.pri)
