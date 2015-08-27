@@ -19,7 +19,7 @@
      <property name="orientation">
       <enum>Qt::Horizontal</enum>
      </property>
-     <widget class="QwtPlot" name="m_plot" native="true"/>
+     <widget class="QwtPlot" name="m_plot"/>
      <widget class="QScrollArea" name="m_detailsPanel">
       <property name="widgetResizable">
        <bool>true</bool>
@@ -289,8 +289,8 @@
  <customwidgets>
   <customwidget>
    <class>QwtPlot</class>
-   <extends>QWidget</extends>
-   <header location="global">qwt/qwt_plot.h</header>
+   <extends>QFrame</extends>
+   <header>qwt_plot.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

@@ -54,25 +54,27 @@ unix:{
 # подключить библиотеки и *.h файлы
 win32{
 
-Debug:LIBS += -L"../../../lib/win32" -lganttmodeld
-Release:LIBS += -L"../../../lib/win32" -lganttmodel
+Debug:LIBS += -L"../ganttmodel" -lganttmodeld
+Release:LIBS += -L"../ganttmodel" -lganttmodel
 
-Debug:LIBS += -L"../../../lib/win32" -lballisticsd
-Release:LIBS += -L"../../../lib/win32" -lballistics
+Debug:LIBS += -L"C:/lib64" -lballisticsd
+Release:LIBS += -L"C:/lib64" -lballistics
 }
 unix{
 
-debug:LIBS += -L"../../../lib/msvs5" -lganttmodeld
-release:LIBS += -L"../../../lib/msvs5" -lganttmodel
+debug:LIBS += -L"../ganttmodel" -lganttmodeld
+release:LIBS += -L"../ganttmodel" -lganttmodel
 
-debug:LIBS += -L"../../../lib/msvs5" -lballisticsd
-release:LIBS += -L"../../../lib/msvs5" -lballistics
+debug:LIBS += -L"/usr/lib64" -lballisticsd
+release:LIBS += -L"/usr/lib64" -lballistics
 
 }
 
 INCLUDEPATH += "../ganttmodel"
-INCLUDEPATH += "../../../lib/include"
-INCLUDEPATH += "../../../src/src_ballistics_lib/ballistics_lib"
+unix:INCLUDEPATH += "/usr/include/ballistics"
+win32:INCLUDEPATH += "C:/include/ballistics"
+unix:INCLUDEPATH += "/usr/include/qwt"
+win32:INCLUDEPATH += "C:/include/qwt"
 
 
 SOURCES += main.cpp\

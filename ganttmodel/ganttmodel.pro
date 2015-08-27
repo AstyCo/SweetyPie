@@ -16,33 +16,36 @@ DEFINES += QWT_DLL
 #DLLDESTDIR = $$OUT_PWD/
 TARGET = ganttmodel
 
-# подключить библиотеки и *.h файлы
-win32:{
-
-    #DESTDIR = ../../../lib/win32
-
-    Debug:LIBS += -L"../../../lib/win32"  -lqwtd
-    Release:LIBS += -L"../../../lib/win32"  -lqwt
-
-    Debug:LIBS += -L"../../src_ballistics_lib/ballistics_lib" -lballisticsd0
-    Release:LIBS += -L"../../src_ballistics_lib/ballistics_lib" -lballistics0
+# пути к зависимым библиотекам
+unix {
+  DEP_PATH_LIBS = /usr/lib64
+  DEP_PATH_HEADERS = /usr/include
+} else:win32 {
+  DEP_PATH_LIBS = C:/lib
+  DEP_PATH_HEADERS = C:/usr/include
 }
 
-unix:{
+LIBS += -L$${DEP_PATH_LIBS}
 
-    #DESTDIR  = ../../../lib/msvs5
-
-    debug:LIBS += -L"../../../lib/msvs5"  -lqwt
-    release:LIBS += -L"../../../lib/msvs5"  -lqwt
-
-    debug:LIBS += -L"/usr/lib64" -lballisticsd
-    release:LIBS += -L"/usr/lib64" -lballistics
+win32 {
+  CONFIG(release, debug|release) {
+    LIBS += -lballistics -lqwt
+  } else:CONFIG(debug, debug|release) {
+    LIBS += -lballisticsd -lqwt
+  }
+} else:unix {
+  CONFIG(release, debug|release) {
+    LIBS += -lballistics -lqwt
+  } else:CONFIG(debug, debug|release) {
+    LIBS += -lballisticsd -lqwt
+  }
 }
 
-INCLUDEPATH += "../../../lib/include"
-INCLUDEPATH += "../../../src/src_ballistics_lib/ballistics_lib"
-unix:INCLUDEPATH += "/usr/include/ballistics"
-
+# ballistics lib
+INCLUDEPATH += $${DEP_PATH_HEADERS}/ballistics
+DEPENDPATH += $${DEP_PATH_HEADERS}/ballistics
+# qwt
+INCLUDEPATH += $${DEP_PATH_HEADERS}/qwt
 
 DEFINES += GANTTMODEL_LIBRARY
 

@@ -1,7 +1,7 @@
 #ifndef INTERVALSLIDER_H
 #define INTERVALSLIDER_H
 
-#include "qwt/qwt_slider.h"
+#include "qwt_slider.h"
 #include "QPainter"
 #include "ganttmodel_global.h"
 

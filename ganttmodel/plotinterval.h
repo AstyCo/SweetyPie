@@ -1,10 +1,10 @@
 #ifndef PLOTINTERVAL_H
 #define PLOTINTERVAL_H
 
-#include "qwt/qwt_plot_item.h"
+#include "qwt_plot_item.h"
 
 #include <QPainter>
-#include "qwt/qwt_scale_map.h"
+#include "qwt_scale_map.h"
 
 class PlotInterval : public QwtPlotItem
 {

@@ -2,7 +2,7 @@
 #define CURVEDETAILSGROUPBOX_H
 
 #include <QGroupBox>
-#include "qwt/qwt_plot_curve.h"
+#include "qwt_plot_curve.h"
 
 
 

@@ -1,11 +1,11 @@
 #ifndef PLOTMAGNIFIERX_H
 #define PLOTMAGNIFIERX_H
 
-#include <qwt/qwt_plot_magnifier.h>
-#include <qwt/qwt_panner.h>
-#include <qwt/qwt_plot.h>
-#include <qwt/qwt_plot_canvas.h>
-#include <qwt/qwt_plot_zoomer.h>
+#include <qwt_plot_magnifier.h>
+#include <qwt_panner.h>
+#include <qwt_plot.h>
+#include <qwt_plot_canvas.h>
+#include <qwt_plot_zoomer.h>
 
 #include <QWheelEvent>
 
