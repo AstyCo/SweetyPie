@@ -1,6 +1,6 @@
-Name: ganttmodel
-Version: 0
-Release: 0
+Name: ganttmodellib
+Version: 1.0.0
+Release: 1
 Summary: Библиотека для построения диаграммы Ганта
 Group: nk/kpohi
 License: proprietary
@@ -11,11 +11,11 @@ BuildRoot: %{_tmppath}/ganttmodel-root
 %description
 Библиотека для построения диаграммы Ганта
 
-%package dev
+%package devel
 Summary:Библиотека для построения диаграммы Ганта для разработки
 Group: nk/kpohi 
 
-%description dev
+%description devel
 иблиотека для построения диаграммы Ганта для разработки
 
 %prep
@@ -33,7 +33,7 @@ INSTALL_ROOT=$RPM_BUILD_ROOT make install
 %defattr(-,root,root)
 /usr/lib64/libganttmodel.so*
 
-%files dev
+%files devel
 %defattr(-,root,root)
 /usr/lib64/libganttmodeld.so*
 /usr/include/*
