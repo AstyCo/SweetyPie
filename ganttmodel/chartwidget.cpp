@@ -164,7 +164,7 @@ void ChartWidget::setGrid(bool b)
 {
     if(!(_chartActons & caGrid))
     {
-        qWarning()<<"grid is bloks. use setChartActions()";
+        qWarning()<<"grid is blocks. use setChartActions()";
         return;
     }
 
@@ -198,7 +198,7 @@ void ChartWidget::ShowSelectionInterval(QPointF start, QPointF end)
 {
     if(!(_chartActons & caSelectIntervals))
     {
-        qWarning()<<"select intervals is bloks. use setChartActions()";
+        qWarning()<<"select intervals is blocks. use setChartActions()";
         return;
     }
 
@@ -212,7 +212,7 @@ void ChartWidget::ShowSelectionIntervalStart(QPointF start)
 {
     if(!(_chartActons & caSelectIntervals))
     {
-        qWarning()<<"select intervals is bloks. use setChartActions()";
+        qWarning()<<"select intervals is blocks. use setChartActions()";
         return;
     }
 
@@ -225,7 +225,7 @@ void ChartWidget::ShowSelectionIntervalEnd(QPointF end)
 {
     if(!(_chartActons & caSelectIntervals))
     {
-        qWarning()<<"select intervals is bloks. use setChartActions()";
+        qWarning()<<"select intervals is blocks. use setChartActions()";
         return;
     }
 
@@ -771,7 +771,7 @@ void ChartWidget::createMenuIitervals()
 
     if(!(_chartActons & caPaintIntervals))
     {
-        qWarning()<<"intervals is bloks. use setChartActions()";
+        qWarning()<<"intervals is blocks. use setChartActions()";
         return;
     }
     if(ui->toolButtonIntervalVisibled->menu()!=0)
@@ -810,7 +810,7 @@ void ChartWidget::createMenuMaxMin()
 {
     if(!(_chartActons & caMaxMinLines))
     {
-        qWarning()<<"select intervals is bloks. use setChartActions()";
+        qWarning()<<"select intervals is blocks. use setChartActions()";
         return;
     }
 
@@ -1103,6 +1103,9 @@ void ChartWidget::clearChart()
         m_curves[i]->detach();
     m_curves.clear();
 
+    m_beginLimit = CurveIndex();
+    m_endLimit = CurveIndex();
+
     for(int i=0; i<m_intervals.count(); i++)
         m_intervals[i]->detach();
     m_intervals.clear();
@@ -1232,7 +1235,7 @@ void ChartWidget::setLeftMinMaxValues(double minLine, double maxLine, const QCol
 {
     if(!(_chartActons & caPaintIntervals))
     {
-        qWarning()<<"intervals is bloks. use setChartActions()";
+        qWarning()<<"intervals is blocks. use setChartActions()";
         return;
     }
 
@@ -1265,7 +1268,7 @@ void ChartWidget::setRightMinMaxValues(double minLine, double maxLine, const QCo
 {
     if(!(_chartActons & caMaxMinLines))
     {
-        qWarning()<<"min max lines is bloks. use setChartActions()";
+        qWarning()<<"min max lines is blocks. use setChartActions()";
         return;
     }
 
@@ -1300,7 +1303,7 @@ void ChartWidget::selectIntervalByDates(UtcDateTime beginDt, UtcDateTime endDt)
 
     if(!(_chartActons & caSelectIntervals))
     {
-        qWarning()<<"select intervals is bloks. use setChartActions()";
+        qWarning()<<"select intervals is blocks. use setChartActions()";
         return;
     }
 
@@ -1347,7 +1350,7 @@ void ChartWidget::setIntervalSelectionStart(QPointF pos)
 {
     if(!(_chartActons & caSelectIntervals))
     {
-        qWarning()<<"select intervals is bloks. use setChartActions()";
+        qWarning()<<"select intervals is blocks. use setChartActions()";
         return;
     }
 
@@ -1361,7 +1364,7 @@ void ChartWidget::setIntervalSelectionEnd(QPointF pos)
 {
     if(!(_chartActons & caSelectIntervals))
     {
-        qWarning()<<"select intervals is bloks. use setChartActions()";
+        qWarning()<<"select intervals is blocks. use setChartActions()";
         return;
     }
 
@@ -1377,7 +1380,7 @@ void ChartWidget::addInterval(long beginX, long endX, const QColor &c1, const QC
 {
     if(!(_chartActons & caPaintIntervals))
     {
-        qWarning()<<"intervals is bloks. use setChartActions()";
+        qWarning()<<"intervals is blocks. use setChartActions()";
         return;
     }
 
@@ -1405,7 +1408,7 @@ void ChartWidget::beginIntervalSelection()
 {
     if(!(_chartActons & caSelectIntervals))
     {
-        qWarning()<<"select intervals is bloks. use setChartActions()";
+        qWarning()<<"select intervals is blocks. use setChartActions()";
         return;
     }
 
@@ -1417,7 +1420,7 @@ void ChartWidget::on_pushButtonTimerOnline_toggled(bool checked)
 {
     if(!(_chartActons & caTimer))
     {
-        qWarning()<<"timer is bloks. use setChartActions()";
+        qWarning()<<"timer is blocks. use setChartActions()";
         return;
     }
 

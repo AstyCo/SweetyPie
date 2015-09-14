@@ -7,7 +7,7 @@
 QT       += core gui
 
 
-VERSION = 0.4.2
+VERSION = 0.4.3
 
 TEMPLATE = lib
 
@@ -21,8 +21,8 @@ unix {
   DEP_PATH_LIBS = /usr/lib64
   DEP_PATH_HEADERS = /usr/include
 } else:win32 {
-  DEP_PATH_LIBS = C:/lib
-  DEP_PATH_HEADERS = C:/usr/include
+  DEP_PATH_LIBS = C:/lib64
+  DEP_PATH_HEADERS = C:/include
 }
 
 LIBS += -L$${DEP_PATH_LIBS}
@@ -31,7 +31,7 @@ win32 {
   CONFIG(release, debug|release) {
     LIBS += -lballistics -lqwt
   } else:CONFIG(debug, debug|release) {
-    LIBS += -lballisticsd -lqwt
+    LIBS += -lballisticsd -lqwtd
   }
 } else:unix {
   CONFIG(release, debug|release) {
