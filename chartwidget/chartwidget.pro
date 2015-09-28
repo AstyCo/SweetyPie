@@ -79,13 +79,11 @@ win32:INCLUDEPATH += "C:/include/qwt"
 
 SOURCES += main.cpp\
         mainwindow.cpp \
-    chartsettingsdlg.cpp \
-    verticalscrollarea.cpp
+    chartsettingsdlg.cpp
 
 
 HEADERS  += mainwindow.h \
-    chartsettingsdlg.h \
-    verticalscrollarea.h
+    chartsettingsdlg.h
 
 FORMS    += mainwindow.ui \
     chartsettingsdlg.ui

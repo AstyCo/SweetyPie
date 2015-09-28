@@ -114,13 +114,12 @@ void IntervalSlider::setMinValue(long minValue)
 
 long IntervalSlider::getValue(const QPoint &p) const
 {
-    //qDebug()<<((((float)p.x()) / ((float)width()-_handleSize)) * _maxValue);
-    return ((((float)p.x()) / ((float)width()-_handleSize)) * _maxValue);
+    return (((double)p.x()) / width() * _maxValue);
 }
 
 int IntervalSlider::getPoint(long value) const
 {
-    return ((float)value/(float)_maxValue *(width()-_handleSize));
+    return ((double)value/(double)_maxValue *width());
 }
 
 void IntervalSlider::paintEvent(QPaintEvent *event)
@@ -135,13 +134,20 @@ void IntervalSlider::paintEvent(QPaintEvent *event)
     drawSlider( &painter, opt.rect );
 }
 
-void IntervalSlider::drawHandle(QPainter *painter, const QRect &sliderRect, int pos) const
+void IntervalSlider::drawHandle(QPainter *painter, const QRect &sliderRect, int pos, EventHandle handle) const
 {
     const int bw = 1;
 
-    pos++;
+    int x;
+    if (handle == BeginHandle)
+      x = pos;
+    else if (handle == EndHandle)
+      x = pos - _handleSize;
+    else
+      return;
+
     QRect handleRect(
-                pos - _handleSize / 2,
+                x,
                 sliderRect.y(),
                 _handleSize,
                 sliderRect.height()
@@ -151,8 +157,9 @@ void IntervalSlider::drawHandle(QPainter *painter, const QRect &sliderRect, int 
                      handleRect, palette(), false, bw,
                      &palette().brush( QPalette::Button ) );
 
-    qDrawShadeLine( painter, pos, sliderRect.top() + bw,
-                    pos, sliderRect.bottom() - bw,
+    int lineX = handleRect.center().x();
+    qDrawShadeLine( painter, lineX, sliderRect.top() + bw,
+                    lineX, sliderRect.bottom() - bw,
                     palette(), true, 1 );
 }
 
@@ -179,8 +186,8 @@ void IntervalSlider::drawSlider(QPainter *painter, const QRect &sliderRect) cons
     QBrush brush = palette().brush( QPalette::Dark );
     qDrawShadePanel( painter, rSlot, palette(), true, 1 , &brush );
 
-    drawHandle( painter, innerRect, getPoint(_beginValue) );
-    drawHandle( painter, innerRect, getPoint(_endValue)  );
+    drawHandle( painter, innerRect, getPoint(_beginValue), BeginHandle);
+    drawHandle( painter, innerRect, getPoint(_endValue), EndHandle);
 
 }
 
@@ -196,25 +203,33 @@ void IntervalSlider::wheelEvent(QWheelEvent *e)
 
 void IntervalSlider::mouseMoveEvent(QMouseEvent *e)
 {
+    int val = getValue(e->pos());
+    if(_eventHandle==BeginHandle)
+    {
+        if(val<_minValue)
+          _beginValue = _minValue;
+        else if((getPoint(val)+_handleSize)>(getPoint(_endValue)-_handleSize))
+          return;
+        else if(val>_maxValue)
+          _beginValue = _maxValue;
+        else
+          _beginValue = val;
 
-        int val = getValue(e->pos());
-        if(_eventHandle==BeginHandle)
-        {
-            if(val<_minValue) _beginValue = _minValue;
-            else if((getPoint(val)+_handleSize/2)>(getPoint(_endValue)-_handleSize/2)) return;
-            else if(val>_maxValue) _beginValue = _maxValue;
-            else _beginValue =val;
-            emit valueChanged(IntervalSlider::BeginHandle,_beginValue);
+        emit valueChanged(IntervalSlider::BeginHandle, _beginValue);
+    }
+    else if(_eventHandle==EndHandle)
+    {
+        if(val>_maxValue)
+          _endValue = _maxValue;
+        else if((getPoint(val)-_handleSize)<(getPoint(_beginValue)+_handleSize))
+          return;
+        else if(val<_minValue)
+          _endValue = _minValue;
+        else
+          _endValue = val;
 
-        }
-        else if(_eventHandle==EndHandle)
-        {
-            if(val>_maxValue) _endValue = _maxValue;
-            else if((getPoint(val)-_handleSize/2)<(getPoint(_beginValue)+_handleSize/2)) return;
-            else if(val<_minValue) _endValue = _minValue;
-            else _endValue = val;
-            emit valueChanged(IntervalSlider::EndHandle,_endValue);
-        }
+        emit valueChanged(IntervalSlider::EndHandle, _endValue);
+    }
 }
 
 void IntervalSlider::mouseReleaseEvent(QMouseEvent *e)
@@ -227,11 +242,11 @@ void IntervalSlider::mousePressEvent(QMouseEvent *e)
 {
         const QPoint &p = e->pos();
 
-        long beginSlpiter1 = getPoint(_beginValue)-_handleSize/2;
-        long beginSlpiter2 = getPoint(_beginValue)+_handleSize/2;
+        long beginSlpiter1 = getPoint(_beginValue);
+        long beginSlpiter2 = beginSlpiter1 + _handleSize;
 
-        long endSlpiter1 = getPoint(_endValue)-_handleSize/2;
-        long endSlpiter2 = getPoint(_endValue)+_handleSize/2;
+        long endSlpiter2 = getPoint(_endValue);
+        long endSlpiter1 = endSlpiter2 - _handleSize;
 
         if(p.x()>beginSlpiter1 && p.x()<beginSlpiter2)
         {

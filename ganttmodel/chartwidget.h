@@ -99,88 +99,6 @@ class GANTTMODELSHARED_EXPORT ChartWidget : public QWidget
 {
   Q_OBJECT
 
-private:
-
-  void setIntervalSelectionByState(QPointF pos);
-
-
-  Ui::ChartWidget *ui;
-
-  QList<QwtPlotCurve *> m_curves;
-  QList<PlotInterval *> m_intervals;
-  QList<CurveDetailsGroupBox *> m_detaildPanels;
-
-  QwtPlotGrid * m_pGrid;
-  QwtPlotPanner *m_panner;
-  PlotMagnifierX * m_zoomer[2];
-  QwtPlotPicker * m_picker;
-  PlotKeyEventHander * m_keyEventHandler;
-
-  QwtPlotMarker * m_pMinLeftMarker;
-  QwtPlotMarker * m_pMaxLeftMarker;
-  QwtPlotMarker * m_pMinRightMarker;
-  QwtPlotMarker * m_pMaxRightMarker;
-
-
-  /** Маркеры обозначения выделенной точки.
-  * Один маркер для вертикальной, один для горизонтальной линии
-  */
-  QwtPlotMarker * m_pMarker[2];
-  /** Маркеры обозначения выделенного интервала.
-  *   Маркеры в виде вертикальной линии
-  */
-  QwtPlotMarker * m_pIntervalMarker[2];
-
-  /// Дата и время первой точки
-  CurveIndex m_beginLimit;
-  /// Дата и время последней точки
-  CurveIndex m_endLimit;
-
-  /// Номер текущей выделенной точки
-  CurveIndex m_selectedPointIndex;
-
-
-  /// Дата и время начала выделенного интервала
-  UtcDateTime m_curStartDt;
-  /// Дата и время окончания выделенного интервала
-  UtcDateTime m_curEndDt;
-  /// Номер первой точки в выделенном интервале
-  CurveIndex m_curStartPointIdx;
-  /// Номер последней точки в выделенном интервале
-  CurveIndex m_curEndPointIdx;
-
-  /// Текущий выделенный интервал
-  bool m_intervalValuesVisible;
-  TimeSpan m_selInterval;
-  ChartSelectionState m_selectionState;
-
-  QTimer * _timerOnline;
-  int _countLastPoints;
-
-  QPointF getTransformedPoint(const CurveIndex &index) const;
-  QPointF getTransformedPoint(int indexCurve, int indexPoint) const;
-
-  double calcDistance(const QPointF &p1, const QPointF &p2);
-
-  void createMenuIitervals();
-
-  void createMenuMaxMin();
-
-  void DrawMarkerOnCurve(QwtPlot::Axis axis = QwtPlot::yLeft);
-  void ShowSelectionPoint(QwtText xLbl, QwtText yLbl, QPointF point, QwtPlot::Axis axis = QwtPlot::yLeft);
-
-  void ShowSelectionInterval(QPointF start, QPointF end);
-
-  void ShowSelectionIntervalStart(QPointF start);
-  void ShowSelectionIntervalEnd(QPointF end);
-
-  CurveIndex FindPointIndexByPos(const QPointF &pos, SearchDirection direction=sdAny);
-
-  QPointF DtToPoint(UtcDateTime dt);
-
-  QVector<QPointF> limittedData(const QVector<QPointF> data) const;
-
-  int _chartActons;
 public:
   /// Конструктор класса
   ChartWidget(QWidget *parent = 0 ///< Указатель на родительский объект
@@ -188,9 +106,6 @@ public:
 
   /// Деструктор класса
   ~ChartWidget();
-
-
-
 
   /// Возвращает минимальное значение даты и время среди всех графиков
   UtcDateTime minimumDt();
@@ -237,6 +152,7 @@ public:
 
   /// Добавляет специально выделенный интервал
   void addInterval(long beginX, long endX, const QColor &c1=Qt::white, const QColor &c2=QColor());
+
   /// Добавляет специально выделенный интервал
   void addInterval(const UtcDateTime &begin, const UtcDateTime &endX, const QColor &c1, const QColor &c2);
 
@@ -252,12 +168,16 @@ public:
 
   /// Дата и время начала выделенного интервала
   UtcDateTime getSelIntervalBeginDt() { return m_curStartDt; }
+
   /// Дата и время конца выделенного интервала
   UtcDateTime getSelIntervalEndDt() { return m_curEndDt; }
+
   /// Переход в режим выделения интервала
   void beginIntervalSelection();
+
   /// Выделение первой точки интевала
   void setIntervalSelectionStart(QPointF pos);
+
   /// Выделение второй (последней) точки интервала
   void setIntervalSelectionEnd(QPointF pos);
 
@@ -265,17 +185,15 @@ public:
   QwtPlotCurve *curve(int index ///< Номер графика
                       ) const;
 
-
   /// Список интервалов
   QList<PlotInterval *> intervals() const;
-
 
   /// Список графиков
   QList<QwtPlotCurve *> curves() const;
 
-
   /// Запускает таймер для перерисовки графика
   void startOnlineReplot();
+
   /// Останавливает таймер для перерисовки графика
   void stopOnlineReplot();
 
@@ -283,7 +201,8 @@ public:
   void setCountLastPoints(int countLastPoints);
 
   int chartActons() const;
-  void setChartActons(int chartActons);
+  void setChartActions(int chartActons);
+  QwtPlot * getPlot();
 
 signals:
   /// Когда выбрана точка
@@ -301,6 +220,85 @@ public slots:
   /// Отрисовывать сетку
   void setGrid(bool b);
 
+private:
+  void setIntervalSelectionByState(QPointF pos);
+
+  Ui::ChartWidget *ui;
+
+  QList<QwtPlotCurve *> m_curves;
+  QList<PlotInterval *> m_intervals;
+  QList<CurveDetailsGroupBox *> m_detailedPanels;
+
+  QwtPlotGrid * m_pGrid;
+  QwtPlotPanner *m_panner;
+  PlotMagnifierX * m_zoomer;
+  QwtPlotPicker * m_picker;
+  PlotKeyEventHander * m_keyEventHandler;
+
+  QwtPlotMarker * m_pMinLeftMarker;
+  QwtPlotMarker * m_pMaxLeftMarker;
+  QwtPlotMarker * m_pMinRightMarker;
+  QwtPlotMarker * m_pMaxRightMarker;
+
+
+  /** Маркеры обозначения выделенной точки.
+  * Один маркер для вертикальной, один для горизонтальной линии
+  */
+  QwtPlotMarker * m_pMarker[2];
+  /** Маркеры обозначения выделенного интервала.
+  *   Маркеры в виде вертикальной линии
+  */
+  QwtPlotMarker * m_pIntervalMarker[2];
+
+  /// Дата и время первой точки
+  CurveIndex m_beginLimit;
+  /// Дата и время последней точки
+  CurveIndex m_endLimit;
+
+  /// Номер текущей выделенной точки
+  CurveIndex m_selectedPointIndex;
+
+
+  /// Дата и время начала выделенного интервала
+  UtcDateTime m_curStartDt;
+  /// Дата и время окончания выделенного интервала
+  UtcDateTime m_curEndDt;
+  /// Номер первой точки в выделенном интервале
+  CurveIndex m_curStartPointIdx;
+  /// Номер последней точки в выделенном интервале
+  CurveIndex m_curEndPointIdx;
+
+  /// Текущий выделенный интервал
+  bool m_intervalValuesVisible;
+  TimeSpan m_selInterval;
+  ChartSelectionState m_selectionState;
+
+  QTimer * _timerOnline;
+  int _countLastPoints;
+  int _chartActions;
+
+  QPointF getTransformedPoint(const CurveIndex &index) const;
+  QPointF getTransformedPoint(int indexCurve, int indexPoint) const;
+
+  double calcDistance(const QPointF &p1, const QPointF &p2);
+
+  void createMenuIitervals();
+
+  void createMenuMaxMin();
+
+  void DrawMarkerOnCurve(QwtPlot::Axis axis = QwtPlot::yLeft);
+  void ShowSelectionPoint(QwtText xLbl, QwtText yLbl, QPointF point, QwtPlot::Axis axis = QwtPlot::yLeft);
+
+  void ShowSelectionInterval(QPointF start, QPointF end);
+
+  void ShowSelectionIntervalStart(QPointF start);
+  void ShowSelectionIntervalEnd(QPointF end);
+
+  CurveIndex FindPointIndexByPos(const QPointF &pos, SearchDirection direction=sdAny);
+
+  QPointF DtToPoint(UtcDateTime dt);
+
+  QVector<QPointF> limittedData(const QVector<QPointF> data) const;
 
 private slots:
   /// Установить видимость графика

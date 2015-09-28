@@ -7,7 +7,7 @@
 QT       += core gui
 
 
-VERSION = 0.4.3
+VERSION = 0.4.4
 
 TEMPLATE = lib
 
@@ -70,7 +70,8 @@ SOURCES += \
     intervalslider.cpp \
     plotinterval.cpp \
     plotmagnifierx.cpp \
-    plotkeyeventhander.cpp
+    plotkeyeventhander.cpp \
+    verticalscrollarea.cpp
 
 HEADERS += \
     ganttmodel.h \
@@ -94,7 +95,8 @@ HEADERS += \
     intervalslider.h \
     plotinterval.h \
     plotmagnifierx.h \
-    plotkeyeventhander.h
+    plotkeyeventhander.h \
+    verticalscrollarea.h
 
 
 RESOURCES += \

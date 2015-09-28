@@ -13,17 +13,28 @@ class PlotMagnifierX : public QwtPlotMagnifier
 {
 
 private:
- QwtPlotZoomer * m_zoomer;
+ enum AxisSet
+ {
+   setFirst,
+   setSecond
+ };
+
+ QwtPlotZoomer * m_zoomerFirst;
+ QwtPlotZoomer * m_zoomerSecond;
+ bool m_zoomerSecondEnabled;
+
 protected:
   virtual void widgetWheelEvent(QWheelEvent *wheelEvent);
+  void zoom(AxisSet axisSet, qreal scaleFactor, QPoint mousePos);
 
 public:
   explicit PlotMagnifierX(QwtPlotCanvas *canvas);
+  ~PlotMagnifierX();
+
+  void setFirstAxisSet(int xAxis, int yAxis);
+  void setSecondAxisSet(int xAxis, int yAxis);
+  void setSecondAxisEnabled(bool enabled);
   void SetZoomBase(bool ok);
-
-  void setYAxis(QwtPlot::Axis axis);
-
- ~PlotMagnifierX();
 };
 
 #endif // PLOTMAGNIFIERX_H

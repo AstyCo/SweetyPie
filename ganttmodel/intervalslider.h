@@ -44,7 +44,7 @@ private:
     void paintEvent( QPaintEvent *event );
     //void paintEvent(QPaintEvent *ev);
     virtual void drawHandle( QPainter *painter,
-        const QRect &sliderRect, int pos ) const;
+        const QRect &sliderRect, int pos, EventHandle handle) const;
     virtual void drawSlider(QPainter *painter, const QRect &sliderRect ) const;
     virtual void keyPressEvent(QKeyEvent *e);
     virtual void wheelEvent( QWheelEvent *e );

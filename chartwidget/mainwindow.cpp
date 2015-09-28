@@ -20,7 +20,7 @@ MainWindow::MainWindow(QWidget *parent) :
     }
 
     qDebug()<<int(caScale|caGrid|caMaxMinLines|caTimer);
-    ui->widget->setChartActons(caScale|caGrid|caMaxMinLines|caTimer);
+    ui->widget->setChartActions(caScale|caGrid|caMaxMinLines|caTimer);
     ui->widget->setLeftAxis("111111",0,0);
     ui->widget->setRightAxis("222222",0,800);
 

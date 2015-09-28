@@ -6,281 +6,303 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1028</width>
-    <height>552</height>
+    <width>652</width>
+    <height>313</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Form</string>
   </property>
-  <layout class="QGridLayout" name="gridLayout">
-   <item row="0" column="0">
-    <widget class="QSplitter" name="splitter">
-     <property name="orientation">
-      <enum>Qt::Horizontal</enum>
+  <layout class="QHBoxLayout" name="horizontalLayout_2" stretch="99,1">
+   <property name="spacing">
+    <number>5</number>
+   </property>
+   <property name="leftMargin">
+    <number>5</number>
+   </property>
+   <property name="topMargin">
+    <number>5</number>
+   </property>
+   <property name="rightMargin">
+    <number>5</number>
+   </property>
+   <property name="bottomMargin">
+    <number>5</number>
+   </property>
+   <item>
+    <widget class="QwtPlot" name="m_plot">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
      </property>
-     <widget class="QwtPlot" name="m_plot"/>
-     <widget class="QScrollArea" name="m_detailsPanel">
-      <property name="widgetResizable">
-       <bool>true</bool>
+    </widget>
+   </item>
+   <item>
+    <widget class="VerticalScrollArea" name="m_detailsPanel">
+     <property name="widgetResizable">
+      <bool>true</bool>
+     </property>
+     <widget class="QWidget" name="scrollAreaWidgetContents">
+      <property name="geometry">
+       <rect>
+        <x>0</x>
+        <y>0</y>
+        <width>360</width>
+        <height>280</height>
+       </rect>
       </property>
-      <widget class="QWidget" name="scrollAreaWidgetContents">
-       <property name="geometry">
-        <rect>
-         <x>0</x>
-         <y>0</y>
-         <width>778</width>
-         <height>532</height>
-        </rect>
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
+      <layout class="QGridLayout" name="gridLayout_2">
+       <property name="leftMargin">
+        <number>0</number>
        </property>
-       <property name="sizePolicy">
-        <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
-         <horstretch>0</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
+       <property name="topMargin">
+        <number>0</number>
        </property>
-       <layout class="QGridLayout" name="gridLayout_2">
-        <property name="leftMargin">
-         <number>0</number>
-        </property>
-        <property name="topMargin">
-         <number>0</number>
-        </property>
-        <property name="rightMargin">
-         <number>0</number>
-        </property>
-        <property name="bottomMargin">
-         <number>0</number>
-        </property>
-        <item row="0" column="0">
-         <widget class="QWidget" name="widgetDetail" native="true">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-          <layout class="QVBoxLayout" name="verticalLayout">
-           <item>
-            <layout class="QHBoxLayout" name="horizontalLayout">
-             <item>
-              <widget class="QPushButton" name="pushButtonAutoZoom">
-               <property name="toolTip">
-                <string>Автоматически подобрать масштаб</string>
-               </property>
-               <property name="statusTip">
-                <string>Автоматически подобрать масштаб</string>
-               </property>
-               <property name="whatsThis">
-                <string>Автоматически подобрать масштаб</string>
-               </property>
-               <property name="text">
-                <string/>
-               </property>
-               <property name="icon">
-                <iconset resource="images.qrc">
-                 <normaloff>:/icons/icons/find.png</normaloff>:/icons/icons/find.png</iconset>
-               </property>
-               <property name="iconSize">
-                <size>
-                 <width>24</width>
-                 <height>24</height>
-                </size>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QPushButton" name="pushButtonSelectInterval">
-               <property name="toolTip">
-                <string>Выбрать интервал времени</string>
-               </property>
-               <property name="statusTip">
-                <string>Выбрать интервал времени</string>
-               </property>
-               <property name="whatsThis">
-                <string>Выбрать интервал времени</string>
-               </property>
-               <property name="text">
-                <string/>
-               </property>
-               <property name="icon">
-                <iconset resource="images.qrc">
-                 <normaloff>:/icons/icons/selection_interval.png</normaloff>:/icons/icons/selection_interval.png</iconset>
-               </property>
-               <property name="iconSize">
-                <size>
-                 <width>24</width>
-                 <height>24</height>
-                </size>
-               </property>
-               <property name="checkable">
-                <bool>true</bool>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QPushButton" name="pushButtonGrid">
-               <property name="toolTip">
-                <string>Вкл./Выкл сетку</string>
-               </property>
-               <property name="statusTip">
-                <string>Вкл./Выкл сетку</string>
-               </property>
-               <property name="whatsThis">
-                <string>Вкл./Выкл сетку</string>
-               </property>
-               <property name="text">
-                <string/>
-               </property>
-               <property name="icon">
-                <iconset resource="images.qrc">
-                 <normaloff>:/icons/icons/grid.png</normaloff>:/icons/icons/grid.png</iconset>
-               </property>
-               <property name="iconSize">
-                <size>
-                 <width>24</width>
-                 <height>24</height>
-                </size>
-               </property>
-               <property name="checkable">
-                <bool>true</bool>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QToolButton" name="toolButtonIntervalVisibled">
-               <property name="toolTip">
-                <string>Вкл./Выкл интервалов</string>
-               </property>
-               <property name="statusTip">
-                <string>Вкл./Выкл интервалов</string>
-               </property>
-               <property name="whatsThis">
-                <string>Вкл./Выкл интервалов</string>
-               </property>
-               <property name="text">
-                <string/>
-               </property>
-               <property name="icon">
-                <iconset resource="images.qrc">
-                 <normaloff>:/icons/icons/interval_visible.png</normaloff>:/icons/icons/interval_visible.png</iconset>
-               </property>
-               <property name="iconSize">
-                <size>
-                 <width>24</width>
-                 <height>24</height>
-                </size>
-               </property>
-               <property name="popupMode">
-                <enum>QToolButton::InstantPopup</enum>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QToolButton" name="toolButtonMaxMinValues">
-               <property name="toolTip">
-                <string>Настройка границ</string>
-               </property>
-               <property name="statusTip">
-                <string>Настройка границ</string>
-               </property>
-               <property name="whatsThis">
-                <string>Настройка границ</string>
-               </property>
-               <property name="icon">
-                <iconset resource="images.qrc">
-                 <normaloff>:/icons/icons/max_min.png</normaloff>:/icons/icons/max_min.png</iconset>
-               </property>
-               <property name="iconSize">
-                <size>
-                 <width>24</width>
-                 <height>24</height>
-                </size>
-               </property>
-               <property name="popupMode">
-                <enum>QToolButton::InstantPopup</enum>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QPushButton" name="pushButtonTimerOnline">
-               <property name="text">
-                <string/>
-               </property>
-               <property name="icon">
-                <iconset resource="images.qrc">
-                 <normaloff>:/icons/icons/start.png</normaloff>:/icons/icons/start.png</iconset>
-               </property>
-               <property name="iconSize">
-                <size>
-                 <width>24</width>
-                 <height>24</height>
-                </size>
-               </property>
-               <property name="checkable">
-                <bool>true</bool>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QPushButton" name="pushButtonClear">
-               <property name="toolTip">
-                <string>Сбросить все настройки по умолчанию</string>
-               </property>
-               <property name="statusTip">
-                <string>Сбросить все настройки по умолчанию</string>
-               </property>
-               <property name="whatsThis">
-                <string>Сбросить все настройки по умолчанию</string>
-               </property>
-               <property name="text">
-                <string/>
-               </property>
-               <property name="icon">
-                <iconset resource="images.qrc">
-                 <normaloff>:/icons/icons/clear.png</normaloff>:/icons/icons/clear.png</iconset>
-               </property>
-               <property name="iconSize">
-                <size>
-                 <width>24</width>
-                 <height>24</height>
-                </size>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <spacer name="horizontalSpacer">
-               <property name="orientation">
-                <enum>Qt::Horizontal</enum>
-               </property>
-               <property name="sizeHint" stdset="0">
-                <size>
-                 <width>40</width>
-                 <height>20</height>
-                </size>
-               </property>
-              </spacer>
-             </item>
-            </layout>
-           </item>
-           <item>
-            <spacer name="verticalSpacer">
-             <property name="orientation">
-              <enum>Qt::Vertical</enum>
-             </property>
-             <property name="sizeHint" stdset="0">
-              <size>
-               <width>20</width>
-               <height>40</height>
-              </size>
-             </property>
-            </spacer>
-           </item>
-          </layout>
-         </widget>
-        </item>
-       </layout>
-      </widget>
+       <property name="rightMargin">
+        <number>0</number>
+       </property>
+       <property name="bottomMargin">
+        <number>0</number>
+       </property>
+       <item row="0" column="0">
+        <widget class="QWidget" name="widgetDetail" native="true">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <layout class="QVBoxLayout" name="verticalLayout">
+          <item>
+           <layout class="QHBoxLayout" name="horizontalLayout">
+            <item>
+             <widget class="QPushButton" name="pushButtonAutoZoom">
+              <property name="toolTip">
+               <string>Автоматически подобрать масштаб</string>
+              </property>
+              <property name="statusTip">
+               <string>Автоматически подобрать масштаб</string>
+              </property>
+              <property name="whatsThis">
+               <string>Автоматически подобрать масштаб</string>
+              </property>
+              <property name="text">
+               <string/>
+              </property>
+              <property name="icon">
+               <iconset resource="images.qrc">
+                <normaloff>:/icons/icons/find.png</normaloff>:/icons/icons/find.png</iconset>
+              </property>
+              <property name="iconSize">
+               <size>
+                <width>24</width>
+                <height>24</height>
+               </size>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPushButton" name="pushButtonSelectInterval">
+              <property name="toolTip">
+               <string>Выбрать интервал времени</string>
+              </property>
+              <property name="statusTip">
+               <string>Выбрать интервал времени</string>
+              </property>
+              <property name="whatsThis">
+               <string>Выбрать интервал времени</string>
+              </property>
+              <property name="text">
+               <string/>
+              </property>
+              <property name="icon">
+               <iconset resource="images.qrc">
+                <normaloff>:/icons/icons/selection_interval.png</normaloff>:/icons/icons/selection_interval.png</iconset>
+              </property>
+              <property name="iconSize">
+               <size>
+                <width>24</width>
+                <height>24</height>
+               </size>
+              </property>
+              <property name="checkable">
+               <bool>true</bool>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPushButton" name="pushButtonGrid">
+              <property name="toolTip">
+               <string>Вкл./Выкл сетку</string>
+              </property>
+              <property name="statusTip">
+               <string>Вкл./Выкл сетку</string>
+              </property>
+              <property name="whatsThis">
+               <string>Вкл./Выкл сетку</string>
+              </property>
+              <property name="text">
+               <string/>
+              </property>
+              <property name="icon">
+               <iconset resource="images.qrc">
+                <normaloff>:/icons/icons/grid.png</normaloff>:/icons/icons/grid.png</iconset>
+              </property>
+              <property name="iconSize">
+               <size>
+                <width>24</width>
+                <height>24</height>
+               </size>
+              </property>
+              <property name="checkable">
+               <bool>true</bool>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QToolButton" name="toolButtonIntervalVisibled">
+              <property name="toolTip">
+               <string>Вкл./Выкл интервалов</string>
+              </property>
+              <property name="statusTip">
+               <string>Вкл./Выкл интервалов</string>
+              </property>
+              <property name="whatsThis">
+               <string>Вкл./Выкл интервалов</string>
+              </property>
+              <property name="text">
+               <string/>
+              </property>
+              <property name="icon">
+               <iconset resource="images.qrc">
+                <normaloff>:/icons/icons/interval_visible.png</normaloff>:/icons/icons/interval_visible.png</iconset>
+              </property>
+              <property name="iconSize">
+               <size>
+                <width>24</width>
+                <height>24</height>
+               </size>
+              </property>
+              <property name="popupMode">
+               <enum>QToolButton::InstantPopup</enum>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QToolButton" name="toolButtonMaxMinValues">
+              <property name="toolTip">
+               <string>Настройка границ</string>
+              </property>
+              <property name="statusTip">
+               <string>Настройка границ</string>
+              </property>
+              <property name="whatsThis">
+               <string>Настройка границ</string>
+              </property>
+              <property name="icon">
+               <iconset resource="images.qrc">
+                <normaloff>:/icons/icons/max_min.png</normaloff>:/icons/icons/max_min.png</iconset>
+              </property>
+              <property name="iconSize">
+               <size>
+                <width>24</width>
+                <height>24</height>
+               </size>
+              </property>
+              <property name="popupMode">
+               <enum>QToolButton::InstantPopup</enum>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPushButton" name="pushButtonTimerOnline">
+              <property name="text">
+               <string/>
+              </property>
+              <property name="icon">
+               <iconset resource="images.qrc">
+                <normaloff>:/icons/icons/start.png</normaloff>:/icons/icons/start.png</iconset>
+              </property>
+              <property name="iconSize">
+               <size>
+                <width>24</width>
+                <height>24</height>
+               </size>
+              </property>
+              <property name="checkable">
+               <bool>true</bool>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPushButton" name="pushButtonClear">
+              <property name="toolTip">
+               <string>Сбросить все настройки по умолчанию</string>
+              </property>
+              <property name="statusTip">
+               <string>Сбросить все настройки по умолчанию</string>
+              </property>
+              <property name="whatsThis">
+               <string>Сбросить все настройки по умолчанию</string>
+              </property>
+              <property name="text">
+               <string/>
+              </property>
+              <property name="icon">
+               <iconset resource="images.qrc">
+                <normaloff>:/icons/icons/clear.png</normaloff>:/icons/icons/clear.png</iconset>
+              </property>
+              <property name="iconSize">
+               <size>
+                <width>24</width>
+                <height>24</height>
+               </size>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <spacer name="horizontalSpacer">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+              <property name="sizeType">
+               <enum>QSizePolicy::MinimumExpanding</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>40</width>
+                <height>20</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+           </layout>
+          </item>
+          <item>
+           <spacer name="verticalSpacer">
+            <property name="orientation">
+             <enum>Qt::Vertical</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>20</width>
+              <height>40</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+         </layout>
+        </widget>
+       </item>
+      </layout>
      </widget>
     </widget>
    </item>
@@ -291,6 +313,12 @@
    <class>QwtPlot</class>
    <extends>QFrame</extends>
    <header>qwt_plot.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>VerticalScrollArea</class>
+   <extends>QScrollArea</extends>
+   <header>verticalscrollarea.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

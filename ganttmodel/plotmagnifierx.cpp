@@ -1,12 +1,44 @@
 #include "plotmagnifierx.h"
 
+
+PlotMagnifierX::PlotMagnifierX(QwtPlotCanvas *canvas) :
+  QwtPlotMagnifier(canvas)
+{
+  // объект для собственно масштабирования графика
+  m_zoomerFirst = new QwtPlotZoomer(canvas);
+  // выключить перехват кнопок этим объектом
+  // т.к. будем использовать его вручную
+  m_zoomerFirst->setEnabled(false);
+  setFirstAxisSet(QwtPlot::xBottom, QwtPlot::yLeft);
+  // для масштабирования по второй оси Y
+  m_zoomerSecond = new QwtPlotZoomer(canvas);
+  m_zoomerSecond->setEnabled(false);
+  setSecondAxisSet(QwtPlot::xBottom, QwtPlot::yRight);
+
+  m_zoomerSecondEnabled = false;
+}
+
+void PlotMagnifierX::SetZoomBase(bool ok)
+{
+    m_zoomerFirst->setZoomBase(ok);
+    if (m_zoomerSecondEnabled)
+      m_zoomerSecond->setZoomBase(ok);
+}
+
+void PlotMagnifierX::setFirstAxisSet(int xAxis, int yAxis)
+{
+  m_zoomerFirst->setAxis(xAxis, yAxis);
+}
+
+void PlotMagnifierX::setSecondAxisSet(int xAxis, int yAxis)
+{
+  m_zoomerSecond->setAxis(xAxis, yAxis);
+}
+
 void PlotMagnifierX::widgetWheelEvent(QWheelEvent *wheelEvent)
 {
   QPoint mousePos;
-  QRectF zoomRect;
-  float xw, yw, xhw, yhw, xz, yz;
-  float slideFactor;
-  float scaleFactor;
+  qreal scaleFactor;
 
   // Zoom IN
   if (wheelEvent->delta() > 0)
@@ -22,23 +54,43 @@ void PlotMagnifierX::widgetWheelEvent(QWheelEvent *wheelEvent)
   mousePos.setX(wheelEvent->x());
   mousePos.setY(wheelEvent->y());
 
-  // на сколько сдвинуть график в сторону мыши
-  slideFactor = 1.0 - (1.0 / scaleFactor);
+  zoom(setFirst, scaleFactor, mousePos);
+  if (m_zoomerSecondEnabled)
+    zoom(setSecond, scaleFactor, mousePos);
 
+  wheelEvent->accept();
+}
+
+void PlotMagnifierX::zoom(AxisSet axisSet, qreal scaleFactor, QPoint mousePos)
+{
+  QwtPlot::Axis scaleAxisX;
+  QwtPlot::Axis scaleAxisY;
   // Прямоугольник на текущем увеличении
-  zoomRect = m_zoomer->zoomRect();
+  QRectF zoomRect;
+  if (axisSet == setFirst)
+  {
+    zoomRect = m_zoomerFirst->zoomRect();
+    scaleAxisX = (QwtPlot::Axis)m_zoomerFirst->xAxis();
+    scaleAxisY = (QwtPlot::Axis)m_zoomerFirst->yAxis();
+  }
+  else
+  {
+    zoomRect = m_zoomerSecond->zoomRect();
+    scaleAxisX = (QwtPlot::Axis)m_zoomerSecond->xAxis();
+    scaleAxisY = (QwtPlot::Axis)m_zoomerSecond->yAxis();
+  }
 
   // текущие ширина и высота
-  xw = zoomRect.width();
-  yw = zoomRect.height();
+  qreal xw = zoomRect.width();
+  qreal yw = zoomRect.height();
 
   // координаты центральной точки
-  xhw = xw/2.0 + zoomRect.left();
-  yhw = yw/2.0 + zoomRect.top(); // QRect top указывает на нижнюю область графика.
+  qreal xhw = xw/2.0 + zoomRect.left();
+  qreal yhw = yw/2.0 + zoomRect.top(); // QRect top указывает на нижнюю область графика.
 
   // ширина и высота после масштабирования
-  xz = xw / scaleFactor;
-  yz = yw / scaleFactor;
+  qreal xz = xw / scaleFactor;
+  qreal yz = yw / scaleFactor;
 
   // вычисляем новый масштаб в центральной точке
   zoomRect.setLeft (zoomRect.left() +(xw - xz)/2.0);
@@ -46,10 +98,12 @@ void PlotMagnifierX::widgetWheelEvent(QWheelEvent *wheelEvent)
   zoomRect.setRight (zoomRect.right() -(xw - xz)/2.0);
   zoomRect.setTop (zoomRect.top() +(yw - yz)/2.0);
 
+  // на сколько сдвинуть график в сторону мыши
+  qreal slideFactor = 1.0 - (1.0 / scaleFactor);
   // перемещаем в сторону мыши
   // получаем расстояние до указателя мыши от центра
-  float mx = (this->plot()->invTransform(QwtPlot::xBottom, mousePos.x()) - xhw) * slideFactor;
-  float my = (this->plot()->invTransform(QwtPlot::yLeft, mousePos.y()) - yhw) * slideFactor;
+  qreal mx = (this->plot()->invTransform(scaleAxisX, mousePos.x()) - xhw) * slideFactor;
+  qreal my = (this->plot()->invTransform(scaleAxisY, mousePos.y()) - yhw) * slideFactor;
 
   // скорректировать положение на полученые смещения
   zoomRect.setLeft (zoomRect.left() + mx);
@@ -57,34 +111,20 @@ void PlotMagnifierX::widgetWheelEvent(QWheelEvent *wheelEvent)
   zoomRect.setBottom(zoomRect.bottom()+ my);
   zoomRect.setTop (zoomRect.top() + my);
 
-  m_zoomer->zoom(zoomRect);
-  wheelEvent->accept();
+  if (axisSet == setFirst)
+    m_zoomerFirst->zoom(zoomRect);
+  else
+    m_zoomerSecond->zoom(zoomRect);
 }
 
-PlotMagnifierX::PlotMagnifierX(QwtPlotCanvas *canvas) :
-  QwtPlotMagnifier(canvas)
+void PlotMagnifierX::setSecondAxisEnabled(bool enabled)
 {
-  // объект для собственно масштабирования графика
-  m_zoomer = new QwtPlotZoomer(canvas);
-  // выключить перехват кнопок этим объектом
-  // т.к. будем использовать его вручную
-  m_zoomer->setEnabled(false);
+  m_zoomerSecondEnabled = enabled;
 }
-
-void PlotMagnifierX::SetZoomBase(bool ok)
-{
-    m_zoomer->setZoomBase(ok);
-}
-
-void PlotMagnifierX::setYAxis(QwtPlot::Axis axis)
-{
-  m_zoomer->setAxis(QwtPlot::xBottom,axis);
-}
-
-
 
 PlotMagnifierX::~PlotMagnifierX()
 {
-  delete m_zoomer;
+  delete m_zoomerFirst;
+  delete m_zoomerSecond;
 }
 
