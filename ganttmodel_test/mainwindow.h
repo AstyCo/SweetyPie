@@ -19,6 +19,8 @@ public:
 
 private:
     Ui::MainWindow *ui;
+    void testChartWidget();
+    void testGanttModel();
 
 private slots:
     void setInterval();

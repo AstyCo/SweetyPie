@@ -71,7 +71,8 @@ SOURCES += \
     plotinterval.cpp \
     plotmagnifierx.cpp \
     plotkeyeventhander.cpp \
-    verticalscrollarea.cpp
+    verticalscrollarea.cpp \
+    chartsgroupwidget.cpp
 
 HEADERS += \
     ganttmodel.h \
@@ -96,7 +97,8 @@ HEADERS += \
     plotinterval.h \
     plotmagnifierx.h \
     plotkeyeventhander.h \
-    verticalscrollarea.h
+    verticalscrollarea.h \
+    chartsgroupwidget.h
 
 
 RESOURCES += \
@@ -104,6 +106,7 @@ RESOURCES += \
 
 FORMS += \
     chartwidget.ui \
-    curvedetailsgroupbox.ui
+    curvedetailsgroupbox.ui \
+    chartsgroupwidget.ui
 
 include(build_config.pri)

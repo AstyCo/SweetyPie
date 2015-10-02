@@ -9,26 +9,44 @@
 #include <QColorDialog>
 #include <QMenu>
 
+#include <qwt_plot.h>
+#include <qwt_plot_curve.h>
+#include <qwt_plot_grid.h>
+#include <qwt_symbol.h>
+#include <qwt_legend.h>
+#include <qwt_plot_panner.h>
+#include <qwt_plot_picker.h>
+#include <qwt_picker_machine.h>
+#include <qwt_plot_marker.h>
+#include <qwt_series_data.h>
+
+#include "qwt_color_map.h"
+#include "qwt_raster_data.h"
+#include "plotmagnifierx.h"
 
 ChartWidget::ChartWidget(QWidget * parent) :
   QWidget(parent),
   ui(new Ui::ChartWidget)
 {
-    Q_INIT_RESOURCE(images);
+  Q_INIT_RESOURCE(images);
   ui->setupUi(this);
 
-  setChartActions(caScale|
-                 caGrid|
-                 caPaintIntervals|
-                 caSelectIntervals|
-                 caMaxMinLines);
+  setLeftAxisMargin(0);
+  setRightAxisMargin(0);
+
+  setChartActions(caScale
+                  | caGrid
+                  | caPaintIntervals
+                  | caSelectIntervals
+                  | caMaxMinLines
+                  | caSelectTarget);
 
   ui->m_plot->setCanvasBackground( Qt::white );
 
-  ui->m_plot->setAxisTitle(QwtPlot::xBottom,tr(" Дата и время"));
+  ui->m_plot->setAxisTitle(QwtPlot::xBottom, tr("Дата и время"));
   ui->m_plot->setAxisScaleDraw(QwtPlot::xBottom, new TimeScaleDraw());
-  ui->m_plot->setAxisLabelRotation(QwtPlot::xBottom, -50.0);
-  ui->m_plot->setAxisLabelAlignment(QwtPlot::xBottom, Qt::AlignLeft | Qt::AlignBottom);
+  //ui->m_plot->setAxisLabelRotation(QwtPlot::xBottom, -50.0);
+  ui->m_plot->setAxisLabelAlignment(QwtPlot::xBottom, Qt::AlignCenter | Qt::AlignBottom);
 
 
   // сетка
@@ -38,17 +56,18 @@ ChartWidget::ChartWidget(QWidget * parent) :
   m_panner = new QwtPlotPanner(ui->m_plot->canvas());
   m_panner->setCursor(QCursor(Qt::ClosedHandCursor));
   m_panner->setMouseButton(Qt::RightButton); // используя правую кнопку мыши
+  connect(m_panner, SIGNAL(panned(int, int)), SIGNAL(panned(int, int)));
   // добавляем возможность масштабирования колесом мыши
   m_zoomer = new PlotMagnifierX(ui->m_plot->canvas());
   // отключить масштабирование при зажатой кнопке и перемещении мыши
   m_zoomer->setMouseButton(Qt::NoButton);
-
+  connect(m_zoomer, SIGNAL(scaleChanged(qreal, QPoint)), SIGNAL(scaleChanged(qreal, QPoint)));
 
   // создать маркеры, которыми будем помечать выбранную точку
   m_pMarker[0] = new QwtPlotMarker();
   m_pMarker[0]->setLabelAlignment(Qt::AlignRight | Qt::AlignBottom);
   QwtSymbol * sym = new QwtSymbol(QwtSymbol::Diamond, QBrush(Qt::magenta, Qt::SolidPattern),
-                                  QPen(Qt::black, 0.0, Qt::SolidLine), QSize(7,7));
+                                  QPen(Qt::black, 0.0, Qt::SolidLine), QSize(7, 7));
   m_pMarker[0]->setSymbol(sym);
   m_pMarker[0]->setLineStyle(QwtPlotMarker::VLine);
   m_pMarker[0]->setLinePen(QPen( Qt::black, 0, Qt::DashLine ));
@@ -75,10 +94,17 @@ ChartWidget::ChartWidget(QWidget * parent) :
   m_pIntervalMarker[1]->hide();
   m_pIntervalMarker[1]->attach(ui->m_plot);
 
-  m_pMinLeftMarker=0;
-  m_pMaxLeftMarker=0;
-  m_pMinRightMarker=0;
-  m_pMaxRightMarker=0;
+  m_pTargetingMarker = new QwtPlotMarker();
+  m_pTargetingMarker->setLineStyle(QwtPlotMarker::VLine);
+  m_pTargetingMarker->setLinePen(QPen( Qt::magenta, 3, Qt::SolidLine ));
+  m_pTargetingMarker->hide();
+  //m_pTargetingMarker->setZ(100);
+  m_pTargetingMarker->attach(ui->m_plot);
+
+  m_pMinLeftMarker = 0;
+  m_pMaxLeftMarker = 0;
+  m_pMinRightMarker = 0;
+  m_pMaxRightMarker = 0;
 
   // объект отслеживает перемещение и нажатие кнопки мыши
   m_picker = new QwtPlotPicker(QwtPlot::xBottom, QwtPlot::yLeft,
@@ -94,33 +120,30 @@ ChartWidget::ChartWidget(QWidget * parent) :
 
   connect(m_picker, SIGNAL(selected(const QPointF&)), this, SLOT(onCurvePointSelected(const QPointF&)));
   //connect(m_keyEventHandler, SIGNAL(nextPointSelected(bool)), SLOT(onNextCurvePointSelected(bool)));
-  connect(m_panner, SIGNAL(panned(int,int)), SLOT(onPlotPanned()));
+  connect(m_panner, SIGNAL(panned(int, int)), SLOT(onPlotPanned()));
 
-  connect(ui->pushButtonAutoZoom,SIGNAL(clicked()),this,SLOT(autoZoom()));
-  connect(ui->pushButtonGrid,SIGNAL(toggled(bool)),this,SLOT(setGrid(bool)));
-  connect(ui->pushButtonClear,SIGNAL(clicked()),this,SLOT(fullReplot()));
-  connect(ui->pushButtonSelectInterval,SIGNAL(toggled(bool)),this,SLOT(setIntervalSelection(bool)));
+  connect(ui->pushButtonAutoZoom, SIGNAL(clicked()), this, SLOT(autoZoom()));
+  connect(ui->pushButtonGrid, SIGNAL(toggled(bool)), this, SLOT(setGrid(bool)));
+  connect(ui->pushButtonClear, SIGNAL(clicked()), this, SLOT(fullReplot()));
+  connect(ui->pushButtonSelectInterval, SIGNAL(toggled(bool)), this, SLOT(setIntervalSelection(bool)));
 
 
   m_selectedPointIndex = CurveIndex();
-  m_selectionState = chartNoSelection;
+  m_selectionState = ssNone;
   m_intervalValuesVisible = false;
 
-  QVBoxLayout * layout = new QVBoxLayout();
-  ui->widgetDetail->setLayout(layout);
-
-  createMenuIitervals();
+  createMenuIntervals();
   createMenuMaxMin();
 
   _countLastPoints = 0;
   _timerOnline = new QTimer(this);
   _timerOnline->setInterval(1000);
-  connect(_timerOnline,SIGNAL(timeout()),this,SLOT(fullReplot()));
+  connect(_timerOnline, SIGNAL(timeout()), this, SLOT(fullReplot()));
 }
 
 ChartWidget::~ChartWidget()
 {
-    clearChart();
+  clearChart();
 }
 
 void ChartWidget::fullReplot()
@@ -130,37 +153,38 @@ void ChartWidget::fullReplot()
   m_pMarker[1]->hide();
   m_pIntervalMarker[0]->hide();
   m_pIntervalMarker[1]->hide();
+  m_pTargetingMarker->hide();
   autoZoom();
 }
 
 void ChartWidget::autoZoom()
 {
-    // автоматически подобрать масштаб
-    ui->m_plot->setAxisAutoScale(QwtPlot::xBottom);
-    ui->m_plot->setAxisAutoScale(QwtPlot::yRight);
-    ui->m_plot->setAxisAutoScale(QwtPlot::yLeft);
-    ui->m_plot->replot();
-    // установить новый масштаб в качестве базового
-    m_zoomer->SetZoomBase(true);
+  // автоматически подобрать масштаб
+  ui->m_plot->setAxisAutoScale(QwtPlot::xBottom);
+  ui->m_plot->setAxisAutoScale(QwtPlot::yRight);
+  ui->m_plot->setAxisAutoScale(QwtPlot::yLeft);
+  ui->m_plot->replot();
+  // установить новый масштаб в качестве базового
+  m_zoomer->SetZoomBase(true);
 }
 
 void ChartWidget::setGrid(bool b)
 {
-    if(!(_chartActions & caGrid))
-    {
-        qWarning()<<"grid is not available. Use setChartActions()";
-        return;
-    }
+  if(!(_chartActions & caGrid))
+  {
+    qWarning() << "grid is not available. Use setChartActions()";
+    return;
+  }
 
-    if(b)
-        m_pGrid->attach(ui->m_plot);
-    else
-        m_pGrid->detach();
+  if(b)
+    m_pGrid->attach(ui->m_plot);
+  else
+    m_pGrid->detach();
 
-    ui->m_plot->replot();
+  ui->m_plot->replot();
 }
 
-void ChartWidget::ShowSelectionPoint(QwtText xLbl, QwtText yLbl, QPointF point, QwtPlot::Axis axis)
+void ChartWidget::showSelectionPoint(QwtText xLbl, QwtText yLbl, QPointF point, QwtPlot::Axis axis)
 {
   m_pMarker[0]->setLabel(xLbl);
   m_pMarker[0]->setValue(point);
@@ -169,331 +193,472 @@ void ChartWidget::ShowSelectionPoint(QwtText xLbl, QwtText yLbl, QPointF point, 
   m_pMarker[1]->setLabel(yLbl);
   m_pMarker[1]->setValue(point);
   m_pMarker[1]->setYAxis(axis);
-  if(axis==QwtPlot::yRight)
-      m_pMarker[1]->setLabelAlignment(Qt::AlignRight | Qt::AlignTop);
+  if(axis == QwtPlot::yRight)
+    m_pMarker[1]->setLabelAlignment(Qt::AlignRight | Qt::AlignTop);
   else
-      m_pMarker[1]->setLabelAlignment(Qt::AlignLeft | Qt::AlignTop);
+    m_pMarker[1]->setLabelAlignment(Qt::AlignLeft | Qt::AlignTop);
 
   m_pMarker[1]->show();
   ui->m_plot->replot();
 }
 
-void ChartWidget::ShowSelectionInterval(QPointF start, QPointF end)
+void ChartWidget::showSelectionInterval(QPointF start, QPointF end)
 {
-    if(!(_chartActions & caSelectIntervals))
-    {
-        qWarning()<<"select intervals is not available. use setChartActions()";
-        return;
-    }
+  if(!(_chartActions & caSelectIntervals))
+  {
+    qWarning() << "select intervals is not available. use setChartActions()";
+    return;
+  }
 
-    m_pIntervalMarker[0]->setValue(start);
-    m_pIntervalMarker[0]->show();
-    m_pIntervalMarker[1]->setValue(end);
-    m_pIntervalMarker[1]->show();
-    ui->m_plot->replot();
+  m_pIntervalMarker[0]->setValue(start);
+  m_pIntervalMarker[0]->show();
+  m_pIntervalMarker[1]->setValue(end);
+  m_pIntervalMarker[1]->show();
+  ui->m_plot->replot();
 }
-void ChartWidget::ShowSelectionIntervalStart(QPointF start)
+void ChartWidget::showSelectionIntervalStart(QPointF start)
 {
-    if(!(_chartActions & caSelectIntervals))
-    {
-        qWarning()<<"select intervals is not available. use setChartActions()";
-        return;
-    }
+  if(!(_chartActions & caSelectIntervals))
+  {
+    qWarning() << "select intervals is not available. use setChartActions()";
+    return;
+  }
 
-    m_pIntervalMarker[0]->setValue(start);
-    m_pIntervalMarker[0]->show();
-    ui->m_plot->replot();
-}
-
-void ChartWidget::ShowSelectionIntervalEnd(QPointF end)
-{
-    if(!(_chartActions & caSelectIntervals))
-    {
-        qWarning()<<"select intervals is not available. use setChartActions()";
-        return;
-    }
-
-    m_pIntervalMarker[1]->setValue(end);
-    m_pIntervalMarker[1]->show();
-    ui->m_plot->replot();
+  m_pIntervalMarker[0]->setValue(start);
+  m_pIntervalMarker[0]->show();
+  ui->m_plot->replot();
 }
 
-CurveIndex ChartWidget::FindPointIndexByPos(const QPointF &pos, SearchDirection direction)
+void ChartWidget::showSelectionIntervalEnd(QPointF end)
+{
+  if(!(_chartActions & caSelectIntervals))
+  {
+    qWarning() << "select intervals is not available. use setChartActions()";
+    return;
+  }
+
+  m_pIntervalMarker[1]->setValue(end);
+  m_pIntervalMarker[1]->show();
+  ui->m_plot->replot();
+}
+
+long ChartWidget::findPointIndexByPos(const QPointF &pos, SearchDirection direction, int curveId)
+{
+  QwtSeriesData<QPointF> *samples = m_curves.at(curveId)->data();
+  size_t size = samples->size();
+  if (size == 0)
+    return -1;
+
+  long endIdx = size - 1;
+
+  if (direction == sdLeft)
+  {
+    for(int i = endIdx; i >= 0; i--)
+    {
+      if (samples->sample(i).x() <= pos.x())
+        return i;
+    }
+    return 0;
+  }
+  else if (direction == sdRight)
+  {
+    for(int i = 0; i <= endIdx; i++)
+    {
+      if (samples->sample(i).x() >= pos.x())
+        return i;
+    }
+    return endIdx;
+  }
+  else
+  {
+    QPointF p, prev;
+    for(long i = 0; i <= endIdx; i++)
+    {
+      p = samples->sample(i);
+      if (pos.x() <= p.x())
+      {
+        if (i > 0)
+        {
+          if ((p.x() - pos.x()) > (pos.x() - prev.x()))
+          {
+            p = prev;
+            return (i - 1);
+          }
+        }
+        return i;
+      }
+      prev = p;
+    }
+    return endIdx;
+  }
+}
+
+CurveIndex ChartWidget::findClosestPointAllCurves(const QPointF &pos, SearchDirection direction)
 {
 
-    if(m_curves.isEmpty())
-        return CurveIndex();
+  if(m_curves.isEmpty())
+    return CurveIndex();
 
-    double minLenth=2147483647;
-    CurveIndex rez;
-    if (direction == sdLeft)
+  double minLenth = 2147483647;
+  CurveIndex rez;
+  if (direction == sdLeft)
+  {
+    for(int j = 0; j < m_curves.count(); j++)
     {
-        for(int j=0; j<m_curves.count(); j++)
+      if(m_curves[j]->isVisible())
+      {
+        bool isFind = false;
+        for(long i = m_curves[j]->dataSize() - 1; i >= 0; i--)
         {
-            if(m_curves[j]->isVisible())
+          QPointF transP = getTransformedPoint(j, i);
+          if (transP.x() <= pos.x())
+          {
+            double lenth = calcDistance(transP, pos);
+            if(lenth < minLenth)
             {
-                bool isFind=false;
-                for(long i = m_curves[j]->dataSize()-1; i >= 0; i--)
-                {
-                    QPointF transP = getTransformedPoint(j,i);
-                    if (transP.x() <= pos.x())
-                    {
-                        double lenth = calcDistance(transP,pos);
-                        if(lenth<minLenth)
-                        {
-                            isFind=true;
-                            minLenth=lenth;
-                            rez.indexCurve = j;
-                            rez.indexPoint = i;
-                            break;
-                        }
-                    }
-                }
-                if(!isFind)
-                {
-                    QPointF transP = getTransformedPoint(j,0);
-                    double lenth = calcDistance(transP,pos);
-                    if(lenth<minLenth)
-                    {
-                        minLenth=lenth;
-                        rez.indexCurve = j;
-                        rez.indexPoint = 0;
-                    }
-                }
+              isFind = true;
+              minLenth = lenth;
+              rez.indexCurve = j;
+              rez.indexPoint = i;
+              break;
             }
+          }
         }
-        return rez;
+        if(!isFind)
+        {
+          QPointF transP = getTransformedPoint(j, 0);
+          double lenth = calcDistance(transP, pos);
+          if(lenth < minLenth)
+          {
+            minLenth = lenth;
+            rez.indexCurve = j;
+            rez.indexPoint = 0;
+          }
+        }
+      }
     }
-    else if (direction == sdRight)
+    return rez;
+  }
+  else if (direction == sdRight)
+  {
+    for(int j = 0; j < m_curves.count(); j++)
     {
-        for(int j=0; j<m_curves.count(); j++)
+      if(! m_curves[j]->isVisible())
+        continue;
+
+      bool isFind = false;
+      for(long i = 0; i < m_curves[j]->dataSize(); i++)
+      {
+        QPointF transP = getTransformedPoint(j, i);
+        if (transP.x() >= pos.x())
         {
-            if(m_curves[j]->isVisible())
-            {
-                bool isFind=false;
-                for(long i = 0; i < m_curves[j]->dataSize(); i++)
-                {
-                    QPointF transP = getTransformedPoint(j,i);
-                    if (transP.x() >= pos.x())
-                    {
-                        double lenth = calcDistance(transP,pos);
-                        if(lenth<minLenth)
-                        {
-                            isFind=true;
-                            minLenth=lenth;
-                            rez.indexCurve = j;
-                            rez.indexPoint = i;
-                            break;
-                        }
-                    }
-                }
-                if(!isFind)
-                {
-                    QPointF transP = getTransformedPoint(j,m_curves[j]->dataSize()-1);
-                    double lenth = calcDistance(transP,pos);
-                    if(lenth<minLenth)
-                    {
-                        minLenth=lenth;
-                        rez.indexCurve = j;
-                        rez.indexPoint =  m_curves[j]->dataSize()-1;
-                    }
-                }
-            }
+          double lenth = calcDistance(transP, pos);
+          if(lenth < minLenth)
+          {
+            isFind = true;
+            minLenth = lenth;
+            rez.indexCurve = j;
+            rez.indexPoint = i;
+            break;
+          }
         }
-        return rez;
+      }
+      if(!isFind)
+      {
+        QPointF transP = getTransformedPoint(j, m_curves[j]->dataSize() - 1);
+        double lenth = calcDistance(transP, pos);
+        if(lenth < minLenth)
+        {
+          minLenth = lenth;
+          rez.indexCurve = j;
+          rez.indexPoint =  m_curves[j]->dataSize() - 1;
+        }
+      }
+
     }
-    else
+    return rez;
+  }
+  else
+  {
+    for(int j = 0; j < m_curves.count(); j++)
     {
-        for(int j=0; j<m_curves.count(); j++)
+      if(m_curves[j]->isVisible())
+      {
+        bool isFind = false;
+        QPointF p, prev;
+        for(long i = 0; i < m_curves[j]->dataSize(); i++)
         {
-            if(m_curves[j]->isVisible())
+          p = getTransformedPoint(j, i);
+          if (pos.x() <= p.x())
+          {
+            if (i > 0)
             {
-                bool isFind = false;
-                QPointF p, prev;
-                for(long i = 0; i < m_curves[j]->dataSize(); i++)
-                {
-                    p = getTransformedPoint(j,i);
-                    if (pos.x() <= p.x())
-                    {
-                        if (i > 0)
-                        {
-                            double lenth = calcDistance(prev,pos);
-                            if(lenth<minLenth)
-                            {
-                                isFind=true;
-                                minLenth=lenth;
-                                rez.indexCurve = j;
-                                rez.indexPoint = i-1;
-                            }
-                        }
-                        double lenth = calcDistance(p,pos);
-                        if(lenth<minLenth)
-                        {
-                            isFind=true;
-                            minLenth=lenth;
-                            rez.indexCurve = j;
-                            rez.indexPoint = i;
-                        }
-                        break;
-                    }
-                    prev = p;
-                }
-                if(!isFind)
-                {
-                    QPointF transP = getTransformedPoint(j,m_curves[j]->dataSize()-1);
-                    double lenth = calcDistance(transP,pos);
-                    if(lenth<minLenth)
-                    {
-                        minLenth=lenth;
-                        rez.indexCurve = j;
-                        rez.indexPoint =  m_curves[j]->dataSize()-1;
-                    }
-                }
+              double lenth = calcDistance(prev, pos);
+              if(lenth < minLenth)
+              {
+                isFind = true;
+                minLenth = lenth;
+                rez.indexCurve = j;
+                rez.indexPoint = i - 1;
+              }
             }
+            double lenth = calcDistance(p, pos);
+            if(lenth < minLenth)
+            {
+              isFind = true;
+              minLenth = lenth;
+              rez.indexCurve = j;
+              rez.indexPoint = i;
+            }
+            break;
+          }
+          prev = p;
         }
-        return rez;
+        if(!isFind)
+        {
+          QPointF transP = getTransformedPoint(j, m_curves[j]->dataSize() - 1);
+          double lenth = calcDistance(transP, pos);
+          if(lenth < minLenth)
+          {
+            minLenth = lenth;
+            rez.indexCurve = j;
+            rez.indexPoint =  m_curves[j]->dataSize() - 1;
+          }
+        }
+      }
     }
+    return rez;
+  }
 }
 
 void ChartWidget::onCurvePointSelected(const QPointF &pos)
 {
-  if ((m_selectionState == chartNoSelection) || (m_selectionState == chartIntervalSelected))
+  if (m_selectionState == ssNone)
   {
 
     // найти и выделить точку с учетом выделенного интервала
-    CurveIndex selPointIdx = FindPointIndexByPos(pos);
+    CurveIndex selPointIdx = findClosestPointAllCurves(pos);
 
     if(!selPointIdx.isValid())
-        return;
+      return;
 
     m_selectedPointIndex = selPointIdx;
-
-    for(int i=0; i<m_curves.count(); i++)
+    if (m_curves.size() > 1)
     {
-        m_curves[i]->setPen(QPen(m_curves[i]->pen().color(),0.8));
+      for(int i = 0; i < m_curves.count(); i++)
+      {
+        m_curves[i]->setPen(QPen(m_curves[i]->pen().color(), 0.8));
+      }
+      m_curves[m_selectedPointIndex.indexCurve]->setPen(QPen(m_curves[m_selectedPointIndex.indexCurve]->pen().color(), 2.4));
     }
-    m_curves[m_selectedPointIndex.indexCurve]->setPen(QPen(m_curves[m_selectedPointIndex.indexCurve]->pen().color(),2.4));
-
-    if(  m_pMinLeftMarker!=0 &&
-         m_pMaxLeftMarker!=0)
+    if(  m_pMinLeftMarker != 0 &&
+         m_pMaxLeftMarker != 0)
     {
-        m_pMinLeftMarker->setLinePen(QPen(m_pMinLeftMarker->linePen().color(),1));
-        m_pMaxLeftMarker->setLinePen(QPen(m_pMaxLeftMarker->linePen().color(),1));
+      m_pMinLeftMarker->setLinePen(QPen(m_pMinLeftMarker->linePen().color(), 1));
+      m_pMaxLeftMarker->setLinePen(QPen(m_pMaxLeftMarker->linePen().color(), 1));
 
     }
-    if(m_pMinRightMarker!=0 &&
-       m_pMaxRightMarker!=0)
+    if(m_pMinRightMarker != 0 &&
+        m_pMaxRightMarker != 0)
     {
-        m_pMinRightMarker->setLinePen(QPen(m_pMinRightMarker->linePen().color(),1));
-        m_pMaxRightMarker->setLinePen(QPen(m_pMaxRightMarker->linePen().color(),1));
-    }
-
-    if(m_curves[m_selectedPointIndex.indexCurve]->yAxis()==QwtPlot::yLeft)
-    {
-        if(m_pMinLeftMarker!=0 && m_pMaxLeftMarker!=0)
-        {
-            m_pMinLeftMarker->setLinePen(QPen(m_pMinLeftMarker->linePen().color(),3));
-            m_pMaxLeftMarker->setLinePen(QPen(m_pMaxLeftMarker->linePen().color(),3));
-        }
-    }
-    else if(m_curves[m_selectedPointIndex.indexCurve]->yAxis()==QwtPlot::yRight)
-    {
-        if(m_pMinRightMarker!=0 && m_pMaxRightMarker!=0)
-        {
-            m_pMinRightMarker->setLinePen(QPen(m_pMinRightMarker->linePen().color(),3));
-            m_pMaxRightMarker->setLinePen(QPen(m_pMaxRightMarker->linePen().color(),3));
-        }
+      m_pMinRightMarker->setLinePen(QPen(m_pMinRightMarker->linePen().color(), 1));
+      m_pMaxRightMarker->setLinePen(QPen(m_pMaxRightMarker->linePen().color(), 1));
     }
 
-    DrawMarkerOnCurve((QwtPlot::Axis)m_curves[m_selectedPointIndex.indexCurve]->yAxis());
+    if(m_curves[m_selectedPointIndex.indexCurve]->yAxis() == QwtPlot::yLeft)
+    {
+      if(m_pMinLeftMarker != 0 && m_pMaxLeftMarker != 0)
+      {
+        m_pMinLeftMarker->setLinePen(QPen(m_pMinLeftMarker->linePen().color(), 3));
+        m_pMaxLeftMarker->setLinePen(QPen(m_pMaxLeftMarker->linePen().color(), 3));
+      }
+    }
+    else if(m_curves[m_selectedPointIndex.indexCurve]->yAxis() == QwtPlot::yRight)
+    {
+      if(m_pMinRightMarker != 0 && m_pMaxRightMarker != 0)
+      {
+        m_pMinRightMarker->setLinePen(QPen(m_pMinRightMarker->linePen().color(), 3));
+        m_pMaxRightMarker->setLinePen(QPen(m_pMaxRightMarker->linePen().color(), 3));
+      }
+    }
+
+    drawMarkerOnCurve((QwtPlot::Axis)m_curves[m_selectedPointIndex.indexCurve]->yAxis());
 
     calcDetailsPanel();
 
     ui->m_detailsPanel->verticalScrollBar()->setValue(0);
-    int scrolldy=ui->pushButtonClear->height();
-    for(int i=0; i<m_detailedPanels.count(); i++)
+    int scrolldy = ui->pushButtonClear->height();
+    for(int i = 0; i < m_detailedPanels.count(); i++)
     {
-        if(i!=m_selectedPointIndex.indexCurve)
-        {
-            scrolldy+=m_detailedPanels[i]->geometry().height();
-        }
-        else
-            break;
+      if(i != m_selectedPointIndex.indexCurve)
+      {
+        scrolldy += m_detailedPanels[i]->geometry().height();
+      }
+      else
+        break;
     }
 
     ui->m_detailsPanel->verticalScrollBar()->setValue(scrolldy);
 
     emit pointSelected(m_selectedPointIndex);
   }
-  else if (m_selectionState == chartStartSelection)
+  else if (m_selectionState == ssIntervalBegin)
   {
     setIntervalSelectionStart(pos);
 
     emit intervalSelectionStarted(pos);
   }
-  else if (m_selectionState == chartEndSelection)
+  else if (m_selectionState == ssIntervalEnd)
   {
     setIntervalSelectionEnd(pos);
 
     emit intervalSelectionEnded(pos);
   }
+  else if (m_selectionState == ssTargetingPoint)
+  {
+    UtcDateTime dt(QDateTime::fromTime_t(pos.x()).toUTC());
+    setTargetingPoint(dt);
+
+    emit targetingDtSet(dt);
+  }
 }
 
-QPointF ChartWidget::DtToPoint(UtcDateTime dt)
+QPointF ChartWidget::dtToPoint(UtcDateTime dt)
 {
-    double offsetMin = dt.toBshvTime();
-    return QPointF(offsetMin , 0);
+  double offsetSeconds = dt.toBshvTime();
+  return QPointF(offsetSeconds , 0);
 }
 
-QVector<QPointF> ChartWidget::limittedData(const QVector<QPointF> data) const
+QVector<QPointF> ChartWidget::trimData(const QVector<QPointF> data) const
 {
-    if(_countLastPoints==0 || _countLastPoints>data.size())
-        return data;
-    else
-    {
-        QVector<QPointF> tmp;
-        tmp = data.mid(data.size()-_countLastPoints);
-        return tmp;
+  if(_countLastPoints == 0 || _countLastPoints > data.size())
+    return data;
+  else
+  {
+    QVector<QPointF> tmp;
+    tmp = data.mid(data.size() - _countLastPoints);
+    return tmp;
 
-    }
+  }
 }
-int ChartWidget::chartActons() const
+int ChartWidget::chartActions() const
 {
-    return _chartActions;
+  return _chartActions;
 }
 
 void ChartWidget::setChartActions(int chartActions)
 {
-    ui->pushButtonAutoZoom->setVisible(false);
-    ui->pushButtonGrid->setVisible(false);
-    ui->toolButtonIntervalVisibled->setVisible(false);
-    ui->pushButtonSelectInterval->setVisible(false);
-    ui->toolButtonMaxMinValues->setVisible(false);
-    ui->pushButtonTimerOnline->setVisible(false);
+  ui->pushButtonAutoZoom->setVisible(false);
+  ui->pushButtonGrid->setVisible(false);
+  ui->toolButtonIntervalVisibled->setVisible(false);
+  ui->pushButtonSelectInterval->setVisible(false);
+  ui->toolButtonMaxMinValues->setVisible(false);
+  ui->pushButtonTimerOnline->setVisible(false);
+  ui->toolButtonSelectTarget->hide();
 
-    _chartActions = chartActions;
+  _chartActions = chartActions;
 
-    // TODO блокировки самих элементов и функций на графике
-    if(_chartActions & caScale)
-        ui->pushButtonAutoZoom->setVisible(true);
-    if(_chartActions & caGrid)
-        ui->pushButtonGrid->setVisible(true);
-    if(_chartActions & caPaintIntervals)
-        ui->toolButtonIntervalVisibled->setVisible(true);
-    if(_chartActions & caSelectIntervals)
-        ui->pushButtonSelectInterval->setVisible(true);
-    if(_chartActions & caMaxMinLines)
-        ui->toolButtonMaxMinValues->setVisible(true);
-    if(_chartActions & caTimer)
-        ui->pushButtonTimerOnline->setVisible(true);
+  // TODO блокировки самих элементов и функций на графике
+  if(_chartActions & caScale)
+    ui->pushButtonAutoZoom->setVisible(true);
+  if(_chartActions & caGrid)
+    ui->pushButtonGrid->setVisible(true);
+  if(_chartActions & caPaintIntervals)
+    ui->toolButtonIntervalVisibled->setVisible(true);
+  if(_chartActions & caSelectIntervals)
+    ui->pushButtonSelectInterval->setVisible(true);
+  if(_chartActions & caMaxMinLines)
+    ui->toolButtonMaxMinValues->setVisible(true);
+  if(_chartActions & caTimer)
+    ui->pushButtonTimerOnline->setVisible(true);
+  if(_chartActions & caSelectTarget)
+    ui->toolButtonSelectTarget->setVisible(true);
 }
 
-QwtPlot *ChartWidget::getPlot() {return ui->m_plot; }
+QwtPlot *ChartWidget::getPlot()
+{
+  return ui->m_plot;
+}
+
+void ChartWidget::rescale(qreal scaleFactor, QPoint anchorPoint)
+{
+  m_zoomer->rescale(scaleFactor, anchorPoint);
+}
+
+void ChartWidget::moveCanvas( int dx, int dy )
+{
+  if ( dx == 0 && dy == 0 )
+    return;
+
+  QwtPlot *plot = ui->m_plot;
+  if ( plot == NULL )
+    return;
+
+  const bool doAutoReplot = plot->autoReplot();
+  plot->setAutoReplot( false );
+
+  for ( int axis = 0; axis < QwtPlot::axisCnt; axis++ )
+  {
+    const QwtScaleMap map = plot->canvasMap( axis );
+
+    const double p1 = map.transform( plot->axisScaleDiv( axis )->lowerBound() );
+    const double p2 = map.transform( plot->axisScaleDiv( axis )->upperBound() );
+
+    double d1, d2;
+    if ( axis == QwtPlot::xBottom || axis == QwtPlot::xTop )
+    {
+      d1 = map.invTransform( p1 - dx );
+      d2 = map.invTransform( p2 - dx );
+    }
+    else
+    {
+      d1 = map.invTransform( p1 - dy );
+      d2 = map.invTransform( p2 - dy );
+    }
+
+    plot->setAxisScale( axis, d1, d2 );
+  }
+
+  plot->setAutoReplot( doAutoReplot );
+  plot->replot();
+  onPlotPanned();
+}
+
+void ChartWidget::updateCurvesIntervalStats()
+{
+  QPointF posBegin = m_pIntervalMarker[0]->value();
+  QPointF posEnd = m_pIntervalMarker[1]->value();
+
+  for(int i = 0; i < m_curves.size(); i++)
+  {
+    QwtPlotCurve *curve = m_curves.at(i);
+    ChartCurveStats &stats = m_curvesStats[i];
+    if (m_selectionState == ssIntervalEnd)
+    {
+      long pointBeginIdx = findPointIndexByPos(posBegin, sdRight, i);
+      long pointEndIdx = findPointIndexByPos(posEnd, sdLeft, i);
+      if (pointBeginIdx != -1)
+        stats.intervalBeginValue = curve->sample(pointBeginIdx);
+      else
+        stats.intervalBeginValue = QPointF();
+
+      if (pointEndIdx != -1)
+        stats.intervalEndValue = curve->sample(pointEndIdx);
+      else
+        stats.intervalEndValue = QPointF();
+    }
+    else
+    {
+      stats.intervalBeginValue = QPointF();
+      stats.intervalEndValue = QPointF();
+    }
+  }
+}
 
 void ChartWidget::setIntervalSelectionByState(QPointF pos)
 {
-    if(m_curves.isEmpty())
-        return;
+  if(m_curves.isEmpty())
+    return;
 
   QPointF p = pos;
   CurveIndex selPointIdx;
@@ -510,25 +675,25 @@ void ChartWidget::setIntervalSelectionByState(QPointF pos)
   }
   else if (p.x() > m_curves.at(m_endLimit.indexCurve)->sample(m_endLimit.indexPoint).x())
   {
-      selDt.setBshvTime(m_curves.at(m_endLimit.indexCurve)->sample(m_endLimit.indexPoint).x());
+    selDt.setBshvTime(m_curves.at(m_endLimit.indexCurve)->sample(m_endLimit.indexPoint).x());
   }
 
   //this->SetSelectionIntervalDates(selDt, m_curEndDt);
   int markerIdx = 0;
-  if (m_selectionState == chartStartSelection)
+  if (m_selectionState == ssIntervalBegin)
   {
-    selPointIdx = FindPointIndexByPos(p, sdRight);
-    m_curStartPointIdx = selPointIdx;
-    m_curStartDt = selDt;
+    selPointIdx = findClosestPointAllCurves(p, sdRight);
+    m_intervalBeginPointIdx = selPointIdx;
+    m_intervalBeginDt = selDt;
   }
-  else if (m_selectionState == chartEndSelection)
+  else if (m_selectionState == ssIntervalEnd)
   {
-    if (m_curStartDt > selDt)
+    if (m_intervalBeginDt > selDt)
     {
       // если конечная дата на самом деле является началом
       // интервала, то меняем местами
-      m_curEndDt = m_curStartDt;
-      m_curStartDt = selDt;
+      m_intervalEndDt = m_intervalBeginDt;
+      m_intervalBeginDt = selDt;
 
       // текущие маркеры начала заменяем на маркеры окончания
       m_pIntervalMarker[1]->setValue(m_pIntervalMarker[0]->value());
@@ -536,18 +701,17 @@ void ChartWidget::setIntervalSelectionByState(QPointF pos)
       ui->m_plot->replot();
 
       markerIdx = 0;
-      m_curStartPointIdx = FindPointIndexByPos(p, sdRight);
-      QPointF tmpP(m_curEndDt.toBshvTime(),p.y());
-      m_curEndPointIdx = FindPointIndexByPos(tmpP, sdLeft);
+      m_intervalBeginPointIdx = findClosestPointAllCurves(p, sdRight);
+      QPointF tmpP(m_intervalEndDt.toBshvTime(), p.y());
+      m_intervalEndPointIdx = findClosestPointAllCurves(tmpP, sdLeft);
     }
     else
     {
-      m_curEndDt = selDt;
-      selPointIdx = FindPointIndexByPos(p, sdLeft);
-      m_curEndPointIdx = selPointIdx;
+      m_intervalEndDt = selDt;
+      selPointIdx = findClosestPointAllCurves(p, sdLeft);
+      m_intervalEndPointIdx = selPointIdx;
       markerIdx = 1;
     }
-
     // обновить поле "длительность"
     //TimeSpan duration = selDt - m_curStartDt;
     //this->SetSelectionInterval(duration);
@@ -558,442 +722,462 @@ void ChartWidget::setIntervalSelectionByState(QPointF pos)
   // показать маркер начала/окончания выделения интервала
   m_pIntervalMarker[markerIdx]->setValue(p);
   m_pIntervalMarker[markerIdx]->show();
+
+  updateCurvesIntervalStats();
+
   ui->m_plot->replot();
 }
 int ChartWidget::countLastPoints() const
 {
-    return _countLastPoints;
+  return _countLastPoints;
 }
 
 void ChartWidget::setCountLastPoints(int countLastPoints)
 {
-    _countLastPoints = countLastPoints;
+  _countLastPoints = countLastPoints;
 }
 
 
 QList<QwtPlotCurve *> ChartWidget::curves() const
 {
-    return m_curves;
+  return m_curves;
 }
 
 void ChartWidget::startOnlineReplot()
 {
-    on_pushButtonTimerOnline_toggled(true);
+  on_pushButtonTimerOnline_toggled(true);
 }
 
 void ChartWidget::stopOnlineReplot()
 {
-    on_pushButtonTimerOnline_toggled(false);
+  on_pushButtonTimerOnline_toggled(false);
 }
 
 QList<PlotInterval *> ChartWidget::intervals() const
 {
-    return m_intervals;
+  return m_intervals;
 }
 
 
 QPointF ChartWidget::getTransformedPoint(int indexCurve, int indexPoint) const
 {
-    if(m_curves[indexCurve]->yAxis()==QwtPlot::yRight)
-    {
+  if(m_curves[indexCurve]->yAxis() == QwtPlot::yRight)
+  {
 
-        return QPointF(m_curves[indexCurve]->sample(indexPoint).x(),
-                   ui->m_plot->invTransform(QwtPlot::yLeft,ui->m_plot->transform(QwtPlot::yRight,m_curves[indexCurve]->sample(indexPoint).y())));
-    }
-    else
-    {
-        return m_curves[indexCurve]->sample(indexPoint);
-    }
+    return QPointF(m_curves[indexCurve]->sample(indexPoint).x(),
+                   ui->m_plot->invTransform(QwtPlot::yLeft, ui->m_plot->transform(QwtPlot::yRight, m_curves[indexCurve]->sample(indexPoint).y())));
+  }
+  else
+  {
+    return m_curves[indexCurve]->sample(indexPoint);
+  }
 }
 
 QPointF ChartWidget::getTransformedPoint(const CurveIndex &index) const
 {
-    return getTransformedPoint(index.indexCurve,index.indexPoint);
+  return getTransformedPoint(index.indexCurve, index.indexPoint);
 }
 
 double ChartWidget::calcDistance(const QPointF &p1, const QPointF &p2)
 {
-    double x2 = (p2.x() - p1.x())*(p2.x() - p1.x());
-    double y2 = (p2.y() - p1.y())*(p2.y() - p1.y());
-    return sqrt(x2+y2);
+  double x2 = (p2.x() - p1.x()) * (p2.x() - p1.x());
+  double y2 = (p2.y() - p1.y()) * (p2.y() - p1.y());
+  return sqrt(x2 + y2);
 }
 
-void ChartWidget::createMenuIitervals()
+void ChartWidget::createMenuIntervals()
 {
 
-    if(!(_chartActions & caPaintIntervals))
-    {
-        qWarning()<<"intervals is blocks. use setChartActions()";
-        return;
-    }
-    if(ui->toolButtonIntervalVisibled->menu()!=0)
-        delete ui->toolButtonIntervalVisibled->menu();
+  if(!(_chartActions & caPaintIntervals))
+  {
+    qWarning() << "intervals is blocks. use setChartActions()";
+    return;
+  }
+  if(ui->toolButtonIntervalVisibled->menu() != 0)
+    delete ui->toolButtonIntervalVisibled->menu();
 
-    QMenu * menu = new QMenu(ui->toolButtonIntervalVisibled);
-    QList<QAction *> rez;
+  QMenu * menu = new QMenu(ui->toolButtonIntervalVisibled);
+  QList<QAction *> rez;
 
-    for(int i=0; i<m_intervals.count(); i++)
-    {
-        UtcDateTime beg;
-        beg.setBshvTime(m_intervals[i]->beginX());
-        UtcDateTime end;
-        end.setBshvTime(m_intervals[i]->endX());
-        QAction *a = new QAction(beg.toStdString(0)+"-"+end.toStdString(0),ui->toolButtonIntervalVisibled);
-        a->setCheckable(true);
-        a->setChecked(true);
-        connect(a,SIGNAL(toggled(bool)),this,SLOT(setIntervalVisible(bool)));
-        rez.append(a);
-    }
+  for(int i = 0; i < m_intervals.count(); i++)
+  {
+    UtcDateTime beg;
+    beg.setBshvTime(m_intervals[i]->beginX());
+    UtcDateTime end;
+    end.setBshvTime(m_intervals[i]->endX());
+    QAction *a = new QAction(beg.toStdString(0) + "-" + end.toStdString(0), ui->toolButtonIntervalVisibled);
+    a->setCheckable(true);
+    a->setChecked(true);
+    connect(a, SIGNAL(toggled(bool)), this, SLOT(setIntervalVisible(bool)));
+    rez.append(a);
+  }
 
-    menu->clear();
-    menu->addActions(rez);
+  menu->clear();
+  menu->addActions(rez);
 
-    if(rez.isEmpty())
-        ui->toolButtonIntervalVisibled->setVisible(false);
-    else
-    {
-        ui->toolButtonIntervalVisibled->setVisible(true);
-        ui->toolButtonIntervalVisibled->setMenu(menu);
-    }
+  if(rez.isEmpty())
+    ui->toolButtonIntervalVisibled->setVisible(false);
+  else
+  {
+    ui->toolButtonIntervalVisibled->setVisible(true);
+    ui->toolButtonIntervalVisibled->setMenu(menu);
+  }
 
 }
 
 void ChartWidget::createMenuMaxMin()
 {
-    if(!(_chartActions & caMaxMinLines))
-    {
-        qWarning()<<"select intervals is blocks. use setChartActions()";
-        return;
-    }
+  if(!(_chartActions & caMaxMinLines))
+  {
+    qWarning() << "select intervals is blocks. use setChartActions()";
+    return;
+  }
 
-    if(ui->toolButtonMaxMinValues->menu()!=0)
-        delete ui->toolButtonMaxMinValues->menu();
+  if(ui->toolButtonMaxMinValues->menu() != 0)
+    delete ui->toolButtonMaxMinValues->menu();
 
-    QMenu * menu = new QMenu(ui->toolButtonMaxMinValues);
-    QList<QAction *> rez;
-
-
-    if(m_pMaxLeftMarker!=0 && m_pMinLeftMarker!=0)
-    {
-        QAction *amin = new QAction(tr("Пределы левой оси"),ui->toolButtonMaxMinValues);
-        amin->setCheckable(true);
-        amin->setChecked(true);
-        connect(amin,SIGNAL(toggled(bool)),this,SLOT(setMaxMinLeftVisible(bool)));
-        rez.append(amin);
-
-        QAction *acmin = new QAction(tr("Цвет пределов левой оси"),ui->toolButtonMaxMinValues);
-        connect(acmin,SIGNAL(triggered()),this,SLOT(changeColorMaxMinLeft()));
-        rez.append(acmin);
-    }
+  QMenu * menu = new QMenu(ui->toolButtonMaxMinValues);
+  QList<QAction *> rez;
 
 
+  if(m_pMaxLeftMarker != 0 && m_pMinLeftMarker != 0)
+  {
+    QAction *amin = new QAction(tr("Пределы левой оси"), ui->toolButtonMaxMinValues);
+    amin->setCheckable(true);
+    amin->setChecked(true);
+    connect(amin, SIGNAL(toggled(bool)), this, SLOT(setMaxMinLeftVisible(bool)));
+    rez.append(amin);
 
-    if(m_pMaxRightMarker!=0 && m_pMinRightMarker!=0)
-    {
-        QAction *amin = new QAction(tr("Пределы правой оси"),ui->toolButtonMaxMinValues);
-        amin->setCheckable(true);
-        amin->setChecked(true);
-        connect(amin,SIGNAL(toggled(bool)),this,SLOT(setMaxMinRightVisible(bool)));
-        rez.append(amin);
-
-        QAction *acmin = new QAction(tr("Цвет пределов правой оси"),ui->toolButtonMaxMinValues);
-        connect(acmin,SIGNAL(triggered()),this,SLOT(changeColorMaxMinRight()));
-        rez.append(acmin);
-    }
+    QAction *acmin = new QAction(tr("Цвет пределов левой оси"), ui->toolButtonMaxMinValues);
+    connect(acmin, SIGNAL(triggered()), this, SLOT(changeColorMaxMinLeft()));
+    rez.append(acmin);
+  }
 
 
-    menu->clear();
-    menu->addActions(rez);
 
-    if(rez.isEmpty())
-        ui->toolButtonMaxMinValues->setVisible(false);
-    else
-    {
-        ui->toolButtonMaxMinValues->setVisible(true);
-        ui->toolButtonMaxMinValues->setMenu(menu);
-    }
+  if(m_pMaxRightMarker != 0 && m_pMinRightMarker != 0)
+  {
+    QAction *amin = new QAction(tr("Пределы правой оси"), ui->toolButtonMaxMinValues);
+    amin->setCheckable(true);
+    amin->setChecked(true);
+    connect(amin, SIGNAL(toggled(bool)), this, SLOT(setMaxMinRightVisible(bool)));
+    rez.append(amin);
+
+    QAction *acmin = new QAction(tr("Цвет пределов правой оси"), ui->toolButtonMaxMinValues);
+    connect(acmin, SIGNAL(triggered()), this, SLOT(changeColorMaxMinRight()));
+    rez.append(acmin);
+  }
+
+
+  menu->clear();
+  menu->addActions(rez);
+
+  if(rez.isEmpty())
+    ui->toolButtonMaxMinValues->setVisible(false);
+  else
+  {
+    ui->toolButtonMaxMinValues->setVisible(true);
+    ui->toolButtonMaxMinValues->setMenu(menu);
+  }
 
 }
 QwtPlotCurve *ChartWidget::curve(int index) const
 {
-    return m_curves[index];
+  return m_curves[index];
 }
 
 
 void ChartWidget::setCurveVisible(bool b)
 {
-    if(!b)
-    {
-        CurveDetailsGroupBox *curveDlg = (CurveDetailsGroupBox *)QObject::sender();
-        bool isFind = false;
-        for(int i=0; i<m_curves.count(); i++)
-            if(m_curves[i] == curveDlg->curve())
-                if(m_selectedPointIndex.indexCurve == i)
-                {
-                    isFind = true;
-                    fullReplot();
-                }
+  if(!b)
+  {
+    CurveDetailsGroupBox *curveDlg = (CurveDetailsGroupBox *)QObject::sender();
+    bool isFind = false;
+    for(int i = 0; i < m_curves.count(); i++)
+      if(m_curves[i] == curveDlg->curve())
+        if(m_selectedPointIndex.indexCurve == i)
+        {
+          isFind = true;
+          fullReplot();
+        }
 
-        if(!isFind)
-            ui->m_plot->replot();
-    }
-    else
-    {
-        ui->m_plot->replot();
-    }
+    if(!isFind)
+      ui->m_plot->replot();
+  }
+  else
+  {
+    ui->m_plot->replot();
+  }
 }
 
 void ChartWidget::setIntervalVisible(bool b)
 {
-    QAction * a = (QAction *)QObject::sender();
-    int index = ui->toolButtonIntervalVisibled->menu()->actions().indexOf(a);
-    if(index>=0 && index<m_intervals.count())
-    {
-        m_intervals[index]->setVisible(b);
-        ui->m_plot->replot();
-    }
+  QAction * a = (QAction *)QObject::sender();
+  int index = ui->toolButtonIntervalVisibled->menu()->actions().indexOf(a);
+  if(index >= 0 && index < m_intervals.count())
+  {
+    m_intervals[index]->setVisible(b);
+    ui->m_plot->replot();
+  }
 }
 
 void ChartWidget::setMaxMinLeftVisible(bool b)
 {
-    QAction * a = (QAction *)QObject::sender();
-    if(a->text()==tr("Пределы левой оси"))
-    {
-        m_pMaxLeftMarker->setVisible(b);
-        m_pMinLeftMarker->setVisible(b);
-        ui->m_plot->replot();
-    }
+  QAction * a = (QAction *)QObject::sender();
+  if(a->text() == tr("Пределы левой оси"))
+  {
+    m_pMaxLeftMarker->setVisible(b);
+    m_pMinLeftMarker->setVisible(b);
+    ui->m_plot->replot();
+  }
 }
 
 void ChartWidget::setMaxMinRightVisible(bool b)
 {
-    QAction * a = (QAction *)QObject::sender();
-    if(a->text()==tr("Пределы правой оси"))
-    {
-        m_pMaxRightMarker->setVisible(b);
-        m_pMinRightMarker->setVisible(b);
-        ui->m_plot->replot();
-    }
+  QAction * a = (QAction *)QObject::sender();
+  if(a->text() == tr("Пределы правой оси"))
+  {
+    m_pMaxRightMarker->setVisible(b);
+    m_pMinRightMarker->setVisible(b);
+    ui->m_plot->replot();
+  }
 }
 
 void ChartWidget::calcDetailsPanel()
 {
-    for(int i=0; i<m_detailedPanels.count(); i++)
+  bool intervalSelected = m_intervalBeginDt.isValid() && m_intervalEndDt.isValid();
+  for(int i = 0; i < m_detailedPanels.count(); i++)
+  {
+    ChartCurveStats stats = m_curvesStats.at(i);
+    if(m_detailedPanels[i]->curve()->yAxis() == QwtPlot::yLeft)
     {
-        if(m_detailedPanels[i]->curve()->yAxis()==QwtPlot::yLeft)
-        {
-            if(m_pMaxLeftMarker!=0 && m_pMinLeftMarker!=0)
-                m_detailedPanels[i]->setMinMaxValue(m_pMinLeftMarker->yValue(),m_pMaxLeftMarker->yValue());
-            else
-                m_detailedPanels[i]->setMinMaxValue(0,0);
-        }
-        else if(m_detailedPanels[i]->curve()->yAxis()==QwtPlot::yRight)
-        {
-            if(m_pMaxRightMarker!=0 && m_pMinRightMarker!=0)
-                m_detailedPanels[i]->setMinMaxValue(m_pMinRightMarker->yValue(),m_pMaxRightMarker->yValue());
-            else
-                m_detailedPanels[i]->setMinMaxValue(0,0);
-        }
-        else
-            m_detailedPanels[i]->setMinMaxValue(0,0);
-
-        if(m_selectedPointIndex.isValid())
-        {
-            if(m_curves[m_selectedPointIndex.indexCurve]==m_detailedPanels[i]->curve())
-            {
-                m_detailedPanels[i]->setCurrentIndex(m_selectedPointIndex.indexPoint);
-            }
-            else
-            {
-                m_detailedPanels[i]->setCurrentIndex(-1);
-            }
-        }
-        else
-            m_detailedPanels[i]->setCurrentIndex(-1);
-
-
-
-
-        if(m_selectionState==chartIntervalSelected)
-        {
-            m_detailedPanels[i]->setInterval(m_curStartDt.toBshvTime(),m_curEndDt.toBshvTime());
-        }
-        else
-        {
-            m_detailedPanels[i]->setInterval(0,0);
-        }
-
+      if(m_pMaxLeftMarker != 0 && m_pMinLeftMarker != 0)
+        m_detailedPanels[i]->setMinMaxValue(m_pMinLeftMarker->yValue(), m_pMaxLeftMarker->yValue());
+      else
+        m_detailedPanels[i]->setMinMaxValue(0, 0);
     }
+    else if(m_detailedPanels[i]->curve()->yAxis() == QwtPlot::yRight)
+    {
+      if(m_pMaxRightMarker != 0 && m_pMinRightMarker != 0)
+        m_detailedPanels[i]->setMinMaxValue(m_pMinRightMarker->yValue(), m_pMaxRightMarker->yValue());
+      else
+        m_detailedPanels[i]->setMinMaxValue(0, 0);
+    }
+    else
+      m_detailedPanels[i]->setMinMaxValue(0, 0);
+
+    if(m_selectedPointIndex.isValid())
+    {
+      if(m_curves[m_selectedPointIndex.indexCurve] == m_detailedPanels[i]->curve())
+      {
+        m_detailedPanels[i]->setCurrentIndex(m_selectedPointIndex.indexPoint);
+      }
+      else
+      {
+        m_detailedPanels[i]->setCurrentIndex(-1);
+      }
+    }
+    else
+      m_detailedPanels[i]->setCurrentIndex(-1);
+
+    if(intervalSelected)
+    {
+      m_detailedPanels[i]->setInterval(stats.intervalBeginValue.x(), stats.intervalEndValue.x());
+    }
+    else
+    {
+      m_detailedPanels[i]->setInterval(0, 0);
+    }
+
+  }
 }
 
 void ChartWidget::setIntervalSelection(bool b)
 {
-    if(b)
-    {
-        beginIntervalSelection();
-    }
-    else
-    {
-        if(m_selectionState == chartEndSelection)
-            clearSelectedInterval();
-    }
+  if(b)
+  {
+    beginIntervalSelection();
+  }
+  else
+  {
+    if(m_selectionState == ssIntervalEnd)
+      clearSelectedInterval();
+  }
 }
 
 void ChartWidget::changeColorMaxMinLeft()
 {
-    QAction * a = (QAction *)QObject::sender();
-    if(a->text()==tr("Цвет пределов левой оси"))
+  QAction * a = (QAction *)QObject::sender();
+  if(a->text() == tr("Цвет пределов левой оси"))
+  {
+    QColor color;
+    if(m_pMaxLeftMarker->linePen().color() == Qt::black)
+      color = QColorDialog::getColor(Qt::white, this);
+    else
+      color = QColorDialog::getColor(m_pMaxLeftMarker->linePen().color(), this);
+    if(color.isValid())
     {
-        QColor color;
-        if(m_pMaxLeftMarker->linePen().color()==Qt::black)
-            color = QColorDialog::getColor(Qt::white,this);
-        else
-            color = QColorDialog::getColor(m_pMaxLeftMarker->linePen().color(),this);
-        if(color.isValid())
-        {
-            m_pMaxLeftMarker->setLinePen(QPen(color,m_pMaxLeftMarker->linePen().width()));
-            m_pMinLeftMarker->setLinePen(QPen(color,m_pMinLeftMarker->linePen().width()));
+      m_pMaxLeftMarker->setLinePen(QPen(color, m_pMaxLeftMarker->linePen().width()));
+      m_pMinLeftMarker->setLinePen(QPen(color, m_pMinLeftMarker->linePen().width()));
 
-            ui->m_plot->replot();
-        }
+      ui->m_plot->replot();
     }
+  }
 }
 
 void ChartWidget::changeColorMaxMinRight()
 {
-    QAction * a = (QAction *)QObject::sender();
-    if(a->text()==tr("Цвет пределов правой оси"))
+  QAction * a = (QAction *)QObject::sender();
+  if(a->text() == tr("Цвет пределов правой оси"))
+  {
+    QColor color;
+    if(m_pMaxRightMarker->linePen().color() == Qt::black)
+      color = QColorDialog::getColor(Qt::white, this);
+    else
+      color = QColorDialog::getColor(m_pMaxRightMarker->linePen().color(), this);
+    if(color.isValid())
     {
-        QColor color;
-        if(m_pMaxRightMarker->linePen().color()==Qt::black)
-            color = QColorDialog::getColor(Qt::white,this);
-        else
-            color = QColorDialog::getColor(m_pMaxRightMarker->linePen().color(),this);
-        if(color.isValid())
-        {
-            m_pMaxRightMarker->setLinePen(QPen(color,m_pMaxRightMarker->linePen().width()));
-            m_pMinRightMarker->setLinePen(QPen(color,m_pMinRightMarker->linePen().width()));
+      m_pMaxRightMarker->setLinePen(QPen(color, m_pMaxRightMarker->linePen().width()));
+      m_pMinRightMarker->setLinePen(QPen(color, m_pMinRightMarker->linePen().width()));
 
-            ui->m_plot->replot();
-        }
+      ui->m_plot->replot();
     }
+  }
 }
 
 void ChartWidget::onPlotPanned()
 {
-    m_zoomer->SetZoomBase(true);
+  m_zoomer->SetZoomBase(true);
 }
 
 
 void ChartWidget::setData(const QString &title, const QColor &defaultColor, const QVector<QPointF> &data, QwtPlot::Axis axis)
 {
-    QwtPlotCurve * curve = new QwtPlotCurve();
+  QwtPlotCurve * curve = new QwtPlotCurve();
+  curve->setTitle(title);
+  curve->setYAxis(axis);
+  curve->setPen(QPen(defaultColor, 2));
+  curve->setSamples(trimData(data));
+  curve->attach(ui->m_plot);
 
-    curve->setTitle(title);
+  if(m_curves.isEmpty())
+  {
+    m_beginLimit.indexCurve = m_curves.size();
+    m_beginLimit.indexPoint = 0;
 
-
-    curve->setYAxis(axis);
-    curve->setPen(QPen(defaultColor));
-    curve->setSamples(limittedData(data));
-    curve->attach(ui->m_plot);
-
-    CurveDetailsGroupBox * details = new CurveDetailsGroupBox(curve,this);
-    connect(details,SIGNAL(colorChanged(QColor)),ui->m_plot,SLOT(replot()));
-    connect(details,SIGNAL(visibledChanged(bool)),this,SLOT(setCurveVisible(bool)));
-    QVBoxLayout* lay = (QVBoxLayout*) ui->widgetDetail->layout();
-    lay->insertWidget(lay->count()-1,details);
-
-    m_detailedPanels.append(details);
-
-    calcDetailsPanel();
-
-    if(m_curves.isEmpty())
+    m_endLimit.indexCurve = m_curves.size();
+    m_endLimit.indexPoint = curve->dataSize() - 1;
+  }
+  else
+  {
+    if(curve->sample(0).x() < m_curves[m_beginLimit.indexCurve]->sample(m_beginLimit.indexPoint).x())
     {
-        m_beginLimit.indexCurve = m_curves.size();
-        m_beginLimit.indexPoint = 0;
-
-        m_endLimit.indexCurve = m_curves.size();
-        m_endLimit.indexPoint = curve->dataSize()-1;
-    }
-    else
-    {
-        if(curve->sample(0).x()<m_curves[m_beginLimit.indexCurve]->sample(m_beginLimit.indexPoint).x())
-        {
-            m_beginLimit.indexCurve = m_curves.size();
-            m_beginLimit.indexPoint = 0;
-        }
-
-        if(curve->sample(curve->dataSize()-1).x()>m_curves[m_endLimit.indexCurve]->sample(m_endLimit.indexPoint).x())
-        {
-            m_endLimit.indexCurve = m_curves.size();
-            m_endLimit.indexPoint = curve->dataSize()-1;
-        }
+      m_beginLimit.indexCurve = m_curves.size();
+      m_beginLimit.indexPoint = 0;
     }
 
-    m_curves.append(curve);
+    if(curve->sample(curve->dataSize() - 1).x() > m_curves[m_endLimit.indexCurve]->sample(m_endLimit.indexPoint).x())
+    {
+      m_endLimit.indexCurve = m_curves.size();
+      m_endLimit.indexPoint = curve->dataSize() - 1;
+    }
+  }
 
-    fullReplot();
+  ChartCurveStats stats;
+  stats.maxValue = QPointF(curve->maxXValue(), curve->maxYValue());
+  stats.minValue = QPointF(curve->minXValue(), curve->minYValue());
+
+  m_curves.append(curve);
+  m_curvesStats.append(stats);
+
+  CurveDetailsGroupBox * details = new CurveDetailsGroupBox(curve, this);
+  connect(details, SIGNAL(colorChanged(QColor)), ui->m_plot, SLOT(replot()));
+  connect(details, SIGNAL(visibledChanged(bool)), this, SLOT(setCurveVisible(bool)));
+  QVBoxLayout* lay = (QVBoxLayout*) ui->widgetDetail->layout();
+  lay->insertWidget(lay->count() - 1, details);
+
+  m_detailedPanels.append(details);
+
+  calcDetailsPanel();
+  fullReplot();
+}
+
+void ChartWidget::setLeftAxisMargin(int value)
+{
+  ui->widget_leftPadding->setMinimumWidth(value);
+}
+
+void ChartWidget::setRightAxisMargin(int value)
+{
+  ui->widget_rightPadding->setMinimumWidth(value);
 }
 
 void ChartWidget::updateData(int indexCurve, const QVector<QPointF> &data)
 {
 
-    m_curves[indexCurve]->setSamples(limittedData(data));
+  m_curves[indexCurve]->setSamples(trimData(data));
 
-    if(!_timerOnline->isActive())
-        fullReplot();
+  if(!_timerOnline->isActive())
+    fullReplot();
+}
+
+void ChartWidget::setDetailsPaneVisible(bool vis)
+{
+  ui->m_detailsPanel->setVisible(vis);
 }
 
 void ChartWidget::clearChart()
 {
-    for(int i=0; i<m_curves.count(); i++)
-        m_curves[i]->detach();
-    m_curves.clear();
+  for(int i = 0; i < m_curves.count(); i++)
+    m_curves[i]->detach();
 
-    m_beginLimit = CurveIndex();
-    m_endLimit = CurveIndex();
+  m_curves.clear();
+  m_curvesStats.clear();
 
-    for(int i=0; i<m_intervals.count(); i++)
-        m_intervals[i]->detach();
-    m_intervals.clear();
+  m_beginLimit = CurveIndex();
+  m_endLimit = CurveIndex();
 
-    for(int i=0; i<m_detailedPanels.count(); i++)
-        delete m_detailedPanels[i];
-    m_detailedPanels.clear();
+  for(int i = 0; i < m_intervals.count(); i++)
+    m_intervals[i]->detach();
+  m_intervals.clear();
+
+  for(int i = 0; i < m_detailedPanels.count(); i++)
+    delete m_detailedPanels[i];
+  m_detailedPanels.clear();
 
   m_selectedPointIndex = CurveIndex();
-  m_selectionState = chartNoSelection;
-  m_curStartPointIdx = CurveIndex();
-  m_curEndPointIdx = CurveIndex();
+  m_selectionState = ssNone;
+  m_intervalBeginPointIdx = CurveIndex();
+  m_intervalEndPointIdx = CurveIndex();
 
-  if(m_pMinLeftMarker!=0)
+  if(m_pMinLeftMarker != 0)
   {
-      m_pMinLeftMarker->detach();
-      delete m_pMinLeftMarker;
-      m_pMinLeftMarker = 0;
+    m_pMinLeftMarker->detach();
+    delete m_pMinLeftMarker;
+    m_pMinLeftMarker = 0;
   }
-  if(m_pMaxLeftMarker!=0)
+  if(m_pMaxLeftMarker != 0)
   {
-      m_pMaxLeftMarker->detach();
-      delete m_pMaxLeftMarker;
-      m_pMaxLeftMarker = 0;
+    m_pMaxLeftMarker->detach();
+    delete m_pMaxLeftMarker;
+    m_pMaxLeftMarker = 0;
   }
-  if(m_pMinRightMarker!=0)
+  if(m_pMinRightMarker != 0)
   {
-      m_pMinRightMarker->detach();
-      delete m_pMinRightMarker;
-      m_pMinRightMarker = 0;
+    m_pMinRightMarker->detach();
+    delete m_pMinRightMarker;
+    m_pMinRightMarker = 0;
   }
-  if(m_pMaxRightMarker!=0)
+  if(m_pMaxRightMarker != 0)
   {
-      m_pMaxRightMarker->detach();
-      delete m_pMaxRightMarker;
-      m_pMaxRightMarker=0;
+    m_pMaxRightMarker->detach();
+    delete m_pMaxRightMarker;
+    m_pMaxRightMarker = 0;
   }
   ui->m_plot->replot();
 }
 
-void ChartWidget::DrawMarkerOnCurve(QwtPlot::Axis axis)
+void ChartWidget::drawMarkerOnCurve(QwtPlot::Axis axis)
 {
   if (!m_selectedPointIndex.isValid())
     return;
@@ -1014,157 +1198,169 @@ void ChartWidget::DrawMarkerOnCurve(QwtPlot::Axis axis)
 
   txtY = QString("[%1 %2]").arg(valY, axisTitleY);
 
-  ShowSelectionPoint(txtX, txtY, p, axis);
+  showSelectionPoint(txtX, txtY, p, axis);
 
 }
 
 UtcDateTime ChartWidget::minimumDt()
 {
-    UtcDateTime rez;
+  UtcDateTime rez;
+  if (m_beginLimit.isValid())
     rez.setBshvTime(m_curves[m_beginLimit.indexCurve]->sample(m_beginLimit.indexPoint).x());
-    return rez;
+
+  return rez;
 }
 
 UtcDateTime ChartWidget::maximumDt()
 {
-    UtcDateTime rez;
+  UtcDateTime rez;
+  if (m_endLimit.isValid())
     rez.setBshvTime(m_curves[m_endLimit.indexCurve]->sample(m_endLimit.indexPoint).x());
-    return rez;
+
+  return rez;
 }
 
 void ChartWidget::setLeftAxis(const QString &title, double minLine, double maxLine, const QColor &defaultColor)
 {
-    ui->m_plot->setAxisTitle(QwtPlot::yLeft,title);
-    ui->m_plot->setAxisLabelRotation(QwtPlot::yLeft, -50.0);
-    ui->m_plot->setAxisLabelAlignment(QwtPlot::yLeft, Qt::AlignLeft | Qt::AlignBottom);
+  ui->m_plot->setAxisTitle(QwtPlot::yLeft, title);
+  //ui->m_plot->setAxisLabelRotation(QwtPlot::yLeft, -50.0);
+  ui->m_plot->setAxisLabelAlignment(QwtPlot::yLeft, Qt::AlignLeft | Qt::AlignBottom);
 
-    setLeftMinMaxValues(minLine,maxLine,defaultColor);
+  setLeftMinMaxValues(minLine, maxLine, defaultColor);
 
 
 }
 
 void ChartWidget::setRightAxis(const QString &title, double minLine, double maxLine, const QColor &defaultColor)
 {
-    ui->m_plot->enableAxis( QwtPlot::yRight );
-    ui->m_plot->setAxisTitle(QwtPlot::yRight,title);
-    ui->m_plot->setAxisLabelRotation(QwtPlot::yRight, -50.0);
-    ui->m_plot->setAxisLabelAlignment(QwtPlot::yRight, Qt::AlignLeft | Qt::AlignBottom);
+  ui->m_plot->enableAxis( QwtPlot::yRight );
+  ui->m_plot->setAxisTitle(QwtPlot::yRight, title);
+  //ui->m_plot->setAxisLabelRotation(QwtPlot::yRight, -50.0);
+  ui->m_plot->setAxisLabelAlignment(QwtPlot::yRight, Qt::AlignLeft | Qt::AlignBottom);
 
-    setRightMinMaxValues(minLine,maxLine,defaultColor);
+  setRightMinMaxValues(minLine, maxLine, defaultColor);
 
-    m_zoomer->setSecondAxisEnabled(true);
+  m_zoomer->setSecondaryAxisGroupEnabled(true);
 }
 
 void ChartWidget::setLeftMinMaxValues(double minLine, double maxLine, const QColor &defaultColor)
 {
-    if(!(_chartActions & caPaintIntervals))
-    {
-        qWarning()<<"intervals is blocks. use setChartActions()";
-        return;
-    }
+  if(!(_chartActions & caPaintIntervals))
+  {
+    qWarning() << "intervals is blocks. use setChartActions()";
+    return;
+  }
 
-    if(minLine!=0 || maxLine!=0)
-    {
-        m_pMinLeftMarker = new QwtPlotMarker();
-        m_pMinLeftMarker->setLineStyle(QwtPlotMarker::HLine);
-        m_pMinLeftMarker->setLinePen(QPen(defaultColor, 1, Qt::SolidLine ));
-        m_pMinLeftMarker->setYAxis(QwtPlot::yLeft);
-        m_pMinLeftMarker->setYValue(minLine);
-        m_pMinLeftMarker->setLabel("{"+QString::number(minLine)+"}");
-        m_pMinLeftMarker->setLabelAlignment(Qt::AlignLeft | Qt::AlignBottom);
-        m_pMinLeftMarker->attach(ui->m_plot);
+  if(minLine != 0 || maxLine != 0)
+  {
+    m_pMinLeftMarker = new QwtPlotMarker();
+    m_pMinLeftMarker->setLineStyle(QwtPlotMarker::HLine);
+    m_pMinLeftMarker->setLinePen(QPen(defaultColor, 1, Qt::SolidLine ));
+    m_pMinLeftMarker->setYAxis(QwtPlot::yLeft);
+    m_pMinLeftMarker->setYValue(minLine);
+    m_pMinLeftMarker->setLabel("{" + QString::number(minLine) + "}");
+    m_pMinLeftMarker->setLabelAlignment(Qt::AlignLeft | Qt::AlignBottom);
+    m_pMinLeftMarker->attach(ui->m_plot);
 
-        m_pMaxLeftMarker = new QwtPlotMarker();
-        m_pMaxLeftMarker->setLineStyle(QwtPlotMarker::HLine);
-        m_pMaxLeftMarker->setLinePen(QPen(defaultColor, 1, Qt::SolidLine ));
-        m_pMaxLeftMarker->setYAxis(QwtPlot::yLeft);
-        m_pMaxLeftMarker->setYValue(maxLine);
-        m_pMaxLeftMarker->setLabel("{"+QString::number(maxLine)+"}");
-        m_pMaxLeftMarker->setLabelAlignment(Qt::AlignLeft | Qt::AlignTop);
-        m_pMaxLeftMarker->attach(ui->m_plot);
+    m_pMaxLeftMarker = new QwtPlotMarker();
+    m_pMaxLeftMarker->setLineStyle(QwtPlotMarker::HLine);
+    m_pMaxLeftMarker->setLinePen(QPen(defaultColor, 1, Qt::SolidLine ));
+    m_pMaxLeftMarker->setYAxis(QwtPlot::yLeft);
+    m_pMaxLeftMarker->setYValue(maxLine);
+    m_pMaxLeftMarker->setLabel("{" + QString::number(maxLine) + "}");
+    m_pMaxLeftMarker->setLabelAlignment(Qt::AlignLeft | Qt::AlignTop);
+    m_pMaxLeftMarker->attach(ui->m_plot);
 
-        createMenuMaxMin();
-        calcDetailsPanel();
-    }
+    createMenuMaxMin();
+    calcDetailsPanel();
+  }
 }
 
 void ChartWidget::setRightMinMaxValues(double minLine, double maxLine, const QColor &defaultColor)
 {
-    if(!(_chartActions & caMaxMinLines))
-    {
-        qWarning()<<"min max lines is blocks. use setChartActions()";
-        return;
-    }
+  if(!(_chartActions & caMaxMinLines))
+  {
+    qWarning() << "min max lines is blocks. use setChartActions()";
+    return;
+  }
 
-    if((minLine!=0 || maxLine!=0) && ui->m_plot->axisEnabled(QwtPlot::yRight ))
-    {
-        m_pMinRightMarker = new QwtPlotMarker();
-        m_pMinRightMarker->setLineStyle(QwtPlotMarker::HLine);
-        m_pMinRightMarker->setLinePen(QPen(defaultColor, 1, Qt::SolidLine ));
-        m_pMinRightMarker->setYAxis(QwtPlot::yRight);
-        m_pMinRightMarker->setYValue(minLine);
-        m_pMinRightMarker->setLabel("{"+QString::number(minLine)+"}");
-        m_pMinRightMarker->setLabelAlignment(Qt::AlignRight | Qt::AlignBottom);
-        m_pMinRightMarker->attach(ui->m_plot);
+  if((minLine != 0 || maxLine != 0) && ui->m_plot->axisEnabled(QwtPlot::yRight ))
+  {
+    m_pMinRightMarker = new QwtPlotMarker();
+    m_pMinRightMarker->setLineStyle(QwtPlotMarker::HLine);
+    m_pMinRightMarker->setLinePen(QPen(defaultColor, 1, Qt::SolidLine ));
+    m_pMinRightMarker->setYAxis(QwtPlot::yRight);
+    m_pMinRightMarker->setYValue(minLine);
+    m_pMinRightMarker->setLabel("{" + QString::number(minLine) + "}");
+    m_pMinRightMarker->setLabelAlignment(Qt::AlignRight | Qt::AlignBottom);
+    m_pMinRightMarker->attach(ui->m_plot);
 
-        m_pMaxRightMarker = new QwtPlotMarker();
-        m_pMaxRightMarker->setLineStyle(QwtPlotMarker::HLine);
-        m_pMaxRightMarker->setLinePen(QPen(defaultColor, 1, Qt::SolidLine ));
-        m_pMaxRightMarker->setYAxis(QwtPlot::yRight);
-        m_pMaxRightMarker->setYValue(maxLine);
-        m_pMaxRightMarker->setLabel("{"+QString::number(maxLine)+"}");
-        m_pMaxRightMarker->setLabelAlignment(Qt::AlignRight | Qt::AlignTop);
-        m_pMaxRightMarker->attach(ui->m_plot);
-        m_pMaxRightMarker->show();
+    m_pMaxRightMarker = new QwtPlotMarker();
+    m_pMaxRightMarker->setLineStyle(QwtPlotMarker::HLine);
+    m_pMaxRightMarker->setLinePen(QPen(defaultColor, 1, Qt::SolidLine ));
+    m_pMaxRightMarker->setYAxis(QwtPlot::yRight);
+    m_pMaxRightMarker->setYValue(maxLine);
+    m_pMaxRightMarker->setLabel("{" + QString::number(maxLine) + "}");
+    m_pMaxRightMarker->setLabelAlignment(Qt::AlignRight | Qt::AlignTop);
+    m_pMaxRightMarker->attach(ui->m_plot);
+    m_pMaxRightMarker->show();
 
-        createMenuMaxMin();
-        calcDetailsPanel();
-    }
+    createMenuMaxMin();
+    calcDetailsPanel();
+  }
 }
 
 void ChartWidget::selectIntervalByDates(UtcDateTime beginDt, UtcDateTime endDt)
 {
 
-    if(!(_chartActions & caSelectIntervals))
-    {
-        qWarning()<<"select intervals is blocks. use setChartActions()";
-        return;
-    }
+  if(!(_chartActions & caSelectIntervals))
+  {
+    qWarning() << "select intervals is blocks. use setChartActions()";
+    return;
+  }
 
-    if (beginDt > endDt)
-    {
-        UtcDateTime tmpDt(beginDt);
-        beginDt = endDt;
-        endDt = tmpDt;
-    }
-    if(!m_beginLimit.isValid() || !m_endLimit.isValid())
-        return;
+  if (beginDt > endDt)
+  {
+    UtcDateTime tmpDt(beginDt);
+    beginDt = endDt;
+    endDt = tmpDt;
+  }
+  if(!m_beginLimit.isValid() || !m_endLimit.isValid())
+    return;
 
-    if (beginDt.toBshvTime() < m_curves[m_beginLimit.indexCurve]->sample(m_beginLimit.indexPoint).x())
-    {
-        beginDt.setBshvTime(m_curves[m_beginLimit.indexCurve]->sample(m_beginLimit.indexPoint).x());
-    }
-    if (endDt.toBshvTime() > m_curves[m_endLimit.indexCurve]->sample(m_endLimit.indexPoint).x())
-    {
-        endDt.setBshvTime(m_curves[m_endLimit.indexCurve]->sample(m_endLimit.indexPoint).x());
-    }
+  if (beginDt.toBshvTime() < m_curves[m_beginLimit.indexCurve]->sample(m_beginLimit.indexPoint).x())
+  {
+    beginDt.setBshvTime(m_curves[m_beginLimit.indexCurve]->sample(m_beginLimit.indexPoint).x());
+  }
+  if (endDt.toBshvTime() > m_curves[m_endLimit.indexCurve]->sample(m_endLimit.indexPoint).x())
+  {
+    endDt.setBshvTime(m_curves[m_endLimit.indexCurve]->sample(m_endLimit.indexPoint).x());
+  }
 
-    m_selectionState = chartIntervalSelected;
+  QPointF startP = dtToPoint(beginDt);
+  QPointF endP = dtToPoint(endDt);
 
-    QPointF startP = DtToPoint(beginDt);
-    QPointF endP = DtToPoint(endDt);
+  m_intervalBeginPointIdx = findClosestPointAllCurves(startP, sdRight);
+  m_intervalEndPointIdx = findClosestPointAllCurves(endP, sdLeft);
 
-    m_curStartPointIdx = FindPointIndexByPos(startP, sdRight);
-    m_curEndPointIdx = FindPointIndexByPos(endP, sdLeft);
-
-    ShowSelectionInterval(startP, endP);
-
-    calcDetailsPanel();
+  showSelectionInterval(startP, endP);
+  updateCurvesIntervalStats();
+  calcDetailsPanel();
 }
 
 void ChartWidget::clearSelectedInterval()
 {
-  m_selectionState = chartNoSelection;
+  for(int i = 0; i < m_curves.size(); i++)
+  {
+    ChartCurveStats &stats = m_curvesStats[i];
+    stats.intervalBeginValue = QPointF();
+    stats.intervalEndValue = QPointF();
+  }
+
+  m_selectionState = ssNone;
+  m_intervalBeginDt = UtcDateTime();
+  m_intervalEndDt = UtcDateTime();
+
   m_pIntervalMarker[0]->hide();
   m_pIntervalMarker[1]->hide();
   ui->m_plot->replot();
@@ -1172,90 +1368,175 @@ void ChartWidget::clearSelectedInterval()
 
 void ChartWidget::setIntervalSelectionStart(QPointF pos)
 {
-    if(!(_chartActions & caSelectIntervals))
-    {
-        qWarning()<<"select intervals is blocks. use setChartActions()";
-        return;
-    }
+  if(!(_chartActions & caSelectIntervals))
+  {
+    qWarning() << "select intervals is blocks. use setChartActions()";
+    return;
+  }
 
-    m_selectionState = chartStartSelection;
-    setIntervalSelectionByState(pos);
-    m_selectionState = chartEndSelection;
-    emit intervalSelectionStarted(pos);
+  m_selectionState = ssIntervalBegin;
+  setIntervalSelectionByState(pos);
+  m_selectionState = ssIntervalEnd;
 }
 
 void ChartWidget::setIntervalSelectionEnd(QPointF pos)
 {
-    if(!(_chartActions & caSelectIntervals))
-    {
-        qWarning()<<"select intervals is blocks. use setChartActions()";
-        return;
-    }
+  if(!(_chartActions & caSelectIntervals))
+  {
+    qWarning() << "select intervals is blocks. use setChartActions()";
+    return;
+  }
 
-    m_selectionState = chartEndSelection;
-    setIntervalSelectionByState(pos);
-    m_selectionState = chartIntervalSelected;
-    ui->pushButtonSelectInterval->setChecked(false);
-    calcDetailsPanel();
-    emit intervalSelectionEnded(pos);
+  m_selectionState = ssIntervalEnd;
+  setIntervalSelectionByState(pos);
+  m_selectionState = ssNone;
+
+  ui->pushButtonSelectInterval->setChecked(false);
+  calcDetailsPanel();
+}
+
+void ChartWidget::setTargetingPointSelection(bool b)
+{
+  clearTargetingPoint();
+
+  if (b)
+  {
+    if (m_selectionState != ssNone)
+      clearSelectedInterval();
+
+    m_selectionState = ssTargetingPoint;
+  }
+}
+
+void ChartWidget::setTargetingPoint(UtcDateTime dt)
+{
+  if (m_selectionState == ssTargetingPoint)
+    m_selectionState = ssNone;
+
+  bool b = ui->toolButtonSelectTarget->blockSignals(true);
+  ui->toolButtonSelectTarget->setChecked(false);
+  ui->toolButtonSelectTarget->blockSignals(b);
+
+  m_targetingDt = dt;
+  if (!dt.isValid())
+  {
+    clearTargetingPoint();
+    return;
+  }
+  QPointF point = dtToPoint(dt);
+  m_pTargetingMarker->setValue(point);
+  m_pTargetingMarker->show();
+  for(int i = 0; i < m_curves.size(); i++)
+  {
+    QwtPlotCurve *curve = m_curves.at(i);
+    ChartCurveStats &stats = m_curvesStats[i];
+    long pointTargetingIdx = findPointIndexByPos(point, sdRight, i);
+
+    if (pointTargetingIdx != -1)
+      stats.intervalPointingValue = curve->sample(pointTargetingIdx);
+    else
+      stats.intervalPointingValue = QPointF();
+  }
+  ui->m_plot->replot();
+}
+
+void ChartWidget::clearTargetingPoint()
+{
+  if (m_selectionState == ssTargetingPoint)
+    m_selectionState = ssNone;
+
+  bool b = ui->toolButtonSelectTarget->blockSignals(true);
+  ui->toolButtonSelectTarget->setChecked(false);
+  ui->toolButtonSelectTarget->blockSignals(b);
+
+  m_pTargetingMarker->hide();
+  for(int i = 0; i < m_curves.size(); i++)
+    m_curvesStats[i].intervalPointingValue = QPointF();
+
+  ui->m_plot->replot();
+}
+
+void ChartWidget::selectPointByIndex(CurveIndex idx)
+{
+  if ((idx.indexCurve < 0) || (idx.indexCurve > m_curves.size() - 1))
+    return;
+
+  if ((idx.indexPoint >= 0) && (idx.indexPoint < m_curves.at(idx.indexCurve)->dataSize()))
+  {
+    m_selectedPointIndex = idx;
+    drawMarkerOnCurve((QwtPlot::Axis)m_curves[m_selectedPointIndex.indexCurve]->yAxis());
+  }
 }
 
 void ChartWidget::addInterval(long beginX, long endX, const QColor &c1, const QColor &c2)
 {
-    if(!(_chartActions & caPaintIntervals))
-    {
-        qWarning()<<"intervals is blocks. use setChartActions()";
-        return;
-    }
+  if(!(_chartActions & caPaintIntervals))
+  {
+    qWarning() << "intervals is blocks. use setChartActions()";
+    return;
+  }
 
-    PlotInterval * interval = new PlotInterval();
+  PlotInterval * interval = new PlotInterval();
 
-    if(!c2.isValid())
-        interval->setBackground(c1);
-    else
-        interval->setGradient(c1,c2);
+  if(!c2.isValid())
+    interval->setBackground(c1);
+  else
+    interval->setGradient(c1, c2);
 
-    interval->setBeginX(beginX);
-    interval->setEndX(endX);
-    interval->attach(ui->m_plot);
+  interval->setBeginX(beginX);
+  interval->setEndX(endX);
+  interval->attach(ui->m_plot);
 
-    m_intervals.append(interval);
-    createMenuIitervals();
+  m_intervals.append(interval);
+  createMenuIntervals();
 }
 
 void ChartWidget::addInterval(const UtcDateTime &begin, const UtcDateTime &endX, const QColor &c1, const QColor &c2)
 {
-    addInterval(begin.toBshvTime(),endX.toBshvTime(),c1,c2);
+  addInterval(begin.toBshvTime(), endX.toBshvTime(), c1, c2);
 }
 
 void ChartWidget::beginIntervalSelection()
 {
-    if(!(_chartActions & caSelectIntervals))
-    {
-        qWarning()<<"select intervals is blocks. use setChartActions()";
-        return;
-    }
+  if(!(_chartActions & caSelectIntervals))
+  {
+    qWarning() << "select intervals is blocks. use setChartActions()";
+    return;
+  }
 
-    clearSelectedInterval();
-    m_selectionState = chartStartSelection;
+  clearSelectedInterval();
+  m_selectionState = ssIntervalBegin;
 }
 
 void ChartWidget::on_pushButtonTimerOnline_toggled(bool checked)
 {
-    if(!(_chartActions & caTimer))
-    {
-        qWarning()<<"timer is blocks. use setChartActions()";
-        return;
-    }
+  if(!(_chartActions & caTimer))
+  {
+    qWarning() << "timer is blocks. use setChartActions()";
+    return;
+  }
 
-    if(checked)
-    {
-        ui->pushButtonTimerOnline->setIcon(QIcon(":/icons/icons/stop.png"));
-        _timerOnline->start();
-    }
-    else
-    {
-        ui->pushButtonTimerOnline->setIcon(QIcon(":/icons/icons/start.png"));
-        _timerOnline->stop();
-    }
+  if(checked)
+  {
+    ui->pushButtonTimerOnline->setIcon(QIcon(":/icons/icons/stop.png"));
+    _timerOnline->start();
+  }
+  else
+  {
+    ui->pushButtonTimerOnline->setIcon(QIcon(":/icons/icons/start.png"));
+    _timerOnline->stop();
+  }
+}
+
+void ChartWidget::on_toolButtonSelectTarget_toggled(bool checked)
+{
+  if (checked)
+  {
+    if (m_selectionState != ssNone)
+      clearSelectedInterval();
+
+    m_selectionState = ssTargetingPoint;
+  }
+  else
+    m_selectionState = ssNone;
 }

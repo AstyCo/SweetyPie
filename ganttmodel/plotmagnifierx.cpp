@@ -5,34 +5,41 @@ PlotMagnifierX::PlotMagnifierX(QwtPlotCanvas *canvas) :
   QwtPlotMagnifier(canvas)
 {
   // объект для собственно масштабирования графика
-  m_zoomerFirst = new QwtPlotZoomer(canvas);
+  m_zoomerPrimary = new QwtPlotZoomer(canvas);
   // выключить перехват кнопок этим объектом
   // т.к. будем использовать его вручную
-  m_zoomerFirst->setEnabled(false);
-  setFirstAxisSet(QwtPlot::xBottom, QwtPlot::yLeft);
+  m_zoomerPrimary->setEnabled(false);
+  setPrimaryAxisGroup(QwtPlot::xBottom, QwtPlot::yLeft);
   // для масштабирования по второй оси Y
-  m_zoomerSecond = new QwtPlotZoomer(canvas);
-  m_zoomerSecond->setEnabled(false);
-  setSecondAxisSet(QwtPlot::xBottom, QwtPlot::yRight);
+  m_zoomerSecondary = new QwtPlotZoomer(canvas);
+  m_zoomerSecondary->setEnabled(false);
+  setSecondaryAxisGroup(QwtPlot::xBottom, QwtPlot::yRight);
 
-  m_zoomerSecondEnabled = false;
+  m_zoomerSecondaryEnabled = false;
 }
 
 void PlotMagnifierX::SetZoomBase(bool ok)
 {
-    m_zoomerFirst->setZoomBase(ok);
-    if (m_zoomerSecondEnabled)
-      m_zoomerSecond->setZoomBase(ok);
+    m_zoomerPrimary->setZoomBase(ok);
+    if (m_zoomerSecondaryEnabled)
+      m_zoomerSecondary->setZoomBase(ok);
 }
 
-void PlotMagnifierX::setFirstAxisSet(int xAxis, int yAxis)
+void PlotMagnifierX::rescale(qreal scaleFactor, QPoint anchorPoint)
 {
-  m_zoomerFirst->setAxis(xAxis, yAxis);
+  zoom(setPrimary, scaleFactor, anchorPoint);
+  if (m_zoomerSecondaryEnabled)
+    zoom(setSecondary, scaleFactor, anchorPoint);
 }
 
-void PlotMagnifierX::setSecondAxisSet(int xAxis, int yAxis)
+void PlotMagnifierX::setPrimaryAxisGroup(int xAxis, int yAxis)
 {
-  m_zoomerSecond->setAxis(xAxis, yAxis);
+  m_zoomerPrimary->setAxis(xAxis, yAxis);
+}
+
+void PlotMagnifierX::setSecondaryAxisGroup(int xAxis, int yAxis)
+{
+  m_zoomerSecondary->setAxis(xAxis, yAxis);
 }
 
 void PlotMagnifierX::widgetWheelEvent(QWheelEvent *wheelEvent)
@@ -54,30 +61,32 @@ void PlotMagnifierX::widgetWheelEvent(QWheelEvent *wheelEvent)
   mousePos.setX(wheelEvent->x());
   mousePos.setY(wheelEvent->y());
 
-  zoom(setFirst, scaleFactor, mousePos);
-  if (m_zoomerSecondEnabled)
-    zoom(setSecond, scaleFactor, mousePos);
+  zoom(setPrimary, scaleFactor, mousePos);
+  if (m_zoomerSecondaryEnabled)
+    zoom(setSecondary, scaleFactor, mousePos);
 
   wheelEvent->accept();
+
+  emit scaleChanged(scaleFactor, mousePos);
 }
 
-void PlotMagnifierX::zoom(AxisSet axisSet, qreal scaleFactor, QPoint mousePos)
+void PlotMagnifierX::zoom(AxisGroup axisSet, qreal scaleFactor, QPoint mousePos)
 {
   QwtPlot::Axis scaleAxisX;
   QwtPlot::Axis scaleAxisY;
   // Прямоугольник на текущем увеличении
   QRectF zoomRect;
-  if (axisSet == setFirst)
+  if (axisSet == setPrimary)
   {
-    zoomRect = m_zoomerFirst->zoomRect();
-    scaleAxisX = (QwtPlot::Axis)m_zoomerFirst->xAxis();
-    scaleAxisY = (QwtPlot::Axis)m_zoomerFirst->yAxis();
+    zoomRect = m_zoomerPrimary->zoomRect();
+    scaleAxisX = (QwtPlot::Axis)m_zoomerPrimary->xAxis();
+    scaleAxisY = (QwtPlot::Axis)m_zoomerPrimary->yAxis();
   }
   else
   {
-    zoomRect = m_zoomerSecond->zoomRect();
-    scaleAxisX = (QwtPlot::Axis)m_zoomerSecond->xAxis();
-    scaleAxisY = (QwtPlot::Axis)m_zoomerSecond->yAxis();
+    zoomRect = m_zoomerSecondary->zoomRect();
+    scaleAxisX = (QwtPlot::Axis)m_zoomerSecondary->xAxis();
+    scaleAxisY = (QwtPlot::Axis)m_zoomerSecondary->yAxis();
   }
 
   // текущие ширина и высота
@@ -111,20 +120,20 @@ void PlotMagnifierX::zoom(AxisSet axisSet, qreal scaleFactor, QPoint mousePos)
   zoomRect.setBottom(zoomRect.bottom()+ my);
   zoomRect.setTop (zoomRect.top() + my);
 
-  if (axisSet == setFirst)
-    m_zoomerFirst->zoom(zoomRect);
+  if (axisSet == setPrimary)
+    m_zoomerPrimary->zoom(zoomRect);
   else
-    m_zoomerSecond->zoom(zoomRect);
+    m_zoomerSecondary->zoom(zoomRect);
 }
 
-void PlotMagnifierX::setSecondAxisEnabled(bool enabled)
+void PlotMagnifierX::setSecondaryAxisGroupEnabled(bool enabled)
 {
-  m_zoomerSecondEnabled = enabled;
+  m_zoomerSecondaryEnabled = enabled;
 }
 
 PlotMagnifierX::~PlotMagnifierX()
 {
-  delete m_zoomerFirst;
-  delete m_zoomerSecond;
+  delete m_zoomerPrimary;
+  delete m_zoomerSecondary;
 }
 

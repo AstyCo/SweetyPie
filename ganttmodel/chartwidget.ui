@@ -6,14 +6,14 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>652</width>
+    <width>727</width>
     <height>313</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Form</string>
   </property>
-  <layout class="QHBoxLayout" name="horizontalLayout_2" stretch="99,1">
+  <layout class="QHBoxLayout" name="horizontalLayout_2" stretch="0,99,0,1">
    <property name="spacing">
     <number>5</number>
    </property>
@@ -30,6 +30,22 @@
     <number>5</number>
    </property>
    <item>
+    <widget class="QWidget" name="widget_leftPadding" native="true">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="minimumSize">
+      <size>
+       <width>20</width>
+       <height>0</height>
+      </size>
+     </property>
+    </widget>
+   </item>
+   <item>
     <widget class="QwtPlot" name="m_plot">
      <property name="sizePolicy">
       <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
@@ -40,7 +56,29 @@
     </widget>
    </item>
    <item>
+    <widget class="QWidget" name="widget_rightPadding" native="true">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="minimumSize">
+      <size>
+       <width>20</width>
+       <height>0</height>
+      </size>
+     </property>
+    </widget>
+   </item>
+   <item>
     <widget class="VerticalScrollArea" name="m_detailsPanel">
+     <property name="minimumSize">
+      <size>
+       <width>500</width>
+       <height>0</height>
+      </size>
+     </property>
      <property name="widgetResizable">
       <bool>true</bool>
      </property>
@@ -49,8 +87,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>360</width>
-        <height>280</height>
+        <width>498</width>
+        <height>301</height>
        </rect>
       </property>
       <property name="sizePolicy">
@@ -82,209 +120,231 @@
          </property>
          <layout class="QVBoxLayout" name="verticalLayout">
           <item>
-           <layout class="QHBoxLayout" name="horizontalLayout">
-            <item>
-             <widget class="QPushButton" name="pushButtonAutoZoom">
-              <property name="toolTip">
-               <string>Автоматически подобрать масштаб</string>
-              </property>
-              <property name="statusTip">
-               <string>Автоматически подобрать масштаб</string>
-              </property>
-              <property name="whatsThis">
-               <string>Автоматически подобрать масштаб</string>
-              </property>
-              <property name="text">
-               <string/>
-              </property>
-              <property name="icon">
-               <iconset resource="images.qrc">
-                <normaloff>:/icons/icons/find.png</normaloff>:/icons/icons/find.png</iconset>
-              </property>
-              <property name="iconSize">
-               <size>
-                <width>24</width>
-                <height>24</height>
-               </size>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QPushButton" name="pushButtonSelectInterval">
-              <property name="toolTip">
-               <string>Выбрать интервал времени</string>
-              </property>
-              <property name="statusTip">
-               <string>Выбрать интервал времени</string>
-              </property>
-              <property name="whatsThis">
-               <string>Выбрать интервал времени</string>
-              </property>
-              <property name="text">
-               <string/>
-              </property>
-              <property name="icon">
-               <iconset resource="images.qrc">
-                <normaloff>:/icons/icons/selection_interval.png</normaloff>:/icons/icons/selection_interval.png</iconset>
-              </property>
-              <property name="iconSize">
-               <size>
-                <width>24</width>
-                <height>24</height>
-               </size>
-              </property>
-              <property name="checkable">
-               <bool>true</bool>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QPushButton" name="pushButtonGrid">
-              <property name="toolTip">
-               <string>Вкл./Выкл сетку</string>
-              </property>
-              <property name="statusTip">
-               <string>Вкл./Выкл сетку</string>
-              </property>
-              <property name="whatsThis">
-               <string>Вкл./Выкл сетку</string>
-              </property>
-              <property name="text">
-               <string/>
-              </property>
-              <property name="icon">
-               <iconset resource="images.qrc">
-                <normaloff>:/icons/icons/grid.png</normaloff>:/icons/icons/grid.png</iconset>
-              </property>
-              <property name="iconSize">
-               <size>
-                <width>24</width>
-                <height>24</height>
-               </size>
-              </property>
-              <property name="checkable">
-               <bool>true</bool>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QToolButton" name="toolButtonIntervalVisibled">
-              <property name="toolTip">
-               <string>Вкл./Выкл интервалов</string>
-              </property>
-              <property name="statusTip">
-               <string>Вкл./Выкл интервалов</string>
-              </property>
-              <property name="whatsThis">
-               <string>Вкл./Выкл интервалов</string>
-              </property>
-              <property name="text">
-               <string/>
-              </property>
-              <property name="icon">
-               <iconset resource="images.qrc">
-                <normaloff>:/icons/icons/interval_visible.png</normaloff>:/icons/icons/interval_visible.png</iconset>
-              </property>
-              <property name="iconSize">
-               <size>
-                <width>24</width>
-                <height>24</height>
-               </size>
-              </property>
-              <property name="popupMode">
-               <enum>QToolButton::InstantPopup</enum>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QToolButton" name="toolButtonMaxMinValues">
-              <property name="toolTip">
-               <string>Настройка границ</string>
-              </property>
-              <property name="statusTip">
-               <string>Настройка границ</string>
-              </property>
-              <property name="whatsThis">
-               <string>Настройка границ</string>
-              </property>
-              <property name="icon">
-               <iconset resource="images.qrc">
-                <normaloff>:/icons/icons/max_min.png</normaloff>:/icons/icons/max_min.png</iconset>
-              </property>
-              <property name="iconSize">
-               <size>
-                <width>24</width>
-                <height>24</height>
-               </size>
-              </property>
-              <property name="popupMode">
-               <enum>QToolButton::InstantPopup</enum>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QPushButton" name="pushButtonTimerOnline">
-              <property name="text">
-               <string/>
-              </property>
-              <property name="icon">
-               <iconset resource="images.qrc">
-                <normaloff>:/icons/icons/start.png</normaloff>:/icons/icons/start.png</iconset>
-              </property>
-              <property name="iconSize">
-               <size>
-                <width>24</width>
-                <height>24</height>
-               </size>
-              </property>
-              <property name="checkable">
-               <bool>true</bool>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QPushButton" name="pushButtonClear">
-              <property name="toolTip">
-               <string>Сбросить все настройки по умолчанию</string>
-              </property>
-              <property name="statusTip">
-               <string>Сбросить все настройки по умолчанию</string>
-              </property>
-              <property name="whatsThis">
-               <string>Сбросить все настройки по умолчанию</string>
-              </property>
-              <property name="text">
-               <string/>
-              </property>
-              <property name="icon">
-               <iconset resource="images.qrc">
-                <normaloff>:/icons/icons/clear.png</normaloff>:/icons/icons/clear.png</iconset>
-              </property>
-              <property name="iconSize">
-               <size>
-                <width>24</width>
-                <height>24</height>
-               </size>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <spacer name="horizontalSpacer">
-              <property name="orientation">
-               <enum>Qt::Horizontal</enum>
-              </property>
-              <property name="sizeType">
-               <enum>QSizePolicy::MinimumExpanding</enum>
-              </property>
-              <property name="sizeHint" stdset="0">
-               <size>
-                <width>40</width>
-                <height>20</height>
-               </size>
-              </property>
-             </spacer>
-            </item>
-           </layout>
+           <widget class="QFrame" name="frame_chartActions">
+            <layout class="QHBoxLayout" name="horizontalLayout">
+             <item>
+              <widget class="QPushButton" name="pushButtonAutoZoom">
+               <property name="toolTip">
+                <string>Автоматически подобрать масштаб</string>
+               </property>
+               <property name="statusTip">
+                <string>Автоматически подобрать масштаб</string>
+               </property>
+               <property name="whatsThis">
+                <string>Автоматически подобрать масштаб</string>
+               </property>
+               <property name="text">
+                <string/>
+               </property>
+               <property name="icon">
+                <iconset resource="images.qrc">
+                 <normaloff>:/icons/icons/find.png</normaloff>:/icons/icons/find.png</iconset>
+               </property>
+               <property name="iconSize">
+                <size>
+                 <width>24</width>
+                 <height>24</height>
+                </size>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QPushButton" name="pushButtonSelectInterval">
+               <property name="toolTip">
+                <string>Выбрать интервал времени</string>
+               </property>
+               <property name="statusTip">
+                <string>Выбрать интервал времени</string>
+               </property>
+               <property name="whatsThis">
+                <string>Выбрать интервал времени</string>
+               </property>
+               <property name="text">
+                <string/>
+               </property>
+               <property name="icon">
+                <iconset resource="images.qrc">
+                 <normaloff>:/icons/icons/selection_interval.png</normaloff>:/icons/icons/selection_interval.png</iconset>
+               </property>
+               <property name="iconSize">
+                <size>
+                 <width>24</width>
+                 <height>24</height>
+                </size>
+               </property>
+               <property name="checkable">
+                <bool>true</bool>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QToolButton" name="toolButtonSelectTarget">
+               <property name="text">
+                <string>...</string>
+               </property>
+               <property name="icon">
+                <iconset resource="images.qrc">
+                 <normaloff>:/icons/icons/target.png</normaloff>:/icons/icons/target.png</iconset>
+               </property>
+               <property name="iconSize">
+                <size>
+                 <width>24</width>
+                 <height>24</height>
+                </size>
+               </property>
+               <property name="checkable">
+                <bool>true</bool>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QPushButton" name="pushButtonGrid">
+               <property name="toolTip">
+                <string>Вкл./Выкл сетку</string>
+               </property>
+               <property name="statusTip">
+                <string>Вкл./Выкл сетку</string>
+               </property>
+               <property name="whatsThis">
+                <string>Вкл./Выкл сетку</string>
+               </property>
+               <property name="text">
+                <string/>
+               </property>
+               <property name="icon">
+                <iconset resource="images.qrc">
+                 <normaloff>:/icons/icons/grid.png</normaloff>:/icons/icons/grid.png</iconset>
+               </property>
+               <property name="iconSize">
+                <size>
+                 <width>24</width>
+                 <height>24</height>
+                </size>
+               </property>
+               <property name="checkable">
+                <bool>true</bool>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QToolButton" name="toolButtonIntervalVisibled">
+               <property name="toolTip">
+                <string>Вкл./Выкл интервалов</string>
+               </property>
+               <property name="statusTip">
+                <string>Вкл./Выкл интервалов</string>
+               </property>
+               <property name="whatsThis">
+                <string>Вкл./Выкл интервалов</string>
+               </property>
+               <property name="text">
+                <string/>
+               </property>
+               <property name="icon">
+                <iconset resource="images.qrc">
+                 <normaloff>:/icons/icons/interval_visible.png</normaloff>:/icons/icons/interval_visible.png</iconset>
+               </property>
+               <property name="iconSize">
+                <size>
+                 <width>24</width>
+                 <height>24</height>
+                </size>
+               </property>
+               <property name="popupMode">
+                <enum>QToolButton::InstantPopup</enum>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QToolButton" name="toolButtonMaxMinValues">
+               <property name="toolTip">
+                <string>Настройка границ</string>
+               </property>
+               <property name="statusTip">
+                <string>Настройка границ</string>
+               </property>
+               <property name="whatsThis">
+                <string>Настройка границ</string>
+               </property>
+               <property name="icon">
+                <iconset resource="images.qrc">
+                 <normaloff>:/icons/icons/max_min.png</normaloff>:/icons/icons/max_min.png</iconset>
+               </property>
+               <property name="iconSize">
+                <size>
+                 <width>24</width>
+                 <height>24</height>
+                </size>
+               </property>
+               <property name="popupMode">
+                <enum>QToolButton::InstantPopup</enum>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QPushButton" name="pushButtonTimerOnline">
+               <property name="text">
+                <string/>
+               </property>
+               <property name="icon">
+                <iconset resource="images.qrc">
+                 <normaloff>:/icons/icons/start.png</normaloff>:/icons/icons/start.png</iconset>
+               </property>
+               <property name="iconSize">
+                <size>
+                 <width>24</width>
+                 <height>24</height>
+                </size>
+               </property>
+               <property name="checkable">
+                <bool>true</bool>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QPushButton" name="pushButtonClear">
+               <property name="toolTip">
+                <string>Сбросить все настройки по умолчанию</string>
+               </property>
+               <property name="statusTip">
+                <string>Сбросить все настройки по умолчанию</string>
+               </property>
+               <property name="whatsThis">
+                <string>Сбросить все настройки по умолчанию</string>
+               </property>
+               <property name="text">
+                <string/>
+               </property>
+               <property name="icon">
+                <iconset resource="images.qrc">
+                 <normaloff>:/icons/icons/clear.png</normaloff>:/icons/icons/clear.png</iconset>
+               </property>
+               <property name="iconSize">
+                <size>
+                 <width>24</width>
+                 <height>24</height>
+                </size>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <spacer name="horizontalSpacer">
+               <property name="orientation">
+                <enum>Qt::Horizontal</enum>
+               </property>
+               <property name="sizeType">
+                <enum>QSizePolicy::MinimumExpanding</enum>
+               </property>
+               <property name="sizeHint" stdset="0">
+                <size>
+                 <width>40</width>
+                 <height>20</height>
+                </size>
+               </property>
+              </spacer>
+             </item>
+            </layout>
+           </widget>
           </item>
           <item>
            <spacer name="verticalSpacer">
