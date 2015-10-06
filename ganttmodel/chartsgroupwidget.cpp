@@ -10,7 +10,8 @@ ChartsGroupWidget::ChartsGroupWidget(QWidget *parent) :
 {
   ui->setupUi(this);
 
-  //m_settingsChanged = false;
+  m_sideInfoPanel = NULL;
+  createActionsToolBar();
 
   m_zoomActive = 0;
   m_syncChartsByAxisX = true;
@@ -19,7 +20,6 @@ ChartsGroupWidget::ChartsGroupWidget(QWidget *parent) :
   setSelectIntervalPanelEnabled(false);
 
   ui->frame_stats->hide();
-  ui->toolButton_details->setIcon(QIcon(":/icons/icons/back.png"));
 
   ui->doubleSpinBox_SelInterval->setLocale(QLocale::C);
 
@@ -33,12 +33,41 @@ ChartsGroupWidget::ChartsGroupWidget(QWidget *parent) :
   m_curSelTimeIntType = (TimeSpan::TimeIntervalTypes) ui->comboBox_IntervalTimeDim->currentIndex();
 
   connect(ui->splitter_charts, SIGNAL(splitterMoved(int,int)), SLOT(scaleDivChanged()));
-  on_toolButton_SelectionPanel_clicked();
+  onAction_intervalSelectionPanel_clicked();
 }
 
 ChartsGroupWidget::~ChartsGroupWidget()
 { 
   delete ui;
+}
+
+void ChartsGroupWidget::createActionsToolBar()
+{
+  m_actionsToolBar = new ChartActionsToolBar();
+
+  m_actionsToolBar->setOrientation(Qt::Vertical);
+  ui->gridLayout_chartsGroupWidget->addWidget(m_actionsToolBar, 1, 2);
+
+  m_actionsToolBar->setChartActions(
+                    caScale
+                  | caGrid
+                  | caSelectIntervals
+                  | caSelectTarget);
+
+  connect(m_actionsToolBar->getChartAction(caScale), SIGNAL(triggered(bool)), SLOT(onAction_autoZoom_clicked()));
+  connect(m_actionsToolBar->getChartAction(caGrid), SIGNAL(toggled(bool)), SLOT(onAction_grid_toggled(bool)));
+  //connect(m_actionsToolBar->getChartAction(caPaintIntervals), SIGNAL(triggered(bool)), SLOT(setIntervalVisible(bool)));
+  connect(m_actionsToolBar->getChartAction(caSelectIntervals), SIGNAL(toggled(bool)), SLOT(onAction_selectIntervalByMouse_toggled(bool)));
+  connect(m_actionsToolBar->getChartAction(caSelectTarget), SIGNAL(toggled(bool)), SLOT(onAction_selectTarget_toggled(bool)));
+  //connect(m_actionsToolBar->getChartAction(caMaxMinLines), SIGNAL(triggered(bool)), SLOT(setMaxMinLeftVisible(bool)));
+  connect(m_actionsToolBar->getChartActionClear(), SIGNAL(triggered(bool)), SLOT(onAction_clearChart_clicked()));
+
+  m_sideInfoPanel = new QAction(QIcon(":/icons/icons/infopanel.png"), tr("Дополнительная информация"), m_actionsToolBar);
+  m_sideInfoPanel->setCheckable(true);
+  connect(m_sideInfoPanel, SIGNAL(toggled(bool)), SLOT(onAction_sideInfoPanel_clicked()));
+  m_actionsToolBar->insertAction(m_actionsToolBar->getChartActionClear(), m_sideInfoPanel);
+
+  m_actionsToolBar->addSeparator();
 }
 
 void ChartsGroupWidget::addChart(ChartWidget *chart)
@@ -48,14 +77,15 @@ void ChartsGroupWidget::addChart(ChartWidget *chart)
 
 void ChartsGroupWidget::insertChart(int index, ChartWidget *chart)
 {
-  QToolButton * zoomButton = new QToolButton();
-  zoomButton->setCheckable(true);
-  zoomButton->setFixedSize(30, 30);
   int chartNum = m_charts.size() + 1;
-  zoomButton->setText(QString::number(chartNum));
-  connect(zoomButton, SIGNAL(clicked()), SLOT(onToolButton_Zoom_clicked()));
-  m_chartZoomButtons << zoomButton;
-  ui->verticalLayout_zoomButtons->addWidget(zoomButton);
+  QAction * zoomAct = new QAction(QString::number(chartNum), m_actionsToolBar);
+  zoomAct->setCheckable(true);
+  connect(zoomAct, SIGNAL(toggled(bool)), SLOT(onToolButton_Zoom_clicked()));
+  m_actionsToolBar->addAction(zoomAct);
+
+  QSize toolButtonSize = m_actionsToolBar->widgetForAction(m_actionsToolBar->getChartAction(caScale))->size();
+  m_actionsToolBar->widgetForAction(zoomAct)->setFixedSize(toolButtonSize);
+  m_chartZoomActions << zoomAct;
 
   if ((chartNum > 1) && (m_syncChartsByAxisX))
   {
@@ -69,6 +99,7 @@ void ChartsGroupWidget::insertChart(int index, ChartWidget *chart)
 
   //chart->SetIntervalFieldsVisible(ui->frame_SelectionPanel->isVisible());
   chart->setDetailsPaneVisible(m_detailsPanelVisible);
+  chart->setChartToolBarVisible(false);
 
   ui->splitter_charts->insertWidget(index, chart);
   m_charts.insert(index, chart);
@@ -116,9 +147,10 @@ void ChartsGroupWidget::onIntervalSelectionEnd(QPointF pos)
   UtcDateTime endDt = senderChart->getSelIntervalEndDt();
   updateSelectIntervalPanelDates(beginDt, endDt);
   setSelectionInterval(endDt - beginDt);
-  bool b = ui->toolButton_SelectIntervalByMouse->blockSignals(true);
-  ui->toolButton_SelectIntervalByMouse->setChecked(false);
-  ui->toolButton_SelectIntervalByMouse->blockSignals(b);
+  QAction *selIntAct = m_actionsToolBar->getChartAction(caSelectIntervals);
+  bool b = selIntAct->blockSignals(true);
+  selIntAct->setChecked(false);
+  selIntAct->blockSignals(b);
 
   foreach (ChartWidget *cc, m_charts)
     if (cc != senderChart)
@@ -134,9 +166,10 @@ void ChartsGroupWidget::onTargetingDtSet(UtcDateTime dt)
     if (cc != senderChart)
       cc->setTargetingPoint(dt);
 
-  bool b = ui->toolButton_SelectTarget->blockSignals(true);
-  ui->toolButton_SelectTarget->setChecked(false);
-  ui->toolButton_SelectTarget->blockSignals(b);
+  QAction *selTargetAct = m_actionsToolBar->getChartAction(caSelectTarget);
+  bool b = selTargetAct->blockSignals(true);
+  selTargetAct->setChecked(false);
+  selTargetAct->blockSignals(b);
 
   emit targetPointSelected(dt);
 }
@@ -184,7 +217,7 @@ ChartWidget * ChartsGroupWidget::removeChartAt(int index)
   bool chartWithXAxisLabel = (index == (m_charts.size() - 1));
 
   ChartWidget *chartCtrl = m_charts.takeAt(index);
-  QToolButton * zoomButton = m_chartZoomButtons.takeLast();
+  QAction * zoomAct = m_chartZoomActions.takeLast();
 
   if ((! m_charts.isEmpty()) && (m_syncChartsByAxisX))
   {
@@ -193,8 +226,8 @@ ChartWidget * ChartsGroupWidget::removeChartAt(int index)
   }
 
   chartCtrl->setParent(NULL);
-  ui->verticalLayout_zoomButtons->removeWidget(zoomButton);
-  delete zoomButton;
+  m_actionsToolBar->removeAction(zoomAct);
+  delete zoomAct;
 
   return chartCtrl;
 }
@@ -215,8 +248,8 @@ void ChartsGroupWidget::clearChartsData()
 
 void ChartsGroupWidget::onToolButton_Zoom_clicked()
 {
-  QToolButton * btn = static_cast<QToolButton *>(QObject::sender());
-  int chartNum = btn->text().toInt();
+  QAction * act = static_cast<QAction *>(QObject::sender());
+  int chartNum = act->text().toInt();
   zoomChart(chartNum);
 }
 
@@ -241,8 +274,17 @@ void ChartsGroupWidget::zoomChart(int newZoom)
     {
       visible = true;
 
-      m_chartZoomButtons.at(idx)->setChecked(false);
+      bool b = m_chartZoomActions.at(idx)->blockSignals(true);
+      m_chartZoomActions.at(idx)->setChecked(false);
+      m_chartZoomActions.at(idx)->blockSignals(b);
+
       sizes << base.height() / m_charts.size();
+
+      if (m_syncChartsByAxisX)
+      {
+        if (idx < (m_charts.size() - 1))
+          cc->getPlot()->enableAxis(QwtPlot::xBottom, false);
+      }
     }
     else
     {
@@ -250,11 +292,16 @@ void ChartsGroupWidget::zoomChart(int newZoom)
       {
         visible = true;
         sizes << base.height();
+
+        if (m_syncChartsByAxisX)
+          cc->getPlot()->enableAxis(QwtPlot::xBottom, true);
       }
       else
       {
         visible = false;
-        m_chartZoomButtons.at(idx)->setChecked(false);
+        bool b = m_chartZoomActions.at(idx)->blockSignals(true);
+        m_chartZoomActions.at(idx)->setChecked(false);
+        m_chartZoomActions.at(idx)->blockSignals(b);
         sizes << 0;
       }
     }
@@ -297,8 +344,6 @@ void ChartsGroupWidget::setSelectIntervalPanelEnabled(bool selectIntervalPanelEn
   m_selectIntervalPanelEnabled = selectIntervalPanelEnabled;
   if (!selectIntervalPanelEnabled)
     ui->frame_SelectionPanel->hide();
-
-  ui->toolButton_SelectionPanel->setVisible(selectIntervalPanelEnabled);
 }
 
 
@@ -354,20 +399,22 @@ UtcDateTime ChartsGroupWidget::getSelIntervalEndDt()
 }
 
 
-void ChartsGroupWidget::on_toolButton_details_clicked()
+void ChartsGroupWidget::onAction_sideInfoPanel_clicked()
 {
   m_detailsPanelVisible = ! m_detailsPanelVisible;
+  /*
   ui->toolButton_details->setIcon(QIcon(m_detailsPanelVisible
                                         ? ":/icons/icons/forward_arrow.png"
                                         : ":/icons/icons/back.png"));
-
+*/
   foreach(ChartWidget *cc, m_charts)
     cc->setDetailsPaneVisible(m_detailsPanelVisible);
 }
 
-void ChartsGroupWidget::on_toolButton_SelectionPanel_clicked()
+void ChartsGroupWidget::onAction_intervalSelectionPanel_clicked()
 {
-  bool vis = ui->toolButton_SelectionPanel->isChecked();
+  //bool vis = ui->toolButton_SelectionPanel->isChecked();
+  bool vis = false;
   ui->frame_SelectionPanel->setVisible(vis);
   /*
   on_toolButton_EndSelectionByMouse_clicked();
@@ -579,30 +626,31 @@ void ChartsGroupWidget::hideEditIntervalButtons()
   m_intState = iesNone;
 }
 
-void ChartsGroupWidget::on_toolButton_AutoZoom_clicked()
+void ChartsGroupWidget::onAction_autoZoom_clicked()
 {
   foreach(ChartWidget *chart, m_charts)
     chart->autoZoom();
 }
 
-void ChartsGroupWidget::on_toolButton_Grid_toggled(bool checked)
+void ChartsGroupWidget::onAction_grid_toggled(bool checked)
 {
   foreach(ChartWidget *chart, m_charts)
     chart->setGrid(checked);
 }
 
-void ChartsGroupWidget::on_toolButton_Clear_clicked()
+void ChartsGroupWidget::onAction_clearChart_clicked()
 {
     foreach(ChartWidget *chart, m_charts)
       chart->fullReplot();
 }
 
-void ChartsGroupWidget::on_toolButton_SelectIntervalByMouse_toggled(bool checked)
+void ChartsGroupWidget::onAction_selectIntervalByMouse_toggled(bool checked)
 {
   if (checked)
   {
-    if (ui->toolButton_SelectTarget->isChecked())
-      ui->toolButton_SelectTarget->setChecked(false);
+    QAction *selTargetAct = m_actionsToolBar->getChartAction(caSelectTarget);
+    if (selTargetAct->isChecked())
+      selTargetAct->setChecked(false);
   }
 
   foreach(ChartWidget *cc, m_charts)
@@ -690,12 +738,13 @@ void ChartsGroupWidget::alignScaleBorder(int axis)
     }
 }
 
-void ChartsGroupWidget::on_toolButton_SelectTarget_toggled(bool checked)
+void ChartsGroupWidget::onAction_selectTarget_toggled(bool checked)
 {
   if (checked)
   {
-    if (ui->toolButton_SelectIntervalByMouse->isChecked())
-      ui->toolButton_SelectIntervalByMouse->setChecked(false);
+    QAction *selIntervalAct = m_actionsToolBar->getChartAction(caSelectIntervals);
+    if (selIntervalAct->isChecked())
+      selIntervalAct->setChecked(false);
   }
 
   foreach (ChartWidget *chart, m_charts)

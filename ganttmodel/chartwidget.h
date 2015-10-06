@@ -16,6 +16,7 @@
 #include "plotkeyeventhander.h"
 #include "timespan.h"
 #include "utcdatetime.h"
+#include "chartactionstoolbar.h"
 
 enum ChartSelectionState
 {
@@ -32,16 +33,6 @@ enum SearchDirection
   sdAny
 };
 
-enum ChartActions{
-    caNo=0,
-    caScale=1,
-    caGrid=2,
-    caPaintIntervals=4,
-    caSelectIntervals=8,
-    caMaxMinLines=16,
-    caTimer=32,
-    caSelectTarget=64
-};
 
 /// Класс для нижней временной оси
 class TimeScaleDraw: public QwtScaleDraw
@@ -179,7 +170,7 @@ public:
   ChartCurveStats getCurveStats(int curveId) { return m_curvesStats.at(curveId); }
 
   void setDetailsPaneVisible(bool vis);
-
+  void setChartToolBarVisible(bool vis);
   /// Выделение первой точки интевала
   void setIntervalSelectionStart(QPointF pos);
 
@@ -243,6 +234,7 @@ signals:
 private:
   Ui::ChartWidget *ui;
 
+  ChartActionsToolBar *m_actionsToolBar;
   QList<QwtPlotCurve *> m_curves;
   QList<ChartCurveStats> m_curvesStats;
 
@@ -299,7 +291,6 @@ private:
 
   QTimer * _timerOnline;
   int _countLastPoints;
-  int _chartActions;
 
   void updateCurvesIntervalStats();
 
@@ -310,6 +301,7 @@ private:
 
   double calcDistance(const QPointF &p1, const QPointF &p2);
 
+  void createActionsToolBar();
   void createMenuIntervals();
 
   void createMenuMaxMin();
@@ -357,8 +349,8 @@ private slots:
   /// По выбору текущей точки
   void onCurvePointSelected(const QPointF& pos);
 
-  void on_pushButtonTimerOnline_toggled(bool checked);
-  void on_toolButtonSelectTarget_toggled(bool checked);
+  void onAction_TimerOnline_toggled(bool checked);
+  void onAction_SelectTarget_toggled(bool checked);
 };
 
 #endif // CHARTWIDGET_H

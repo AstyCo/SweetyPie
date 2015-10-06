@@ -72,7 +72,8 @@ SOURCES += \
     plotmagnifierx.cpp \
     plotkeyeventhander.cpp \
     verticalscrollarea.cpp \
-    chartsgroupwidget.cpp
+    chartsgroupwidget.cpp \
+    chartactionstoolbar.cpp
 
 HEADERS += \
     ganttmodel.h \
@@ -98,7 +99,8 @@ HEADERS += \
     plotmagnifierx.h \
     plotkeyeventhander.h \
     verticalscrollarea.h \
-    chartsgroupwidget.h
+    chartsgroupwidget.h \
+    chartactionstoolbar.h
 
 
 RESOURCES += \

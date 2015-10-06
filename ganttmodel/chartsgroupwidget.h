@@ -68,9 +68,9 @@ private slots:
 
   //void on_toolButton_GraphSettings_clicked();
 
-  void on_toolButton_details_clicked();
+  void onAction_sideInfoPanel_clicked();
 
-  void on_toolButton_SelectionPanel_clicked();
+  void onAction_intervalSelectionPanel_clicked();
 
   void on_dateTimeEdit_StartSelection_dateTimeChanged(const QDateTime &dateTime);
 
@@ -96,15 +96,15 @@ private slots:
 
   //void on_toolButton_EndSelectionByMouse_clicked();
 
-  void on_toolButton_AutoZoom_clicked();
+  void onAction_autoZoom_clicked();
 
-  void on_toolButton_Grid_toggled(bool checked);
+  void onAction_grid_toggled(bool checked);
 
-  void on_toolButton_Clear_clicked();
+  void onAction_clearChart_clicked();
 
-  void on_toolButton_SelectIntervalByMouse_toggled(bool checked);
+  void onAction_selectIntervalByMouse_toggled(bool checked);
 
-  void on_toolButton_SelectTarget_toggled(bool checked);
+  void onAction_selectTarget_toggled(bool checked);
 
 private:
   void updateSelectionPanel();
@@ -120,8 +120,10 @@ private:
 private:
   Ui::ChartsGroupWidget *ui;
 
+  ChartActionsToolBar *m_actionsToolBar;
+  QAction *m_sideInfoPanel;
   QList<ChartWidget *> m_charts;
-  QList<QToolButton *> m_chartZoomButtons;
+  QList<QAction *> m_chartZoomActions;
   /// Текущие отображаемые графики имеют общую ось X
   bool m_syncChartsByAxisX;
   bool m_frameStatsEnabled;
@@ -141,6 +143,7 @@ private:
   TimeSpan m_selInterval;
   void alignAxes(int axis);
   void alignScaleBorder(int axis);
+  void createActionsToolBar();
 };
 
 #endif // CHARTSDLG_H

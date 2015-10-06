@@ -34,12 +34,7 @@ ChartWidget::ChartWidget(QWidget * parent) :
   setLeftAxisMargin(0);
   setRightAxisMargin(0);
 
-  setChartActions(caScale
-                  | caGrid
-                  | caPaintIntervals
-                  | caSelectIntervals
-                  | caMaxMinLines
-                  | caSelectTarget);
+  createActionsToolBar();
 
   ui->m_plot->setCanvasBackground( Qt::white );
 
@@ -47,7 +42,6 @@ ChartWidget::ChartWidget(QWidget * parent) :
   ui->m_plot->setAxisScaleDraw(QwtPlot::xBottom, new TimeScaleDraw());
   //ui->m_plot->setAxisLabelRotation(QwtPlot::xBottom, -50.0);
   ui->m_plot->setAxisLabelAlignment(QwtPlot::xBottom, Qt::AlignCenter | Qt::AlignBottom);
-
 
   // сетка
   m_pGrid = new QwtPlotGrid();
@@ -122,12 +116,6 @@ ChartWidget::ChartWidget(QWidget * parent) :
   //connect(m_keyEventHandler, SIGNAL(nextPointSelected(bool)), SLOT(onNextCurvePointSelected(bool)));
   connect(m_panner, SIGNAL(panned(int, int)), SLOT(onPlotPanned()));
 
-  connect(ui->pushButtonAutoZoom, SIGNAL(clicked()), this, SLOT(autoZoom()));
-  connect(ui->pushButtonGrid, SIGNAL(toggled(bool)), this, SLOT(setGrid(bool)));
-  connect(ui->pushButtonClear, SIGNAL(clicked()), this, SLOT(fullReplot()));
-  connect(ui->pushButtonSelectInterval, SIGNAL(toggled(bool)), this, SLOT(setIntervalSelection(bool)));
-
-
   m_selectedPointIndex = CurveIndex();
   m_selectionState = ssNone;
   m_intervalValuesVisible = false;
@@ -170,12 +158,6 @@ void ChartWidget::autoZoom()
 
 void ChartWidget::setGrid(bool b)
 {
-  if(!(_chartActions & caGrid))
-  {
-    qWarning() << "grid is not available. Use setChartActions()";
-    return;
-  }
-
   if(b)
     m_pGrid->attach(ui->m_plot);
   else
@@ -204,12 +186,6 @@ void ChartWidget::showSelectionPoint(QwtText xLbl, QwtText yLbl, QPointF point, 
 
 void ChartWidget::showSelectionInterval(QPointF start, QPointF end)
 {
-  if(!(_chartActions & caSelectIntervals))
-  {
-    qWarning() << "select intervals is not available. use setChartActions()";
-    return;
-  }
-
   m_pIntervalMarker[0]->setValue(start);
   m_pIntervalMarker[0]->show();
   m_pIntervalMarker[1]->setValue(end);
@@ -218,12 +194,6 @@ void ChartWidget::showSelectionInterval(QPointF start, QPointF end)
 }
 void ChartWidget::showSelectionIntervalStart(QPointF start)
 {
-  if(!(_chartActions & caSelectIntervals))
-  {
-    qWarning() << "select intervals is not available. use setChartActions()";
-    return;
-  }
-
   m_pIntervalMarker[0]->setValue(start);
   m_pIntervalMarker[0]->show();
   ui->m_plot->replot();
@@ -231,12 +201,6 @@ void ChartWidget::showSelectionIntervalStart(QPointF start)
 
 void ChartWidget::showSelectionIntervalEnd(QPointF end)
 {
-  if(!(_chartActions & caSelectIntervals))
-  {
-    qWarning() << "select intervals is not available. use setChartActions()";
-    return;
-  }
-
   m_pIntervalMarker[1]->setValue(end);
   m_pIntervalMarker[1]->show();
   ui->m_plot->replot();
@@ -485,21 +449,6 @@ void ChartWidget::onCurvePointSelected(const QPointF &pos)
     drawMarkerOnCurve((QwtPlot::Axis)m_curves[m_selectedPointIndex.indexCurve]->yAxis());
 
     calcDetailsPanel();
-
-    ui->m_detailsPanel->verticalScrollBar()->setValue(0);
-    int scrolldy = ui->pushButtonClear->height();
-    for(int i = 0; i < m_detailedPanels.count(); i++)
-    {
-      if(i != m_selectedPointIndex.indexCurve)
-      {
-        scrolldy += m_detailedPanels[i]->geometry().height();
-      }
-      else
-        break;
-    }
-
-    ui->m_detailsPanel->verticalScrollBar()->setValue(scrolldy);
-
     emit pointSelected(m_selectedPointIndex);
   }
   else if (m_selectionState == ssIntervalBegin)
@@ -543,36 +492,12 @@ QVector<QPointF> ChartWidget::trimData(const QVector<QPointF> data) const
 }
 int ChartWidget::chartActions() const
 {
-  return _chartActions;
+  return m_actionsToolBar->chartActions();
 }
 
 void ChartWidget::setChartActions(int chartActions)
 {
-  ui->pushButtonAutoZoom->setVisible(false);
-  ui->pushButtonGrid->setVisible(false);
-  ui->toolButtonIntervalVisibled->setVisible(false);
-  ui->pushButtonSelectInterval->setVisible(false);
-  ui->toolButtonMaxMinValues->setVisible(false);
-  ui->pushButtonTimerOnline->setVisible(false);
-  ui->toolButtonSelectTarget->hide();
-
-  _chartActions = chartActions;
-
-  // TODO блокировки самих элементов и функций на графике
-  if(_chartActions & caScale)
-    ui->pushButtonAutoZoom->setVisible(true);
-  if(_chartActions & caGrid)
-    ui->pushButtonGrid->setVisible(true);
-  if(_chartActions & caPaintIntervals)
-    ui->toolButtonIntervalVisibled->setVisible(true);
-  if(_chartActions & caSelectIntervals)
-    ui->pushButtonSelectInterval->setVisible(true);
-  if(_chartActions & caMaxMinLines)
-    ui->toolButtonMaxMinValues->setVisible(true);
-  if(_chartActions & caTimer)
-    ui->pushButtonTimerOnline->setVisible(true);
-  if(_chartActions & caSelectTarget)
-    ui->toolButtonSelectTarget->setVisible(true);
+  m_actionsToolBar->setChartActions(chartActions);
 }
 
 QwtPlot *ChartWidget::getPlot()
@@ -745,12 +670,12 @@ QList<QwtPlotCurve *> ChartWidget::curves() const
 
 void ChartWidget::startOnlineReplot()
 {
-  on_pushButtonTimerOnline_toggled(true);
+  onAction_TimerOnline_toggled(true);
 }
 
 void ChartWidget::stopOnlineReplot()
 {
-  on_pushButtonTimerOnline_toggled(false);
+  onAction_TimerOnline_toggled(false);
 }
 
 QList<PlotInterval *> ChartWidget::intervals() const
@@ -785,102 +710,103 @@ double ChartWidget::calcDistance(const QPointF &p1, const QPointF &p2)
   return sqrt(x2 + y2);
 }
 
+void ChartWidget::createActionsToolBar()
+{
+  m_actionsToolBar = new ChartActionsToolBar();
+  QVBoxLayout* lay = (QVBoxLayout*) ui->widgetDetail->layout();
+  lay->insertWidget(0, m_actionsToolBar);
+
+  connect(m_actionsToolBar->getChartAction(caScale), SIGNAL(triggered(bool)), SLOT(autoZoom()));
+  connect(m_actionsToolBar->getChartAction(caGrid), SIGNAL(toggled(bool)), SLOT(setGrid(bool)));
+  //connect(m_actionsToolBar->getChartAction(caPaintIntervals), SIGNAL(triggered(bool)), SLOT(setIntervalVisible(bool)));
+  connect(m_actionsToolBar->getChartAction(caSelectIntervals), SIGNAL(toggled(bool)), SLOT(setIntervalSelection(bool)));
+  connect(m_actionsToolBar->getChartAction(caSelectTarget), SIGNAL(toggled(bool)), SLOT(onAction_SelectTarget_toggled(bool)));
+  //connect(m_actionsToolBar->getChartAction(caMaxMinLines), SIGNAL(triggered(bool)), SLOT(setMaxMinLeftVisible(bool)));
+  connect(m_actionsToolBar->getChartActionClear(), SIGNAL(triggered(bool)), SLOT(fullReplot()));
+
+  setChartActions(  caScale
+                  | caGrid
+                  | caPaintIntervals
+                  | caSelectIntervals
+                  | caMaxMinLines
+                  | caSelectTarget);
+}
+
 void ChartWidget::createMenuIntervals()
 {
+  QAction * intervalsAct = m_actionsToolBar->getChartAction(caPaintIntervals);
+  QMenu * menu = intervalsAct->menu();
 
-  if(!(_chartActions & caPaintIntervals))
+  if (intervalsAct->menu() == NULL)
   {
-    qWarning() << "intervals is blocks. use setChartActions()";
-    return;
+    menu = new QMenu(m_actionsToolBar);
+    intervalsAct->setMenu(menu);
   }
-  if(ui->toolButtonIntervalVisibled->menu() != 0)
-    delete ui->toolButtonIntervalVisibled->menu();
+  else
+    menu->clear();
 
-  QMenu * menu = new QMenu(ui->toolButtonIntervalVisibled);
   QList<QAction *> rez;
-
   for(int i = 0; i < m_intervals.count(); i++)
   {
     UtcDateTime beg;
     beg.setBshvTime(m_intervals[i]->beginX());
     UtcDateTime end;
     end.setBshvTime(m_intervals[i]->endX());
-    QAction *a = new QAction(beg.toStdString(0) + "-" + end.toStdString(0), ui->toolButtonIntervalVisibled);
+    QAction *a = new QAction(beg.toStdString(0) + "-" + end.toStdString(0), menu);
     a->setCheckable(true);
     a->setChecked(true);
     connect(a, SIGNAL(toggled(bool)), this, SLOT(setIntervalVisible(bool)));
     rez.append(a);
   }
-
-  menu->clear();
   menu->addActions(rez);
 
-  if(rez.isEmpty())
-    ui->toolButtonIntervalVisibled->setVisible(false);
-  else
-  {
-    ui->toolButtonIntervalVisibled->setVisible(true);
-    ui->toolButtonIntervalVisibled->setMenu(menu);
-  }
-
+  m_actionsToolBar->setChartActionVisible(caPaintIntervals, (! rez.isEmpty()));
 }
 
 void ChartWidget::createMenuMaxMin()
 {
-  if(!(_chartActions & caMaxMinLines))
+  QAction * maxMinAct = m_actionsToolBar->getChartAction(caMaxMinLines);
+  QMenu * menu = maxMinAct->menu();
+
+  if (maxMinAct->menu() == NULL)
   {
-    qWarning() << "select intervals is blocks. use setChartActions()";
-    return;
+    menu = new QMenu(m_actionsToolBar);
+    maxMinAct->setMenu(menu);
   }
+  else
+    menu->clear();
 
-  if(ui->toolButtonMaxMinValues->menu() != 0)
-    delete ui->toolButtonMaxMinValues->menu();
-
-  QMenu * menu = new QMenu(ui->toolButtonMaxMinValues);
   QList<QAction *> rez;
-
-
   if(m_pMaxLeftMarker != 0 && m_pMinLeftMarker != 0)
   {
-    QAction *amin = new QAction(tr("Пределы левой оси"), ui->toolButtonMaxMinValues);
+    QAction *amin = new QAction(tr("Пределы левой оси"), menu);
     amin->setCheckable(true);
     amin->setChecked(true);
     connect(amin, SIGNAL(toggled(bool)), this, SLOT(setMaxMinLeftVisible(bool)));
     rez.append(amin);
 
-    QAction *acmin = new QAction(tr("Цвет пределов левой оси"), ui->toolButtonMaxMinValues);
+    QAction *acmin = new QAction(tr("Цвет пределов левой оси"), menu);
     connect(acmin, SIGNAL(triggered()), this, SLOT(changeColorMaxMinLeft()));
     rez.append(acmin);
   }
 
-
-
   if(m_pMaxRightMarker != 0 && m_pMinRightMarker != 0)
   {
-    QAction *amin = new QAction(tr("Пределы правой оси"), ui->toolButtonMaxMinValues);
+    QAction *amin = new QAction(tr("Пределы правой оси"), menu);
     amin->setCheckable(true);
     amin->setChecked(true);
     connect(amin, SIGNAL(toggled(bool)), this, SLOT(setMaxMinRightVisible(bool)));
     rez.append(amin);
 
-    QAction *acmin = new QAction(tr("Цвет пределов правой оси"), ui->toolButtonMaxMinValues);
+    QAction *acmin = new QAction(tr("Цвет пределов правой оси"), menu);
     connect(acmin, SIGNAL(triggered()), this, SLOT(changeColorMaxMinRight()));
     rez.append(acmin);
   }
-
-
-  menu->clear();
   menu->addActions(rez);
 
-  if(rez.isEmpty())
-    ui->toolButtonMaxMinValues->setVisible(false);
-  else
-  {
-    ui->toolButtonMaxMinValues->setVisible(true);
-    ui->toolButtonMaxMinValues->setMenu(menu);
-  }
-
+  m_actionsToolBar->setChartActionVisible(caMaxMinLines, (! rez.isEmpty()));
 }
+
 QwtPlotCurve *ChartWidget::curve(int index) const
 {
   return m_curves[index];
@@ -913,7 +839,8 @@ void ChartWidget::setCurveVisible(bool b)
 void ChartWidget::setIntervalVisible(bool b)
 {
   QAction * a = (QAction *)QObject::sender();
-  int index = ui->toolButtonIntervalVisibled->menu()->actions().indexOf(a);
+  QAction * menuHost = m_actionsToolBar->getChartAction(caPaintIntervals);
+  int index = menuHost->menu()->actions().indexOf(a);
   if(index >= 0 && index < m_intervals.count())
   {
     m_intervals[index]->setVisible(b);
@@ -1126,6 +1053,11 @@ void ChartWidget::setDetailsPaneVisible(bool vis)
   ui->m_detailsPanel->setVisible(vis);
 }
 
+void ChartWidget::setChartToolBarVisible(bool vis)
+{
+  m_actionsToolBar->setVisible(vis);
+}
+
 void ChartWidget::clearChart()
 {
   for(int i = 0; i < m_curves.count(); i++)
@@ -1236,7 +1168,6 @@ void ChartWidget::setRightAxis(const QString &title, double minLine, double maxL
   ui->m_plot->enableAxis( QwtPlot::yRight );
   ui->m_plot->setAxisTitle(QwtPlot::yRight, title);
   //ui->m_plot->setAxisLabelRotation(QwtPlot::yRight, -50.0);
-  ui->m_plot->setAxisLabelAlignment(QwtPlot::yRight, Qt::AlignLeft | Qt::AlignBottom);
 
   setRightMinMaxValues(minLine, maxLine, defaultColor);
 
@@ -1245,12 +1176,6 @@ void ChartWidget::setRightAxis(const QString &title, double minLine, double maxL
 
 void ChartWidget::setLeftMinMaxValues(double minLine, double maxLine, const QColor &defaultColor)
 {
-  if(!(_chartActions & caPaintIntervals))
-  {
-    qWarning() << "intervals is blocks. use setChartActions()";
-    return;
-  }
-
   if(minLine != 0 || maxLine != 0)
   {
     m_pMinLeftMarker = new QwtPlotMarker();
@@ -1278,12 +1203,6 @@ void ChartWidget::setLeftMinMaxValues(double minLine, double maxLine, const QCol
 
 void ChartWidget::setRightMinMaxValues(double minLine, double maxLine, const QColor &defaultColor)
 {
-  if(!(_chartActions & caMaxMinLines))
-  {
-    qWarning() << "min max lines is blocks. use setChartActions()";
-    return;
-  }
-
   if((minLine != 0 || maxLine != 0) && ui->m_plot->axisEnabled(QwtPlot::yRight ))
   {
     m_pMinRightMarker = new QwtPlotMarker();
@@ -1312,13 +1231,6 @@ void ChartWidget::setRightMinMaxValues(double minLine, double maxLine, const QCo
 
 void ChartWidget::selectIntervalByDates(UtcDateTime beginDt, UtcDateTime endDt)
 {
-
-  if(!(_chartActions & caSelectIntervals))
-  {
-    qWarning() << "select intervals is blocks. use setChartActions()";
-    return;
-  }
-
   if (beginDt > endDt)
   {
     UtcDateTime tmpDt(beginDt);
@@ -1368,12 +1280,6 @@ void ChartWidget::clearSelectedInterval()
 
 void ChartWidget::setIntervalSelectionStart(QPointF pos)
 {
-  if(!(_chartActions & caSelectIntervals))
-  {
-    qWarning() << "select intervals is blocks. use setChartActions()";
-    return;
-  }
-
   m_selectionState = ssIntervalBegin;
   setIntervalSelectionByState(pos);
   m_selectionState = ssIntervalEnd;
@@ -1381,17 +1287,13 @@ void ChartWidget::setIntervalSelectionStart(QPointF pos)
 
 void ChartWidget::setIntervalSelectionEnd(QPointF pos)
 {
-  if(!(_chartActions & caSelectIntervals))
-  {
-    qWarning() << "select intervals is blocks. use setChartActions()";
-    return;
-  }
-
   m_selectionState = ssIntervalEnd;
   setIntervalSelectionByState(pos);
   m_selectionState = ssNone;
 
-  ui->pushButtonSelectInterval->setChecked(false);
+  QAction *selIntAct = m_actionsToolBar->getChartAction(caSelectIntervals);
+  selIntAct->setChecked(false);
+
   calcDetailsPanel();
 }
 
@@ -1413,9 +1315,10 @@ void ChartWidget::setTargetingPoint(UtcDateTime dt)
   if (m_selectionState == ssTargetingPoint)
     m_selectionState = ssNone;
 
-  bool b = ui->toolButtonSelectTarget->blockSignals(true);
-  ui->toolButtonSelectTarget->setChecked(false);
-  ui->toolButtonSelectTarget->blockSignals(b);
+  QAction *selTargetAct = m_actionsToolBar->getChartAction(caSelectTarget);
+  bool b = selTargetAct->blockSignals(true);
+  selTargetAct->setChecked(false);
+  selTargetAct->blockSignals(b);
 
   m_targetingDt = dt;
   if (!dt.isValid())
@@ -1445,9 +1348,10 @@ void ChartWidget::clearTargetingPoint()
   if (m_selectionState == ssTargetingPoint)
     m_selectionState = ssNone;
 
-  bool b = ui->toolButtonSelectTarget->blockSignals(true);
-  ui->toolButtonSelectTarget->setChecked(false);
-  ui->toolButtonSelectTarget->blockSignals(b);
+  QAction *selTargetAct = m_actionsToolBar->getChartAction(caSelectTarget);
+  bool b = selTargetAct->blockSignals(true);
+  selTargetAct->setChecked(false);
+  selTargetAct->blockSignals(b);
 
   m_pTargetingMarker->hide();
   for(int i = 0; i < m_curves.size(); i++)
@@ -1470,12 +1374,6 @@ void ChartWidget::selectPointByIndex(CurveIndex idx)
 
 void ChartWidget::addInterval(long beginX, long endX, const QColor &c1, const QColor &c2)
 {
-  if(!(_chartActions & caPaintIntervals))
-  {
-    qWarning() << "intervals is blocks. use setChartActions()";
-    return;
-  }
-
   PlotInterval * interval = new PlotInterval();
 
   if(!c2.isValid())
@@ -1498,37 +1396,19 @@ void ChartWidget::addInterval(const UtcDateTime &begin, const UtcDateTime &endX,
 
 void ChartWidget::beginIntervalSelection()
 {
-  if(!(_chartActions & caSelectIntervals))
-  {
-    qWarning() << "select intervals is blocks. use setChartActions()";
-    return;
-  }
-
   clearSelectedInterval();
   m_selectionState = ssIntervalBegin;
 }
 
-void ChartWidget::on_pushButtonTimerOnline_toggled(bool checked)
+void ChartWidget::onAction_TimerOnline_toggled(bool checked)
 {
-  if(!(_chartActions & caTimer))
-  {
-    qWarning() << "timer is blocks. use setChartActions()";
-    return;
-  }
-
   if(checked)
-  {
-    ui->pushButtonTimerOnline->setIcon(QIcon(":/icons/icons/stop.png"));
     _timerOnline->start();
-  }
   else
-  {
-    ui->pushButtonTimerOnline->setIcon(QIcon(":/icons/icons/start.png"));
     _timerOnline->stop();
-  }
 }
 
-void ChartWidget::on_toolButtonSelectTarget_toggled(bool checked)
+void ChartWidget::onAction_SelectTarget_toggled(bool checked)
 {
   if (checked)
   {

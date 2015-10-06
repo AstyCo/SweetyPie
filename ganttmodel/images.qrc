@@ -50,5 +50,6 @@
         <file>icons/apply.png</file>
         <file>icons/item_error.png</file>
         <file>icons/target.png</file>
+        <file>icons/infopanel.png</file>
     </qresource>
 </RCC>
