@@ -568,7 +568,7 @@ void ChartWidget::updateCurvesIntervalStats()
     {
         QwtPlotCurve *curve = m_curves.at(i);
     ChartCurveStats &stats = m_curvesStats[i];
-    if (m_selectionState == ssIntervalEnd)
+    if (m_selectionState == ssNone)
     {
       long pointBeginIdx = findPointIndexByPos(posBegin, sdRight, i);
       long pointEndIdx = findPointIndexByPos(posEnd, sdLeft, i);
