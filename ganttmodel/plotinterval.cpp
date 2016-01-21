@@ -38,6 +38,16 @@ void PlotInterval::setGradient(const QColor &c1, const QColor &c2)
     _background1=c1;
     _background2=c2;
 }
+
+QString PlotInterval::name() const
+{
+    return _name;
+}
+
+void PlotInterval::setName(const QString &name)
+{
+    _name = name;
+}
 PlotInterval::PlotInterval()
 {
     _beginX=0;

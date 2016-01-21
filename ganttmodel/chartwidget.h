@@ -147,10 +147,10 @@ public:
 
 
   /// Добавляет специально выделенный интервал
-  void addInterval(long beginX, long endX, const QColor &c1=Qt::white, const QColor &c2=QColor());
+  void addInterval(const QString &name, long beginX, long endX, const QColor &c1=Qt::white, const QColor &c2=QColor());
 
   /// Добавляет специально выделенный интервал
-  void addInterval(const UtcDateTime &begin, const UtcDateTime &endX, const QColor &c1, const QColor &c2);
+  void addInterval(const QString &name, const UtcDateTime &begin, const UtcDateTime &endX, const QColor &c1, const QColor &c2);
 
   /// Добавляет новый график
   void setData(const QString &title, ///< Заголовок графика

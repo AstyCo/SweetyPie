@@ -37,9 +37,9 @@ void MainWindow::testChartWidget()
 
   ui->widget->setCountLastPoints(111);
 
-  ui->widget->addInterval(data[0].x(), data[30].x(), QColor(229, 229, 229), QColor(187, 187, 187));
+  ui->widget->addInterval("zone 1", data[0].x(), data[30].x(), QColor(229, 229, 229), QColor(187, 187, 187));
 
-  ui->widget->addInterval(data[60].x(), data[80].x(),  QColor(229, 229, 229), QColor(187, 187, 187));
+  ui->widget->addInterval("zone 2", data[60].x(), data[80].x(),  QColor(229, 229, 229), QColor(187, 187, 187));
 
   ui->widget->setData("11111111111111",Qt::blue,data);
   ui->widget->setData("22222222222222",Qt::black,data2,QwtPlot::yRight);

@@ -1023,6 +1023,7 @@ void ChartWidget::setData(const QString &title, const QColor &defaultColor, cons
   QVBoxLayout* lay = (QVBoxLayout*) ui->widgetDetail->layout();
   lay->insertWidget(lay->count() - 1, details);
 
+
   m_detailedPanels.append(details);
 
   calcDetailsPanel();
@@ -1372,7 +1373,7 @@ void ChartWidget::selectPointByIndex(CurveIndex idx)
   }
 }
 
-void ChartWidget::addInterval(long beginX, long endX, const QColor &c1, const QColor &c2)
+void ChartWidget::addInterval(const QString &name, long beginX, long endX, const QColor &c1, const QColor &c2)
 {
   PlotInterval * interval = new PlotInterval();
 
@@ -1383,15 +1384,32 @@ void ChartWidget::addInterval(long beginX, long endX, const QColor &c1, const QC
 
   interval->setBeginX(beginX);
   interval->setEndX(endX);
+  interval->setName(name);
   interval->attach(ui->m_plot);
 
   m_intervals.append(interval);
+
+  QVBoxLayout* lay = (QVBoxLayout*) ui->widgetDetail->layout();
+  QHBoxLayout *hlay = new QHBoxLayout(this);
+
+  QLabel * intervalColor = new QLabel(this);
+  intervalColor->setPalette(QPalette(c1));
+  intervalColor->setAutoFillBackground(true);
+  intervalColor->setFrameShape(QFrame::Box);
+  hlay->addWidget(intervalColor);
+
+  QLabel * intervalName = new QLabel(this);
+  intervalName->setText(name);
+  hlay->addWidget(intervalName);
+
+  lay->insertLayout(lay->count() - 1, hlay);
+
   createMenuIntervals();
 }
 
-void ChartWidget::addInterval(const UtcDateTime &begin, const UtcDateTime &endX, const QColor &c1, const QColor &c2)
+void ChartWidget::addInterval(const QString &name, const UtcDateTime &begin, const UtcDateTime &endX, const QColor &c1, const QColor &c2)
 {
-  addInterval(begin.toBshvTime(), endX.toBshvTime(), c1, c2);
+  addInterval(name, begin.toBshvTime(), endX.toBshvTime(), c1, c2);
 }
 
 void ChartWidget::beginIntervalSelection()

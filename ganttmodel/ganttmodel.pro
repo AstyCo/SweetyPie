@@ -7,7 +7,7 @@
 QT       += core gui
 
 
-VERSION = 0.4.5
+VERSION = 0.5.1
 
 TEMPLATE = lib
 

@@ -11,6 +11,7 @@ class PlotInterval : public QwtPlotItem
 private:
     qreal _beginX;
     qreal _endX;
+    QString _name;
     QColor _background1;
     QColor _background2;
 public:
@@ -24,6 +25,8 @@ public:
     QColor background() const;
     void setBackground(const QColor &background);
     void setGradient(const QColor &c1, const QColor &c2);
+    QString name() const;
+    void setName(const QString &name);
 };
 
 #endif // PLOTINTERVAL_H
