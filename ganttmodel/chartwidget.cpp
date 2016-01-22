@@ -548,15 +548,25 @@ void ChartWidget::moveCanvas( int dx, int dy )
   plot->replot();
   onPlotPanned();
 }
+QList<CurveDetailsGroupBox *> ChartWidget::detailedPanels() const
+{
+    return m_detailedPanels;
+}
+
+void ChartWidget::setDetailedPanels(const QList<CurveDetailsGroupBox *> &detailedPanels)
+{
+    m_detailedPanels = detailedPanels;
+}
+
 
 void ChartWidget::updateCurvesIntervalStats()
 {
-  QPointF posBegin = m_pIntervalMarker[0]->value();
-  QPointF posEnd = m_pIntervalMarker[1]->value();
+    QPointF posBegin = m_pIntervalMarker[0]->value();
+    QPointF posEnd = m_pIntervalMarker[1]->value();
 
-  for(int i = 0; i < m_curves.size(); i++)
-  {
-    QwtPlotCurve *curve = m_curves.at(i);
+    for(int i = 0; i < m_curves.size(); i++)
+    {
+        QwtPlotCurve *curve = m_curves.at(i);
     ChartCurveStats &stats = m_curvesStats[i];
     if (m_selectionState == ssIntervalEnd)
     {
@@ -1387,22 +1397,36 @@ void ChartWidget::addInterval(const QString &name, long beginX, long endX, const
   interval->setName(name);
   interval->attach(ui->m_plot);
 
+
+  bool isFind = false;
+  for(int i=0; i<m_intervals.count(); i++)
+  {
+      if(m_intervals[i]->name() == name)
+      {
+          isFind = true;
+          break;
+      }
+  }
+
+  if(!isFind)
+  {
+      QVBoxLayout* lay = (QVBoxLayout*) ui->widgetDetail->layout();
+      QHBoxLayout *hlay = new QHBoxLayout(this);
+
+      QLabel * intervalColor = new QLabel(this);
+      intervalColor->setPalette(QPalette(c1));
+      intervalColor->setAutoFillBackground(true);
+      intervalColor->setFrameShape(QFrame::Box);
+      hlay->addWidget(intervalColor);
+
+      QLabel * intervalName = new QLabel(this);
+      intervalName->setText(name);
+      hlay->addWidget(intervalName);
+
+      lay->insertLayout(lay->count() - 1, hlay);
+  }
+
   m_intervals.append(interval);
-
-  QVBoxLayout* lay = (QVBoxLayout*) ui->widgetDetail->layout();
-  QHBoxLayout *hlay = new QHBoxLayout(this);
-
-  QLabel * intervalColor = new QLabel(this);
-  intervalColor->setPalette(QPalette(c1));
-  intervalColor->setAutoFillBackground(true);
-  intervalColor->setFrameShape(QFrame::Box);
-  hlay->addWidget(intervalColor);
-
-  QLabel * intervalName = new QLabel(this);
-  intervalName->setText(name);
-  hlay->addWidget(intervalName);
-
-  lay->insertLayout(lay->count() - 1, hlay);
 
   createMenuIntervals();
 }

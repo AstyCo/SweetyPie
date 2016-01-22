@@ -205,6 +205,9 @@ public:
   QwtPlot * getPlot();
   void rescale(qreal scaleFactor, QPoint anchorPoint);
 
+  QList<CurveDetailsGroupBox *> detailedPanels() const;
+  void setDetailedPanels(const QList<CurveDetailsGroupBox *> &detailedPanels);
+
 public slots:
   /// Установить начало выделение интервала
   void setIntervalSelection(bool b);

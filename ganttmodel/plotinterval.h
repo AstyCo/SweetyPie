@@ -5,8 +5,9 @@
 
 #include <QPainter>
 #include "qwt_scale_map.h"
+#include "ganttmodel_global.h"
 
-class PlotInterval : public QwtPlotItem
+class GANTTMODELSHARED_EXPORT PlotInterval : public QwtPlotItem
 {
 private:
     qreal _beginX;
