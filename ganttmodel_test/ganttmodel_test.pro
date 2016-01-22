@@ -56,23 +56,16 @@ win32{
 
 Debug:LIBS += -L"../ganttmodel" -lganttmodeld
 Release:LIBS += -L"../ganttmodel" -lganttmodel
-
-Debug:LIBS += -L"C:/lib64" -lballisticsd
-Release:LIBS += -L"C:/lib64" -lballistics
 }
 unix{
 
 debug:LIBS += -L"../ganttmodel" -lganttmodeld
 release:LIBS += -L"../ganttmodel" -lganttmodel
-
-debug:LIBS += -L"/usr/lib64" -lballisticsd
-release:LIBS += -L"/usr/lib64" -lballistics
-
 }
 
 INCLUDEPATH += "../ganttmodel"
-unix:INCLUDEPATH += "/usr/include/ballistics"
-win32:INCLUDEPATH += "C:/include/ballistics"
+unix:INCLUDEPATH += "/usr/include/extensions"
+win32:INCLUDEPATH += "C:/include/extensions"
 unix:INCLUDEPATH += "/usr/include/qwt"
 win32:INCLUDEPATH += "C:/include/qwt"
 

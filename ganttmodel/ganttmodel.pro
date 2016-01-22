@@ -29,21 +29,21 @@ LIBS += -L$${DEP_PATH_LIBS}
 
 win32 {
   CONFIG(release, debug|release) {
-    LIBS += -lballistics -lqwt
+    LIBS += -lextensions -lqwt
   } else:CONFIG(debug, debug|release) {
-    LIBS += -lballisticsd -lqwtd
+    LIBS += -lextensionsd -lqwtd
   }
 } else:unix {
   CONFIG(release, debug|release) {
-    LIBS += -lballistics -lqwt
+    LIBS += -lextensions -lqwt
   } else:CONFIG(debug, debug|release) {
-    LIBS += -lballisticsd -lqwt
+    LIBS += -lextensionsd -lqwt
   }
 }
 
-# ballistics lib
-INCLUDEPATH += $${DEP_PATH_HEADERS}/ballistics
-DEPENDPATH += $${DEP_PATH_HEADERS}/ballistics
+INCLUDEPATH += $${DEP_PATH_HEADERS}/extensions
+DEPENDPATH += $${DEP_PATH_HEADERS}/extensions
+
 # qwt
 INCLUDEPATH += $${DEP_PATH_HEADERS}/qwt
 
