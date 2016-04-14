@@ -1,12 +1,12 @@
-#include "plotkeyeventhander.h"
+#include "plotkeyeventhandler.h"
 #include "QKeyEvent"
 
-PlotKeyEventHander::PlotKeyEventHander(QObject *parent) :
+PlotKeyEventHandler::PlotKeyEventHandler(QObject *parent) :
   QObject(parent)
 {
 }
 
-bool PlotKeyEventHander::eventFilter(QObject *obj, QEvent *event)
+bool PlotKeyEventHandler::eventFilter(QObject *obj, QEvent *event)
 {
   Q_UNUSED(obj)
 

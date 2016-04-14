@@ -1,6 +1,8 @@
 #include "plotinterval.h"
-#include "qwt_painter.h"
-#include "QRect"
+
+#include <QRect>
+
+#include <qwt/qwt_painter.h>
 
 
 qreal PlotInterval::beginX() const

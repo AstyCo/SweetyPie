@@ -2,16 +2,17 @@
 #define CURVEDETAILSGROUPBOX_H
 
 #include <QGroupBox>
-#include "qwt_plot_curve.h"
 
+#include <qwt/qwt_plot_curve.h>
 
+#include "ganttmodel_global.h"
 
 
 namespace Ui {
 class CurveDetailsGroupBox;
 }
 
-class CurveDetailsGroupBox : public QGroupBox
+class GANTTMODELSHARED_EXPORT CurveDetailsGroupBox : public QGroupBox
 {
     Q_OBJECT
 
@@ -22,42 +23,40 @@ public:
     QwtPlotCurve *curve() const;
     void setCurve(QwtPlotCurve *curve);
 
-    double minValue() const;
-    double maxValue() const;
-    void setMinMaxValue(double minValue, double maxValue);
-
     long endInterval() const;
     long beginInterval() const;
-    void setInterval(long beginInterval, long endInterval);
+    void setInterval(double beginInterval, double endInterval);
 
-    int currentIndex() const;
-    void setCurrentIndex(int currentIndex);
+    void setIntervalLabelsVisible(bool vis);
+
+    void setDimensionsText(QString dim);
+
+    int currentSelPointIndex() const;
+    void setCurrentSelPointIndex(int currentSelPointIndex);
+
+public slots:
+    void updateData();
+    void updateCurveColor();
+    void calcStats(bool hasSelection);
+
+signals:
+    void colorChanged(const QColor &color);
+    void visibledChanged(bool b);
+
+private slots:
+    void setCurveVisible(bool b);
 
 private:
     Ui::CurveDetailsGroupBox *ui;
 
     int m_currentIndex;
 
-    double m_minValue;
-    double m_maxValue;
-
-    long m_beginInterval;
-    long m_endInterval;
+    double m_beginSelectionValue;
+    double m_endSelectionValue;
 
     QwtPlotCurve * m_curve;
-public slots:
-    void updateData();
-    void calcIntervals();
-    void calcCurrentValuesData();
 
-private slots:
-    void changeColor();
-    void setCurveVisible(bool b);
-
-
-signals:
-    void colorChanged(const QColor &color);
-    void visibledChanged(bool b);
+    void findSelectionPointIdxs(long &begin, long &end);
 };
 
 #endif // CURVEDETAILSGROUPBOX_H

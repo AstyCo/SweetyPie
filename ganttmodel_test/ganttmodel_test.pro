@@ -16,68 +16,54 @@ greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 TARGET = ChartWidget
 TEMPLATE = app
 
-DEFINES += QWT_DLL
+#DEFINES += QWT_DLL
 
-unix:{
-    # убираем не очевидную директиву
-    CONFIG -= debug_and_release
-    # проверяем, если debug сборка, то убираем флаг release, который устанавливается всегда
-    CONFIG( debug, debug|release )  {
-      CONFIG -= release
-    }
-    else {
-    # если release, на всякий случаем убираем debug и добавляем release
-      CONFIG -= debug
-      CONFIG += release
-    }
+DESTDIR = $$OUT_PWD/../bin
 
-    # теперь точно поддерживается проверка на release и debug флаги
-    # все дополнительные файлы раскидаем по директориям
-    release:{
-            DESTDIR = release
-            OBJECTS_DIR=$(DESTDIR)
-            MOC_DIR = release/.moc
-            RCC_DIR = release/.qrc
-            UI_DIR = release/.ui
-        } else {
-            DESTDIR = debug
-            OBJECTS_DIR=$(DESTDIR)
-            MOC_DIR = debug/.moc
-            RCC_DIR = debug/.qrc
-            UI_DIR = debug/.ui
-        }
+unix:{    
+    CONFIG += debug_and_release debug_and_release_target
 }
  # выведем сообщение компилятора в каком режиме собираем (для проверки)
  release:message(Building in release mode.)
  debug:message(Building in debug mode.)
 
+
 # подключить библиотеки и *.h файлы
-win32{
+INCLUDEPATH += "$$PWD/../ganttmodel"
+DEPENDPATH += "$$PWD/../ganttmodel"
 
-Debug:LIBS += -L"../ganttmodel" -lganttmodeld
-Release:LIBS += -L"../ganttmodel" -lganttmodel
+LIBS += -L"$${DESTDIR}"
+CONFIG(release, debug|release) {
+  LIBS += -lganttmodel
+} else:CONFIG(debug, debug|release) {
+  LIBS += -lganttmodeld
 }
-unix{
 
-debug:LIBS += -L"../ganttmodel" -lganttmodeld
-release:LIBS += -L"../ganttmodel" -lganttmodel
+# пути к зависимым библиотекам
+unix {
+  DEP_PATH_LIBS = /usr/lib64
+  DEP_PATH_HEADERS = /usr/include
+} else:win32 {
+  DEP_PATH_LIBS = C:/lib64
+  DEP_PATH_HEADERS = C:/include
 }
 
-INCLUDEPATH += "../ganttmodel"
-unix:INCLUDEPATH += "/usr/include/extensions"
-win32:INCLUDEPATH += "C:/include/extensions"
-unix:INCLUDEPATH += "/usr/include/qwt"
-win32:INCLUDEPATH += "C:/include/qwt"
+LIBS += -L$${DEP_PATH_LIBS}
+CONFIG(release, debug|release) {
+  LIBS += -lextensions
+} else:CONFIG(debug, debug|release) {
+  LIBS += -lextensionsd
+}
+
+INCLUDEPATH += $${DEP_PATH_HEADERS}/extensions
+INCLUDEPATH += $${DEP_PATH_HEADERS}
 
 
 SOURCES += main.cpp\
-        mainwindow.cpp \
-    chartsettingsdlg.cpp
+        mainwindow.cpp
 
 
-HEADERS  += mainwindow.h \
-    chartsettingsdlg.h
+HEADERS  += mainwindow.h
 
-FORMS    += mainwindow.ui \
-    chartsettingsdlg.ui
+FORMS    += mainwindow.ui
 

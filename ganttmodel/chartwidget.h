@@ -6,17 +6,20 @@
 #include <QToolButton>
 #include <QLabel>
 #include <QTimer>
+#include <QScrollArea>
 
-#include "qwt_scale_draw.h"
-#include "qwt_plot.h"
+#include <qwt/qwt_scale_draw.h>
+#include <qwt/qwt_plot.h>
+
+#include <timespan.h>
+#include <utcdatetime.h>
 
 #include "ganttmodel_global.h"
 #include "plotinterval.h"
 #include "curvedetailsgroupbox.h"
-#include "plotkeyeventhander.h"
-#include "timespan.h"
-#include "utcdatetime.h"
+#include "plotkeyeventhandler.h"
 #include "chartactionstoolbar.h"
+#include "chartsettingsdlg.h"
 
 enum ChartSelectionState
 {
@@ -47,8 +50,8 @@ public:
     virtual QwtText label (double v) const
     {
         UtcDateTime dt;
-        dt.setBshvTime((int)v);
-        return dt.toString("hh:mm:ss");
+        dt = UtcDateTime::fromMicrosecondsSinceEpoch((long long)v * 1000);
+        return dt.toString("hh:mm:ss\ndd.MM.yy");
     }
 };
 
@@ -86,7 +89,7 @@ struct GANTTMODELSHARED_EXPORT ChartCurveStats
 class QwtPlotCurve;
 class QwtPlotGrid;
 class QwtPlotPanner;
-class PlotMagnifierX;
+class PlotNavigator;
 class QwtPlotPicker;
 class QwtPlotMarker;
 
@@ -138,45 +141,45 @@ public:
   void clearChart();
 
   /// Выполняет выделение интервала
-  void selectIntervalByDates(UtcDateTime beginDt, ///< Начало интервала
+  void setIntervalSelectionByDates(UtcDateTime beginDt, ///< Начало интервала
                              UtcDateTime endDt ///< Конец интервала
                              );
 
   /// Отменяет выделенный интервал
-  void clearSelectedInterval();
+  void clearIntervalSelection();
 
 
-  /// Добавляет специально выделенный интервал
-  void addInterval(const QString &name, long beginX, long endX, const QColor &c1=Qt::white, const QColor &c2=QColor());
+  /// Добавляет специально выделенную зону
+  void addZone(const QString &name, double beginX, double endX, const QColor &c1=Qt::white, const QColor &c2=QColor());
 
-  /// Добавляет специально выделенный интервал
-  void addInterval(const QString &name, const UtcDateTime &begin, const UtcDateTime &endX, const QColor &c1, const QColor &c2);
+  /// Добавляет специально выделенную зону
+  void addZone(const QString &name, const UtcDateTime &begin, const UtcDateTime &endX, const QColor &c1, const QColor &c2);
 
   /// Добавляет новый график
-  void setData(const QString &title, ///< Заголовок графика
-               const QColor &defaultColor, ///< Первоначальный цвет графика
+  void setData(const QString &title, ///< Первоначальный цвет графика
                const QVector<QPointF> &data, ///< Значения точке графика
-               QwtPlot::Axis axis = QwtPlot::yLeft ///< Привязанность к оси
-          );
+               QwtPlot::Axis axis = QwtPlot::yLeft);
   void setLeftAxisMargin(int value);
   void setRightAxisMargin(int value);
   /// Обновляет данные графика. Если таймер запущен то график не перерисовывается.
   void updateData(int indexCurve, const QVector<QPointF> &data);
 
   /// Дата и время начала выделенного интервала
-  UtcDateTime getSelIntervalBeginDt() { return m_intervalBeginDt; }
+  UtcDateTime getIntervalSelectionBeginDt() { return m_intervalBeginDt; }
   /// Дата и время конца выделенного интервала
-  UtcDateTime getSelIntervalEndDt() { return m_intervalEndDt; }
+  UtcDateTime getIntervalSelectionEndDt() { return m_intervalEndDt; }
   ChartCurveStats getCurveStats(int curveId) { return m_curvesStats.at(curveId); }
 
-  void setDetailsPaneVisible(bool vis);
+  bool panelCurveDetailsVisible();
+  void setPanelCurveDetailsVisible(bool vis);
+
   void setChartToolBarVisible(bool vis);
   /// Выделение первой точки интевала
   void setIntervalSelectionStart(QPointF pos);
 
   /// Выделение второй (последней) точки интервала
   void setIntervalSelectionEnd(QPointF pos);
-  void setTargetingPointSelection(bool b);
+  void setSelectionModeTargetingPoint(bool b);
   void setTargetingPoint(UtcDateTime dt);
   void clearTargetingPoint();
 
@@ -200,13 +203,21 @@ public:
   int countLastPoints() const;
   void setCountLastPoints(int countLastPoints);
 
-  int chartActions() const;
-  void setChartActions(int chartActions);
   QwtPlot * getPlot();
+  void zoom(const QRectF &rect);
   void rescale(qreal scaleFactor, QPoint anchorPoint);
 
   QList<CurveDetailsGroupBox *> detailedPanels() const;
   void setDetailedPanels(const QList<CurveDetailsGroupBox *> &detailedPanels);
+
+  void updateChartSettings(const ChartSettings &newSettings);  
+
+  static QPointF dtToPoint(const UtcDateTime &dt, double y = 0);
+  static UtcDateTime pointToDt(const QPointF &p);
+
+  ChartActionsToolBar *getActionsToolBar() const;
+  QScrollArea *getPanelCurveDetails() const;
+  QList<CurveStyle> getCurveStyles() const;
 
 public slots:
   /// Установить начало выделение интервала
@@ -233,8 +244,9 @@ signals:
   /// Видимая область графика была перемещена
   void panned(int, int);
 
+  void zoomed(const QRectF &rect);
 
-private:
+protected:
   Ui::ChartWidget *ui;
 
   ChartActionsToolBar *m_actionsToolBar;
@@ -242,18 +254,17 @@ private:
   QList<ChartCurveStats> m_curvesStats;
 
   QList<PlotInterval *> m_intervals;
-  QList<CurveDetailsGroupBox *> m_detailedPanels;
+  QList<CurveDetailsGroupBox *> m_panelCurveDetailsList;
 
-  QwtPlotGrid * m_pGrid;
-  QwtPlotPanner *m_panner;
-  PlotMagnifierX * m_zoomer;
-  QwtPlotPicker * m_picker;
-  PlotKeyEventHander * m_keyEventHandler;
+  QwtPlotGrid *m_pGrid;
+  PlotNavigator *m_navigator;
+  QwtPlotPicker *m_picker;
+  PlotKeyEventHandler *m_keyEventHandler;
 
-  QwtPlotMarker * m_pMinLeftMarker;
-  QwtPlotMarker * m_pMaxLeftMarker;
-  QwtPlotMarker * m_pMinRightMarker;
-  QwtPlotMarker * m_pMaxRightMarker;
+  QwtPlotMarker *m_pMinLeftMarker;
+  QwtPlotMarker *m_pMaxLeftMarker;
+  QwtPlotMarker *m_pMinRightMarker;
+  QwtPlotMarker *m_pMaxRightMarker;
 
 
   /** Маркеры обозначения выделенной точки.
@@ -267,6 +278,9 @@ private:
 
   /// Маркер для обозначения точки прицеливания
   QwtPlotMarker * m_pTargetingMarker;
+
+  ChartSettings m_settings;
+  QList<CurveStyle> m_curveStyles;
 
   /// Дата и время первой точки
   CurveIndex m_beginLimit;
@@ -283,17 +297,17 @@ private:
   /// Дата и время окончания выделенного интервала
   UtcDateTime m_intervalEndDt;
   /// Номер первой точки в выделенном интервале
-  CurveIndex m_intervalBeginPointIdx;
+  CurveIndex m_selectionBeginPointIdx;
   /// Номер последней точки в выделенном интервале
-  CurveIndex m_intervalEndPointIdx;
+  CurveIndex m_selectionEndPointIdx;
 
   /// Текущий выделенный интервал
-  bool m_intervalValuesVisible;
+  bool m_hasSelection;
   TimeSpan m_selInterval;
   ChartSelectionState m_selectionState;
 
-  QTimer * _timerOnline;
-  int _countLastPoints;
+  QTimer * m_timerOnline;
+  int m_countLastPoints;
 
   void updateCurvesIntervalStats();
 
@@ -309,7 +323,7 @@ private:
 
   void createMenuMaxMin();
 
-  void drawMarkerOnCurve(QwtPlot::Axis axis = QwtPlot::yLeft);
+  virtual void drawMarkerOnCurve(QwtPlot::Axis axis = QwtPlot::yLeft);
   void showSelectionPoint(QwtText xLbl, QwtText yLbl, QPointF point, QwtPlot::Axis axis = QwtPlot::yLeft);
 
   void showSelectionInterval(QPointF start, QPointF end);
@@ -318,16 +332,11 @@ private:
   void showSelectionIntervalEnd(QPointF end);
 
   long findPointIndexByPos(const QPointF &pos, SearchDirection direction, int curveId);
-  CurveIndex findClosestPointAllCurves(const QPointF &pos, SearchDirection direction=sdAny);
-
-  QPointF dtToPoint(UtcDateTime dt);
+  CurveIndex findClosestPointAllCurves(const QPointF &pos, SearchDirection direction=sdAny);  
 
   QVector<QPointF> trimData(const QVector<QPointF> data) const;
 
 private slots:
-  /// Переход в режим выделения интервала
-  void beginIntervalSelection();
-
   /// Установить видимость графика
   void setCurveVisible(bool b);
   /// Установить видимость интервала
@@ -345,15 +354,37 @@ private slots:
   void changeColorMaxMinLeft();
   /// Изменение цвета правых линий макс и мин.
   void changeColorMaxMinRight();
-
-  /// Что то делает с зумом
-  void onPlotPanned();
+  void onNextCurvePointSelected(bool prev);
 
   /// По выбору текущей точки
   void onCurvePointSelected(const QPointF& pos);
-
+  void onAction_panelCurveDetails_toggled(bool checked);
+  void onAction_grid_toggled(bool checked);
   void onAction_TimerOnline_toggled(bool checked);
   void onAction_SelectTarget_toggled(bool checked);
+  void onAction_chartSettings_triggered();
+
+private:
+  CurveStyle nextCurveStyle()
+  {
+    CurveStyle next;
+    if (m_curves.size() < m_curveStyles.size())
+    {
+      next = m_curveStyles.at(m_curves.size());
+    }
+    else
+    {
+      if (m_curveStyles.size() < CurveStyle::defColors.size())
+        next.pen.setColor(CurveStyle::defColors.at(m_curveStyles.size()));
+
+      m_curveStyles << next;
+    }
+
+    return next;
+  }
+
+  virtual void updateChartSettingsPrivate() { }
+  void updateDetailsPanelsSelPoint();
 };
 
 #endif // CHARTWIDGET_H

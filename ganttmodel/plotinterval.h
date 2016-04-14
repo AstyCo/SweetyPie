@@ -1,10 +1,11 @@
 #ifndef PLOTINTERVAL_H
 #define PLOTINTERVAL_H
 
-#include "qwt_plot_item.h"
-
 #include <QPainter>
-#include "qwt_scale_map.h"
+
+#include <qwt/qwt_plot_item.h>
+#include <qwt/qwt_scale_map.h>
+
 #include "ganttmodel_global.h"
 
 class GANTTMODELSHARED_EXPORT PlotInterval : public QwtPlotItem

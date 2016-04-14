@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>727</width>
+    <width>532</width>
     <height>313</height>
    </rect>
   </property>
@@ -73,9 +73,15 @@
    </item>
    <item>
     <widget class="VerticalScrollArea" name="m_detailsPanel">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Minimum" vsizetype="Expanding">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
      <property name="minimumSize">
       <size>
-       <width>500</width>
+       <width>100</width>
        <height>0</height>
       </size>
      </property>
@@ -87,7 +93,7 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>498</width>
+        <width>98</width>
         <height>301</height>
        </rect>
       </property>
@@ -145,7 +151,7 @@
   <customwidget>
    <class>QwtPlot</class>
    <extends>QFrame</extends>
-   <header>qwt_plot.h</header>
+   <header location="global">qwt/qwt_plot.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>

@@ -1,15 +1,9 @@
-#ifndef CHARTSDLG_H
-#define CHARTSDLG_H
+#ifndef CHARTSGROUPWIDGET_H
+#define CHARTSGROUPWIDGET_H
 
 #include <QToolButton>
-#include "chartwidget.h"
 
-/// Режимы изменения выбранного интервала
-enum IntervalEditState { iesNone,  ///< Интервал не изменялся
-                         iesBegin, ///< Изменилось начало интервала
-                         iesEnd,   ///< Изменилось окончание интервала
-                         iesInt    ///< Изменилась длина интервала
-                       };
+#include "chartwidget.h"
 
 namespace Ui {
 class ChartsGroupWidget;
@@ -50,8 +44,14 @@ public:
 
   /// Дата и время конца выделенного интервала
   UtcDateTime getSelIntervalEndDt();
-  bool getSelectIntervalPanelEnabled() const;
-  void setSelectIntervalPanelEnabled(bool selectIntervalPanelEnabled);
+  bool panelSelectIntervalVisible() const;
+  void setPanelSelectIntervalVisible(bool vis);
+  void updateSelectionPanel();
+
+  ChartActionsToolBar *getActionsToolBar() const;
+
+  ChartSettings getSettings() const;
+  void setSettings(const ChartSettings &settings);
 
 signals:
   /// Выбрана вторая точка при выделении интервала
@@ -60,17 +60,15 @@ signals:
 
 public slots:
   void scaleDivChanged();
+  void alignPanelsDetails();
+
 protected:
   void resizeEvent(QResizeEvent *ev);
 
 private slots:
-  void onToolButton_Zoom_clicked();
+  void onToolButtonZoom_clicked();  
 
-  //void on_toolButton_GraphSettings_clicked();
-
-  void onAction_sideInfoPanel_clicked();
-
-  void onAction_intervalSelectionPanel_clicked();
+  void onAction_panelSelectionInterval_clicked();
 
   void on_dateTimeEdit_StartSelection_dateTimeChanged(const QDateTime &dateTime);
 
@@ -106,8 +104,11 @@ private slots:
 
   void onAction_selectTarget_toggled(bool checked);
 
+  void onAction_chartSettings_triggered();
+  void onAction_panelCurveDetails_toggled(bool checked);
+  void onZoomed(const QRectF &rect);
 private:
-  void updateSelectionPanel();
+
   void setSelectionInterval(TimeSpan selInt);
   void updateSelectIntervalPanelDates(UtcDateTime startDt, UtcDateTime endDt);
 
@@ -116,21 +117,30 @@ private:
   void zoomChart(int newZoom);
   void interconnectCharts();
   void connectChart(ChartWidget *chart);
+  void alignAxes(int axis);
+  void alignScaleBorder(int axis);
+  void createActionsToolBar();
 
 private:
+  /// Режимы изменения выбранного интервала
+  enum IntervalEditState { iesNone,  ///< Интервал не изменялся
+                           iesBegin, ///< Изменилось начало интервала
+                           iesEnd,   ///< Изменилось окончание интервала
+                           iesInt    ///< Изменилась длина интервала
+                         };
+
   Ui::ChartsGroupWidget *ui;
 
-  ChartActionsToolBar *m_actionsToolBar;
-  QAction *m_sideInfoPanel;
+  ChartActionsToolBar *m_actionsToolBar;  
+  QAction *m_actionSetPanelSelectInterval;
   QList<ChartWidget *> m_charts;
   QList<QAction *> m_chartZoomActions;
   /// Текущие отображаемые графики имеют общую ось X
   bool m_syncChartsByAxisX;
-  bool m_frameStatsEnabled;
+  bool m_panelStatsVisible;
   /// Номер графика, развернутого на всю форму
   int m_zoomActive;
-  bool m_selectIntervalPanelEnabled;
-  bool m_detailsPanelVisible;
+  bool m_panelSelectIntervalVisible;  
 
   UtcDateTime m_curStartDt;
   UtcDateTime m_curEndDt;
@@ -141,10 +151,9 @@ private:
 
   /// Текущий выделенный интервал
   TimeSpan m_selInterval;
-  void alignAxes(int axis);
-  void alignScaleBorder(int axis);
-  void createActionsToolBar();
+
+  ChartSettings m_settings;  
 };
 
-#endif // CHARTSDLG_H
+#endif // CHARTSGROUPWIDGET_H
 

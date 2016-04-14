@@ -154,12 +154,12 @@ void GanttView::setModel(GanttModel *model)
     connect(abModel, SIGNAL(rowsRemoved(QModelIndex, int, int)), m_graphicsscene, SLOT(onRowsRemoved(QModelIndex,int,int)));
     connect(m_model, SIGNAL(rowInserted(QModelIndex, int, int)), m_graphicsscene, SLOT(onRowsInserted(QModelIndex,int,int)));
 
-    connect(m_player, SIGNAL(currentValueChanged(qreal)), m_graphicsscene, SLOT(onCurrentValueChanged(qreal)));
+    //connect(m_player, SIGNAL(currentValueChanged(qreal)), m_graphicsscene, SLOT(onCurrentValueChanged(qreal)));
     m_player->setBeginDt(m_graphicsscene->m_header->begin());
     m_player->setEndDt(m_graphicsscene->m_header->end());
     connect(m_graphicsscene, SIGNAL(cursorChanged(qreal)), m_graphicsview, SLOT(onCursorChanged(qreal)));
 
-    connect(m_graphicsview->zoomSlider, SIGNAL(valueChanged(int)), m_player, SLOT(scaleSlot()));
+    //connect(m_graphicsview->zoomSlider, SIGNAL(valueChanged(int)), m_player, SLOT(scaleSlot()));
 }
 GanttTreeView *GanttView::treeview() const
 {

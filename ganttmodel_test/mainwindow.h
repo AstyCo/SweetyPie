@@ -20,6 +20,7 @@ public:
 private:
     Ui::MainWindow *ui;
     void testChartWidget();
+    void testChartGroupWidget();
     void testGanttModel();
 
 private slots:

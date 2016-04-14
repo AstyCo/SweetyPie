@@ -4,287 +4,215 @@
 #include <QColorDialog>
 
 CurveDetailsGroupBox::CurveDetailsGroupBox(QwtPlotCurve *curve, QWidget *parent) :
-    QGroupBox(parent),
-    ui(new Ui::CurveDetailsGroupBox)
+  QGroupBox(parent),
+  ui(new Ui::CurveDetailsGroupBox)
 {
-    ui->setupUi(this);
+  ui->setupUi(this);
 
-    m_curve = 0;
+  m_curve = curve;
 
-    setCurrentIndex(-1);
+  setCurrentSelPointIndex(-1);
 
-    setMinMaxValue(0,0);
+  setDimensionsText(QString());
 
-    setInterval(0,0);
+  connect(this, SIGNAL(toggled(bool)), this, SLOT(setCurveVisible(bool)));
 
-    connect(ui->pushButtonColor,SIGNAL(clicked()),this,SLOT(changeColor()));
-    connect(this,SIGNAL(toggled(bool)),this,SLOT(setCurveVisible(bool)));
-
-    m_curve = curve;
-    updateData();
+  updateCurveColor();
+  updateData();
 }
 
 CurveDetailsGroupBox::~CurveDetailsGroupBox()
 {
-    delete ui;
+  delete ui;
 }
 QwtPlotCurve *CurveDetailsGroupBox::curve() const
 {
-    return m_curve;
+  return m_curve;
 }
 
 void CurveDetailsGroupBox::setCurve(QwtPlotCurve *curve)
 {
-    m_curve = curve;
-    updateData();
+  m_curve = curve;
+  updateData();
 }
-double CurveDetailsGroupBox::minValue() const
-{
-    return m_minValue;
-}
-
-void CurveDetailsGroupBox::setMinMaxValue(double minValue,double maxValue)
-{
-    m_minValue = minValue;
-    m_maxValue = maxValue;
-    if(m_minValue!=0 || m_maxValue!=0)
-    {
-        ui->labelForMaxCapture->setVisible(true);
-        ui->labelForMaxValue->setVisible(true);
-        ui->labelForMinCapture->setVisible(true);
-        ui->labelForMaxValue->setVisible(true);
-        calcCurrentValuesData();
-    }
-    else
-    {
-        ui->labelForMaxCapture->setVisible(false);
-        ui->labelForMaxValue->setVisible(false);
-        ui->labelForMinCapture->setVisible(false);
-        ui->labelForMaxValue->setVisible(false);
-    }
-
-}
-double CurveDetailsGroupBox::maxValue() const
-{
-    return m_maxValue;
-}
-
 
 long CurveDetailsGroupBox::beginInterval() const
 {
-    return m_beginInterval;
+  return m_beginSelectionValue;
 }
 
-void CurveDetailsGroupBox::setInterval(long beginInterval, long endInterval)
+void CurveDetailsGroupBox::setInterval(double beginInterval, double endInterval)
 {
-    m_beginInterval = beginInterval;
-    m_endInterval = endInterval;
-    if(m_beginInterval!=0 || m_endInterval!=0)
-    {
-        ui->labelAvgCapture_2->setVisible(true);
-        ui->labelAvgValue_2->setVisible(true);
-        ui->labelCountPointCapture_2->setVisible(true);
-        ui->labelCountPoint_2->setVisible(true);
-        ui->labelMaxCapture_2->setVisible(true);
-        ui->labelMaxValue_2->setVisible(true);
-        ui->labelMinCapture_2->setVisible(true);
-        ui->labelMinValue_2->setVisible(true);
-        calcIntervals();
-    }
-    else
-    {
-        ui->labelAvgCapture_2->setVisible(false);
-        ui->labelAvgValue_2->setVisible(false);
-        ui->labelCountPointCapture_2->setVisible(false);
-        ui->labelCountPoint_2->setVisible(false);
-        ui->labelMaxCapture_2->setVisible(false);
-        ui->labelMaxValue_2->setVisible(false);
-        ui->labelMinCapture_2->setVisible(false);
-        ui->labelMinValue_2->setVisible(false);
-    }
-}
-int CurveDetailsGroupBox::currentIndex() const
-{
-    return m_currentIndex;
+  m_beginSelectionValue = beginInterval;
+  m_endSelectionValue = endInterval;
+
+  if(m_curve == 0)
+    return;
+
+  calcStats(true);
 }
 
-void CurveDetailsGroupBox::setCurrentIndex(int currentIndex)
+void CurveDetailsGroupBox::setIntervalLabelsVisible(bool vis)
 {
-    m_currentIndex = currentIndex;
-    if(m_currentIndex!=-1)
-    {
-        ui->labelCurentValue->setVisible(true);
-        ui->labelCurentCaption->setVisible(true);
-        if(m_minValue!=0 || m_maxValue!=0)
-        {
-            ui->labelForMaxCapture->setVisible(true);
-            ui->labelForMaxValue->setVisible(true);
-            ui->labelForMinCapture->setVisible(true);
-            ui->labelForMinValue->setVisible(true);
-        }
-        calcCurrentValuesData();
-    }
-    else
-    {
-        ui->labelCurentValue->setVisible(false);
-        ui->labelCurentCaption->setVisible(false);
-        ui->labelForMaxCapture->setVisible(false);
-        ui->labelForMaxValue->setVisible(false);
-        ui->labelForMinCapture->setVisible(false);
-        ui->labelForMinValue->setVisible(false);
-    }
+  ui->labelIntervalAvgCaption->setVisible(vis);
+  ui->labelIntervalAvgValue->setVisible(vis);
+  ui->labelIntervalAvgValueDim->setVisible(vis);
+  ui->labelIntervalCountPointCaption->setVisible(vis);
+  ui->labelIntervalCountPointValue->setVisible(vis);
+  ui->labelIntervalMaxCaption->setVisible(vis);
+  ui->labelIntervalMaxValue->setVisible(vis);
+  ui->labelIntervalMaxValueDim->setVisible(vis);
+  ui->labelIntervalMinCaption->setVisible(vis);
+  ui->labelIntervalMinValue->setVisible(vis);
+  ui->labelIntervalMinValueDim->setVisible(vis);
+  ui->labelIntervalDiffCaption->setVisible(vis);
+  ui->labelIntervalDiffValue->setVisible(vis);
+  ui->labelIntervalDiffValueDim->setVisible(vis);
+}
+
+void CurveDetailsGroupBox::setDimensionsText(QString dim)
+{
+  ui->labelMaxValueDim->setText(dim);
+  ui->labelAvgValueDim->setText(dim);
+  ui->labelMinValueDim->setText(dim);
+  ui->labelCurrentValueDim->setText(dim);
+
+  ui->labelIntervalMaxValueDim->setText(dim);
+  ui->labelIntervalAvgValueDim->setText(dim);
+  ui->labelIntervalMinValueDim->setText(dim);
+  ui->labelIntervalDiffValueDim->setText(dim);
+}
+
+int CurveDetailsGroupBox::currentSelPointIndex() const
+{
+  return m_currentIndex;
+}
+
+void CurveDetailsGroupBox::setCurrentSelPointIndex(int currentIndex)
+{
+  m_currentIndex = currentIndex;
+
+  if ((m_currentIndex != -1) && (m_curve != NULL))
+  {
+    QString selValue = QString::number(m_curve->sample(m_currentIndex).y(), 'f', 6);
+    ui->labelCurrentValue->setText(selValue);
+  }
 }
 
 long CurveDetailsGroupBox::endInterval() const
 {
-    return m_endInterval;
+  return m_endSelectionValue;
 }
 
 void CurveDetailsGroupBox::updateData()
 {
-    if(m_curve==0)
-        return;
+  if(m_curve == 0)
+    return;
 
-    QString cl("background:%1;");
-    ui->pushButtonColor->setStyleSheet(cl.arg(m_curve->pen().color().name()));
-    ui->pushButtonColor->update();
+  setTitle(m_curve->title().text());
+  ui->labelTitle->setText(m_curve->title().text());
 
-    setTitle(m_curve->title().text());
-    ui->labelTitle->setText(m_curve->title().text());
+  calcStats(false);
+}
 
-    double max=-2147483647, min=2147483647;
-    double startVal, endVal;
-    QString sMax, sMean, sMin, sCount;
-    long startIdx = 0;
-    long endIdx = m_curve->dataSize() - 1;
-    long count = m_curve->dataSize();
+void CurveDetailsGroupBox::calcStats(bool hasSelection)
+{  
+  QString sMax, sAvg, sMin, sDiff, sCount;
+  long startIdx = 0;
+  long endIdx = m_curve->dataSize() - 1;
+  long count = m_curve->dataSize();
 
-    if (startIdx > endIdx)
+  if (hasSelection)
+  {
+    findSelectionPointIdxs(startIdx, endIdx);
+    count = endIdx - startIdx;
+  }
+
+  bool validIndexes = (startIdx != -1) && (endIdx != -1);
+  if (! validIndexes || (startIdx > endIdx))
+  {
+    // ни одна точка не попала в выделенный интервал
+    sMax = sAvg = sMin = sDiff = sCount = "-";
+  }
+  else
+  {
+    double max, min;
+    double startVal = max = min = m_curve->sample(startIdx).y();
+    double avgVal = startVal / count;
+    for(long i = startIdx + 1; i <= endIdx; i++)
     {
-        // ни одна точка не попала в выделенный интервал
-        sMax = sMean = sMin = "-";
-    }
-    else
-    {
-        startVal = max = min = m_curve->sample(startIdx).y();
-        endVal = m_curve->sample(endIdx).y();
-        double sumVal = startVal/count;
-        for(long i = startIdx + 1; i <= endIdx; i++)
-        {
-            double y = m_curve->sample(i).y();
-            sumVal+=y/count;
-            if (y > max)
-                max = y;
-            else if (y < min)
-                min = y;
-        }
-
-        sMax = QString::number(max, 'f', 6);
-        sMin = QString::number(min, 'f', 6);
-        sMean = QString::number(sumVal, 'f', 6);
-        sCount = QString::number(count);
+      double y = m_curve->sample(i).y();
+      avgVal += y / count;
+      if (y > max)
+        max = y;
+      else if (y < min)
+        min = y;
     }
 
+    sMax = QString::number(max, 'f', 6);
+    sMin = QString::number(min, 'f', 6);
+    sAvg = QString::number(avgVal, 'f', 6);
+    sDiff = QString::number(qAbs(max - min), 'f', 6);
+    sCount = QString::number(count);
+  }
+
+  if (hasSelection)
+  {
+    ui->labelIntervalDiffValue->setText(sDiff);
+    ui->labelIntervalMaxValue->setText(sMax);
+    ui->labelIntervalAvgValue->setText(sAvg);
+    ui->labelIntervalMinValue->setText(sMin);
+    ui->labelIntervalCountPointValue->setText(sCount);
+  }
+  else
+  {
     ui->labelMaxValue->setText(sMax);
-    ui->labelAvgValue->setText(sMean);
+    ui->labelAvgValue->setText(sAvg);
     ui->labelMinValue->setText(sMin);
     ui->labelCountPoint->setText(sCount);
+  }
 }
 
-void CurveDetailsGroupBox::calcIntervals()
+void CurveDetailsGroupBox::updateCurveColor()
 {
-    if(m_curve==0)
-        return;
+  if(m_curve == NULL)
+    return;
 
-    double max=-2147483647, min=2147483647;
-    QString sMax, sMean, sMin, sCount;
-    long count = 0;
-    double sumVal = 0;
+  QColor color = m_curve->pen().color();
 
-    for(long i = 0; i < m_curve->dataSize()-1; i++)
-    {
-        if(m_beginInterval<m_curve->sample(i).x())
-        {
-            if(m_endInterval<m_curve->sample(i).x())
-                break;
-
-            double y = m_curve->sample(i).y();
-            count++;
-            sumVal+=y/count;
-            if (y > max)
-                max = y;
-            else if (y < min)
-                min = y;
-        }
-    }
-
-    if(count!=0)
-    {
-        sMax = QString::number(max, 'f', 6);
-        sMin = QString::number(min, 'f', 6);
-        sMean = QString::number(sumVal, 'f', 6);
-        sCount = QString::number(count);
-    }
-    else
-    {
-        sMax = "-";
-        sMin ="-";
-        sMean = "-";
-        sCount = QString::number(count);
-    }
-
-    ui->labelMaxValue_2->setText(sMax);
-    ui->labelAvgValue_2->setText(sMean);
-    ui->labelMinValue_2->setText(sMin);
-    ui->labelCountPoint_2->setText(sCount);
-}
-
-void CurveDetailsGroupBox::calcCurrentValuesData()
-{
-    if(m_curve==0)
-        return;
-    if(m_currentIndex==-1)
-        return;
-
-    QPointF cur = m_curve->sample(m_currentIndex);
-    ui->labelCurentValue->setText(QString::number(cur.y(),'f', 6));
-
-    if(m_minValue!=0 || m_maxValue!=0)
-    {
-        ui->labelForMaxValue->setText(QString::number(m_maxValue - cur.y(),'f', 6));
-        ui->labelForMinValue->setText(QString::number(cur.y() - m_minValue, 'f', 6));
-    }
-
-}
-
-void CurveDetailsGroupBox::changeColor()
-{
-    if(m_curve!=0)
-    {
-        QColor color;
-        if(m_curve->pen().color()==Qt::black)
-            color = QColorDialog::getColor(Qt::white,this);
-        else
-            color = QColorDialog::getColor(m_curve->pen().color(),this);
-        if(color.isValid())
-        {
-            m_curve->setPen(QPen(color));
-
-
-            QString cl("background:%1;");
-            ui->pushButtonColor->setStyleSheet(cl.arg(color.name()));
-            ui->pushButtonColor->update();
-            emit colorChanged(color);
-        }
-    }
-
+  QString cl("background-color:%1;");
+  ui->label_curveColor->setStyleSheet(cl.arg(color.name()));
+  ui->label_curveColor->update();
 }
 
 void CurveDetailsGroupBox::setCurveVisible(bool b)
 {
-    if(m_curve!=0)
+  if(m_curve != 0)
+  {
+    m_curve->setVisible(b);
+    emit visibledChanged(b);
+  }
+}
+
+void CurveDetailsGroupBox::findSelectionPointIdxs(long &begin, long &end)
+{
+  begin = -1;
+  end = -1;
+  for(long i = 0; i < m_curve->dataSize() - 1; i++)
+  {
+    double curValueX = m_curve->sample(i).x();
+    if (begin == -1)
     {
-        m_curve->setVisible(b);
-        emit visibledChanged(b);
+      if(m_beginSelectionValue <= curValueX)
+        begin = i;
+      else
+        continue;
     }
+
+    if(curValueX >= m_endSelectionValue)
+    {
+      end = i - 1;
+      break;
+    }
+  }
 }

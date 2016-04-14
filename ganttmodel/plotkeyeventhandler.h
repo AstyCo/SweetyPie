@@ -3,11 +3,11 @@
 
 #include <QObject>
 
-class PlotKeyEventHander : public QObject
+class PlotKeyEventHandler : public QObject
 {
   Q_OBJECT
 public:
-  explicit PlotKeyEventHander(QObject *parent = 0);
+  explicit PlotKeyEventHandler(QObject *parent = 0);
 
 protected:
   bool eventFilter(QObject *obj, QEvent *event);

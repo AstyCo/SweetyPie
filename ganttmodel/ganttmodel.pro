@@ -16,6 +16,9 @@ DEFINES += QWT_DLL
 #DLLDESTDIR = $$OUT_PWD/
 TARGET = ganttmodel
 
+DESTDIR = $$OUT_PWD/../bin
+DLLDESTDIR = $$DESTDIR
+
 # пути к зависимым библиотекам
 unix {
   DEP_PATH_LIBS = /usr/lib64
@@ -27,25 +30,23 @@ unix {
 
 LIBS += -L$${DEP_PATH_LIBS}
 
-win32 {
-  CONFIG(release, debug|release) {
-    LIBS += -lextensions -lqwt
-  } else:CONFIG(debug, debug|release) {
-    LIBS += -lextensionsd -lqwtd
-  }
-} else:unix {
-  CONFIG(release, debug|release) {
-    LIBS += -lextensions -lqwt
-  } else:CONFIG(debug, debug|release) {
-    LIBS += -lextensionsd -lqwt
+CONFIG(release, debug|release) {
+  LIBS += -lextensions -lqwt
+} else:CONFIG(debug, debug|release) {
+  LIBS += -lextensionsd -lqwt
+  unix {
+    LIBS += -lqwt
+  } else:win32 {
+    LIBS += -lqwtd
   }
 }
+
 
 INCLUDEPATH += $${DEP_PATH_HEADERS}/extensions
 DEPENDPATH += $${DEP_PATH_HEADERS}/extensions
 
 # qwt
-INCLUDEPATH += $${DEP_PATH_HEADERS}/qwt
+INCLUDEPATH += $${DEP_PATH_HEADERS}
 
 DEFINES += GANTTMODEL_LIBRARY
 
@@ -69,11 +70,13 @@ SOURCES += \
     curvedetailsgroupbox.cpp \
     intervalslider.cpp \
     plotinterval.cpp \
-    plotmagnifierx.cpp \
-    plotkeyeventhander.cpp \
-    verticalscrollarea.cpp \
     chartsgroupwidget.cpp \
-    chartactionstoolbar.cpp
+    chartactionstoolbar.cpp \
+    plotkeyeventhandler.cpp \
+    chartsettingsdlg.cpp \
+    chartsettings.cpp \
+    plotnavigator.cpp \
+    intervalselectionmodel.cpp
 
 HEADERS += \
     ganttmodel.h \
@@ -96,11 +99,13 @@ HEADERS += \
     curvedetailsgroupbox.h \
     intervalslider.h \
     plotinterval.h \
-    plotmagnifierx.h \
-    plotkeyeventhander.h \
-    verticalscrollarea.h \
     chartsgroupwidget.h \
-    chartactionstoolbar.h
+    chartactionstoolbar.h \
+    plotkeyeventhandler.h \
+    chartsettingsdlg.h \
+    chartsettings.h \
+    plotnavigator.h \
+    intervalselectionmodel.h
 
 
 RESOURCES += \
@@ -109,6 +114,7 @@ RESOURCES += \
 FORMS += \
     chartwidget.ui \
     curvedetailsgroupbox.ui \
-    chartsgroupwidget.ui
+    chartsgroupwidget.ui \
+    chartsettingsdlg.ui
 
 include(build_config.pri)

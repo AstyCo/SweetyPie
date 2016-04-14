@@ -19,8 +19,6 @@ INSTALL_HEADERS_PATH = $${INSTALL_PREFIX}/include/$${TARGET}
 CONFIG(debug, debug|release):TARGET = $$join(TARGET,,,d)
 
 win32:TARGET_EXT=.dll
-# Скопировать библиотеку в рабочую директорию сборки(для доступа к ней тестового приложения)
-DLLDESTDIR = $$OUT_PWD/
 
 target.path   = $${INSTALL_LIB_PATH}
 
