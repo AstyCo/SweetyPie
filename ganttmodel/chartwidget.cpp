@@ -111,6 +111,7 @@ ChartWidget::ChartWidget(QWidget * parent) :
 
   m_selectedPointIndex = CurveIndex();
   m_selectionState = ssNone;
+  m_hasSelection = false;
 
   setPanelCurveDetailsVisible(true);
 
@@ -121,6 +122,7 @@ ChartWidget::ChartWidget(QWidget * parent) :
   m_timerOnline = new QTimer(this);
   m_timerOnline->setInterval(1000);
   connect(m_timerOnline, SIGNAL(timeout()), this, SLOT(fullReplot()));
+  connect(m_timerOnline, SIGNAL(timeout()), this, SLOT(calcDetailsPanel()));
 }
 
 ChartWidget::~ChartWidget()
@@ -702,12 +704,15 @@ QList<QwtPlotCurve *> ChartWidget::curves() const
 
 void ChartWidget::startOnlineReplot()
 {
-  onAction_TimerOnline_toggled(true);
+  //onAction_TimerOnline_toggled(true);
+  getActionsToolBar()->getChartAction(caTimer)->setChecked(true);
 }
 
 void ChartWidget::stopOnlineReplot()
 {
-  onAction_TimerOnline_toggled(false);
+  //onAction_TimerOnline_toggled(false);
+  //getActionsToolBar()->onToolButton_TimerOnline_toggled(false);
+  getActionsToolBar()->getChartAction(caTimer)->setChecked(false);
 }
 
 QList<PlotInterval *> ChartWidget::intervals() const
@@ -758,6 +763,7 @@ void ChartWidget::createActionsToolBar()
   connect(m_actionsToolBar->getChartAction(caClear), SIGNAL(triggered(bool)), SLOT(fullReplot()));
   connect(m_actionsToolBar->getChartAction(caDetailsPanel), SIGNAL(toggled(bool)), SLOT(onAction_panelCurveDetails_toggled(bool)));
   connect(m_actionsToolBar->getChartAction(caSettingsDlg), SIGNAL(triggered(bool)), SLOT(onAction_chartSettings_triggered()));
+  connect(m_actionsToolBar->getChartAction(caTimer),SIGNAL(toggled(bool)),this,SLOT(onAction_TimerOnline_toggled(bool)));
   m_actionsToolBar->setChartActions(QSet<ChartActions>()
                     << caScale
                     << caGrid
@@ -915,7 +921,7 @@ void ChartWidget::calcDetailsPanel()
       details->setInterval(stats.intervalBeginValue.x(), stats.intervalEndValue.x());
     }
     else
-      details->setInterval(0, 0);
+      details->calcStats(false);
 
     details->setIntervalLabelsVisible(m_hasSelection);
   }
@@ -1048,8 +1054,11 @@ void ChartWidget::updateData(int indexCurve, const QVector<QPointF> &data)
 
   m_curves[indexCurve]->setSamples(trimData(data));
 
-  if(!m_timerOnline->isActive())
+  if(!getActionsToolBar()->getChartAction(caTimer)->isVisible())
+  {
+    calcDetailsPanel();
     fullReplot();
+  }
 }
 
 void ChartWidget::setPanelCurveDetailsVisible(bool vis)

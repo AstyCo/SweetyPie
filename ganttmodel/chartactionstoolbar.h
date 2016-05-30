@@ -38,7 +38,7 @@ private:
 
   void initActions();
 
-private slots:
+public slots:
   void onToolButton_TimerOnline_toggled(bool checked);
 };
 
