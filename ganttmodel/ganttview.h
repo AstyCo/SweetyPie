@@ -3,7 +3,7 @@
 
 #include <QSplitter>
 #include <QToolBar>
-#include "gantttreeview.h"
+#include "QTreeView.h"
 #include "ganttgraphicsview.h"
 #include "ganttgraphicsscene.h"
 #include "QVBoxLayout"
@@ -37,8 +37,8 @@ public:
     GanttModel *model() const;
     void setModel(GanttModel *model);
 
-    GanttTreeView *treeview() const;
-    void setTreeview(GanttTreeView *treeview);
+    QTreeView *treeview() const;
+    void setTreeview(QTreeView *treeview);
 
     void ShowOnlyPlayer(bool flag);
 
@@ -49,7 +49,7 @@ private:
     //QGraphicsScene * createScene(QAbstractItemModel * model); // тут будет происходить отрисовка сцены на основе данных модели
                                                             // хотя решил передавать указатель на модель в сам конструктор сцены
 
-    GanttTreeView      * m_treeview;
+    QTreeView      * m_treeview;
     GanttGraphicsView  * m_graphicsview;
     GanttGraphicsScene * m_graphicsscene;
     GanttModel         * m_model;

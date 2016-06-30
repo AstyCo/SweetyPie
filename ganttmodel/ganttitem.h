@@ -14,25 +14,6 @@
 class GANTTMODELSHARED_EXPORT  GanttItem
 {
 public:
-    //========etm==============
-//    GanttItem(const QVector<QVariant> &data, GanttItem *parent = 0);
-//    ~GanttItem();
-
-//    GanttItem *child(int number);
-//    int childCount() const;
-//    int columnCount() const;
-//    QVariant data(int column) const;
-//    bool insertChildren(int position, int count, int columns);
-//    bool insertColumns(int position, int columns);
-//    GanttItem *parent();
-//    bool removeChildren(int position, int count);
-//    bool removeColumns(int position, int columns);
-//    int childNumber() const;
-//    bool setData(int column, const QVariant &value);
-    //==========================
-
-    //=======timelog2============
-    //explicit GanttItem(const QString &name=QString(), QDateTime begin, QDateTime end, bool done=false, GanttItem *parent=0);
     explicit GanttItem(const QString &name=QString(),
                        QDateTime begin = QDateTime::currentDateTime(),
                        QDateTime end= QDateTime::currentDateTime(),
@@ -41,9 +22,9 @@ public:
 
     QString name() const { return m_name; }
     void setName(const QString &name) { m_name = name; }
-//    QString title() const { return m_title; }
-//    void setTitle(const QString &title) { m_title = title; }
-    bool isDone() const { return m_done; }
+
+
+    bool isVisible() const { return m_done; }
     void setDone(bool done) { m_done = done; }
     QList<QPair<QDateTime, QDateTime> > dateTimes() const
         { return m_dateTimes; }
@@ -74,16 +55,10 @@ public:
     QDateTime end();// { return m_commonEnd; }
     QString duration();// { return m_commonDuration; }
 
-    //QList<GanttItemStage*> stageList() { return m_stageList; }
-
-
-    //GanttItem(QDateTime begin, QDateTime end, GanttItem::ItemType type);
-
     enum ItemType {Simple,          // элемент не объединяет детей и не зависит от них
                    Union,          // элемент объединяет детей и зависит от них
                    Multiunion};    // элемент состоит из частей, каждая из которых объединяет детей и зависит от них
 
-    //void addStage(QDateTime begin, QDateTime end);
 
 
     QDateTime commonBegin() const;
@@ -105,11 +80,6 @@ public:
     void setColor(const QColor &color);
 
 private:
-    //=======etm==========
-    //    QList<GanttItem*> childItems;
-    //    QVector<QVariant> itemData;
-//    GanttItem *parentItem;
-    //==============
 
     //======timelog2=====
     int minutesForTask(bool onlyForToday) const;

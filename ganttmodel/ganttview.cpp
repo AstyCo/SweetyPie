@@ -70,7 +70,7 @@ GanttView::GanttView(QWidget *parent) :
 
     m_splitter = new QSplitter(this);
 
-    m_treeview = new GanttTreeView();
+    m_treeview = new QTreeView();
     m_graphicsview = new GanttGraphicsView();
 
     //QTime midnight(0,0,0);
@@ -161,12 +161,12 @@ void GanttView::setModel(GanttModel *model)
 
     //connect(m_graphicsview->zoomSlider, SIGNAL(valueChanged(int)), m_player, SLOT(scaleSlot()));
 }
-GanttTreeView *GanttView::treeview() const
+QTreeView *GanttView::treeview() const
 {
     return m_treeview;
 }
 
-void GanttView::setTreeview(GanttTreeView *treeview)
+void GanttView::setTreeview(QTreeView *treeview)
 {
     m_treeview = treeview;
 }

@@ -47,6 +47,7 @@ DEPENDPATH += $${DEP_PATH_HEADERS}/extensions
 
 # qwt
 INCLUDEPATH += $${DEP_PATH_HEADERS}
+INCLUDEPATH += $${DEP_PATH_HEADERS}/qwt
 
 DEFINES += GANTTMODEL_LIBRARY
 
@@ -55,7 +56,6 @@ SOURCES += \
     ganttitem.cpp \
     ganttview.cpp \
     ganttgraphicsview.cpp \
-    gantttreeview.cpp \
 #    ganttitemstage.cpp \
     ganttgraphicsscene.cpp \
     ganttgraphicsitem.cpp \
@@ -83,7 +83,6 @@ HEADERS += \
     ganttitem.h \
     ganttview.h \
     ganttgraphicsview.h \
-    gantttreeview.h \
 #    ganttitemstage.h \
     ganttgraphicsscene.h \
     ganttgraphicsitem.h \

@@ -198,7 +198,7 @@ QVariant GanttModel::data(const QModelIndex &index, int role) const
             }
         }
         if (role == Qt::CheckStateRole && index.column() == Title)
-            return static_cast<int>(item->isDone() ? Qt::Checked
+            return static_cast<int>(item->isVisible() ? Qt::Checked
                                                    : Qt::Unchecked);
         if (role == Qt::TextAlignmentRole) {
             if (index.column() == Title)
