@@ -4,12 +4,12 @@
 #include <QList>
 #include <QVariant>
 #include <QVector>
-#include "ganttitemstage.h"
 
 #include <QDateTime>
 #include <QPair>
 #include <QString>
 #include "ganttmodel_global.h"
+#include <QColor>
 
 class GANTTMODELSHARED_EXPORT  GanttItem
 {

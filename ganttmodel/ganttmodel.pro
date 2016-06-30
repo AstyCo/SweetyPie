@@ -16,7 +16,7 @@ DEFINES += QWT_DLL
 #DLLDESTDIR = $$OUT_PWD/
 TARGET = ganttmodel
 
-DESTDIR = $$OUT_PWD/../bin
+DESTDIR = $$OUT_PWD
 DLLDESTDIR = $$DESTDIR
 
 # пути к зависимым библиотекам
@@ -33,7 +33,7 @@ LIBS += -L$${DEP_PATH_LIBS}
 CONFIG(release, debug|release) {
   LIBS += -lextensions -lqwt
 } else:CONFIG(debug, debug|release) {
-  LIBS += -lextensionsd -lqwt
+  LIBS += -lextensionsd
   unix {
     LIBS += -lqwt
   } else:win32 {

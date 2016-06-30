@@ -469,12 +469,12 @@ void ChartWidget::onCurvePointSelected(const QPointF &pos)
 
 QPointF ChartWidget::dtToPoint(const UtcDateTime &dt, double y)
 {
-  return QPointF(double(dt.toMicrosecondsSinceEpoch() / 1000), y);
+  return QPointF(double(dt.toMicrosecondsSinceEpoch() / TimeSpan::MICROSECONDS_IN_SECOND), y);
 }
 
 UtcDateTime ChartWidget::pointToDt(const QPointF &p)
 {
-  return UtcDateTime::fromMicrosecondsSinceEpoch((long long)p.x() * 1000);
+  return UtcDateTime::fromMicrosecondsSinceEpoch((long long)p.x() * TimeSpan::MICROSECONDS_IN_SECOND);
 }
 
 QVector<QPointF> ChartWidget::trimData(const QVector<QPointF> data) const
