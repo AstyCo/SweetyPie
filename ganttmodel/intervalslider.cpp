@@ -35,10 +35,6 @@ void IntervalSlider::setEndValue(int endValue)
     {
         _endValue=_maxValue;
     }
-//    if((getPoint(_endValue)-_handleSize/2)<(getPoint(_beginValue)+_handleSize/2))
-//    {
-//        _endValue=getValue(QPoint(getPoint(_beginValue)+_handleSize,0));
-//    }
 
     emit valueChanged(IntervalSlider::EndHandle,_endValue);
     repaint();
@@ -52,10 +48,6 @@ void IntervalSlider::setBeginValue(long beginValue)
 {
     _beginValue = beginValue;
 
-//    if((getPoint(_beginValue)+_handleSize/2)>(getPoint(_endValue)-_handleSize/2))
-//    {
-//        _beginValue=getValue(QPoint(getPoint(_endValue)-_handleSize,0));
-//    }
     if(_beginValue<_minValue)
     {
         _beginValue=_minValue;
@@ -77,14 +69,8 @@ void IntervalSlider::setMaxValue(long maxValue)
     {
         _endValue=_maxValue;
         emit valueChanged(IntervalSlider::EndHandle,_endValue);
-        repaint();
     }
-//    if((getPoint(_beginValue)+_handleSize/2)>(getPoint(_endValue)-_handleSize/2))
-//    {
-//        _beginValue=getValue(QPoint(getPoint(_endValue)-_handleSize,0));
-//        emit valueChanged(BeginHandle,_beginValue);
-//    }
-
+    repaint();
 }
 
 long IntervalSlider::minValue() const
@@ -100,13 +86,8 @@ void IntervalSlider::setMinValue(long minValue)
     {
         _beginValue=_minValue;
         emit valueChanged(IntervalSlider::BeginHandle,_beginValue);
-        repaint();
     }
-//    if((getPoint(_endValue)-_handleSize/2)<(getPoint(_beginValue)+_handleSize/2))
-//    {
-//        _endValue=getValue(QPoint(getPoint(_beginValue)+_handleSize,0));
-//        emit valueChanged(EndHandle,_endValue);
-//    }
+    repaint();
 }
 
 
@@ -114,12 +95,13 @@ void IntervalSlider::setMinValue(long minValue)
 
 long IntervalSlider::getValue(const QPoint &p) const
 {
-    return (((double)p.x()) / width() * _maxValue);
+    return _minValue+(((double)p.x()) / width() * (_maxValue-_minValue));
 }
 
 int IntervalSlider::getPoint(long value) const
 {
-    return ((double)value/(double)_maxValue *width());
+    long relativeValue = value-_minValue;
+    return (double)relativeValue/(double)(_maxValue-_minValue) * width();
 }
 
 void IntervalSlider::paintEvent(QPaintEvent *event)
