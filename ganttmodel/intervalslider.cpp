@@ -346,7 +346,6 @@ void IntervalSlider::mouseMoveEvent(QMouseEvent *e)
             if(endHandle()+deltaVal>m_maxValue)
             {
                 deltaVal=m_maxValue-endHandle();
-                val = beginHandle()+deltaVal;
             }
             moveHandles(deltaVal);
         }
@@ -361,8 +360,7 @@ void IntervalSlider::mouseMoveEvent(QMouseEvent *e)
             deltaVal = val-endHandle();
             if(beginHandle()+deltaVal<m_minValue)
             {
-                deltaVal=beginHandle()-m_minValue;
-                val = endHandle()+deltaVal;
+                deltaVal=-beginHandle()+m_minValue;
             }
             moveHandles(deltaVal);
         }
