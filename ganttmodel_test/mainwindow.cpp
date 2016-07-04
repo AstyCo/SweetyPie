@@ -49,7 +49,7 @@ void MainWindow::testChartWidget()
 
   ui->widgetIntervalSlider->setMinValue(0);
   ui->widgetIntervalSlider->setMaxValue(TimeSpan(ui->widget->maximumDt() - ui->widget->minimumDt()).totalSeconds());
-  ui->widgetIntervalSlider->setEndValue(ui->widgetIntervalSlider->maxValue());
+  ui->widgetIntervalSlider->setEndHandle(ui->widgetIntervalSlider->maxValue());
 
   connect(ui->widgetIntervalSlider, SIGNAL(valueChanged(IntervalSlider::EventHandle, long)), this, SLOT(setInterval()));
 
@@ -130,8 +130,8 @@ void MainWindow::testGanttModel()
 void MainWindow::setInterval()
 {
   UtcDateTime baseDt = ui->widget->minimumDt();
-  UtcDateTime rez1 = baseDt.addSecs(ui->widgetIntervalSlider->beginValue());
+  UtcDateTime rez1 = baseDt.addSecs(ui->widgetIntervalSlider->beginHandle());
 
-  UtcDateTime rez2 = baseDt.addSecs(ui->widgetIntervalSlider->endValue());
+  UtcDateTime rez2 = baseDt.addSecs(ui->widgetIntervalSlider->endHandle());
   ui->widget->setIntervalSelectionByDates(rez1, rez2);
 }

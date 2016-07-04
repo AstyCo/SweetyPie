@@ -1,125 +1,213 @@
 #include "intervalslider.h"
-#include "QPainter"
-#include "QStyle"
-#include "QStylePainter"
+
+#include <QPainter>
+#include <QStyle>
+#include <QStylePainter>
 
 #include <QKeyEvent>
-#include <QtGui>
+#include <QStyleOption>
+#include <QApplication>
+
+#include <QDebug>
 
 
 IntervalSlider::IntervalSlider(QWidget *parent) :
     QWidget(parent)
 {
-    _handleSize=12;
+    setOffsetV(7);
+    setSliderV(8);
+    setHandleSize(12);
 
-    _maxValue=100;
-    _minValue=0;
+    m_maxValue=100;
+    m_minValue=0;
 
-    _beginValue=_minValue;
-    _endValue=_maxValue;
+    m_beginValue=m_minValue;
+    m_endValue=m_maxValue;
 
-    _eventHandle = NoHandle;
+    m_clippedHandle = NoHandle;
 
-    connect(this,SIGNAL(valueChanged(IntervalSlider::EventHandle,long)),this,SLOT(repaint()));
-}
-int IntervalSlider::endValue() const
-{
-    return _endValue;
-}
+    connect(this,SIGNAL(valueChanged(ClippedHandle,long)),this,SLOT(repaint()));
 
-void IntervalSlider::setEndValue(int endValue)
-{
-    _endValue = endValue;
+    adjustSize();
 
-    if(_endValue>_maxValue)
-    {
-        _endValue=_maxValue;
-    }
-//    if((getPoint(_endValue)-_handleSize/2)<(getPoint(_beginValue)+_handleSize/2))
-//    {
-//        _endValue=getValue(QPoint(getPoint(_beginValue)+_handleSize,0));
-//    }
-
-    emit valueChanged(IntervalSlider::EndHandle,_endValue);
     repaint();
 }
-long IntervalSlider::beginValue() const
+long IntervalSlider::endHandle() const
 {
-    return _beginValue;
+    return m_endValue;
 }
 
-void IntervalSlider::setBeginValue(long beginValue)
+void IntervalSlider::setEndHandle(int endValue)
 {
-    _beginValue = beginValue;
+    if(m_endValue==endValue)
+        return;
 
-//    if((getPoint(_beginValue)+_handleSize/2)>(getPoint(_endValue)-_handleSize/2))
-//    {
-//        _beginValue=getValue(QPoint(getPoint(_endValue)-_handleSize,0));
-//    }
-    if(_beginValue<_minValue)
+//    qDebug() << "setEnd: "+QString::number(endValue);
+
+    m_endValue = endValue;
+
+    if(m_endValue>m_maxValue)
     {
-        _beginValue=_minValue;
+        m_endValue=m_maxValue;
+    }
+    if(m_endValue<m_beginValue)
+    {
+        m_endValue=m_beginValue;
     }
 
-    emit valueChanged(IntervalSlider::BeginHandle,_beginValue);
+    emit valueChanged(IntervalSlider::EndHandle,m_endValue);
+    emit endMoved(m_endValue);
+    repaint();
+}
+long IntervalSlider::beginHandle() const
+{
+    return m_beginValue;
+}
+
+void IntervalSlider::setBeginHandle(long beginValue)
+{
+    if(m_beginValue==beginValue)
+        return;
+
+//    qDebug() << "setBegin: "+QString::number(beginValue);
+
+    m_beginValue = beginValue;
+
+    if(m_beginValue<m_minValue)
+    {
+        m_beginValue=m_minValue;
+    }
+
+    if(m_endValue<m_beginValue)
+    {
+        m_beginValue=m_endValue;
+    }
+
+    emit valueChanged(IntervalSlider::BeginHandle,m_beginValue);
+    emit beginMoved(m_beginValue);
     repaint();
 }
 long IntervalSlider::maxValue() const
 {
-    return _maxValue;
+    return m_maxValue;
 }
 
 void IntervalSlider::setMaxValue(long maxValue)
 {
-    _maxValue = maxValue;
-
-    if(_endValue>_maxValue)
-    {
-        _endValue=_maxValue;
-        emit valueChanged(IntervalSlider::EndHandle,_endValue);
-        repaint();
-    }
-//    if((getPoint(_beginValue)+_handleSize/2)>(getPoint(_endValue)-_handleSize/2))
-//    {
-//        _beginValue=getValue(QPoint(getPoint(_endValue)-_handleSize,0));
-//        emit valueChanged(BeginHandle,_beginValue);
-//    }
-
+    if(m_maxValue == maxValue)
+        return;
+    m_maxValue = maxValue;
+    setEndHandle(m_maxValue);
+    repaint();
 }
 
 long IntervalSlider::minValue() const
 {
-    return _minValue;
+    return m_minValue;
 }
 
 void IntervalSlider::setMinValue(long minValue)
 {
-    _minValue = minValue;
+    if(m_minValue == minValue)
+        return;
 
-    if(_beginValue<_minValue)
+    m_minValue = minValue;
+    setBeginHandle(m_minValue);
+    repaint();
+}
+
+void IntervalSlider::setLimits(long minValue,long maxValue)
+{
+    setMinValue(minValue);
+    setMaxValue(maxValue);
+}
+
+int IntervalSlider::handleSize() const
+{
+    return m_handleH;
+}
+
+void IntervalSlider::setHandleSize(int new_handle_value)
+{
+    m_handleH = new_handle_value;
+    setMinimumWidth(2*m_handleH);
+    repaint();
+}
+
+void IntervalSlider::setSliderV(int new_sliderV)
+{
+    m_sliderV = new_sliderV;
+    setMinimumHeight(m_sliderV+2*m_offsetV);
+    setMaximumHeight(m_sliderV+2*m_offsetV);
+    repaint();
+}
+
+void IntervalSlider::setOffsetV(int new_offsetV)
+{
+    m_offsetV=new_offsetV;
+    setMinimumHeight(m_sliderV+2*m_offsetV);
+    setMaximumHeight(m_sliderV+2*m_offsetV);
+    repaint();
+}
+
+void IntervalSlider::repaint()
+{
+    return QWidget::repaint();
+}
+
+
+
+
+long IntervalSlider::pointToValue(const QPoint &p,ClippedHandle handle) const
+{
+//    qDebug() << "pointToValue";
+//    qDebug()<<p;
+
+    int x = p.x() - halfHandleH();
+    int offset;
+    long widthDiff = m_handleH +((handle==NoHandle)?(0):(m_handleH)),
+         relWidth= width() - widthDiff;
+    switch(handle)
     {
-        _beginValue=_minValue;
-        emit valueChanged(IntervalSlider::BeginHandle,_beginValue);
-        repaint();
+    case EndHandle:
+        offset = m_handleH;
+        break;
+    default:
+        offset = 0;
+        break;
     }
-//    if((getPoint(_endValue)-_handleSize/2)<(getPoint(_beginValue)+_handleSize/2))
-//    {
-//        _endValue=getValue(QPoint(getPoint(_beginValue)+_handleSize,0));
-//        emit valueChanged(EndHandle,_endValue);
-//    }
+    long relValue =((1.0*x-offset) / relWidth * (m_maxValue-m_minValue))+0.5;
+    if (relValue<0)
+        relValue=0;
+    if(relValue>m_maxValue-m_minValue)
+        relValue=m_maxValue-m_minValue;
+    return m_minValue+relValue;
 }
 
-
-
-
-long IntervalSlider::getValue(const QPoint &p) const
+int IntervalSlider::valueToPoint(long value,ClippedHandle handle) const
 {
-    return (((double)p.x()) / width() * _maxValue);
-}
+    long relativeValue = value-m_minValue;
+    int offset= halfHandleH();
+    long widthDiff = m_handleH +((handle==NoHandle)?(0):(m_handleH)),
+         relWidth= width() - widthDiff;
+    switch(handle)
+    {
+    case EndHandle:
+        offset+=m_handleH;
+        break;
+    default:
+        offset+=0;
+        break;
+    }
 
-int IntervalSlider::getPoint(long value) const
-{
-    return ((double)value/(double)_maxValue *width());
+    int relPoint = relativeValue*1.0/(m_maxValue-m_minValue) * relWidth;
+    if(relPoint<0)
+        relPoint=0;
+    if(relPoint>relWidth)
+        relPoint=relWidth;
+
+//    qDebug() << "point: "+ QString::number(offset+relPoint);
+    return offset+relPoint;
 }
 
 void IntervalSlider::paintEvent(QPaintEvent *event)
@@ -134,129 +222,181 @@ void IntervalSlider::paintEvent(QPaintEvent *event)
     drawSlider( &painter, opt.rect );
 }
 
-void IntervalSlider::drawHandle(QPainter *painter, const QRect &sliderRect, int pos, EventHandle handle) const
+void IntervalSlider::drawHandle(QPainter *painter, const QRect &sliderRect, int pos, ClippedHandle handle) const
 {
-    const int bw = 1;
+    QPalette::ColorRole handleRole,handleLineRole;
+    QColor color;
 
-    int x;
-    if (handle == BeginHandle)
-      x = pos;
-    else if (handle == EndHandle)
-      x = pos - _handleSize;
+//    qDebug() << "pos: "+ QString::number(pos);
+
+    if(handle == m_clippedHandle || (QApplication::keyboardModifiers()&Qt::ShiftModifier))
+    {
+        handleRole = QPalette::Mid;
+        handleLineRole = QPalette::Button;
+    }
     else
-      return;
+    {
+        handleRole = QPalette::Button;
+        handleLineRole = QPalette::Mid;
+    }
+    int handlePos = pos- halfHandleH();
+
 
     QRect handleRect(
-                x,
+                handlePos,
                 sliderRect.y(),
-                _handleSize,
+                m_handleH,
                 sliderRect.height()
                 );
 
+    int borderWidth = 1;
+
+
+//    qDebug() << palette().color(darkerThanHandleRole);
+    painter->setPen(palette().color(handleLineRole));
+    painter->setBrush(palette().color(handleRole));
+
     qDrawShadePanel( painter,
-                     handleRect, palette(), false, bw,
-                     &palette().brush( QPalette::Button ) );
+                     handleRect, palette(), false, borderWidth,
+                     &palette().brush(handleRole) );
 
     int lineX = handleRect.center().x();
-    qDrawShadeLine( painter, lineX, sliderRect.top() + bw,
-                    lineX, sliderRect.bottom() - bw,
-                    palette(), true, 1 );
+    QLineF handleMidLine(lineX, handleRect.top()+borderWidth,
+                         lineX, handleRect.bottom()-borderWidth);
+
+
+    painter->drawLine(handleMidLine);
+
+//    qDrawShadeLine( painter, lineX, handleRect.top()+borderWidth,
+//                    lineX, handleRect.bottom()-borderWidth,
+//                    palette(), true, 0, borderWidth );
 }
 
 void IntervalSlider::drawSlider(QPainter *painter, const QRect &sliderRect) const
 {
     QRect innerRect( sliderRect );
-
-
-    int ws = 8;
-    int ds = _handleSize / 2; //- 8;
-    if ( ds < 1 )
-        ds = 1;
+    int sliderV = m_sliderV,
+        sliderH = innerRect.width();
 
     QRect rSlot;
 
-    if ( innerRect.height() & 1 )
-        ws++;
-
-    rSlot = QRect( innerRect.x() + ds,
-                   innerRect.y() + ( innerRect.height() - ws ) / 2,
-                   innerRect.width() - 2 * ds, ws );
+    rSlot = QRect( innerRect.x() + halfHandleH(),
+                   innerRect.y() + m_offsetV,
+                   sliderH - 2 * halfHandleH(), sliderV );
 
 
     QBrush brush = palette().brush( QPalette::Dark );
     qDrawShadePanel( painter, rSlot, palette(), true, 1 , &brush );
 
-    drawHandle( painter, innerRect, getPoint(_beginValue), BeginHandle);
-    drawHandle( painter, innerRect, getPoint(_endValue), EndHandle);
+    drawHandle( painter, innerRect, valueToPoint(m_beginValue,BeginHandle), BeginHandle);
+    drawHandle( painter, innerRect, valueToPoint(m_endValue,EndHandle), EndHandle);
 
 }
 
 void IntervalSlider::keyPressEvent(QKeyEvent *e)
 {
-    return;
+    if(e->modifiers() & Qt::ShiftModifier)
+    {
+        repaint();
+    }
+}
+
+void IntervalSlider::keyReleaseEvent(QKeyEvent *e)
+{
+    if(e->key() == Qt::Key_Shift)
+    {
+        repaint();
+    }
+}
+
+int IntervalSlider::halfHandleH() const {return m_handleH/2;}
+
+void IntervalSlider::moveHandles(long deltaVal)
+{
+    if(!deltaVal)
+        return;
+    if(deltaVal>0)
+    {
+        setEndHandle(endHandle()+deltaVal);
+        setBeginHandle(beginHandle()+deltaVal);
+    }
+    else
+    {
+        setBeginHandle(beginHandle()+deltaVal);
+        setEndHandle(endHandle()+deltaVal);
+    }
 }
 
 void IntervalSlider::wheelEvent(QWheelEvent *e)
 {
+    Q_UNUSED(e);
     return;
 }
 
 void IntervalSlider::mouseMoveEvent(QMouseEvent *e)
 {
-    int val = getValue(e->pos());
-    if(_eventHandle==BeginHandle)
-    {
-        if(val<_minValue)
-          _beginValue = _minValue;
-        else if((getPoint(val)+_handleSize)>(getPoint(_endValue)-_handleSize))
-          return;
-        else if(val>_maxValue)
-          _beginValue = _maxValue;
-        else
-          _beginValue = val;
+    long val,deltaVal;
 
-        emit valueChanged(IntervalSlider::BeginHandle, _beginValue);
+    if(m_clippedHandle==BeginHandle)
+    {
+        val = pointToValue(e->pos(),BeginHandle);
+        if(QApplication::keyboardModifiers()&Qt::ShiftModifier)
+        {
+            deltaVal = val-beginHandle();
+            if(endHandle()+deltaVal>m_maxValue)
+            {
+                deltaVal=m_maxValue-endHandle();
+                val = beginHandle()+deltaVal;
+            }
+            moveHandles(deltaVal);
+        }
+        else
+            setBeginHandle(val);
     }
-    else if(_eventHandle==EndHandle)
+    else if(m_clippedHandle==EndHandle)
     {
-        if(val>_maxValue)
-          _endValue = _maxValue;
-        else if((getPoint(val)-_handleSize)<(getPoint(_beginValue)+_handleSize))
-          return;
-        else if(val<_minValue)
-          _endValue = _minValue;
+        val = pointToValue(e->pos(),EndHandle);
+        if(QApplication::keyboardModifiers()&Qt::ShiftModifier)
+        {
+            deltaVal = val-endHandle();
+            if(beginHandle()+deltaVal<m_minValue)
+            {
+                deltaVal=beginHandle()-m_minValue;
+                val = endHandle()+deltaVal;
+            }
+            moveHandles(deltaVal);
+        }
         else
-          _endValue = val;
-
-        emit valueChanged(IntervalSlider::EndHandle, _endValue);
+            setEndHandle(val);
     }
 }
 
 void IntervalSlider::mouseReleaseEvent(QMouseEvent *e)
 {
     mouseMoveEvent(e);
-    _eventHandle=NoHandle;
+    m_clippedHandle=NoHandle;
+    repaint();
 }
 
 void IntervalSlider::mousePressEvent(QMouseEvent *e)
 {
         const QPoint &p = e->pos();
 
-        long beginSlpiter1 = getPoint(_beginValue);
-        long beginSlpiter2 = beginSlpiter1 + _handleSize;
+        int beginSpliter1 = valueToPoint(m_beginValue,BeginHandle)-halfHandleH(),
+            beginSpliter2 = beginSpliter1 + m_handleH;
 
-        long endSlpiter2 = getPoint(_endValue);
-        long endSlpiter1 = endSlpiter2 - _handleSize;
+        int endSpliter1 = valueToPoint(m_endValue,EndHandle)-halfHandleH(),
+             endSpliter2 = endSpliter1 + m_handleH;
 
-        if(p.x()>beginSlpiter1 && p.x()<beginSlpiter2)
+        if(p.x()>beginSpliter1 && p.x()<beginSpliter2)
         {
-            _eventHandle=BeginHandle;
+            m_clippedHandle=BeginHandle;
         }
-        else if(p.x()>endSlpiter1 && p.x()<endSlpiter2)
+        else if(p.x()>endSpliter1 && p.x()<endSpliter2)
         {
-            _eventHandle=EndHandle;
+            m_clippedHandle=EndHandle;
         }
         else
-            _eventHandle=NoHandle;
+            m_clippedHandle=NoHandle;
     return;
 }
