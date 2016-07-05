@@ -59,6 +59,7 @@ public:
 
     void keyPressEvent(QKeyEvent *e);
     void keyReleaseEvent(QKeyEvent *e);
+    int intervalSliderHeight() const;
 private:
     ClippedHandle m_clippedHandle;
 
@@ -69,8 +70,8 @@ private:
 
     int m_handleH,
         m_sliderV,
-        m_offsetV;
-
+        m_offsetV,
+        m_borderWidth;
 
     int halfHandleH() const;
     void moveHandles(long deltaVal);
