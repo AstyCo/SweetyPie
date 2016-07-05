@@ -4,7 +4,7 @@
 unix{
   INSTALL_PREFIX = /usr
   # Собирать сразу две версии (Debug и Release)
-  CONFIG += debug_and_release
+  CONFIG += debug_and_release debug_and_release_target
 
 } else:win32 {
   INSTALL_PREFIX = C:/

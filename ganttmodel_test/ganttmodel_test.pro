@@ -18,7 +18,7 @@ TEMPLATE = app
 
 #DEFINES += QWT_DLL
 
-DESTDIR = $$OUT_PWD
+DESTDIR = $$OUT_PWD/../bin
 
 unix:{    
     CONFIG += debug_and_release debug_and_release_target

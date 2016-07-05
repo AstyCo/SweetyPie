@@ -16,7 +16,7 @@ DEFINES += QWT_DLL
 #DLLDESTDIR = $$OUT_PWD/
 TARGET = ganttmodel
 
-DESTDIR = $$OUT_PWD
+DESTDIR = $$OUT_PWD/../bin
 DLLDESTDIR = $$DESTDIR
 
 # пути к зависимым библиотекам
