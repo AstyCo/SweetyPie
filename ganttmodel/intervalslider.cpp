@@ -17,6 +17,7 @@ IntervalSlider::IntervalSlider(QWidget *parent) :
     setOffsetV(7);
     setSliderV(8);
     setHandleSize(12);
+    m_borderWidth = 1;
 
     m_maxValue=100;
     m_minValue=0;
@@ -136,17 +137,21 @@ void IntervalSlider::setHandleSize(int new_handle_value)
 
 void IntervalSlider::setSliderV(int new_sliderV)
 {
+    if(m_sliderV == new_sliderV)
+        return;
     m_sliderV = new_sliderV;
-    setMinimumHeight(m_sliderV+2*m_offsetV);
-    setMaximumHeight(m_sliderV+2*m_offsetV);
+    setMinimumHeight(intervalSliderHeight());
+    setMaximumHeight(intervalSliderHeight());
     repaint();
 }
 
 void IntervalSlider::setOffsetV(int new_offsetV)
 {
+    if(m_offsetV == new_offsetV)
+        return;
     m_offsetV=new_offsetV;
-    setMinimumHeight(m_sliderV+2*m_offsetV);
-    setMaximumHeight(m_sliderV+2*m_offsetV);
+    setMinimumHeight(intervalSliderHeight());
+    setMaximumHeight(intervalSliderHeight());
     repaint();
 }
 
@@ -286,7 +291,7 @@ void IntervalSlider::drawSlider(QPainter *painter, const QRect &sliderRect) cons
 
 
     QBrush brush = palette().brush( QPalette::Dark );
-    qDrawShadePanel( painter, rSlot, palette(), true, 1 , &brush );
+    qDrawShadePanel( painter, rSlot, palette(), true, m_borderWidth , &brush );
 
     drawHandle( painter, innerRect, valueToPoint(m_beginValue,BeginHandle), BeginHandle);
     drawHandle( painter, innerRect, valueToPoint(m_endValue,EndHandle), EndHandle);
@@ -307,6 +312,11 @@ void IntervalSlider::keyReleaseEvent(QKeyEvent *e)
     {
         repaint();
     }
+}
+
+int IntervalSlider::intervalSliderHeight() const
+{
+    return m_sliderV+2*(m_offsetV+m_borderWidth);
 }
 
 int IntervalSlider::halfHandleH() const {return m_handleH/2;}
@@ -346,7 +356,6 @@ void IntervalSlider::mouseMoveEvent(QMouseEvent *e)
             if(endHandle()+deltaVal>m_maxValue)
             {
                 deltaVal=m_maxValue-endHandle();
-                val = beginHandle()+deltaVal;
             }
             moveHandles(deltaVal);
         }
@@ -361,8 +370,7 @@ void IntervalSlider::mouseMoveEvent(QMouseEvent *e)
             deltaVal = val-endHandle();
             if(beginHandle()+deltaVal<m_minValue)
             {
-                deltaVal=beginHandle()-m_minValue;
-                val = endHandle()+deltaVal;
+                deltaVal=-beginHandle()+m_minValue;
             }
             moveHandles(deltaVal);
         }
