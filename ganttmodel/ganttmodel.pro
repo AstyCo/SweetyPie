@@ -13,7 +13,6 @@ TEMPLATE = lib
 
 DEFINES += QWT_DLL
 
-#DLLDESTDIR = $$OUT_PWD/
 TARGET = ganttmodel
 
 DESTDIR = $$OUT_PWD/../bin
@@ -104,7 +103,8 @@ HEADERS += \
     chartsettingsdlg.h \
     chartsettings.h \
     plotnavigator.h \
-    intervalselectionmodel.h
+    intervalselectionmodel.h \
+    ganttitemstage.h
 
 
 RESOURCES += \
