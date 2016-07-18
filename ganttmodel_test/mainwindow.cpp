@@ -5,6 +5,9 @@
 #include <time.h>
 #include "utcdatetime.h"
 
+#include "memoryplanningwidget.hpp"
+#include "memoryscene.hpp"
+
 MainWindow::MainWindow(QWidget *parent) :
   QMainWindow(parent),
   ui(new Ui::MainWindow)
@@ -14,6 +17,7 @@ MainWindow::MainWindow(QWidget *parent) :
   testChartWidget();
   testChartGroupWidget();
   testGanttModel();
+  testMemoryPlanningWidget();
 }
 
 MainWindow::~MainWindow()
@@ -125,6 +129,45 @@ void MainWindow::testGanttModel()
 
   ui->ganttWidget->setModel(model);
   //ui->ganttWidget->ShowOnlyPlayer(true);
+}
+
+void MainWindow::testMemoryPlanningWidget()
+{
+    QList<MemoryItemPresentation> records;
+
+    int memoryPeaceLength,spaceBetweenUnits;
+
+    int vacantPos = 0;
+    int id = 1;
+
+    for(;;)
+    {
+        memoryPeaceLength = qrand()%100;
+        spaceBetweenUnits = qrand()%15;
+
+        MemoryItemPresentation newPeace;
+        vacantPos+=spaceBetweenUnits;
+        newPeace.m_start=vacantPos;
+        vacantPos+=memoryPeaceLength;
+
+        if(vacantPos>2047)
+            break;
+
+        newPeace.m_finish=vacantPos;
+        vacantPos+=1;
+
+        newPeace.m_state=static_cast<MemoryState>(qrand()%Memory::StateCount);
+        if(newPeace.m_state==Memory::Freed)
+            newPeace.m_unitId=0;
+        else
+        {
+            newPeace.m_unitId=id++;
+            records.push_back(newPeace);
+        }
+    }
+
+    ui->memoryPlanningWidget->scene()->init(records,2048);
+    ui->memoryPlanningWidget->show();
 }
 
 void MainWindow::setInterval()

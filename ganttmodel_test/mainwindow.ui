@@ -18,7 +18,7 @@
     <item row="0" column="0">
      <widget class="QTabWidget" name="tabWidget">
       <property name="currentIndex">
-       <number>0</number>
+       <number>3</number>
       </property>
       <widget class="QWidget" name="tab">
        <attribute name="title">
@@ -73,6 +73,16 @@
         </item>
        </layout>
       </widget>
+      <widget class="QWidget" name="tab_4">
+       <attribute name="title">
+        <string>Страница</string>
+       </attribute>
+       <layout class="QGridLayout" name="gridLayout_2">
+        <item row="0" column="0">
+         <widget class="MemoryPlanningWidget" name="memoryPlanningWidget" native="true"/>
+        </item>
+       </layout>
+      </widget>
      </widget>
     </item>
    </layout>
@@ -83,7 +93,7 @@
      <x>0</x>
      <y>0</y>
      <width>1032</width>
-     <height>26</height>
+     <height>21</height>
     </rect>
    </property>
   </widget>
@@ -112,6 +122,12 @@
    <class>GanttView</class>
    <extends>QWidget</extends>
    <header location="global">ganttview.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>MemoryPlanningWidget</class>
+   <extends>QWidget</extends>
+   <header>memoryplanningwidget.hpp</header>
    <container>1</container>
   </customwidget>
  </customwidgets>
