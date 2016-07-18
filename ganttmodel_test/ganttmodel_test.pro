@@ -52,9 +52,14 @@ unix {
 
 LIBS += -L$${DEP_PATH_LIBS}
 CONFIG(release, debug|release) {
-  LIBS += -lextensions
+  LIBS += -lextensions -lqwt
 } else:CONFIG(debug, debug|release) {
   LIBS += -lextensionsd
+  unix {
+    LIBS += -lqwt
+  } else:win32 {
+    LIBS += -lqwtd
+  }
 }
 
 INCLUDEPATH += $${DEP_PATH_HEADERS}/extensions

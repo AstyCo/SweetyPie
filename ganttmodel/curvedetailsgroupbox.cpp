@@ -4,7 +4,7 @@
 #include <QColorDialog>
 
 CurveDetailsGroupBox::CurveDetailsGroupBox(QwtPlotCurve *curve, QWidget *parent) :
-  QGroupBox(parent),
+  QFrame(parent),
   ui(new Ui::CurveDetailsGroupBox)
 {
   ui->setupUi(this);
@@ -15,7 +15,7 @@ CurveDetailsGroupBox::CurveDetailsGroupBox(QwtPlotCurve *curve, QWidget *parent)
 
   setDimensionsText(QString());
 
-  connect(this, SIGNAL(toggled(bool)), this, SLOT(setCurveVisible(bool)));
+  connect(ui->checkBox_title, SIGNAL(toggled(bool)), this, SLOT(setCurveVisible(bool)));
 
   updateCurveColor();
   updateData();
@@ -83,6 +83,20 @@ void CurveDetailsGroupBox::setDimensionsText(QString dim)
   ui->labelIntervalDiffValueDim->setText(dim);
 }
 
+void CurveDetailsGroupBox::setCurveCheckable(bool checkable)
+{
+  ui->checkBox_title->setCheckable(checkable);
+  if (checkable)
+  {
+    ui->checkBox_title->setStyleSheet(QString::null);
+    bool b = ui->checkBox_title->blockSignals(true);
+    ui->checkBox_title->setChecked(m_curve->isVisible());
+    ui->checkBox_title->blockSignals(b);
+  }
+  else
+    ui->checkBox_title->setStyleSheet("QCheckBox::indicator { width: 1px; height: 1px; }");
+}
+
 int CurveDetailsGroupBox::currentSelPointIndex() const
 {
   return m_currentIndex;
@@ -109,8 +123,10 @@ void CurveDetailsGroupBox::updateData()
   if(m_curve == 0)
     return;
 
-  setTitle(m_curve->title().text());
-  ui->labelTitle->setText(m_curve->title().text());
+  ui->checkBox_title->setText(m_curve->title().text());
+  bool b = ui->checkBox_title->blockSignals(true);
+  ui->checkBox_title->setChecked(m_curve->isVisible());
+  ui->checkBox_title->blockSignals(b);
 
   calcStats(false);
 }
@@ -187,6 +203,7 @@ void CurveDetailsGroupBox::updateCurveColor()
 
 void CurveDetailsGroupBox::setCurveVisible(bool b)
 {
+  ui->frameAllValues->setEnabled(b);
   if(m_curve != 0)
   {
     m_curve->setVisible(b);
@@ -198,7 +215,7 @@ void CurveDetailsGroupBox::findSelectionPointIdxs(long &begin, long &end)
 {
   begin = -1;
   end = -1;
-  for(long i = 0; i < m_curve->dataSize() - 1; i++)
+  for(long i = 0; i < long(m_curve->dataSize()) - 1; i++)
   {
     double curValueX = m_curve->sample(i).x();
     if (begin == -1)
@@ -209,10 +226,9 @@ void CurveDetailsGroupBox::findSelectionPointIdxs(long &begin, long &end)
         continue;
     }
 
+    end = i - 1;
+
     if(curValueX >= m_endSelectionValue)
-    {
-      end = i - 1;
       break;
-    }
   }
 }

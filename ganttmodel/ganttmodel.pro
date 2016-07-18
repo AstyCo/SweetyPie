@@ -13,7 +13,6 @@ TEMPLATE = lib
 
 DEFINES += QWT_DLL
 
-#DLLDESTDIR = $$OUT_PWD/
 TARGET = ganttmodel
 
 DESTDIR = $$OUT_PWD/../bin
@@ -123,7 +122,8 @@ HEADERS += \
     memoryplanningwidget/memoryunit.hpp \
     memoryplanningwidget/memoryview.hpp \
     memoryplanningwidget/memorywidget.hpp \
-    memoryplanningwidget/memoryplanningwidget.hpp
+    memoryplanningwidget/memoryplanningwidget.hpp \
+    ganttitemstage.h
 
 
 RESOURCES += \

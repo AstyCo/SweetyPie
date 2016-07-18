@@ -3,7 +3,7 @@
 
 #include <QSplitter>
 #include <QToolBar>
-#include "QTreeView.h"
+#include <QTreeView>
 #include "ganttgraphicsview.h"
 #include "ganttgraphicsscene.h"
 #include "QVBoxLayout"

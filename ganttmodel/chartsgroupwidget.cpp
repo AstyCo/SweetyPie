@@ -132,11 +132,11 @@ void ChartsGroupWidget::insertChart(int index, ChartWidget *chart)
   }
 
   connectChart(chart);
-
-  chart->setPanelCurveDetailsVisible(m_settings.detailsPanelVisible);
-  chart->setChartToolBarVisible(false);  
   ui->splitter_charts->insertWidget(index, chart);
   m_charts.insert(index, chart);
+  chart->updateChartSettings(m_settings);
+  chart->setPanelCurveDetailsVisible(m_settings.detailsPanelVisible);
+  chart->setChartToolBarVisible(false);  
 
   updateSelectionPanel();  
 }
@@ -182,10 +182,10 @@ void ChartsGroupWidget::onIntervalSelectionEnd(QPointF pos)
   updateSelectIntervalPanelDates(beginDt, endDt);
   setSelectionInterval(endDt - beginDt);
   QAction *selIntAct = m_actionsToolBar->getChartAction(caSelectInterval);
+
   bool b = selIntAct->blockSignals(true);
   selIntAct->setChecked(false);
   selIntAct->blockSignals(b);
-
   foreach (ChartWidget *cc, m_charts)
     if (cc != senderChart)
       cc->setIntervalSelectionEnd(pos);
@@ -395,7 +395,7 @@ void ChartsGroupWidget::connectChart(ChartWidget *chart)
   if (m_syncChartsByAxisX)
   {
     connect(chart, SIGNAL(pointSelected(CurveIndex)), SLOT(onPointSelected(CurveIndex)));
-    connect(chart, SIGNAL(intervalSelectionStarted(QPointF)), SLOT(onIntervalSelectionStart(QPointF)));
+    connect(chart, SIGNAL(intervalSelectionStarted(QPointF)), SLOT(onIntervalSelectionStart(QPointF)));    
     connect(chart, SIGNAL(intervalSelectionEnded(QPointF)), SLOT(onIntervalSelectionEnd(QPointF)));
     connect(chart, SIGNAL(targetingDtSet(UtcDateTime)), SLOT(onTargetingDtSet(UtcDateTime)));
     connect(chart, SIGNAL(scaleChanged(qreal,QPoint)), SLOT(onScaleChanged(qreal,QPoint)));
@@ -403,6 +403,7 @@ void ChartsGroupWidget::connectChart(ChartWidget *chart)
     connect(chart, SIGNAL(panned(int,int)), SLOT(onChartPanned(int,int)));
   }
 }
+
 bool ChartsGroupWidget::panelSelectIntervalVisible() const
 {
   return m_panelSelectIntervalVisible;
