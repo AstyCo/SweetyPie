@@ -5,6 +5,10 @@
 #include <time.h>
 #include "utcdatetime.h"
 
+#include <qwt/qwt_scale_div.h>
+#include "memoryplanningwidget.hpp"
+#include "memoryscene.hpp"
+
 MainWindow::MainWindow(QWidget *parent) :
   QMainWindow(parent),
   ui(new Ui::MainWindow)
@@ -14,6 +18,7 @@ MainWindow::MainWindow(QWidget *parent) :
   testChartWidget();
   testChartGroupWidget();
   testGanttModel();
+  testMemoryPlanningWidget();
 }
 
 MainWindow::~MainWindow()
@@ -26,15 +31,19 @@ void MainWindow::testChartWidget()
   srand(time(0));
   QVector<QPointF> data, data2;
   UtcDateTime baseDt = QDateTime::currentDateTime();
-  for(int i = 0; i < 100; i++)
+  for(int i = 0; i < 60; i++)
   {    
-    data.append(ChartWidget::dtToPoint(baseDt.addSecs(i * 60), (rand() % 100)));
+    data.append(ChartWidget::dtToPoint(baseDt.addSecs(i * 60), (rand() % 100)));    
+  }
+
+  for(int i = 60; i < 100; i++)
+  {
     data2.append(ChartWidget::dtToPoint(baseDt.addSecs(i * 65), (rand() % 1000) + 100));
   }
 
-  qDebug() << int(caScale | caGrid | caMaxMinLines | caTimer);
   ui->widget->getActionsToolBar()->setChartActions(QSet<ChartActions>()
-        << caScale << caGrid << caMaxMinLines << caTimer << caSelectInterval);
+        << caScale << caGrid << caMaxMinLines << caTimer << caSelectInterval
+                                                   << caDetailsPanel << caSettingsDlg);
   ui->widget->setLeftAxis("111111", 0, 0);
   ui->widget->setRightAxis("222222", 0, 800);
 
@@ -42,7 +51,7 @@ void MainWindow::testChartWidget()
 
   ui->widget->addZone("zone 1", data[0].x(), data[30].x(), QColor(229, 229, 229), QColor(187, 187, 187));
 
-  ui->widget->addZone("zone 2", data[60].x(), data[80].x(),  QColor(229, 229, 229), QColor(187, 187, 187));
+  //ui->widget->addZone("zone 2", data[60].x(), data[80].x(),  QColor(229, 229, 229), QColor(187, 187, 187));
 
   ui->widget->setData("11111111111111", data);
   ui->widget->setData("22222222222222", data2, QwtPlot::yRight);
@@ -82,6 +91,7 @@ void MainWindow::testChartGroupWidget()
   chart->setLeftAxis("Test Chart 3 norm");
   chart->setData("chart 3", data3);
   ui->widget_chartGroup->addChart(chart);
+  ui->widget_chartGroup->setSyncChartsByAxisX(false);
   ui->widget_chartGroup->setPanelSelectIntervalVisible(true);
 }
 
@@ -127,6 +137,45 @@ void MainWindow::testGanttModel()
   //ui->ganttWidget->ShowOnlyPlayer(true);
 }
 
+void MainWindow::testMemoryPlanningWidget()
+{
+    QList<MemoryItemPresentation> records;
+
+    int memoryPeaceLength,spaceBetweenUnits;
+
+    int vacantPos = 0;
+    int id = 1;
+
+    for(;;)
+    {
+        memoryPeaceLength = qrand()%100;
+        spaceBetweenUnits = qrand()%15;
+
+        MemoryItemPresentation newPeace;
+        vacantPos+=spaceBetweenUnits;
+        newPeace.m_start=vacantPos;
+        vacantPos+=memoryPeaceLength;
+
+        if(vacantPos>2047)
+            break;
+
+        newPeace.m_finish=vacantPos;
+        vacantPos+=1;
+
+        newPeace.m_state=static_cast<MemoryState>(qrand()%Memory::StateCount);
+        if(newPeace.m_state==Memory::Freed)
+            newPeace.m_unitId=0;
+        else
+        {
+            newPeace.m_unitId=id++;
+            records.push_back(newPeace);
+        }
+    }
+
+    ui->memoryPlanningWidget->scene()->init(records,2048);
+    ui->memoryPlanningWidget->show();
+}
+
 void MainWindow::setInterval()
 {
   UtcDateTime baseDt = ui->widget->minimumDt();
@@ -134,4 +183,21 @@ void MainWindow::setInterval()
 
   UtcDateTime rez2 = baseDt.addSecs(ui->widgetIntervalSlider->endHandle());
   ui->widget->setIntervalSelectionByDates(rez1, rez2);
+}
+
+void MainWindow::on_checkBox_syncAxisX_toggled(bool checked)
+{
+   ui->widget_chartGroup->setSyncChartsByAxisX(checked);
+}
+
+void MainWindow::on_pushButton_clicked()
+{
+   QwtScaleDiv *div = ui->widget->getPlot()->axisScaleDiv(QwtPlot::xBottom);
+   UtcDateTime begin(ChartWidget::pointToDt(QPointF(div->lowerBound(), 0)));
+   UtcDateTime end(ChartWidget::pointToDt(QPointF(div->upperBound(), 0)));
+   ui->widget->getPlot()->setAxisAutoScale(QwtPlot::xBottom, false);
+   ui->widget->getPlot()->setAxisScale(QwtPlot::xBottom, ChartWidget::dtToPoint(begin.addSecs(20 * 60), 0).x(),
+                                       ChartWidget::dtToPoint(end.addSecs(-20 * 60), 0).x());
+
+   ui->widget->getPlot()->replot();
 }

@@ -386,6 +386,7 @@ private:
 
   virtual void updateChartSettingsPrivate() { }
   void updateDetailsPanelsSelPoint();
+  void clearSelectedPoint();
 };
 
 #endif // CHARTWIDGET_H

@@ -12,7 +12,7 @@ namespace Ui {
 class CurveDetailsGroupBox;
 }
 
-class GANTTMODELSHARED_EXPORT CurveDetailsGroupBox : public QGroupBox
+class GANTTMODELSHARED_EXPORT CurveDetailsGroupBox : public QFrame
 {
     Q_OBJECT
 
@@ -30,6 +30,7 @@ public:
     void setIntervalLabelsVisible(bool vis);
 
     void setDimensionsText(QString dim);
+    void setCurveCheckable(bool checkable);
 
     int currentSelPointIndex() const;
     void setCurrentSelPointIndex(int currentSelPointIndex);

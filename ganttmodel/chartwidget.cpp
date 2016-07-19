@@ -113,7 +113,7 @@ ChartWidget::ChartWidget(QWidget * parent) :
   m_selectionState = ssNone;
   m_hasSelection = false;
 
-  setPanelCurveDetailsVisible(true);
+  setPanelCurveDetailsVisible(true);  
 
   createMenuIntervals();
   createMenuMaxMin();
@@ -130,11 +130,16 @@ ChartWidget::~ChartWidget()
   clearChart();
 }
 
+void ChartWidget::clearSelectedPoint()
+{
+  m_pMarker[0]->hide();
+  m_pMarker[1]->hide();
+}
+
 void ChartWidget::fullReplot()
 {
   // скрыть маркеры
-  m_pMarker[0]->hide();
-  m_pMarker[1]->hide();
+  clearSelectedPoint();
   m_pIntervalMarker[0]->hide();
   m_pIntervalMarker[1]->hide();
   m_pTargetingMarker->hide();
@@ -148,6 +153,9 @@ void ChartWidget::autoZoom()
   ui->m_plot->setAxisAutoScale(QwtPlot::yRight);
   ui->m_plot->setAxisAutoScale(QwtPlot::yLeft);
   ui->m_plot->replot();
+  ui->m_plot->setAxisAutoScale(QwtPlot::xBottom, false);
+  ui->m_plot->setAxisAutoScale(QwtPlot::yRight, false);
+  ui->m_plot->setAxisAutoScale(QwtPlot::yLeft, false);
   // установить новый масштаб в качестве базового
   m_navigator->setZoomBase(true);
 }
@@ -264,7 +272,7 @@ CurveIndex ChartWidget::findClosestPointAllCurves(const QPointF &pos, SearchDire
   {
     for(int j = 0; j < m_curves.count(); j++)
     {
-      if(m_curves[j]->isVisible())
+      if (m_curves[j]->isVisible() && m_curves[j]->dataSize() > 0)
       {
         bool isFind = false;
         for(long i = m_curves[j]->dataSize() - 1; i >= 0; i--)
@@ -302,7 +310,7 @@ CurveIndex ChartWidget::findClosestPointAllCurves(const QPointF &pos, SearchDire
   {
     for(int j = 0; j < m_curves.count(); j++)
     {
-      if(! m_curves[j]->isVisible())
+      if (! m_curves[j]->isVisible() || m_curves[j]->dataSize() == 0)
         continue;
 
       bool isFind = false;
@@ -341,7 +349,7 @@ CurveIndex ChartWidget::findClosestPointAllCurves(const QPointF &pos, SearchDire
   {
     for(int j = 0; j < m_curves.count(); j++)
     {
-      if(m_curves[j]->isVisible())
+      if (m_curves[j]->isVisible() && m_curves[j]->dataSize() > 0)
       {
         bool isFind = false;
         QPointF p, prev;
@@ -401,15 +409,24 @@ void ChartWidget::onCurvePointSelected(const QPointF &pos)
     if(!selPointIdx.isValid())
       return;
 
-    m_selectedPointIndex = selPointIdx;
-    if (m_curves.size() > 1)
+    if ((m_curves.size() > 1) && (m_selectedPointIndex.indexCurve != selPointIdx.indexCurve))
     {
-      for(int i = 0; i < m_curves.count(); i++)
+      if (m_selectedPointIndex.isValid())
       {
-        m_curves[i]->setPen(QPen(m_curves[i]->pen().color(), 0.8));
+        QwtPlotCurve *focusCurve = m_curves[m_selectedPointIndex.indexCurve];
+        QPen focusCurvePen = focusCurve->pen();
+        focusCurvePen.setWidth(focusCurvePen.width() - 1);
+        focusCurve->setPen(focusCurvePen);
       }
-      m_curves[m_selectedPointIndex.indexCurve]->setPen(QPen(m_curves[m_selectedPointIndex.indexCurve]->pen().color(), 2.4));
+
+      QwtPlotCurve *newFocusCurve = m_curves[selPointIdx.indexCurve];
+      QPen newFocusCurvePen = newFocusCurve->pen();
+      newFocusCurvePen.setWidth(newFocusCurvePen.width() + 1);
+      newFocusCurve->setPen(newFocusCurvePen);
     }
+
+    m_selectedPointIndex = selPointIdx;
+
     if(  m_pMinLeftMarker != 0 &&
          m_pMaxLeftMarker != 0)
     {
@@ -561,6 +578,10 @@ void ChartWidget::onAction_panelCurveDetails_toggled(bool checked)
 {
   m_settings.detailsPanelVisible = checked;
   ui->m_detailsPanel->setVisible(checked);
+  if (! checked)
+    ui->m_plot->insertLegend(new QwtLegend(), QwtPlot::RightLegend);
+  else
+    ui->m_plot->insertLegend(NULL);
 }
 
 void ChartWidget::onAction_grid_toggled(bool checked)
@@ -856,23 +877,16 @@ void ChartWidget::setCurveVisible(bool b)
 {
   if(!b)
   {
-    CurveDetailsGroupBox *curveDlg = (CurveDetailsGroupBox *)QObject::sender();
-    bool isFind = false;
-    for(int i = 0; i < m_curves.count(); i++)
-      if(m_curves[i] == curveDlg->curve())
-        if(m_selectedPointIndex.indexCurve == i)
-        {
-          isFind = true;
-          fullReplot();
-        }
+    if (m_selectedPointIndex.isValid())
+    {
+      CurveDetailsGroupBox *curveDlg = (CurveDetailsGroupBox *)QObject::sender();
+      int curveIdx = m_curves.indexOf(curveDlg->curve());
+      if (curveIdx == m_selectedPointIndex.indexCurve)
+        clearSelectedPoint();
+    }
+  }
 
-    if(!isFind)
-      ui->m_plot->replot();
-  }
-  else
-  {
-    ui->m_plot->replot();
-  }
+  ui->m_plot->replot();
 }
 
 void ChartWidget::setIntervalVisible(bool b)
@@ -937,7 +951,7 @@ void ChartWidget::setIntervalSelection(bool b)
   }
   else
   {
-    if(m_selectionState == ssIntervalEnd)
+    if (m_selectionState != ssNone)
       clearIntervalSelection();
 
     m_navigator->setZoomRectEnabled(true);
@@ -996,23 +1010,25 @@ void ChartWidget::setData(const QString &title, const QVector<QPointF> &data, Qw
   curve->setSamples(trimData(data));
   curve->attach(ui->m_plot);
 
-  if(m_curves.isEmpty())
+  if (curve->dataSize() > 0)
   {
-    m_beginLimit.indexCurve = m_curves.size();
-    m_beginLimit.indexPoint = 0;
-
-    m_endLimit.indexCurve = m_curves.size();
-    m_endLimit.indexPoint = curve->dataSize() - 1;
-  }
-  else
-  {
-    if(curve->sample(0).x() < m_curves[m_beginLimit.indexCurve]->sample(m_beginLimit.indexPoint).x())
+    if(! m_beginLimit.isValid())
+    {
+      m_beginLimit.indexCurve = m_curves.size();
+      m_beginLimit.indexPoint = 0;
+    }
+    else if(curve->sample(0).x() < m_curves[m_beginLimit.indexCurve]->sample(m_beginLimit.indexPoint).x())
     {
       m_beginLimit.indexCurve = m_curves.size();
       m_beginLimit.indexPoint = 0;
     }
 
-    if(curve->sample(curve->dataSize() - 1).x() > m_curves[m_endLimit.indexCurve]->sample(m_endLimit.indexPoint).x())
+    if (! m_endLimit.isValid())
+    {
+      m_endLimit.indexCurve = m_curves.size();
+      m_endLimit.indexPoint = curve->dataSize() - 1;
+    }
+    else if(curve->sample(curve->dataSize() - 1).x() > m_curves[m_endLimit.indexCurve]->sample(m_endLimit.indexPoint).x())
     {
       m_endLimit.indexCurve = m_curves.size();
       m_endLimit.indexPoint = curve->dataSize() - 1;
@@ -1024,9 +1040,10 @@ void ChartWidget::setData(const QString &title, const QVector<QPointF> &data, Qw
   stats.minValue = QPointF(curve->minXValue(), curve->minYValue());
 
   m_curves.append(curve);
-  m_curvesStats.append(stats);
+  m_curvesStats.append(stats);      
 
   CurveDetailsGroupBox * details = new CurveDetailsGroupBox(curve, this);
+  details->setCurveCheckable(m_curves.size() > 1);
   connect(details, SIGNAL(colorChanged(QColor)), ui->m_plot, SLOT(replot()));
   connect(details, SIGNAL(visibledChanged(bool)), this, SLOT(setCurveVisible(bool)));
   QVBoxLayout* lay = (QVBoxLayout*) ui->widgetDetail->layout();
@@ -1034,6 +1051,9 @@ void ChartWidget::setData(const QString &title, const QVector<QPointF> &data, Qw
 
 
   m_panelCurveDetailsList.append(details);
+
+  if (m_curves.size() == 2)
+    m_panelCurveDetailsList.first()->setCurveCheckable(true);
 
   calcDetailsPanel();
   fullReplot();
@@ -1320,7 +1340,9 @@ void ChartWidget::setIntervalSelectionEnd(QPointF pos)
   m_navigator->setZoomRectEnabled(true);
 
   QAction *selIntAct = m_actionsToolBar->getChartAction(caSelectInterval);
+  bool b = selIntAct->blockSignals(true);
   selIntAct->setChecked(false);
+  selIntAct->blockSignals(b);
   updateCurvesIntervalStats();
   calcDetailsPanel();
 }

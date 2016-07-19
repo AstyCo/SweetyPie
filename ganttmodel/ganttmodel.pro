@@ -7,13 +7,13 @@
 QT       += core gui
 
 
+
 VERSION = 0.5.5
 
 TEMPLATE = lib
 
 DEFINES += QWT_DLL
 
-#DLLDESTDIR = $$OUT_PWD/
 TARGET = ganttmodel
 
 DESTDIR = $$OUT_PWD/../bin
@@ -48,6 +48,7 @@ DEPENDPATH += $${DEP_PATH_HEADERS}/extensions
 # qwt
 INCLUDEPATH += $${DEP_PATH_HEADERS}
 INCLUDEPATH += $${DEP_PATH_HEADERS}/qwt
+INCLUDEPATH += $${PWD}/gantmodel/memoryplanningwidget
 
 DEFINES += GANTTMODEL_LIBRARY
 
@@ -56,11 +57,8 @@ SOURCES += \
     ganttitem.cpp \
     ganttview.cpp \
     ganttgraphicsview.cpp \
-#    ganttitemstage.cpp \
     ganttgraphicsscene.cpp \
     ganttgraphicsitem.cpp \
-#    ganttgraphicsitemstage.cpp \
-#    ganttdatetimegrid.cpp \
     ganttgraphicsheader.cpp \
     ganttgraphicsheaderrectitem.cpp \
     ganttdatetimedelegate.cpp \
@@ -76,7 +74,17 @@ SOURCES += \
     chartsettingsdlg.cpp \
     chartsettings.cpp \
     plotnavigator.cpp \
-    intervalselectionmodel.cpp
+    intervalselectionmodel.cpp \
+    memoryplanningwidget/labelitem.cpp \
+    memoryplanningwidget/memoryinteractiveunit.cpp \
+    memoryplanningwidget/memoryitem.cpp \
+    memoryplanningwidget/memoryitempresentation.cpp \
+    memoryplanningwidget/memorywidget.cpp \
+    memoryplanningwidget/memoryscene.cpp \
+    memoryplanningwidget/memorystatus.cpp \
+    memoryplanningwidget/memoryunit.cpp \
+    memoryplanningwidget/memoryview.cpp \
+    memoryplanningwidget/memoryplanningwidget.cpp
 
 HEADERS += \
     ganttmodel.h \
@@ -104,7 +112,19 @@ HEADERS += \
     chartsettingsdlg.h \
     chartsettings.h \
     plotnavigator.h \
-    intervalselectionmodel.h
+    intervalselectionmodel.h \
+    memoryplanningwidget/globalvalues.hpp \
+    memoryplanningwidget/labelitem.hpp \
+    memoryplanningwidget/memoryinteractiveunit.hpp \
+    memoryplanningwidget/memoryitem.hpp \
+    memoryplanningwidget/memoryitempresentation.hpp \
+    memoryplanningwidget/memoryscene.hpp \
+    memoryplanningwidget/memorystatus.hpp \
+    memoryplanningwidget/memoryunit.hpp \
+    memoryplanningwidget/memoryview.hpp \
+    memoryplanningwidget/memorywidget.hpp \
+    memoryplanningwidget/memoryplanningwidget.hpp \
+    ganttitemstage.h
 
 
 RESOURCES += \
@@ -114,6 +134,7 @@ FORMS += \
     chartwidget.ui \
     curvedetailsgroupbox.ui \
     chartsgroupwidget.ui \
-    chartsettingsdlg.ui
+    chartsettingsdlg.ui \
+    memoryplanningwidget/memoryplanningwidget.ui
 
 include(build_config.pri)

@@ -29,8 +29,10 @@ unix:{
 
 
 # подключить библиотеки и *.h файлы
+CONFIG += depend_includepath
+
 INCLUDEPATH += "$$PWD/../ganttmodel"
-DEPENDPATH += "$$PWD/../ganttmodel"
+INCLUDEPATH += "$$PWD/../ganttmodel/memoryplanningwidget"
 
 LIBS += -L"$${DESTDIR}"
 CONFIG(release, debug|release) {
@@ -50,9 +52,14 @@ unix {
 
 LIBS += -L$${DEP_PATH_LIBS}
 CONFIG(release, debug|release) {
-  LIBS += -lextensions
+  LIBS += -lextensions -lqwt
 } else:CONFIG(debug, debug|release) {
   LIBS += -lextensionsd
+  unix {
+    LIBS += -lqwt
+  } else:win32 {
+    LIBS += -lqwtd
+  }
 }
 
 INCLUDEPATH += $${DEP_PATH_HEADERS}/extensions
