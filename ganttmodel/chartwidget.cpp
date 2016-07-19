@@ -1111,6 +1111,13 @@ void ChartWidget::clearChart()
     m_intervals[i]->detach();
   m_intervals.clear();
 
+  // чистим легенду интервалов
+  for(int i=0; i<m_intervalsWidgetsLegends.size(); i++)
+      delete m_intervalsWidgetsLegends[i];
+  m_intervalsWidgetsLegends.clear();
+
+
+
   for(int i = 0; i < m_panelCurveDetailsList.count(); i++)
     delete m_panelCurveDetailsList[i];
   m_panelCurveDetailsList.clear();
@@ -1444,7 +1451,7 @@ void ChartWidget::addZone(const QString &name, double beginX, double endX, const
   if(!isFind)
   {
     QVBoxLayout* lay = (QVBoxLayout*) ui->widgetDetail->layout();
-    QHBoxLayout *hlay = new QHBoxLayout();
+    QHBoxLayout *hlay = new QHBoxLayout(this);
 
     QLabel * intervalColor = new QLabel(this);
     intervalColor->setPalette(QPalette(c1));
@@ -1457,6 +1464,8 @@ void ChartWidget::addZone(const QString &name, double beginX, double endX, const
     hlay->addWidget(intervalName);
 
     lay->insertLayout(lay->count() - 1, hlay);
+    m_intervalsWidgetsLegends.append(intervalColor);
+    m_intervalsWidgetsLegends.append(intervalName);
   }
 
   m_intervals.append(interval);
