@@ -254,6 +254,7 @@ protected:
   QList<ChartCurveStats> m_curvesStats;
 
   QList<PlotInterval *> m_intervals;
+  QList<QLabel *> m_intervalsWidgetsLegends;
   QList<CurveDetailsGroupBox *> m_panelCurveDetailsList;
 
   QwtPlotGrid *m_pGrid;
