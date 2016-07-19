@@ -33,6 +33,9 @@ CONFIG += depend_includepath
 
 INCLUDEPATH += "$$PWD/../ganttmodel"
 INCLUDEPATH += "$$PWD/../ganttmodel/memoryplanningwidget"
+INCLUDEPATH += "$$PWD/../ganttmodel/memoryplanningwidget/memoryline"
+INCLUDEPATH += "$$PWD/../ganttmodel/memoryplanningwidget/memorygrid"
+
 
 LIBS += -L"$${DESTDIR}"
 CONFIG(release, debug|release) {

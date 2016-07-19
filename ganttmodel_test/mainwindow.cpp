@@ -8,7 +8,7 @@
 #include <qwt/qwt_scale_div.h>
 #include "memoryplanningwidget.hpp"
 #include "memoryscene.hpp"
-#include "memoryline/kamemoryview.h"
+#include "kamemoryscene.h"
 
 MainWindow::MainWindow(QWidget *parent) :
   QMainWindow(parent),

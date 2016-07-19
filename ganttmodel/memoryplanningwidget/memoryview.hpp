@@ -4,8 +4,6 @@
 #include <QGraphicsView>
 #include <QtCore>
 
-#include "memoryplanningwidget/memoryline/kamemoryview.h"
-
 
 class MemoryScene;
 

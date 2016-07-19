@@ -5,7 +5,7 @@
 #include <QCursor>
 #include "QGraphicsScene"
 
-#include "kamemory.h"
+#include "kamemoryscene.h"
 
 int KaMemoryAbstractPart::begin() const
 {

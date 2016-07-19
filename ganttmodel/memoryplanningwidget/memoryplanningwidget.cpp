@@ -4,7 +4,8 @@
 #include "memorywidget.hpp"
 #include "memoryview.hpp"
 #include "memoryscene.hpp"
-#include "memoryitempresentation.hpp"
+#include "kamemoryscene.h"
+#include "kamemorypart.h"
 
 #include <QDebug>
 #include <QScrollBar>

@@ -48,8 +48,13 @@ DEPENDPATH += $${DEP_PATH_HEADERS}/extensions
 # qwt
 INCLUDEPATH += $${DEP_PATH_HEADERS}
 INCLUDEPATH += $${DEP_PATH_HEADERS}/qwt
-INCLUDEPATH += $${PWD}/gantmodel/memoryplanningwidget
-INCLUDEPATH += $${PWD}/gantmodel/memoryplanningwidget/memoryline
+
+INCLUDEPATH += "$$PWD/../ganttmodel"
+INCLUDEPATH += "$$PWD/../ganttmodel/memoryplanningwidget"
+INCLUDEPATH += "$$PWD/../ganttmodel/memoryplanningwidget/memoryline"
+INCLUDEPATH += "$$PWD/../ganttmodel/memoryplanningwidget/memorygrid"
+
+
 
 DEFINES += GANTTMODEL_LIBRARY
 
@@ -76,21 +81,21 @@ SOURCES += \
     chartsettings.cpp \
     plotnavigator.cpp \
     intervalselectionmodel.cpp \
-    memoryplanningwidget/labelitem.cpp \
-    memoryplanningwidget/memoryinteractiveunit.cpp \
-    memoryplanningwidget/memoryitem.cpp \
-    memoryplanningwidget/memoryitempresentation.cpp \
-    memoryplanningwidget/memorywidget.cpp \
-    memoryplanningwidget/memoryscene.cpp \
-    memoryplanningwidget/memorystatus.cpp \
-    memoryplanningwidget/memoryunit.cpp \
     memoryplanningwidget/memoryview.cpp \
     memoryplanningwidget/memoryplanningwidget.cpp \
-    memoryplanningwidget/memoryline/kamemory.cpp \
     memoryplanningwidget/memoryline/kamemoryabstractpart.cpp \
-    memoryplanningwidget/memoryline/kamemorypart.cpp \
     memoryplanningwidget/memoryline/kamemorypicker.cpp \
-    memoryplanningwidget/memoryline/kamemoryview.cpp
+    memoryplanningwidget/kamemory.cpp \
+    memoryplanningwidget/kamemorypart.cpp \
+    memoryplanningwidget/memoryline/kamemoryscene.cpp \
+    memoryplanningwidget/memoryline/kamemorygraphicspart.cpp \
+    memoryplanningwidget/memorygrid/labelitem.cpp \
+    memoryplanningwidget/memorygrid/memoryinteractiveunit.cpp \
+    memoryplanningwidget/memorygrid/memoryitem.cpp \
+    memoryplanningwidget/memorygrid/memoryscene.cpp \
+    memoryplanningwidget/memorygrid/memorystatus.cpp \
+    memoryplanningwidget/memorygrid/memoryunit.cpp \
+    memoryplanningwidget/memorygrid/memorywidget.cpp
 
 HEADERS += \
     ganttmodel.h \
@@ -120,22 +125,22 @@ HEADERS += \
     plotnavigator.h \
     intervalselectionmodel.h \
     memoryplanningwidget/globalvalues.hpp \
-    memoryplanningwidget/labelitem.hpp \
-    memoryplanningwidget/memoryinteractiveunit.hpp \
-    memoryplanningwidget/memoryitem.hpp \
-    memoryplanningwidget/memoryitempresentation.hpp \
-    memoryplanningwidget/memoryscene.hpp \
-    memoryplanningwidget/memorystatus.hpp \
-    memoryplanningwidget/memoryunit.hpp \
     memoryplanningwidget/memoryview.hpp \
-    memoryplanningwidget/memorywidget.hpp \
     memoryplanningwidget/memoryplanningwidget.hpp \
     ganttitemstage.h \
-    memoryplanningwidget/memoryline/kamemory.h \
     memoryplanningwidget/memoryline/kamemoryabstractpart.h \
-    memoryplanningwidget/memoryline/kamemorypart.h \
     memoryplanningwidget/memoryline/kamemorypicker.h \
-    memoryplanningwidget/memoryline/kamemoryview.h
+    memoryplanningwidget/kamemory.h \
+    memoryplanningwidget/memoryline/kamemoryscene.h \
+    memoryplanningwidget/kamemorypart.h \
+    memoryplanningwidget/memoryline/kamemorygraphicspart.h \
+    memoryplanningwidget/memorygrid/labelitem.hpp \
+    memoryplanningwidget/memorygrid/memoryinteractiveunit.hpp \
+    memoryplanningwidget/memorygrid/memoryitem.hpp \
+    memoryplanningwidget/memorygrid/memoryscene.hpp \
+    memoryplanningwidget/memorygrid/memorystatus.hpp \
+    memoryplanningwidget/memorygrid/memoryunit.hpp \
+    memoryplanningwidget/memorygrid/memorywidget.hpp
 
 
 RESOURCES += \
