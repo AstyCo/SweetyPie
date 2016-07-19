@@ -48,6 +48,7 @@ DEPENDPATH += $${DEP_PATH_HEADERS}/extensions
 INCLUDEPATH += $${DEP_PATH_HEADERS}
 INCLUDEPATH += $${DEP_PATH_HEADERS}/qwt
 INCLUDEPATH += $${PWD}/gantmodel/memoryplanningwidget
+INCLUDEPATH += $${PWD}/gantmodel/memoryplanningwidget/memoryline
 
 DEFINES += GANTTMODEL_LIBRARY
 
@@ -83,7 +84,12 @@ SOURCES += \
     memoryplanningwidget/memorystatus.cpp \
     memoryplanningwidget/memoryunit.cpp \
     memoryplanningwidget/memoryview.cpp \
-    memoryplanningwidget/memoryplanningwidget.cpp
+    memoryplanningwidget/memoryplanningwidget.cpp \
+    memoryplanningwidget/memoryline/kamemory.cpp \
+    memoryplanningwidget/memoryline/kamemoryabstractpart.cpp \
+    memoryplanningwidget/memoryline/kamemorypart.cpp \
+    memoryplanningwidget/memoryline/kamemorypicker.cpp \
+    memoryplanningwidget/memoryline/kamemoryview.cpp
 
 HEADERS += \
     ganttmodel.h \
@@ -123,7 +129,12 @@ HEADERS += \
     memoryplanningwidget/memoryview.hpp \
     memoryplanningwidget/memorywidget.hpp \
     memoryplanningwidget/memoryplanningwidget.hpp \
-    ganttitemstage.h
+    ganttitemstage.h \
+    memoryplanningwidget/memoryline/kamemory.h \
+    memoryplanningwidget/memoryline/kamemoryabstractpart.h \
+    memoryplanningwidget/memoryline/kamemorypart.h \
+    memoryplanningwidget/memoryline/kamemorypicker.h \
+    memoryplanningwidget/memoryline/kamemoryview.h
 
 
 RESOURCES += \

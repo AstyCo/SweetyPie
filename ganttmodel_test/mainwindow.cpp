@@ -8,6 +8,7 @@
 #include <qwt/qwt_scale_div.h>
 #include "memoryplanningwidget.hpp"
 #include "memoryscene.hpp"
+#include "memoryline/kamemoryview.h"
 
 MainWindow::MainWindow(QWidget *parent) :
   QMainWindow(parent),
@@ -60,7 +61,7 @@ void MainWindow::testChartWidget()
   ui->widgetIntervalSlider->setMaxValue(TimeSpan(ui->widget->maximumDt() - ui->widget->minimumDt()).totalSeconds());
   ui->widgetIntervalSlider->setEndHandle(ui->widgetIntervalSlider->maxValue());
 
-  connect(ui->widgetIntervalSlider, SIGNAL(valueChanged(IntervalSlider::EventHandle, long)), this, SLOT(setInterval()));
+  connect(ui->widgetIntervalSlider, SIGNAL(valueChanged(IntervalSlider::ClippedHandle, long)), this, SLOT(setInterval()));
 
 
 }
@@ -139,40 +140,83 @@ void MainWindow::testGanttModel()
 
 void MainWindow::testMemoryPlanningWidget()
 {
-    QList<MemoryItemPresentation> records;
-
-    int memoryPeaceLength,spaceBetweenUnits;
-
-    int vacantPos = 0;
-    int id = 1;
-
-    for(;;)
+    MemoryScene* gridScene = dynamic_cast<MemoryScene*>(ui->memoryPlanningWidget->scene());
+    if(gridScene)
     {
-        memoryPeaceLength = qrand()%100;
-        spaceBetweenUnits = qrand()%15;
+        QList<MemoryItemPresentation> records;
 
-        MemoryItemPresentation newPeace;
-        vacantPos+=spaceBetweenUnits;
-        newPeace.m_start=vacantPos;
-        vacantPos+=memoryPeaceLength;
+        int memoryPeaceLength,spaceBetweenUnits;
 
-        if(vacantPos>2047)
-            break;
+        int vacantPos = 0;
+        int id = 1;
 
-        newPeace.m_finish=vacantPos;
-        vacantPos+=1;
-
-        newPeace.m_state=static_cast<MemoryState>(qrand()%Memory::StateCount);
-        if(newPeace.m_state==Memory::Freed)
-            newPeace.m_unitId=0;
-        else
+        for(;;)
         {
-            newPeace.m_unitId=id++;
-            records.push_back(newPeace);
+            memoryPeaceLength = qrand()%100;
+            spaceBetweenUnits = qrand()%15;
+
+            MemoryItemPresentation newPeace;
+            vacantPos+=spaceBetweenUnits;
+            newPeace.m_start=vacantPos;
+            vacantPos+=memoryPeaceLength;
+
+            if(vacantPos>2047)
+                break;
+
+            newPeace.m_finish=vacantPos;
+            vacantPos+=1;
+
+            newPeace.m_state=static_cast<MemoryState>(qrand()%Memory::MemoryState_count);
+            if(newPeace.m_state==Memory::Empty)
+                newPeace.m_unitId=0;
+            else
+            {
+                newPeace.m_unitId=id++;
+                records.push_back(newPeace);
+            }
         }
+
+        gridScene->init(records,2048);
+    }
+    // if memoryLine
+    KaMemoryScene* lineScene = dynamic_cast<KaMemoryScene*>(ui->memoryPlanningWidget->scene());
+    if(lineScene)
+    {
+        QList<KaMemoryPart> records;
+
+        int memoryPeaceLength,spaceBetweenUnits;
+
+        int vacantPos = 0;
+        int id = 1;
+
+        for(;;)
+        {
+            memoryPeaceLength = qrand()%100;
+            spaceBetweenUnits = qrand()%15;
+
+            KaMemoryPart newPeace;
+            vacantPos+=spaceBetweenUnits;
+            newPeace.setBegin(vacantPos);
+            vacantPos+=memoryPeaceLength;
+
+            if(vacantPos>2047)
+                break;
+
+            newPeace.setEnd(vacantPos);
+            vacantPos+=1;
+
+            newPeace.setState(static_cast<MemoryState>(qrand()%Memory::MemoryState_count));
+//            if(newPeace.state()==Memory::Empty)
+//                newPeace.m_unitId=0;
+//            else
+            {
+//                newPeace.m_unitId=id++;
+                records.push_back(newPeace);
+            }
+        }
+        lineScene->init(records,2048);
     }
 
-    ui->memoryPlanningWidget->scene()->init(records,2048);
     ui->memoryPlanningWidget->show();
 }
 

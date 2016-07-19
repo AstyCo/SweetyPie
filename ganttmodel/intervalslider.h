@@ -33,6 +33,7 @@ public:
 
 
     explicit IntervalSlider(QWidget *parent = 0);
+    ~IntervalSlider(){}
     long endHandle() const;
     void setEndHandle(int endHandle);
 
