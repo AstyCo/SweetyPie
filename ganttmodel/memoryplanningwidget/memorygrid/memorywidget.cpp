@@ -1,10 +1,10 @@
-#include "memorywidget.hpp"
-#include "memoryscene.hpp"
+#include "mgrid_widget.h"
+#include "mgrid_scene.h"
 
-#include "memorystatus.hpp"
+#include "mgrid_status.h"
 
-#include "memoryitem.hpp"
-#include "labelitem.hpp"
+#include "mgrid_item.h"
+#include "mgrid_labelitem.h"
 
 #include <QGraphicsGridLayout>
 #include <QSizePolicy>
@@ -20,7 +20,7 @@
 #include <QDebug>
 
 
-MemoryWidget::MemoryWidget(QGraphicsWidget *parent) :
+MGridWidget::MGridWidget(QGraphicsWidget *parent) :
     QGraphicsWidget(parent)
 {
     setItemPerRow(64);
@@ -30,39 +30,39 @@ MemoryWidget::MemoryWidget(QGraphicsWidget *parent) :
 
 }
 
-MemoryWidget::~MemoryWidget()
+MGridWidget::~MGridWidget()
 {
 }
 
 
-int MemoryWidget::toColumn(int index) const
+int MGridWidget::toColumn(int index) const
 {
     return (labels()?1:0)+index % itemPerRow();
 }
 
-int MemoryWidget::toRow(int index) const
+int MGridWidget::toRow(int index) const
 {
     return (labels()?1:0)+index / itemPerRow();
 }
 
-int MemoryWidget::fromPos(int row, int column) const
+int MGridWidget::fromPos(int row, int column) const
 {
     return row*(itemPerRow()+(labels()?1:0))+column;
 }
 
-int MemoryWidget::toMemoryAdress(int row, int column) const
+int MGridWidget::toMemoryAdress(int row, int column) const
 {
     return (row-(labels()?1:0))*itemPerRow()+(column-(labels()?1:0));
 }
 
-int MemoryWidget::toMemoryAdress(int pos) const
+int MGridWidget::toMemoryAdress(int pos) const
 {
     return toMemoryAdress(toRow(pos),toColumn(pos));
 }
 
 
 
-void MemoryWidget::setupMatrix(QList<MemoryItem*> mem_items)
+void MGridWidget::setupMatrix(QList<MGridtem*> mem_items)
 {
 
     removeLabels();
@@ -73,13 +73,13 @@ void MemoryWidget::setupMatrix(QList<MemoryItem*> mem_items)
 
     if(labels())
     {
-        LabelItem* emptyLabelItem = new LabelItem(QString(),this);
+        MGridLabelItem* emptyLabelItem = new MGridLabelItem(QString(),this);
         gridLayout->addItem(emptyLabelItem,0,0);
         m_labelItems.append(emptyLabelItem);
 
         for(int j=0;j<itemPerRow();++j)
         {
-            LabelItem* labelItem = new LabelItem(QString::number(j),this);
+            MGridLabelItem* labelItem = new MGridLabelItem(QString::number(j),this);
             gridLayout->addItem(labelItem,0,j+1);
             m_labelItems.append(labelItem);
         }
@@ -88,7 +88,7 @@ void MemoryWidget::setupMatrix(QList<MemoryItem*> mem_items)
     {
         if(labels()&&!(i%itemPerRow()))
         {
-            LabelItem* labelItem = new LabelItem(QString::number(i/itemPerRow()),this);
+            MGridLabelItem* labelItem = new MGridLabelItem(QString::number(i/itemPerRow()),this);
             gridLayout->addItem(labelItem,i/itemPerRow()+1,0);
             m_labelItems.append(labelItem);
         }
@@ -99,7 +99,7 @@ void MemoryWidget::setupMatrix(QList<MemoryItem*> mem_items)
         // MemoryStatus
         if(!m_memoryStatus)
         {
-            m_memoryStatus = new MemoryStatus(this);
+            m_memoryStatus = new MGridStatus(this);
             m_memoryStatus->setStatusLabel(tr("Info:"));
             m_memoryStatus->setItemInfo(tr("Item Info"));
             m_memoryStatus->setUnitInfo(tr("Unit Info"));
@@ -116,71 +116,71 @@ void MemoryWidget::setupMatrix(QList<MemoryItem*> mem_items)
     adjustSize();
 }
 
-QGraphicsLayout *MemoryWidget::layout()
+QGraphicsLayout *MGridWidget::layout()
 {
     return QGraphicsWidget::layout();
 }
 
-qreal MemoryWidget::margins() const
+qreal MGridWidget::margins() const
 {
     return m_margins;
 }
 
-void MemoryWidget::setMargins(const qreal &margins)
+void MGridWidget::setMargins(const qreal &margins)
 {
     m_margins = margins;
 }
 
-qreal MemoryWidget::spacing() const
+qreal MGridWidget::spacing() const
 {
     return m_spacing;
 }
 
-void MemoryWidget::setSpacing(const qreal &spacing)
+void MGridWidget::setSpacing(const qreal &spacing)
 {
     m_spacing = spacing;
 }
 
-void MemoryWidget::setStatusLabel(const QString &text)
+void MGridWidget::setStatusLabel(const QString &text)
 {
     m_memoryStatus->setStatusLabel(text);
 }
 
-QString MemoryWidget::statusLabel() const
+QString MGridWidget::statusLabel() const
 {
     return m_memoryStatus->statusLabel();
 }
 
-void MemoryWidget::setItemInfo(const QString &text)
+void MGridWidget::setItemInfo(const QString &text)
 {
     m_memoryStatus->setItemInfo(text);
 }
 
-QString MemoryWidget::itemInfo() const
+QString MGridWidget::itemInfo() const
 {
     return m_memoryStatus->itemInfo();
 }
 
-void MemoryWidget::setUnitInfo(const QString &text)
+void MGridWidget::setUnitInfo(const QString &text)
 {
     m_memoryStatus->setUnitInfo(text);
 }
 
-QString MemoryWidget::unitInfo() const
+QString MGridWidget::unitInfo() const
 {
     return m_memoryStatus->unitInfo();
 }
-bool MemoryWidget::labels() const
+bool MGridWidget::labels() const
 {
     return m_labels;
 }
 
-void MemoryWidget::setLabels(bool labels)
+void MGridWidget::setLabels(bool labels)
 {
     m_labels = labels;
 }
 
-void MemoryWidget::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
+void MGridWidget::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
 {
     Q_UNUSED(painter);
     Q_UNUSED(option);
@@ -188,12 +188,12 @@ void MemoryWidget::paint(QPainter *painter, const QStyleOptionGraphicsItem *opti
     // empty
 }
 
-void MemoryWidget::memoryStatusUpdate(const QRectF &rect)
+void MGridWidget::memoryStatusUpdate(const QRectF &rect)
 {
     m_memoryStatus->update(rect);
 }
 
-QVariant MemoryWidget::itemChange(QGraphicsItem::GraphicsItemChange change, const QVariant &value)
+QVariant MGridWidget::itemChange(QGraphicsItem::GraphicsItemChange change, const QVariant &value)
 {
     if(change == QGraphicsItem::ItemTransformHasChanged)
     {
@@ -202,9 +202,9 @@ QVariant MemoryWidget::itemChange(QGraphicsItem::GraphicsItemChange change, cons
     return QGraphicsItem::itemChange(change,value);
 }
 
-void MemoryWidget::removeLabels()
+void MGridWidget::removeLabels()
 {
-    foreach(LabelItem* item, m_labelItems)
+    foreach(MGridLabelItem* item, m_labelItems)
     {
         scene()->removeItem(item);
         item->setParentItem(NULL);
@@ -212,17 +212,17 @@ void MemoryWidget::removeLabels()
     }
 }
 
-void MemoryWidget::transformChanged(const QTransform &transform)
+void MGridWidget::transformChanged(const QTransform &transform)
 {
     m_memoryStatus->transformChanged(transform);
 }
 
-int MemoryWidget::itemPerRow() const
+int MGridWidget::itemPerRow() const
 {
     return m_itemPerRow;
 }
 
-void MemoryWidget::setItemPerRow(int itemPerRow)
+void MGridWidget::setItemPerRow(int itemPerRow)
 {
     m_itemPerRow = itemPerRow;
 

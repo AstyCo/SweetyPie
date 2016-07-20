@@ -1,5 +1,5 @@
-#ifndef MEMORYITEMPRESENTATION_HPP
-#define MEMORYITEMPRESENTATION_HPP
+#ifndef KAMEMORYPART_HPP
+#define KAMEMORYPART_HPP
 
 #include <ganttmodel_global.h>
 
@@ -30,30 +30,32 @@ QColor MemoryState_to_QColor(MemoryState state, bool isActive = true);
 QString operator+(const QString& qstr, MemoryState status);
 
 
-struct GANTTMODELSHARED_EXPORT MemoryItemPresentation
-{
-    MemoryItemPresentation(MemoryState status = Empty, int unitId = 0);
+//struct GANTTMODELSHARED_EXPORT MemoryItemPresentation
+//{
+//    MemoryItemPresentation(MemoryState status = Empty, int unitId = 0);
 
-    MemoryState m_state;
+//    MemoryState m_state;
 
-    // extra info here
-    int m_unitId;
+//    // extra info here
+//    int m_unitId;
 
-    //
+//    //
 
-    long m_start,
-         m_finish;
+//    long m_start,
+//         m_finish;
 
-    QColor color() const;
-};
+//    QColor color() const;
+//};
 
 class GANTTMODELSHARED_EXPORT KaMemoryPart
 {
 private:
-    MemoryState _state;
-    int _begin;
-    int _end;
-
+    MemoryState m_state;
+    long m_start;
+    long m_finish;
+    // extra
+    int m_id;
+    //
 public:
     KaMemoryPart();
     ~KaMemoryPart();
@@ -70,8 +72,8 @@ public:
 
     bool operator ==(const KaMemoryPart &part)
     {
-        return begin() == part.begin() &&
-                end() == part.end();
+        return start() == part.start() &&
+                finish() == part.finish();
     }
 
     bool operator !=(const KaMemoryPart &part)
@@ -79,14 +81,16 @@ public:
         return !(*this==part);
     }
 
-    int size() const;
+    long size() const;
 
-    int begin() const;
-    void setBegin(int begin);
-    int end() const;
-    void setEnd(int end);
+    long start() const;
+    void setStart(long start);
+    long finish() const;
+    void setFinish(long finish);
+    int id() const;
+    void setId(int id);
 };
 
 
-#endif // MEMORYITEMPRESENTATION_HPP
+#endif // KAMEMORYPART_HPP
 

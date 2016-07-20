@@ -1,21 +1,21 @@
 #ifndef MEMORYINTERACTIVEUNIT_CPP
 #define MEMORYINTERACTIVEUNIT_CPP
 
-#include "memoryinteractiveunit.hpp"
-#include "memoryscene.hpp"
+#include "mgrid_interactiveunit.h"
+#include "mgrid_scene.h"
 
 #include "kamemorypart.h"
 
-#include "globalvalues.hpp"
+#include "memory_globalvalues.h"
 
 #include <QPainterPath>
 #include <QPainter>
 
 #include <QDebug>
 
-extern MemoryScene* mem_scene;
+extern MGridScene* mem_scene;
 
-MemoryInteractiveUnit::MemoryInteractiveUnit(MemoryScene* scene,QGraphicsItem *parent /*= 0*/)
+MGridInteractiveUnit::MGridInteractiveUnit(MGridScene* scene,QGraphicsItem *parent /*= 0*/)
     : QGraphicsItem(parent)
 {
     if(!scene)
@@ -34,17 +34,17 @@ MemoryInteractiveUnit::MemoryInteractiveUnit(MemoryScene* scene,QGraphicsItem *p
 
 }
 
-QRectF MemoryInteractiveUnit::boundingRect() const
+QRectF MGridInteractiveUnit::boundingRect() const
 {
     return m_shapeBorder.boundingRect().adjusted(-spacing()*1.5,-spacing()*1.5,spacing()*1.5,spacing()*1.5);
 }
 
-QPainterPath MemoryInteractiveUnit::shape() const
+QPainterPath MGridInteractiveUnit::shape() const
 {
     return m_shapeBorder;
 }
 
-void MemoryInteractiveUnit::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
+void MGridInteractiveUnit::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
 {
     Q_UNUSED(option);
     Q_UNUSED(widget);
@@ -60,52 +60,52 @@ void MemoryInteractiveUnit::paint(QPainter *painter, const QStyleOptionGraphicsI
     painter->drawPath(m_shapeBorder);
 }
 
-bool MemoryInteractiveUnit::inRange(long index) const
+bool MGridInteractiveUnit::inRange(long index) const
 {
     return m_initialized&&(index>=m_start && index <=m_finish);
 }
 
 
-long MemoryInteractiveUnit::start() const
+long MGridInteractiveUnit::start() const
 {
     return m_start;
 }
 
-void MemoryInteractiveUnit::setStart(long start)
+void MGridInteractiveUnit::setStart(long start)
 {
     m_start = start;
 }
 
-long MemoryInteractiveUnit::finish() const
+long MGridInteractiveUnit::finish() const
 {
     return m_finish;
 }
 
-void MemoryInteractiveUnit::setFinish(long finish)
+void MGridInteractiveUnit::setFinish(long finish)
 {
     m_finish = finish;
 }
 
-long MemoryInteractiveUnit::size() const
+long MGridInteractiveUnit::size() const
 {
     return m_finish-m_start + 1;
 }
 
-void MemoryInteractiveUnit::setSize(long newSize)
+void MGridInteractiveUnit::setSize(long newSize)
 {
     setFinish(start()+newSize-1);
 }
 
-qreal MemoryInteractiveUnit::spacing() const
+qreal MGridInteractiveUnit::spacing() const
 {
-    MemoryScene* p_memScene = dynamic_cast<MemoryScene*>(scene());
+    MGridScene* p_memScene = dynamic_cast<MGridScene*>(scene());
     if(!p_memScene)
         return DEFAULT_SPACING;
     return p_memScene->spacing();
 }
 
 
-void MemoryInteractiveUnit::rebuildShape()
+void MGridInteractiveUnit::rebuildShape()
 {
     if(m_finish>m_items->size())
     {
@@ -127,12 +127,12 @@ void MemoryInteractiveUnit::rebuildShape()
             utterRight = itemsRect.left(); // -||- right, left() is MAX
 
 
-    MemoryItem  *utterLeftItem = NULL,
+    MGridtem  *utterLeftItem = NULL,
                 *utterRightItem = NULL;
 
     for(int i = m_start; i <= m_finish; ++i)
     {
-        MemoryItem* item = m_items->at(i);
+        MGridtem* item = m_items->at(i);
         qreal   itemTop = item->geometry().top(),
                 itemBottom = item->geometry().bottom();
 
@@ -167,7 +167,7 @@ void MemoryInteractiveUnit::rebuildShape()
         return;
     }
 
-    MemoryScene* p_memScene = dynamic_cast<MemoryScene*>(scene());
+    MGridScene* p_memScene = dynamic_cast<MGridScene*>(scene());
     if(!p_memScene)
     {
         qDebug() << "not MemoryScene";
@@ -222,23 +222,23 @@ void MemoryInteractiveUnit::rebuildShape()
     setShapeBorder(path);
 }
 
-QPainterPath MemoryInteractiveUnit::shapeBorder() const
+QPainterPath MGridInteractiveUnit::shapeBorder() const
 {
     return m_shapeBorder;
 }
 
-void MemoryInteractiveUnit::setShapeBorder(const QPainterPath &shapeBorder)
+void MGridInteractiveUnit::setShapeBorder(const QPainterPath &shapeBorder)
 {
     m_shapeBorder = shapeBorder;
 }
 
-void MemoryInteractiveUnit::setShowBorders(bool value)
+void MGridInteractiveUnit::setShowBorders(bool value)
 {
     m_showBorders = value;
     update();
 }
 
-long MemoryInteractiveUnit::memorySize() const
+long MGridInteractiveUnit::memorySize() const
 {
     if(!m_items)
         return 0;
@@ -247,7 +247,7 @@ long MemoryInteractiveUnit::memorySize() const
 
 
 
-void MemoryInteractiveUnit::setRange(long start, long finish)
+void MGridInteractiveUnit::setRange(long start, long finish)
 {
     if(!m_items)
     {

@@ -28,6 +28,11 @@ QList<KaMemoryPart> &KaMemory::memoryParts()
     return _memoryParts;
 }
 
+const QList<KaMemoryPart> &KaMemory::memoryParts() const
+{
+    return _memoryParts;
+}
+
 void KaMemory::init(const QList<KaMemoryPart> &list, long memorySize)
 {
     _memoryParts.clear();

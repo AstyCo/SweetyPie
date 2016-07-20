@@ -1,18 +1,18 @@
-#include "kamemoryabstractpart.h"
+#include "mline_abstractpart.h"
 
 #include <QPainter>
 #include <QDebug>
 #include <QCursor>
 #include "QGraphicsScene"
 
-#include "kamemoryscene.h"
+#include "mline_scene.h"
 
-int KaMemoryAbstractPart::begin() const
+int MLineAbstractPart::begin() const
 {
     return _begin;
 }
 
-void KaMemoryAbstractPart::setBegin(int begin)
+void MLineAbstractPart::setBegin(int begin)
 {
     if(memorySize()!=0 && scene()!=0)
     {
@@ -45,12 +45,12 @@ void KaMemoryAbstractPart::setBegin(int begin)
     }
 }
 
-int KaMemoryAbstractPart::end() const
+int MLineAbstractPart::end() const
 {
     return _end;
 }
 
-void KaMemoryAbstractPart::setEnd(int end)
+void MLineAbstractPart::setEnd(int end)
 {
 
     if(memorySize()!=0 && scene()!=0)
@@ -83,12 +83,12 @@ void KaMemoryAbstractPart::setEnd(int end)
     }
 }
 
-int KaMemoryAbstractPart::size() const
+int MLineAbstractPart::size() const
 {
     return _end-_begin;
 }
 
-qreal KaMemoryAbstractPart::width() const
+qreal MLineAbstractPart::width() const
 {
     if(memorySize()==0  || scene()==0)
         return 0;
@@ -96,12 +96,12 @@ qreal KaMemoryAbstractPart::width() const
     return xByVal(_end)-xByVal(_begin);
 }
 
-int KaMemoryAbstractPart::memorySize() const
+int MLineAbstractPart::memorySize() const
 {
     if(scene()==0)
         return 0;
 
-    KaMemoryScene * sc = dynamic_cast<KaMemoryScene*>(scene());
+    MLineScene * sc = dynamic_cast<MLineScene*>(scene());
     if(sc == 0)
     {
         return 0;
@@ -112,7 +112,7 @@ int KaMemoryAbstractPart::memorySize() const
 
 }
 
-qreal KaMemoryAbstractPart::xByVal(int val) const
+qreal MLineAbstractPart::xByVal(int val) const
 {
     if(memorySize()!=0 && scene()!=0)
     {
@@ -122,7 +122,7 @@ qreal KaMemoryAbstractPart::xByVal(int val) const
     return 0;
 }
 
-int KaMemoryAbstractPart::valByX(qreal x) const
+int MLineAbstractPart::valByX(qreal x) const
 {
     if(memorySize()!=0 && scene()!=0)
     {
@@ -134,7 +134,7 @@ int KaMemoryAbstractPart::valByX(qreal x) const
 
 
 
-KaMemoryAbstractPart::KaMemoryAbstractPart(QGraphicsItem *parent):
+MLineAbstractPart::MLineAbstractPart(QGraphicsItem *parent):
     QGraphicsObject(parent)
 {
     _begin=0;
@@ -144,7 +144,7 @@ KaMemoryAbstractPart::KaMemoryAbstractPart(QGraphicsItem *parent):
     setY(y_pos);
 }
 
-KaMemoryAbstractPart::KaMemoryAbstractPart(const KaMemoryAbstractPart &part):
+MLineAbstractPart::MLineAbstractPart(const MLineAbstractPart &part):
     QGraphicsObject(part.parentItem())
 {
     _begin=part._begin;
@@ -154,12 +154,12 @@ KaMemoryAbstractPart::KaMemoryAbstractPart(const KaMemoryAbstractPart &part):
     setY(y_pos);
 }
 
-KaMemoryAbstractPart::~KaMemoryAbstractPart()
+MLineAbstractPart::~MLineAbstractPart()
 {
 
 }
 
-QRectF KaMemoryAbstractPart::boundingRect() const
+QRectF MLineAbstractPart::boundingRect() const
 {
     return QRectF(0,0, width(), height+5);
 }

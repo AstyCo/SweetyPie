@@ -1,11 +1,11 @@
-#include "kamemorypicker.h"
+#include "mline_picker.h"
 
 #include <QPainter>
 #include <QDebug>
 #include <QCursor>
 #include "QGraphicsScene"
 
-#include "kamemoryscene.h"
+#include "mline_scene.h"
 
 //void KaMemoryPicker::hoverEnterEvent(QGraphicsSceneHoverEvent *event)
 //{
@@ -31,7 +31,7 @@
 //            emit valueChanged(begin(),end());
 //}
 
-void KaMemoryPicker::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
+void MLinePicker::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
 {
 //    if(cursor().shape() == Qt::SizeHorCursor)
 //    {
@@ -72,22 +72,22 @@ void KaMemoryPicker::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
         }
 }
 
-void KaMemoryPicker::mousePressEvent(QGraphicsSceneMouseEvent *event)
+void MLinePicker::mousePressEvent(QGraphicsSceneMouseEvent *event)
 {
     Q_UNUSED(event);
     if(cursor().shape() == Qt::OpenHandCursor)
         setCursor(Qt::ClosedHandCursor);
 }
 
-void KaMemoryPicker::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
+void MLinePicker::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
 {
     mouseMoveEvent(event);
     setCursor(Qt::OpenHandCursor);
 }
 
 
-KaMemoryPicker::KaMemoryPicker(QGraphicsItem *parent):
-    KaMemoryAbstractPart(parent)
+MLinePicker::MLinePicker(QGraphicsItem *parent):
+    MLineAbstractPart(parent)
 {
   //  setFlags(QGraphicsItem::ItemIsMovable);
     setCursor(Qt::OpenHandCursor);
@@ -95,12 +95,12 @@ KaMemoryPicker::KaMemoryPicker(QGraphicsItem *parent):
     setX(dx_border);
 }
 
-KaMemoryPicker::~KaMemoryPicker()
+MLinePicker::~MLinePicker()
 {
 
 }
 
-void KaMemoryPicker::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
+void MLinePicker::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
 {
     Q_UNUSED(option);
     Q_UNUSED(widget);

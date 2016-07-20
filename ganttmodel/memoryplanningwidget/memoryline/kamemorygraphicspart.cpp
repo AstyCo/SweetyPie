@@ -1,16 +1,16 @@
-#include "kamemorygraphicspart.h"
+#include "mline_graphicspart.h"
 
 #include <QBrush>
 #include <QPainter>
 #include <QDebug>
 #include <qstyleoption.h>
 //#include "dbprocess.h"
-#include "kamemoryscene.h"
+#include "mline_scene.h"
 
 //setToolTip(QString::number(size()) + QObject::trUtf8(" КБ"));
 
 
-void KaMemoryGraphicsPart::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
+void MLineGraphicsPart::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
 {
     Q_UNUSED(option);
     Q_UNUSED(widget);
@@ -44,12 +44,12 @@ void KaMemoryGraphicsPart::paint(QPainter *painter, const QStyleOptionGraphicsIt
 
 }
 
-QRectF KaMemoryGraphicsPart::boundingRect() const
+QRectF MLineGraphicsPart::boundingRect() const
 {
     return m_boundingRect;
 }
 
-QVariant KaMemoryGraphicsPart::itemChange(QGraphicsItem::GraphicsItemChange change, const QVariant &value)
+QVariant MLineGraphicsPart::itemChange(QGraphicsItem::GraphicsItemChange change, const QVariant &value)
 {
     if(change == QGraphicsItem::ItemSceneHasChanged)
     {
@@ -64,28 +64,28 @@ QVariant KaMemoryGraphicsPart::itemChange(QGraphicsItem::GraphicsItemChange chan
 
 
 
-void KaMemoryGraphicsPart::setKaMemoryPart(const KaMemoryPart &part)
+void MLineGraphicsPart::setKaMemoryPart(const KaMemoryPart &part)
 {
     _status = part.state();
-    setBegin(part.begin());
-    setEnd(part.end());
+    setBegin(part.start());
+    setEnd(part.finish());
 
     updateVisualElements();
 }
 
 
 
-MemoryState KaMemoryGraphicsPart::status() const
+MemoryState MLineGraphicsPart::status() const
 {
     return _status;
 }
 
-void KaMemoryGraphicsPart::setStatus(const MemoryState &status)
+void MLineGraphicsPart::setStatus(const MemoryState &status)
 {
     _status = status;
 }
 
-void KaMemoryGraphicsPart::updateVisualElements()
+void MLineGraphicsPart::updateVisualElements()
 {
     m_rect = QRectF(0,0, width(), 20);
 
@@ -104,7 +104,7 @@ void KaMemoryGraphicsPart::updateVisualElements()
     m_boundingRect|=m_endText;
 
 }
-QColor KaMemoryGraphicsPart::statusColor() const
+QColor MLineGraphicsPart::statusColor() const
 {
     switch (_status) {
     case Empty:
@@ -136,97 +136,8 @@ QColor KaMemoryGraphicsPart::statusColor() const
 
 
 
-int KaMemoryPart::begin() const
-{
-    return _begin;
-}
-
-void KaMemoryPart::setBegin(int begin)
-{
-    _begin = begin;
-}
-
-int KaMemoryPart::end() const
-{
-    return _end;
-}
-
-void KaMemoryPart::setEnd(int end)
-{
-    _end = end;
-}
-KaMemoryPart::KaMemoryPart()
-{
-    _state=Empty;
-    _begin =0;
-    _end = 0;
-}
-
-KaMemoryPart::~KaMemoryPart()
-{
-
-}
-
-
-
-
-//QMultiMap<int, KaMemoryPart> KaMemoryPart::selectAll()
-//{
-//    QMultiMap<int, KaMemoryPart> rez;
-////    DbProcess dbp1(dbptConnectAndSqlCommand,"all ka mem parts list","select * from koci.kamemorypart");
-////    dbp1.startDbProcess();
-////    if(dbp1.getSqlResultIsActive())
-////    {
-////        QSqlQuery q1 = dbp1.getSqlResultToQuery();
-////        while(q1.next())
-////        {
-////            int idka = q1.value(q1.record().indexOf("id_device")).toInt();
-
-////            KaMemoryPart part ;
-////            part.setData(q1.record());
-////            rez.insert(idka,part);
-////        }
-
-////    }
-//    return rez;
-//}
-
-QList<KaMemoryPart> KaMemoryPart::selectDeviceParts(int idKaDevice)
-{
-    QList<KaMemoryPart> rez;
-//    DbProcess dbp1(dbptConnectAndSqlCommand,"ka mem parts list","select * from koci.kamemorypart where id_device="+QString::number(idKaDevice));
-//    dbp1.startDbProcess();
-//    if(dbp1.getSqlResultIsActive())
-//    {
-//        QSqlQuery q1 = dbp1.getSqlResultToQuery();
-//        while(q1.next())
-//        {
-//            int tmpiddevice = q1.value(q1.record().indexOf("id_device")).toInt();
-
-//            if(tmpiddevice==idKaDevice)
-//            {
-//                KaMemoryPart part;
-//                part.setData(q1.record());
-//                rez.append(part);
-//            }
-//        }
-
-//    }
-    return rez;
-}
-
-void KaMemoryPart::setData(const QList<MemoryState>& list)
-{
-//    setBegin(record.value("from").toInt());
-//    setEnd(record.value("to").toInt());
-//    setStatus((MemoryState)record.value("type").toInt());
-}
-
-
-
-
-KaMemoryGraphicsPart::KaMemoryGraphicsPart(QGraphicsItem *parent):
-    KaMemoryAbstractPart(parent)
+MLineGraphicsPart::MLineGraphicsPart(QGraphicsItem *parent):
+    MLineAbstractPart(parent)
 {
     _status=Empty;
     setFlags(ItemIsSelectable);
@@ -234,7 +145,7 @@ KaMemoryGraphicsPart::KaMemoryGraphicsPart(QGraphicsItem *parent):
 
 }
 
-KaMemoryGraphicsPart::~KaMemoryGraphicsPart()
+MLineGraphicsPart::~MLineGraphicsPart()
 {
 
 }

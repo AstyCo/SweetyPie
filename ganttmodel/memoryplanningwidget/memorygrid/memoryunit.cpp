@@ -1,18 +1,18 @@
-#include "memoryunit.hpp"
-#include "memoryscene.hpp"
+#include "mgrid_unit.h"
+#include "mgrid_scene.h"
 
 #include "kamemorypart.h"
 
-#include "globalvalues.hpp"
+#include "memory_globalvalues.h"
 
 #include <QPainterPath>
 #include <QPainter>
 
 #include <QDebug>
 
-extern MemoryScene* mem_scene;
+extern MGridScene* mem_scene;
 
-MemoryUnit::MemoryUnit(QGraphicsItem *parent /*= 0*/)
+MGridUnit::MGridUnit(QGraphicsItem *parent /*= 0*/)
     : QGraphicsItem(parent)
 {
 //    setFlag(QGraphicsItem::ItemHasNoContents);
@@ -20,7 +20,7 @@ MemoryUnit::MemoryUnit(QGraphicsItem *parent /*= 0*/)
     rand = qrand()%2;
     isEmpty = true;
 
-    m_scene = dynamic_cast<MemoryScene*>(scene());
+    m_scene = dynamic_cast<MGridScene*>(scene());
     setItems();
     if(!m_scene)
         qDebug() << "Not MemoryScene*";
@@ -34,17 +34,17 @@ MemoryUnit::MemoryUnit(QGraphicsItem *parent /*= 0*/)
 
 }
 
-QRectF MemoryUnit::boundingRect() const
+QRectF MGridUnit::boundingRect() const
 {
     return m_shapeBorder.boundingRect().adjusted(-extraSize(),-extraSize(),extraSize(),extraSize());
 }
 
-QPainterPath MemoryUnit::shape() const
+QPainterPath MGridUnit::shape() const
 {
     return m_shapeBorder;
 }
 
-void MemoryUnit::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
+void MGridUnit::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
 {
     Q_UNUSED(option);
     Q_UNUSED(widget);
@@ -61,65 +61,65 @@ void MemoryUnit::paint(QPainter *painter, const QStyleOptionGraphicsItem *option
 
 }
 
-int MemoryUnit::unitId() const
+int MGridUnit::unitId() const
 {
     return m_unitId;
 }
 
-void MemoryUnit::setUnitId(int unitId)
+void MGridUnit::setUnitId(int unitId)
 {
     m_unitId = unitId;
 }
 
-Memory::MemoryState MemoryUnit::state() const
+Memory::MemoryState MGridUnit::state() const
 {
     return m_state;
 }
 
-void MemoryUnit::setState(const Memory::MemoryState &status)
+void MGridUnit::setState(const Memory::MemoryState &status)
 {
     m_state = status;
 }
 
-long MemoryUnit::start() const
+long MGridUnit::start() const
 {
     return m_start;
 }
 
-void MemoryUnit::setStart(long start)
+void MGridUnit::setStart(long start)
 {
     m_start = start;
 }
 
-long MemoryUnit::finish() const
+long MGridUnit::finish() const
 {
     return m_finish;
 }
 
-void MemoryUnit::setFinish(long finish)
+void MGridUnit::setFinish(long finish)
 {
     m_finish = finish;
 }
 
-long MemoryUnit::size() const
+long MGridUnit::size() const
 {
     return m_finish-m_start + 1;
 }
 
-void MemoryUnit::setSize(long newSize)
+void MGridUnit::setSize(long newSize)
 {
     setFinish(start()+newSize-1);
 }
 
-qreal MemoryUnit::spacing() const
+qreal MGridUnit::spacing() const
 {
-    MemoryScene* p_memScene = dynamic_cast<MemoryScene*>(scene());
+    MGridScene* p_memScene = dynamic_cast<MGridScene*>(scene());
     if(!p_memScene)
         return DEFAULT_SPACING;
     return p_memScene->spacing();
 }
 
-QVariant MemoryUnit::itemChange(QGraphicsItem::GraphicsItemChange change, const QVariant &value)
+QVariant MGridUnit::itemChange(QGraphicsItem::GraphicsItemChange change, const QVariant &value)
 {
 //    MemoryItem* p_mem = dynamic_cast<MemoryItem*>(value.value<QGraphicsItem*>());
 //    if(!p_mem)
@@ -151,7 +151,7 @@ QVariant MemoryUnit::itemChange(QGraphicsItem::GraphicsItemChange change, const 
     return QGraphicsItem::itemChange(change,value); // MAYBE change to QVariant()
 }
 
-void MemoryUnit::hoverEnterEvent(QGraphicsSceneHoverEvent *event)
+void MGridUnit::hoverEnterEvent(QGraphicsSceneHoverEvent *event)
 {
     if(!m_scene)
         return;
@@ -173,14 +173,14 @@ void MemoryUnit::hoverEnterEvent(QGraphicsSceneHoverEvent *event)
     return QGraphicsItem::hoverEnterEvent(event);
 }
 
-void MemoryUnit::hoverLeaveEvent(QGraphicsSceneHoverEvent *event)
+void MGridUnit::hoverLeaveEvent(QGraphicsSceneHoverEvent *event)
 {
     setZValue(0);
     setShowBorder(false);
     return QGraphicsItem::hoverLeaveEvent(event);
 }
 
-void MemoryUnit::rebuildShape()
+void MGridUnit::rebuildShape()
 {
     if(isEmpty)
     {
@@ -202,12 +202,12 @@ void MemoryUnit::rebuildShape()
             utterRight = itemsPath.boundingRect().left(); // -||- right, left() is MAX
 
 
-    MemoryItem  *utterLeftItem = NULL,
+    MGridtem  *utterLeftItem = NULL,
                 *utterRightItem = NULL;
 
     for(int i = m_start; i<= m_finish; ++i)
     {
-        MemoryItem* item = m_items->at(i);
+        MGridtem* item = m_items->at(i);
         qreal   itemTop = item->geometry().top(),
                 itemBottom = item->geometry().bottom();
 
@@ -295,37 +295,37 @@ void MemoryUnit::rebuildShape()
     setShapeBorder(path);   
 }
 
-QPainterPath MemoryUnit::shapeBorder() const
+QPainterPath MGridUnit::shapeBorder() const
 {
     return m_shapeBorder;
 }
 
-void MemoryUnit::setShapeBorder(const QPainterPath &shapeBorder)
+void MGridUnit::setShapeBorder(const QPainterPath &shapeBorder)
 {
     m_shapeBorder = shapeBorder;
 }
 
-void MemoryUnit::setItems()
+void MGridUnit::setItems()
 {
     m_items = &(m_scene->m_items);
 }
 
-bool MemoryUnit::showBorder() const
+bool MGridUnit::showBorder() const
 {
     return m_unitSelected;
 }
 
-void MemoryUnit::setShowBorder(bool unitSelected)
+void MGridUnit::setShowBorder(bool unitSelected)
 {
     m_unitSelected = unitSelected;
 }
 
-QColor MemoryUnit::color() const
+QColor MGridUnit::color() const
 {
     return MemoryState_to_QColor(m_state);
 }
 
-void MemoryUnit::addItems(long start, long finish)
+void MGridUnit::addItems(long start, long finish)
 {
     if(!m_items)
         return;
@@ -339,7 +339,7 @@ void MemoryUnit::addItems(long start, long finish)
     updateParenthesis();
 }
 
-long MemoryUnit::removeItems(long from, long count)
+long MGridUnit::removeItems(long from, long count)
 {
     if(!m_scene)
         return 0;
@@ -350,11 +350,11 @@ long MemoryUnit::removeItems(long from, long count)
 
     if(from>m_start && from+count-1<m_finish)
     {
-        MemoryUnit* p_memUnit1 = m_scene->newUnit(); // first -to- from-1
+        MGridUnit* p_memUnit1 = m_scene->newUnit(); // first -to- from-1
         p_memUnit1->setState(m_state);
         p_memUnit1->addItems(m_start,from-1);
 
-        MemoryUnit* p_memUnit2 = m_scene->newUnit(); // from+count-1   -to- last
+        MGridUnit* p_memUnit2 = m_scene->newUnit(); // from+count-1   -to- last
         p_memUnit2->setState(m_state);
         p_memUnit2->addItems(from+count,m_finish);
 
@@ -397,7 +397,7 @@ long MemoryUnit::removeItems(long from, long count)
     return count;
 }
 
-void MemoryUnit::updateParenthesis()
+void MGridUnit::updateParenthesis()
 {
     if(isEmpty)
         return;
@@ -408,7 +408,7 @@ void MemoryUnit::updateParenthesis()
     rebuildShape();
 }
 
-qreal MemoryUnit::extraSize() const
+qreal MGridUnit::extraSize() const
 {
     return spacing()/2 + m_scene->itemBorder();
 }

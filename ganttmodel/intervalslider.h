@@ -23,6 +23,7 @@
 class GANTTMODELSHARED_EXPORT IntervalSlider : public QWidget
 {
     Q_OBJECT
+
 public:
     enum  ClippedHandle
     {
@@ -88,6 +89,7 @@ private:
     virtual void mouseMoveEvent( QMouseEvent *e );
     virtual void mouseReleaseEvent( QMouseEvent *e );
     virtual void mousePressEvent( QMouseEvent *e );
+public:
 
 signals:
 
@@ -95,8 +97,6 @@ signals:
     void endMoved(long value);
 
     void valueChanged(ClippedHandle e, long value);
-
-private slots:
 
 };
 

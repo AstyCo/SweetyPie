@@ -1,6 +1,6 @@
 
-#include "labelitem.hpp"
-#include "globalvalues.hpp"
+#include "mgrid_labelitem.h"
+#include "memory_globalvalues.h"
 
 #include <QPainter>
 #include <QStyle>
@@ -11,7 +11,7 @@
 
 #include <QDebug>
 
-LabelItem::LabelItem(const QString& label,
+MGridLabelItem::MGridLabelItem(const QString& label,
                      QGraphicsItem *parent/* = 0*/,
                      qreal edgeLength /*= DEFAULT_EDGELENGTH*/,
                      qreal borderWidth /*= DEFAULT_BORDERWIDTH*/,
@@ -25,13 +25,13 @@ LabelItem::LabelItem(const QString& label,
     setLabel(label);
 }
 
-LabelItem::~LabelItem()
+MGridLabelItem::~MGridLabelItem()
 {
 
 }
 
 
-void LabelItem::paint(QPainter *painter,
+void MGridLabelItem::paint(QPainter *painter,
     const QStyleOptionGraphicsItem *option, QWidget *widget /*= 0*/)
 {
     Q_UNUSED(option);
@@ -78,40 +78,40 @@ void LabelItem::paint(QPainter *painter,
         painter->drawText(boundingRect(),Qt::AlignCenter,m_label);
     }
 }
-QString LabelItem::getLabel() const
+QString MGridLabelItem::getLabel() const
 {
     return m_label;
 }
 
-void LabelItem::setLabel(const QString &value)
+void MGridLabelItem::setLabel(const QString &value)
 {
     m_label = value;
 }
 
-QColor LabelItem::getColor() const
+QColor MGridLabelItem::getColor() const
 {
     return m_color;
 }
 
-void LabelItem::setColor(const QColor &color)
+void MGridLabelItem::setColor(const QColor &color)
 {
     m_color = color;
 }
-int LabelItem::getEdgeLength() const
+int MGridLabelItem::getEdgeLength() const
 {
     return m_edgeLength;
 }
 
-void LabelItem::setEdgeLength(int edgeLength)
+void MGridLabelItem::setEdgeLength(int edgeLength)
 {
     m_edgeLength = edgeLength;
 }
-qreal LabelItem::getBorderWidth() const
+qreal MGridLabelItem::getBorderWidth() const
 {
     return m_borderWidth;
 }
 
-void LabelItem::setBorderWidth(const qreal &borderWidth)
+void MGridLabelItem::setBorderWidth(const qreal &borderWidth)
 {
     m_borderWidth = borderWidth;
 }
@@ -119,7 +119,7 @@ void LabelItem::setBorderWidth(const qreal &borderWidth)
 
 
 
-QRectF LabelItem::boundingRect() const
+QRectF MGridLabelItem::boundingRect() const
 {
     return QRectF( 0, 0, m_edgeLength + 2*m_borderWidth, m_edgeLength + 2*m_borderWidth);
 }
@@ -132,14 +132,14 @@ QRectF LabelItem::boundingRect() const
 //    return path;
 //}
 
-void LabelItem::setGeometry(const QRectF &geom)
+void MGridLabelItem::setGeometry(const QRectF &geom)
 {
     prepareGeometryChange();
     QGraphicsLayoutItem::setGeometry(geom);
     setPos(geom.topLeft());
 }
 
-QSizeF LabelItem::sizeHint(Qt::SizeHint which, const QSizeF &constraint) const
+QSizeF MGridLabelItem::sizeHint(Qt::SizeHint which, const QSizeF &constraint) const
 {
     switch (which) {
     case Qt::MinimumSize:

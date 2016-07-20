@@ -36,7 +36,7 @@ INCLUDEPATH += "$$PWD/../ganttmodel/memoryplanningwidget"
 INCLUDEPATH += "$$PWD/../ganttmodel/memoryplanningwidget/memoryline"
 INCLUDEPATH += "$$PWD/../ganttmodel/memoryplanningwidget/memorygrid"
 
-
+message(DESTDIR: $$DESTDIR)
 LIBS += -L"$${DESTDIR}"
 CONFIG(release, debug|release) {
   LIBS += -lganttmodel

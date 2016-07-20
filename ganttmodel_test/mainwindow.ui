@@ -162,7 +162,7 @@
   <customwidget>
    <class>MemoryPlanningWidget</class>
    <extends>QWidget</extends>
-   <header>memoryplanningwidget.hpp</header>
+   <header>memoryplanningwidget.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

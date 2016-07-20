@@ -1,30 +1,30 @@
 
 #include "kamemory.h"
-#include "kamemoryscene.h"
+#include "mline_scene.h"
 
 #include <QDebug>
 #include <QCursor>
 #include "QGraphicsTextItem"
 
-KaMemory KaMemoryScene::memory() const
+KaMemory MLineScene::memory() const
 {
     return _memory;
 }
 
-void KaMemoryScene::init(const QList<KaMemoryPart> &records, long memorySize)
+void MLineScene::init(const QList<KaMemoryPart> &records, long memorySize)
 {
     KaMemory kaMemory;
     kaMemory.init(records,2048);
     setMemory(kaMemory);
 }
 
-void KaMemoryScene::setMemory(const KaMemory &memory)
+void MLineScene::setMemory(const KaMemory &memory)
 {
     _memory = memory;
 
     for(int i=0; i<_memory.memoryParts().count(); i++)
     {
-        KaMemoryGraphicsPart * part = new KaMemoryGraphicsPart();
+        MLineGraphicsPart * part = new MLineGraphicsPart();
         addItem(part);
         part->setVisible(true);
         _memoryParts.append(part);
@@ -35,11 +35,11 @@ void KaMemoryScene::setMemory(const KaMemory &memory)
         _memoryGroups.append(group);
         addItem(group);
         {
-            KaMemoryGraphicsPart * part = new KaMemoryGraphicsPart(group);
+            MLineGraphicsPart * part = new MLineGraphicsPart(group);
             group->addToGroup(part);
             part->setStatus(_memory.memoryParts()[i].state());
-            part->setBegin(_memory.memoryParts()[i].begin());
-            part->setEnd(_memory.memoryParts()[i].end());
+            part->setBegin(_memory.memoryParts()[i].start());
+            part->setEnd(_memory.memoryParts()[i].finish());
 
         }
         group->setVisible(true);
@@ -47,10 +47,10 @@ void KaMemoryScene::setMemory(const KaMemory &memory)
 }
 
 
-KaMemoryScene::KaMemoryScene(QObject *parent):
+MLineScene::MLineScene(QObject *parent):
     QGraphicsScene(parent)
 {
-    m_picker = new KaMemoryPicker();
+    m_picker = new MLinePicker();
     m_picker->setVisible(true);
     addItem(m_picker);
 
@@ -61,35 +61,35 @@ KaMemoryScene::KaMemoryScene(QObject *parent):
     createLegend(10, 70);
 }
 
-KaMemoryScene::~KaMemoryScene()
+MLineScene::~MLineScene()
 {
 
 }
 
-void KaMemoryScene::drawBackground(QPainter *painter, const QRectF &rect)
+void MLineScene::drawBackground(QPainter *painter, const QRectF &rect)
 {
-    painter->setPen(QColor(Qt::black));
-    qreal metrY = 40;
-    painter->drawLine(rect.left()+dx_border, sceneRect().top()+metrY, rect.left()+dx_border, sceneRect().top()+metrY+10);
-    painter->drawLine(rect.left()+dx_border, sceneRect().top()+metrY+10, rect.right()-dx_border, sceneRect().top()+metrY+10);
-    painter->drawLine(rect.right()-dx_border, sceneRect().top()+metrY+10, rect.right()-dx_border, sceneRect().top()+metrY);
-    QRectF textLeft(rect.left(), sceneRect().top()+metrY+10, 20, 15);
-    painter->drawText(textLeft, Qt::AlignCenter, "0");
-    QRectF textRight(rect.right()-20, sceneRect().top()+metrY+10, 20, 15);
+//    painter->setPen(QColor(Qt::black));
+//    qreal metrY = 40;
+//    painter->drawLine(rect.left()+dx_border, sceneRect().top()+metrY, rect.left()+dx_border, sceneRect().top()+metrY+10);
+//    painter->drawLine(rect.left()+dx_border, sceneRect().top()+metrY+10, rect.right()-dx_border, sceneRect().top()+metrY+10);
+//    painter->drawLine(rect.right()-dx_border, sceneRect().top()+metrY+10, rect.right()-dx_border, sceneRect().top()+metrY);
+//    QRectF textLeft(rect.left(), sceneRect().top()+metrY+10, 20, 15);
+//    painter->drawText(textLeft, Qt::AlignCenter, "0");
+//    QRectF textRight(rect.right()-20, sceneRect().top()+metrY+10, 20, 15);
 
-    {
-        painter->drawText(textRight, Qt::AlignCenter,QString::number(_memory.memorySize()));
-        painter->setPen(Qt::DashLine);
-        {
-            painter->drawLine(rect.left()/*+i*inputChannelSize()*(width()-2*dx_border)/_memory.memorySize()*/+dx_border,
-                              sceneRect().top()+metrY+20,
-                              rect.left()/*+i*inputChannelSize()*(width()-2*dx_border)/_memory.memorySize()*/+dx_border,
-                              sceneRect().top()+metrY-5);
-        }
-    }
+//    {
+//        painter->drawText(textRight, Qt::AlignCenter,QString::number(_memory.memorySize()));
+//        painter->setPen(Qt::DashLine);
+//        {
+//            painter->drawLine(rect.left()/*+i*inputChannelSize()*(width()-2*dx_border)/_memory.memorySize()*/+dx_border,
+//                              sceneRect().top()+metrY+20,
+//                              rect.left()/*+i*inputChannelSize()*(width()-2*dx_border)/_memory.memorySize()*/+dx_border,
+//                              sceneRect().top()+metrY-5);
+//        }
+//    }
 }
 
-void KaMemoryScene::createLegend(qreal posX, qreal posY)
+void MLineScene::createLegend(qreal posX, qreal posY)
 {
     qreal row0 = posY;
     qreal row1 = row0 + 20;
@@ -165,7 +165,7 @@ void KaMemoryScene::createLegend(qreal posX, qreal posY)
 
 }
 
-void KaMemoryScene::createStatistic(qreal posX, qreal posY)
+void MLineScene::createStatistic(qreal posX, qreal posY)
 {
 //    if(!isInputChannelMode())
 //    {
@@ -185,13 +185,13 @@ void KaMemoryScene::createStatistic(qreal posX, qreal posY)
     _memSizeText->setPos(posX, posY+20);
 }
 
-KaMemoryPicker *KaMemoryScene::picker() const
+MLinePicker *MLineScene::picker() const
 {
     return m_picker;
 }
 
 
-KaMemoryGraphicsPart *KaMemoryScene::selectedKaMemoryPart()
+MLineGraphicsPart *MLineScene::selectedKaMemoryPart()
 {
     QGraphicsItem * selItem = selectedItems().first();
     for(int i=0; i<_memoryParts.count(); i++)

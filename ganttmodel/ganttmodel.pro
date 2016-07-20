@@ -17,7 +17,8 @@ DEFINES += QWT_DLL
 TARGET = ganttmodel
 
 DESTDIR = $$OUT_PWD/../bin
-DLLDESTDIR = $$DESTDIR
+
+#DLLDESTDIR = $$DESTDIR
 
 # пути к зависимым библиотекам
 unix {
@@ -124,23 +125,23 @@ HEADERS += \
     chartsettings.h \
     plotnavigator.h \
     intervalselectionmodel.h \
-    memoryplanningwidget/globalvalues.hpp \
-    memoryplanningwidget/memoryview.hpp \
-    memoryplanningwidget/memoryplanningwidget.hpp \
     ganttitemstage.h \
-    memoryplanningwidget/memoryline/kamemoryabstractpart.h \
-    memoryplanningwidget/memoryline/kamemorypicker.h \
+    memoryplanningwidget/memoryline/mline_abstractpart.h \
+    memoryplanningwidget/memoryline/mline_picker.h \
+    memoryplanningwidget/memoryline/mline_graphicspart.h \
+    memoryplanningwidget/memorygrid/mgrid_interactiveunit.h \
+    memoryplanningwidget/memorygrid/mgrid_item.h \
+    memoryplanningwidget/memorygrid/mgrid_labelitem.h \
+    memoryplanningwidget/memorygrid/mgrid_scene.h \
+    memoryplanningwidget/memorygrid/mgrid_status.h \
+    memoryplanningwidget/memorygrid/mgrid_unit.h \
+    memoryplanningwidget/memorygrid/mgrid_widget.h \
+    memoryplanningwidget/memoryplanningwidget.h \
+    memoryplanningwidget/memoryview.h \
+    memoryplanningwidget/memoryline/mline_scene.h \
     memoryplanningwidget/kamemory.h \
-    memoryplanningwidget/memoryline/kamemoryscene.h \
     memoryplanningwidget/kamemorypart.h \
-    memoryplanningwidget/memoryline/kamemorygraphicspart.h \
-    memoryplanningwidget/memorygrid/labelitem.hpp \
-    memoryplanningwidget/memorygrid/memoryinteractiveunit.hpp \
-    memoryplanningwidget/memorygrid/memoryitem.hpp \
-    memoryplanningwidget/memorygrid/memoryscene.hpp \
-    memoryplanningwidget/memorygrid/memorystatus.hpp \
-    memoryplanningwidget/memorygrid/memoryunit.hpp \
-    memoryplanningwidget/memorygrid/memorywidget.hpp
+    memoryplanningwidget/memory_globalvalues.h
 
 
 RESOURCES += \

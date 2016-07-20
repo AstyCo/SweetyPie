@@ -1,6 +1,6 @@
-#include "memorystatus.hpp"
+#include "mgrid_status.h"
 
-#include "memoryscene.hpp"
+#include "mgrid_scene.h"
 
 #include <QPainter>
 
@@ -9,9 +9,9 @@
 
 #include <QDebug>
 
-extern MemoryScene* mem_scene;
+extern MGridScene* mem_scene;
 
-MemoryStatus::MemoryStatus(QGraphicsItem* parent)
+MGridStatus::MGridStatus(QGraphicsItem* parent)
     : QGraphicsItem(parent), QGraphicsLayoutItem()
 {
     setGraphicsItem(this);
@@ -21,20 +21,20 @@ MemoryStatus::MemoryStatus(QGraphicsItem* parent)
     setFlag(QGraphicsItem::ItemSendsGeometryChanges,true);
 }
 
-MemoryStatus::~MemoryStatus()
+MGridStatus::~MGridStatus()
 {
 }
 
-void MemoryStatus::setGeometry(const QRectF &geom)
+void MGridStatus::setGeometry(const QRectF &geom)
 {
     prepareGeometryChange();
     QGraphicsLayoutItem::setGeometry(geom);
     setPos(geom.topLeft());
 }
 
-QSizeF MemoryStatus::sizeHint(Qt::SizeHint which, const QSizeF &constraint) const
+QSizeF MGridStatus::sizeHint(Qt::SizeHint which, const QSizeF &constraint) const
 {
-    MemoryScene* p_scene =dynamic_cast<MemoryScene*>(scene());
+    MGridScene* p_scene =dynamic_cast<MGridScene*>(scene());
 
     if(p_scene)
     {
@@ -50,12 +50,12 @@ QSizeF MemoryStatus::sizeHint(Qt::SizeHint which, const QSizeF &constraint) cons
     return constraint;
 }
 
-QRectF MemoryStatus::boundingRect() const
+QRectF MGridStatus::boundingRect() const
 {
     return QRectF( 0, 0, parentItem()->boundingRect().width(), height());
 }
 
-void MemoryStatus::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
+void MGridStatus::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
 {
     Q_UNUSED(widget);
     Q_UNUSED(option);
@@ -88,57 +88,57 @@ void MemoryStatus::paint(QPainter *painter, const QStyleOptionGraphicsItem *opti
     painter->drawText(m_unitInfoRect,Qt::AlignCenter,unitInfo());
 
 }
-QString MemoryStatus::statusLabel() const
+QString MGridStatus::statusLabel() const
 {
     return m_statusLabel;
 }
 
-void MemoryStatus::setStatusLabel(const QString &statusLabel)
+void MGridStatus::setStatusLabel(const QString &statusLabel)
 {
     m_statusLabel = statusLabel;
 }
-QString MemoryStatus::itemInfo() const
+QString MGridStatus::itemInfo() const
 {
     return m_itemInfo;
 }
 
-void MemoryStatus::setItemInfo(const QString &itemInfo)
+void MGridStatus::setItemInfo(const QString &itemInfo)
 {
     m_itemInfo = itemInfo;
 }
-QString MemoryStatus::unitInfo() const
+QString MGridStatus::unitInfo() const
 {
     return m_unitInfo;
 }
 
-void MemoryStatus::setUnitInfo(const QString &unitInfo)
+void MGridStatus::setUnitInfo(const QString &unitInfo)
 {
     m_unitInfo = unitInfo;
 }
 
 
-void MemoryStatus::transformChanged(const QTransform &transform)
+void MGridStatus::transformChanged(const QTransform &transform)
 {
     qreal vScaling = transform.m22();
 
     setHeight(DEFAULT_STATUS_HEIGHT/vScaling);
 
 }
-qreal MemoryStatus::height() const
+qreal MGridStatus::height() const
 {
     return m_height;
 }
 
-void MemoryStatus::setHeight(const qreal &height)
+void MGridStatus::setHeight(const qreal &height)
 {
     m_height = height;
 }
-QFont MemoryStatus::font() const
+QFont MGridStatus::font() const
 {
     return m_font;
 }
 
-void MemoryStatus::setFont(const QFont &font)
+void MGridStatus::setFont(const QFont &font)
 {
     m_font = font;
 }

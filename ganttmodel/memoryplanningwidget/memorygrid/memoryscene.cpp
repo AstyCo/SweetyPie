@@ -1,7 +1,8 @@
-#include "memoryscene.hpp"
-#include "memoryview.hpp"
+#include "mgrid_scene.h"
+#include "memoryview.h"
 
-#include "memoryinteractiveunit.hpp"
+#include "kamemory.h"
+#include "mgrid_interactiveunit.h"
 
 #include <QGraphicsSceneMouseEvent>
 
@@ -17,7 +18,7 @@ qreal qSqrt(qreal);
 
 
 
-MemoryScene::MemoryScene( QObject * parent)
+MGridScene::MGridScene( QObject * parent)
     :QGraphicsScene(parent)
 {
     clearLastSelected();
@@ -34,7 +35,7 @@ MemoryScene::MemoryScene( QObject * parent)
     setLengthHighlight(100);
 
 
-    m_memoryWidget = new MemoryWidget;
+    m_memoryWidget = new MGridWidget;
 
 //    m_memoryWidget->setPos(5,5);
 
@@ -48,20 +49,21 @@ MemoryScene::MemoryScene( QObject * parent)
 
 }
 
-MemoryScene::~MemoryScene()
+MGridScene::~MGridScene()
 {
+    delete m_memoryWidget;
 }
 
-void MemoryScene::mousePressEvent(QGraphicsSceneMouseEvent *event)
+void MGridScene::mousePressEvent(QGraphicsSceneMouseEvent *event)
 {
     QList<QGraphicsItem*> itemsAtPos = items(event->scenePos());
 
 
-    MemoryItem* p_mem = NULL;
+    MGridtem* p_mem = NULL;
 
     foreach(QGraphicsItem* itemAtPos,itemsAtPos)
     {
-        if((p_mem=dynamic_cast<MemoryItem*>(itemAtPos)))
+        if((p_mem=dynamic_cast<MGridtem*>(itemAtPos)))
             break;
     }
     if(!p_mem)
@@ -73,7 +75,7 @@ void MemoryScene::mousePressEvent(QGraphicsSceneMouseEvent *event)
 
 }
 
-void MemoryScene::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
+void MGridScene::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
 {
     if(m_lastSelected
 //       && (QApplication::keyboardModifiers()&Qt::ShiftModifier)
@@ -81,11 +83,11 @@ void MemoryScene::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
     {
 
         QList<QGraphicsItem*> itemsAtPos = items(event->scenePos());
-        MemoryItem * p_mem = NULL;
+        MGridtem * p_mem = NULL;
 
         foreach(QGraphicsItem* itemAtPos,itemsAtPos)
         {
-            if((p_mem=dynamic_cast<MemoryItem*>(itemAtPos)))
+            if((p_mem=dynamic_cast<MGridtem*>(itemAtPos)))
                 break;
         }
 
@@ -103,7 +105,7 @@ void MemoryScene::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
 
         for(int i = 0; i < sceneItems.size(); ++i)
         {
-            MemoryItem* p_itemAt = dynamic_cast<MemoryItem*>(sceneItems[i]);
+            MGridtem* p_itemAt = dynamic_cast<MGridtem*>(sceneItems[i]);
             if(!p_itemAt)
             {
                 continue;
@@ -117,14 +119,14 @@ void MemoryScene::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
     return QGraphicsScene::mouseMoveEvent(event);
 }
 
-void MemoryScene::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
+void MGridScene::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
 {
     clearLastSelected();
 
     return QGraphicsScene::mouseReleaseEvent(event);
 }
 
-void MemoryScene::keyPressEvent(QKeyEvent *event)
+void MGridScene::keyPressEvent(QKeyEvent *event)
 {
     qDebug()<<"MemoryScene::keyPressEvent";
 
@@ -133,7 +135,7 @@ void MemoryScene::keyPressEvent(QKeyEvent *event)
     return QGraphicsScene::keyPressEvent(event);
 }
 
-void MemoryScene::keyReleaseEvent(QKeyEvent *event)
+void MGridScene::keyReleaseEvent(QKeyEvent *event)
 {
     return QGraphicsScene::keyReleaseEvent(event);
 }
@@ -147,55 +149,56 @@ void MemoryScene::keyReleaseEvent(QKeyEvent *event)
 //    return QGraphicsScene::drawForeground(painter,rect);
 //}
 
-void MemoryScene::clearShownUnits()
+void MGridScene::clearShownUnits()
 {
-    foreach(MemoryUnit* unit,m_units)
+    foreach(MGridUnit* unit,m_units)
         unit->setShowBorder(false);
 }
 
-void MemoryScene::updateShownUnits()
+void MGridScene::updateShownUnits()
 {
     if(!m_highlightMode)
         return;
     for(int i = m_startHighlight; i<m_startHighlight+m_lengthHighlight; ++i)
     {
-        MemoryUnit* pmem_unit = m_items[i]->parentUnit();
+        MGridUnit* pmem_unit = m_items[i]->parentUnit();
         if(!pmem_unit)
             continue;
         pmem_unit->setShowBorder(true);
     }
 }
 
-void MemoryScene::init(const QList<MemoryItemPresentation> &mem_it_list,long memSize)
+void MGridScene::setMemory(const KaMemory& kaMemory/*const QList<MemoryItemPresentation> &mem_it_list,long memSize*/)
 {
-    MemoryUnit * p_memUnit = NULL;
+    MGridUnit * p_memUnit = NULL;
 
-    setMemorySize(memSize);
+    m_memory = kaMemory;
+    setMemorySize(kaMemory.memorySize());
 
     for(int i = 0; i<memorySize(); ++i)
     {
-        m_items.append(new MemoryItem(i,itemEdge(),itemBorder(),m_memoryWidget));
+        m_items.append(new MGridtem(i,itemEdge(),itemBorder(),m_memoryWidget));
     }
 
     m_memoryWidget->setupMatrix(m_items);
 
-    for(int i = 0; i < mem_it_list.size(); ++i)
+    const QList<KaMemoryPart>& units = kaMemory.memoryParts();
+
+    for(int i = 0; i < units.size(); ++i)
     {
-        p_memUnit = new MemoryUnit(m_memoryWidget);
-        p_memUnit->setState(mem_it_list[i].m_state);
-        p_memUnit->setUnitId(mem_it_list[i].m_unitId);
-        p_memUnit->addItems(mem_it_list[i].m_start,mem_it_list[i].m_finish);
+        p_memUnit = new MGridUnit(m_memoryWidget);
+        p_memUnit->setState(units[i].state());
+        p_memUnit->setUnitId(units[i].id());
+        p_memUnit->addItems(units[i].start(),units[i].finish());
 
 
         addUnit(p_memUnit);
     }
-
-//    m_interactiveUnit = new MemoryInteractiveUnit(this,m_memoryWidget);
 }
 
-MemoryUnit* MemoryScene::newUnit(int unitId)
+MGridUnit* MGridScene::newUnit(int unitId)
 {
-    MemoryUnit* p_memUnit = NULL;
+    MGridUnit* p_memUnit = NULL;
     if(unitId == -1)
     {
         int vacantUnitId = 1;
@@ -209,7 +212,7 @@ MemoryUnit* MemoryScene::newUnit(int unitId)
     else if(m_unit_by_unitId.contains(unitId))
         return m_unit_by_unitId[unitId];
 
-    p_memUnit = new MemoryUnit(m_memoryWidget);
+    p_memUnit = new MGridUnit(m_memoryWidget);
     p_memUnit->setState(Memory::Empty);
     p_memUnit->setUnitId(unitId);
 
@@ -218,18 +221,18 @@ MemoryUnit* MemoryScene::newUnit(int unitId)
     return p_memUnit;
 }
 
-MemoryUnit *MemoryScene::unit(int unitId) const
+MGridUnit *MGridScene::unit(int unitId) const
 {
     return m_unit_by_unitId.value(unitId);
 }
 
-void MemoryScene::setItemInfo(const QString &text)
+void MGridScene::setItemInfo(const QString &text)
 {
     m_memoryWidget->setItemInfo(text);
     memoryStatusUpdate();
 }
 
-void MemoryScene::setUnitInfo(const QString &text)
+void MGridScene::setUnitInfo(const QString &text)
 {
     m_memoryWidget->setUnitInfo(text);
     memoryStatusUpdate();
@@ -240,12 +243,12 @@ void MemoryScene::setUnitInfo(const QString &text)
 //    return m_memoryWidget->m_statusBar;
 //}
 
-int MemoryScene::itemPerRow() const
+int MGridScene::itemPerRow() const
 {
     return m_memoryWidget->itemPerRow();
 }
 
-void MemoryScene::setItemPerRow(int newItemPerRow)
+void MGridScene::setItemPerRow(int newItemPerRow)
 {
     if(newItemPerRow==itemPerRow())
         return;
@@ -255,28 +258,28 @@ void MemoryScene::setItemPerRow(int newItemPerRow)
     updateParenthesis();
 }
 
-qreal MemoryScene::itemEdge() const
+qreal MGridScene::itemEdge() const
 {
     if(m_items.isEmpty())
         return DEFAULT_EDGELENGTH;
     return m_items[0]->edgeLength();
 }
 
-void MemoryScene::setItemEdge(qreal newEdgeLength)
+void MGridScene::setItemEdge(qreal newEdgeLength)
 {
-    foreach(MemoryItem* item, m_items)
+    foreach(MGridtem* item, m_items)
     {
         item->setEdgeLength(newEdgeLength);
     }
 }
 
-void MemoryScene::clearLastSelected()
+void MGridScene::clearLastSelected()
 {
     m_lastSelected = NULL;
     m_lastSelectedIndex = -1;
 }
 
-void MemoryScene::setLastSelected(MemoryItem *p_mem)
+void MGridScene::setLastSelected(MGridtem *p_mem)
 {
     m_lastSelected = p_mem;
     if(!p_mem)
@@ -289,22 +292,24 @@ void MemoryScene::setLastSelected(MemoryItem *p_mem)
     }
 }
 
-int MemoryScene::itemIndex(QGraphicsItem *item) const
+int MGridScene::itemIndex(QGraphicsItem *item) const
 {
     return items().indexOf(item);
 }
 
-void MemoryScene::memoryStatusUpdate(const QRectF &rect)
+void MGridScene::memoryStatusUpdate(const QRectF &rect)
 {
     m_memoryWidget->memoryStatusUpdate(rect);
 }
 
-bool MemoryScene::inHighlightRange(long index) const
+bool MGridScene::inHighlightRange(long index) const
 {
+    if(!m_highlightMode)
+        return false;
     return m_startHighlight <= index && index < m_startHighlight+m_lengthHighlight;
 }
 
-bool MemoryScene::errorHandler(QList<ActionErrors> &errors) const
+bool MGridScene::errorHandler(QList<ActionErrors> &errors) const
 {
     qDebug() <<"MemoryScene::errorHandler";
 
@@ -346,18 +351,25 @@ bool MemoryScene::errorHandler(QList<ActionErrors> &errors) const
         return false;
     }
 }
-bool MemoryScene::interactiveHighlight() const
+KaMemory MGridScene::memory() const
 {
+    return m_memory;
+}
+
+bool MGridScene::interactiveHighlight() const
+{
+    if(!m_highlightMode)
+        return false;
     return m_interactiveHighlight;
 }
 
-void MemoryScene::setInteractiveHighlight(bool interactiveHighlight)
+void MGridScene::setInteractiveHighlight(bool interactiveHighlight)
 {
     m_interactiveHighlight = interactiveHighlight;
 }
 
 
-QString MemoryScene::warning(ActionErrors id)
+QString MGridScene::warning(ActionErrors id)
 {
 
     switch (id)
@@ -394,17 +406,17 @@ QString MemoryScene::warning(ActionErrors id)
     }
 }
 
-long MemoryScene::lengthHighlight() const
+long MGridScene::lengthHighlight() const
 {
         return m_lengthHighlight;
         }
 
-MemoryWidget *MemoryScene::widget() const
+MGridWidget *MGridScene::widget() const
 {
         return m_memoryWidget;
 }
 
-void MemoryScene::addUnit(MemoryUnit *p_memUnit)
+void MGridScene::addUnit(MGridUnit *p_memUnit)
 {
     if(!p_memUnit)
         return;
@@ -412,7 +424,7 @@ void MemoryScene::addUnit(MemoryUnit *p_memUnit)
     m_units.append(p_memUnit);
 }
 
-void MemoryScene::removeUnit(MemoryUnit *p_memUnit)
+void MGridScene::removeUnit(MGridUnit *p_memUnit)
 {
     if(!p_memUnit)
         return;
@@ -423,12 +435,12 @@ void MemoryScene::removeUnit(MemoryUnit *p_memUnit)
     removeItem(p_memUnit);
 }
 
-QList<MemoryUnit *> MemoryScene::affectedUnits(long from, long to) const
+QList<MGridUnit *> MGridScene::affectedUnits(long from, long to) const
 {
-    QList<MemoryUnit*> result;
+    QList<MGridUnit*> result;
     for(int i = from; i <= to; ++i)
     {
-        MemoryUnit* parUnit = m_items[i]->parentUnit();
+        MGridUnit* parUnit = m_items[i]->parentUnit();
         if(!parUnit)
             continue;
         if(!result.contains(parUnit))
@@ -437,7 +449,7 @@ QList<MemoryUnit *> MemoryScene::affectedUnits(long from, long to) const
     return result;
 }
 
-long MemoryScene::freedCount(long from, long to) const
+long MGridScene::freedCount(long from, long to) const
 {
     long result = 0;
     for(int i = from; i <= to; ++i)
@@ -451,13 +463,13 @@ long MemoryScene::freedCount(long from, long to) const
     return result;
 }
 
-long MemoryScene::startHighlight() const
+long MGridScene::startHighlight() const
 {
     return m_startHighlight;
 }
 
 
-void MemoryScene::setStartHighlight(long startHighlight)
+void MGridScene::setStartHighlight(long startHighlight)
 {
     m_highlightMode = true;
     if(startHighlight+m_lengthHighlight>m_memorySize)
@@ -468,27 +480,27 @@ void MemoryScene::setStartHighlight(long startHighlight)
 }
 
 
-void MemoryScene::setLengthHighlight(long lengthHighlight)
+void MGridScene::setLengthHighlight(long lengthHighlight)
 {
     m_lengthHighlight = lengthHighlight;
 }
 
-bool MemoryScene::highlightMode() const
+bool MGridScene::highlightMode() const
 {
     return m_highlightMode;
 }
 
-void MemoryScene::setHighlightMode(bool highlightMode)
+void MGridScene::setHighlightMode(bool highlightMode)
 {
     m_highlightMode = highlightMode;
 }
 
-void MemoryScene::transformChanged(const QTransform &transform)
+void MGridScene::transformChanged(const QTransform &transform)
 {
     m_memoryWidget->transformChanged(transform);
 }
 
-void MemoryScene::setEmpty(long from, long count)
+void MGridScene::setEmpty(long from, long count)
 {
     QList<ActionErrors> errors;
     // ANALYSIS
@@ -511,7 +523,7 @@ void MemoryScene::setEmpty(long from, long count)
     }
 }
 
-void MemoryScene::setRead(long from, long count)
+void MGridScene::setRead(long from, long count)
 {
 
     QList<ActionErrors> errors;
@@ -536,7 +548,7 @@ void MemoryScene::setRead(long from, long count)
 
 }
 
-void MemoryScene::setAvailable(long from, long count)
+void MGridScene::setAvailable(long from, long count)
 {
 
     QList<ActionErrors> errors;
@@ -553,7 +565,7 @@ void MemoryScene::setAvailable(long from, long count)
 
 }
 
-void MemoryScene::setWritten(long from, long count)
+void MGridScene::setWritten(long from, long count)
 {
 
     QList<ActionErrors> errors;
@@ -585,7 +597,7 @@ void MemoryScene::setWritten(long from, long count)
 
 }
 
-void MemoryScene::setState(long from, long count, MemoryState state)
+void MGridScene::setState(long from, long count, MemoryState state)
 {
 
     clear(from,count);
@@ -594,7 +606,7 @@ void MemoryScene::setState(long from, long count, MemoryState state)
 
 
 
-    MemoryUnit* p_mu = newUnit();
+    MGridUnit* p_mu = newUnit();
     p_mu->setState(state);
     p_mu->addItems(from,from+count-1);
 
@@ -602,33 +614,33 @@ void MemoryScene::setState(long from, long count, MemoryState state)
 //    update();
 }
 
-void MemoryScene::clear(long from, long count)
+void MGridScene::clear(long from, long count)
 {
     if(from+count>=m_memorySize)
     {
         qDebug() <<"MemoryScene::free";
         count = m_memorySize-from-1;
     }
-    QList<MemoryUnit*> memoryUnits = affectedUnits(from,from+count-1);
+    QList<MGridUnit*> memoryUnits = affectedUnits(from,from+count-1);
     count-= freedCount(from,from+count-1);
 
-    foreach(MemoryUnit* unit, memoryUnits)
+    foreach(MGridUnit* unit, memoryUnits)
     {
         count-=unit->removeItems(qMax(unit->start(),from),count);
     }
     qDebug() << "MemoryScene::free";
 }
-long MemoryScene::memorySize() const
+long MGridScene::memorySize() const
 {
     return m_memorySize;
 }
 
-void MemoryScene::setMemorySize(long memorySize)
+void MGridScene::setMemorySize(long memorySize)
 {
     m_memorySize = memorySize;
 }
 
-void MemoryScene::viewResized(QSizeF viewSize)
+void MGridScene::viewResized(QSizeF viewSize)
 {
     qDebug()<<"viewResized";
 
@@ -644,26 +656,26 @@ void MemoryScene::viewResized(QSizeF viewSize)
     setSceneRect(itemsBoundingRect());
 }
 
-void MemoryScene::showInteractiveRange(long start, long finish)
+void MGridScene::showInteractiveRange(long start, long finish)
 {
     if(!m_interactiveUnit)
         return;
     m_interactiveUnit->setRange(start,finish);
 }
 
-void MemoryScene::hideInteractiveRange()
+void MGridScene::hideInteractiveRange()
 {
     if(!m_interactiveUnit)
         return;
     m_interactiveUnit->setShowBorders(false);
 }
 
-qreal MemoryScene::itemSize() const
+qreal MGridScene::itemSize() const
 {
     return spacing()+itemEdge()+2*itemBorder();
 }
 
-void MemoryScene::updateParenthesis()
+void MGridScene::updateParenthesis()
 {
     for(int i=0;i<m_units.size();++i)
     {
@@ -671,26 +683,26 @@ void MemoryScene::updateParenthesis()
     }
 }
 
-qreal MemoryScene::itemBorder() const
+qreal MGridScene::itemBorder() const
 {
     if(m_items.isEmpty())
         return DEFAULT_BORDERWIDTH;
     return m_items[0]->borderWidth();
 }
 
-void MemoryScene::setItemBorder(qreal itemBorder)
+void MGridScene::setItemBorder(qreal itemBorder)
 {
-    foreach(MemoryItem* item,m_items)
+    foreach(MGridtem* item,m_items)
         item->setBorderWidth(itemBorder);
 }
 
 
-qreal MemoryScene::spacing() const
+qreal MGridScene::spacing() const
 {
     return m_memoryWidget->spacing();
 }
 
-void MemoryScene::setSpacing(const qreal &spacing)
+void MGridScene::setSpacing(const qreal &spacing)
 {
     m_memoryWidget->setSpacing(spacing);
 }

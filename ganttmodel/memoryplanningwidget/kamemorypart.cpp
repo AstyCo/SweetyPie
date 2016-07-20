@@ -5,20 +5,120 @@
 using namespace Memory;
 
 
+
+int KaMemoryPart::id() const
+{
+    return m_id;
+}
+
+void KaMemoryPart::setId(int id)
+{
+    m_id = id;
+}
 MemoryState KaMemoryPart::state() const
 {
-    return _state;
+    return m_state;
 }
 
 void KaMemoryPart::setState(const MemoryState &statusPart)
 {
-    _state = statusPart;
+    m_state = statusPart;
 }
 
-int KaMemoryPart::size() const
+long KaMemoryPart::size() const
 {
-    return _end-_begin;
+    return m_finish-m_start;
 }
+
+
+long KaMemoryPart::start() const
+{
+    return m_start;
+}
+
+void KaMemoryPart::setStart(long start)
+{
+    m_start = start;
+}
+
+long KaMemoryPart::finish() const
+{
+    return m_finish;
+}
+
+void KaMemoryPart::setFinish(long finish)
+{
+    m_finish = finish;
+}
+KaMemoryPart::KaMemoryPart()
+{
+    m_state=Empty;
+    m_start =0;
+    m_finish = 0;
+}
+
+KaMemoryPart::~KaMemoryPart()
+{
+
+}
+
+
+
+
+//QMultiMap<int, KaMemoryPart> KaMemoryPart::selectAll()
+//{
+//    QMultiMap<int, KaMemoryPart> rez;
+////    DbProcess dbp1(dbptConnectAndSqlCommand,"all ka mem parts list","select * from koci.kamemorypart");
+////    dbp1.startDbProcess();
+////    if(dbp1.getSqlResultIsActive())
+////    {
+////        QSqlQuery q1 = dbp1.getSqlResultToQuery();
+////        while(q1.next())
+////        {
+////            int idka = q1.value(q1.record().indexOf("id_device")).toInt();
+
+////            KaMemoryPart part ;
+////            part.setData(q1.record());
+////            rez.insert(idka,part);
+////        }
+
+////    }
+//    return rez;
+//}
+
+QList<KaMemoryPart> KaMemoryPart::selectDeviceParts(int idKaDevice)
+{
+    QList<KaMemoryPart> rez;
+//    DbProcess dbp1(dbptConnectAndSqlCommand,"ka mem parts list","select * from koci.kamemorypart where id_device="+QString::number(idKaDevice));
+//    dbp1.startDbProcess();
+//    if(dbp1.getSqlResultIsActive())
+//    {
+//        QSqlQuery q1 = dbp1.getSqlResultToQuery();
+//        while(q1.next())
+//        {
+//            int tmpiddevice = q1.value(q1.record().indexOf("id_device")).toInt();
+
+//            if(tmpiddevice==idKaDevice)
+//            {
+//                KaMemoryPart part;
+//                part.setData(q1.record());
+//                rez.append(part);
+//            }
+//        }
+
+//    }
+    return rez;
+}
+
+void KaMemoryPart::setData(const QList<MemoryState>& list)
+{
+//    setBegin(record.value("from").toInt());
+//    setEnd(record.value("to").toInt());
+//    setStatus((MemoryState)record.value("type").toInt());
+}
+
+
+
 
 static QChar calcChar(long num,int base)
 {
@@ -63,17 +163,17 @@ QString fixedNumPresentation(long num, int base, long max)
 }
 
 
-MemoryItemPresentation::MemoryItemPresentation(MemoryState status, int unitId)
-{
-    m_state = status;
-    m_unitId = unitId;
-}
+//MemoryItemPresentation::MemoryItemPresentation(MemoryState status, int unitId)
+//{
+//    m_state = status;
+//    m_unitId = unitId;
+//}
 
 
-QColor MemoryItemPresentation::color() const
-{
-    return MemoryState_to_QColor(m_state);
-}
+//QColor MemoryItemPresentation::color() const
+//{
+//    return MemoryState_to_QColor(m_state);
+//}
 
 
 QString operator+(const QString &qstr, MemoryState status)

@@ -7,7 +7,7 @@
 #include "kamemorypart.h"
 
 
-class KaMemory
+class GANTTMODELSHARED_EXPORT KaMemory
 {
 public:
     KaMemory();
@@ -18,6 +18,8 @@ public:
     void setMemorySize(long memorySize);
 
     QList<KaMemoryPart> &memoryParts();
+    const QList<KaMemoryPart> &memoryParts() const;
+
 
     void init(const QList<KaMemoryPart>& list, long memorySize);
 

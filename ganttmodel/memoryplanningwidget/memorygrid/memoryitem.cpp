@@ -1,6 +1,6 @@
-#include "memoryitem.hpp"
-#include "memoryscene.hpp"
-#include "globalvalues.hpp"
+#include "mgrid_item.h"
+#include "mgrid_scene.h"
+#include "memory_globalvalues.h"
 
 
 #include <QPainter>
@@ -11,16 +11,16 @@
 #include <QApplication>
 #include <QDebug>
 
-MemoryItem::MemoryItem(long index,qreal edgeLength,qreal borderWidth,QGraphicsItem *parent/* = 0*/)
+MGridtem::MGridtem(long index,qreal edgeLength,qreal borderWidth,QGraphicsItem *parent/* = 0*/)
     : QGraphicsLayoutItem(), QGraphicsItem(parent)
 {
     setGraphicsItem(this);
     setIndex(index);
 
-    m_parentUnit = dynamic_cast<MemoryUnit*>(parent);
+    m_parentUnit = dynamic_cast<MGridUnit*>(parent);
         // NULL if not MemoryUnit*
 
-    m_scene = dynamic_cast<MemoryScene*>(scene());
+    m_scene = dynamic_cast<MGridScene*>(scene());
         // NULL if not MemoryScene*
     if(!m_scene)
         qDebug() << "not MemoryScene*";
@@ -36,13 +36,13 @@ MemoryItem::MemoryItem(long index,qreal edgeLength,qreal borderWidth,QGraphicsIt
 
 }
 
-MemoryItem::~MemoryItem()
+MGridtem::~MGridtem()
 {
 
 }
 
 
-void MemoryItem::paint(QPainter *painter,
+void MGridtem::paint(QPainter *painter,
     const QStyleOptionGraphicsItem *option, QWidget *widget /*= 0*/)
 {
     Q_UNUSED(widget);
@@ -60,7 +60,7 @@ void MemoryItem::paint(QPainter *painter,
 
 }
 
-void MemoryItem::drawHighlighted(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
+void MGridtem::drawHighlighted(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
 {
     Q_UNUSED(widget);
 
@@ -97,7 +97,7 @@ void MemoryItem::drawHighlighted(QPainter *painter, const QStyleOptionGraphicsIt
     painter->drawPath(path);
 }
 
-void MemoryItem::drawBlurred(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
+void MGridtem::drawBlurred(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
 {
     Q_UNUSED(widget);
 
@@ -129,12 +129,12 @@ void MemoryItem::drawBlurred(QPainter *painter, const QStyleOptionGraphicsItem *
     painter->drawPath(path);
 }
 
-MemoryUnit *MemoryItem::parentUnit() const
+MGridUnit *MGridtem::parentUnit() const
 {
     return m_parentUnit;
 }
 
-void MemoryItem::setParentUnit(MemoryUnit *parentUnit)
+void MGridtem::setParentUnit(MGridUnit *parentUnit)
 {
     if(!parentUnit)
         setParentItem(m_scene->widget());
@@ -143,7 +143,7 @@ void MemoryItem::setParentUnit(MemoryUnit *parentUnit)
 
 
 
-void MemoryItem::hoverEnterEvent(QGraphicsSceneHoverEvent *event)
+void MGridtem::hoverEnterEvent(QGraphicsSceneHoverEvent *event)
 {
     if(!m_scene)
         return QGraphicsItem::hoverEnterEvent(event);
@@ -160,7 +160,7 @@ void MemoryItem::hoverEnterEvent(QGraphicsSceneHoverEvent *event)
     return QGraphicsItem::hoverEnterEvent(event);
 }
 
-void MemoryItem::hoverLeaveEvent(QGraphicsSceneHoverEvent *event)
+void MGridtem::hoverLeaveEvent(QGraphicsSceneHoverEvent *event)
 {
 //    if(!m_scene)
 //        return QGraphicsItem::hoverLeaveEvent(event);
@@ -172,7 +172,7 @@ void MemoryItem::hoverLeaveEvent(QGraphicsSceneHoverEvent *event)
     return QGraphicsItem::hoverLeaveEvent(event);
 }
 
-void MemoryItem::mousePressEvent(QGraphicsSceneMouseEvent *event)
+void MGridtem::mousePressEvent(QGraphicsSceneMouseEvent *event)
 {
     qDebug()<<"MemoryItem::mousePressEvent";
 
@@ -194,29 +194,29 @@ void MemoryItem::mousePressEvent(QGraphicsSceneMouseEvent *event)
     return QGraphicsItem::mousePressEvent(event);
 }
 
-QString MemoryItem::toolTip() const
+QString MGridtem::toolTip() const
 {
     return QGraphicsItem::toolTip();
 }
 
-void MemoryItem::setToolTip(const QString &toolTip)
+void MGridtem::setToolTip(const QString &toolTip)
 {
     return QGraphicsItem::setToolTip(toolTip);
 }
 
-void MemoryItem::enableToolTip()
+void MGridtem::enableToolTip()
 {
     setToolTip(QString("Dec: ")+fixedNumPresentation(index(),10,2047)+'\n'
                +QString("Hex: 0x")+fixedNumPresentation(index(),16,2047)+'\n'
                +QString("Bin:  ")+fixedNumPresentation(index(),2,2047));
 }
 
-void MemoryItem::disableToolTip()
+void MGridtem::disableToolTip()
 {
     setToolTip(QString());
 }
 
-QVariant MemoryItem::itemChange(QGraphicsItem::GraphicsItemChange change, const QVariant &value)
+QVariant MGridtem::itemChange(QGraphicsItem::GraphicsItemChange change, const QVariant &value)
 {
     if(change == QGraphicsItem::ItemParentHasChanged)
     {
@@ -228,7 +228,7 @@ QVariant MemoryItem::itemChange(QGraphicsItem::GraphicsItemChange change, const 
             return QGraphicsItem::itemChange(change,value);
         }
 
-        MemoryUnit* newParent = dynamic_cast<MemoryUnit*>(newParentItem);
+        MGridUnit* newParent = dynamic_cast<MGridUnit*>(newParentItem);
         if(!newParent)
         {
             return QGraphicsItem::itemChange(change,value);
@@ -240,7 +240,7 @@ QVariant MemoryItem::itemChange(QGraphicsItem::GraphicsItemChange change, const 
     return QGraphicsItem::itemChange(change,value);
 }
 
-void MemoryItem::setParentUnitSelected(bool selected)
+void MGridtem::setParentUnitSelected(bool selected)
 {
     if(!m_parentUnit)
     {
@@ -251,7 +251,7 @@ void MemoryItem::setParentUnitSelected(bool selected)
     m_parentUnit->update();
 }
 
-MemoryState MemoryItem::state() const
+MemoryState MGridtem::state() const
 {
     if(m_parentUnit)
     {
@@ -261,7 +261,7 @@ MemoryState MemoryItem::state() const
     return Memory::Empty;
 }
 
-QColor MemoryItem::color() const
+QColor MGridtem::color() const
 {
     bool highlightedItem = isHighlighted();
 
@@ -296,16 +296,16 @@ QColor MemoryItem::color() const
 //}
 
 
-long MemoryItem::index() const
+long MGridtem::index() const
 {
     return m_index;
 }
 
-void MemoryItem::setIndex(long index)
+void MGridtem::setIndex(long index)
 {
     m_index = index;
 }
-qreal MemoryItem::edgeLength() const
+qreal MGridtem::edgeLength() const
 {
     if(m_sizeModifying)
     {
@@ -314,14 +314,14 @@ qreal MemoryItem::edgeLength() const
     return m_edgeLength;
 }
 
-void MemoryItem::setEdgeLength(qreal edgeLength)
+void MGridtem::setEdgeLength(qreal edgeLength)
 {
     if(m_edgeLength == edgeLength)
         return;
     m_edgeLength = edgeLength;
     updateGeometry();
 }
-qreal MemoryItem::borderWidth() const
+qreal MGridtem::borderWidth() const
 {
     if(m_sizeModifying)
     {
@@ -330,7 +330,7 @@ qreal MemoryItem::borderWidth() const
     return m_borderWidth;
 }
 
-void MemoryItem::setBorderWidth(const qreal &borderWidth)
+void MGridtem::setBorderWidth(const qreal &borderWidth)
 {
     if(borderWidth==m_borderWidth)
         return;
@@ -338,32 +338,31 @@ void MemoryItem::setBorderWidth(const qreal &borderWidth)
     updateGeometry();
 }
 
-void MemoryItem::disableSizeModify()
+void MGridtem::disableSizeModify()
 {
     m_sizeModifying = false;
     m_sizeModify = 1.0;
 }
 
-qreal MemoryItem::sizeModify() const
+qreal MGridtem::sizeModify() const
 {
     return m_sizeModify;
 }
 
-void MemoryItem::setSizeModify(qreal sizeModify)
+void MGridtem::setSizeModify(qreal sizeModify)
 {
     m_sizeModifying = true;
     m_sizeModify = sizeModify;
     updateGeometry();
 }
 
-bool MemoryItem::isHighlighted() const
+bool MGridtem::isHighlighted() const
 {
-    return (!(m_scene->m_highlightMode))
-            || m_scene->inHighlightRange(index());
+    return m_scene->inHighlightRange(index());
 }
 
 
-QRectF MemoryItem::boundingRect() const
+QRectF MGridtem::boundingRect() const
 {
     return QRectF( 0, 0, edgeLength() + 2*borderWidth(), edgeLength() + 2*borderWidth());
     //    return QRectF(QPointF(0,0), geometry().size());
@@ -377,7 +376,7 @@ QRectF MemoryItem::boundingRect() const
 //    return path;
 //}
 
-void MemoryItem::setGeometry(const QRectF &geom)
+void MGridtem::setGeometry(const QRectF &geom)
 {
     prepareGeometryChange();
     QGraphicsLayoutItem::setGeometry(geom);
@@ -389,7 +388,7 @@ void MemoryItem::setGeometry(const QRectF &geom)
 //    return QGraphicsLayoutItem::geometry();
 //}
 
-QSizeF MemoryItem::sizeHint(Qt::SizeHint which, const QSizeF &constraint) const
+QSizeF MGridtem::sizeHint(Qt::SizeHint which, const QSizeF &constraint) const
 {
     switch (which) {
     case Qt::MinimumSize:
