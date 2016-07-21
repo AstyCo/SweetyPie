@@ -37,6 +37,7 @@ void KaMemory::init(const QList<KaMemoryPart> &list, long memorySize)
 {
     _memoryParts.clear();
 
+
     setMemorySize(memorySize);
     _memoryParts.append(list);
 }

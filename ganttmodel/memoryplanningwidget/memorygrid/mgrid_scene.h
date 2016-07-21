@@ -26,14 +26,6 @@ class GANTTMODELSHARED_EXPORT MGridScene : public QGraphicsScene
 {
     Q_OBJECT
 
-    Q_PROPERTY(long startHighlight READ startHighlight WRITE setStartHighlight
-                NOTIFY startHighlightChanged )
-    Q_PROPERTY(long lengthHighlight READ lengthHighlight WRITE setLengthHighlight
-                NOTIFY lengthHighlightChanged )
-    Q_PROPERTY(bool interactiveHighlight READ interactiveHighlight WRITE setInteractiveHighlight
-                NOTIFY interactiveHighlightChanged )
-
-
 public:
     MGridScene( QObject * parent = 0 );
     ~MGridScene();
@@ -95,7 +87,9 @@ public:
     bool interactiveHighlight() const;
     void setInteractiveHighlight(bool interactiveHighlight);
 
-    KaMemory memory() const;
+    KaMemory memory();
+
+    void updateMemory();
 
 public slots:
     void transformChanged(const QTransform& transform);
@@ -117,6 +111,7 @@ signals:
     void startHighlightChanged(long val);
     void lengthHighlightChanged(long val);
     void interactiveHighlightChanged(bool val);
+    void memoryChanged();
 
 protected:
     void mousePressEvent(QGraphicsSceneMouseEvent *event);

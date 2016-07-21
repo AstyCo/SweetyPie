@@ -61,12 +61,12 @@ void MGridUnit::paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
 
 }
 
-int MGridUnit::unitId() const
+int MGridUnit::id() const
 {
     return m_unitId;
 }
 
-void MGridUnit::setUnitId(int unitId)
+void MGridUnit::setId(int unitId)
 {
     m_unitId = unitId;
 }
@@ -158,7 +158,7 @@ void MGridUnit::hoverEnterEvent(QGraphicsSceneHoverEvent *event)
     setShowBorder(true);
 
     m_scene->setUnitInfo(QString(   QObject::tr("Unit Group Id: ")
-                                    +QString::number(unitId())
+                                    +QString::number(id())
                                     +QString(QObject::tr("  Unit State: "))
                                     +state()
                                     +QObject::tr(" Unit Memory: ")
@@ -343,7 +343,8 @@ long MGridUnit::removeItems(long from, long count)
 {
     if(!m_scene)
         return 0;
-
+    if(from+count<=m_start)
+        return 0;
     if(from+count-1>m_finish)
         count = m_finish - from + 1;
 

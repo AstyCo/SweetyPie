@@ -40,7 +40,7 @@ public:
     Memory::MemoryViewMode mode() const;
 
 protected:
-    void keyPressEvent(QKeyEvent *);
+    void keyPressEvent(QKeyEvent *); // FOR TEST
 
 private:
     void clear();

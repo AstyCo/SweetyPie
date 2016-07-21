@@ -19,8 +19,9 @@ public:
     void setScene(QGraphicsScene *scene);
     void init();
     void changeScene();
-
     void setMemory(const KaMemory& kaMemory);
+
+public slots:
 
 private:
 

@@ -20,8 +20,8 @@ public:
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
         QWidget *widget = 0);
 
-    int unitId() const;
-    void setUnitId(int unitId);
+    int id() const;
+    void setId(int id);
 
     Memory::MemoryState state() const;
     void setState(const Memory::MemoryState &state);
@@ -47,7 +47,7 @@ public:
     QColor color() const;
 
     void addItems(long start, long finish);
-    long removeItems(long from, long count);
+    long removeItems(long from, long count); ///< returns count of actually removed items
     void updateParenthesis();
 
     qreal extraSize() const;

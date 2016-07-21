@@ -182,13 +182,13 @@ void MGridtem::mousePressEvent(QGraphicsSceneMouseEvent *event)
     m_scene->setInteractiveHighlight(false);
 
     if(QApplication::keyboardModifiers()&Qt::ShiftModifier)
-        m_scene->setEmpty(index(),100);
+        m_scene->setEmpty(index(),m_scene->lengthHighlight());
     else if (QApplication::keyboardModifiers()&Qt::ControlModifier)
-        m_scene->setWritten(index(),100);
+        m_scene->setWritten(index(),m_scene->lengthHighlight());
     else if (QApplication::keyboardModifiers()&Qt::AltModifier)
-        m_scene->setAvailable(index(),100);
+        m_scene->setAvailable(index(),m_scene->lengthHighlight());
     else
-        m_scene->setRead(index(),100);
+        m_scene->setRead(index(),m_scene->lengthHighlight());
 
 
     return QGraphicsItem::mousePressEvent(event);

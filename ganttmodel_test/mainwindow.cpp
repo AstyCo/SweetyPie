@@ -140,7 +140,7 @@ void MainWindow::testGanttModel()
 
 void MainWindow::testMemoryPlanningWidget()
 {
-    ui->memoryPlanningWidget->init(Memory::MemoryLine);
+    ui->memoryPlanningWidget->init(Memory::MemoryGrid);
 
     // Begin init values
     QList<KaMemoryPart> records;

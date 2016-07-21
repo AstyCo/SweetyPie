@@ -173,6 +173,7 @@ void MGridScene::setMemory(const KaMemory& kaMemory/*const QList<MemoryItemPrese
     MGridUnit * p_memUnit = NULL;
 
     m_memory = kaMemory;
+
     setMemorySize(kaMemory.memorySize());
 
     for(int i = 0; i<memorySize(); ++i)
@@ -188,9 +189,8 @@ void MGridScene::setMemory(const KaMemory& kaMemory/*const QList<MemoryItemPrese
     {
         p_memUnit = new MGridUnit(m_memoryWidget);
         p_memUnit->setState(units[i].state());
-        p_memUnit->setUnitId(units[i].id());
+        p_memUnit->setId(units[i].id());
         p_memUnit->addItems(units[i].start(),units[i].finish());
-
 
         addUnit(p_memUnit);
     }
@@ -214,7 +214,7 @@ MGridUnit* MGridScene::newUnit(int unitId)
 
     p_memUnit = new MGridUnit(m_memoryWidget);
     p_memUnit->setState(Memory::Empty);
-    p_memUnit->setUnitId(unitId);
+    p_memUnit->setId(unitId);
 
     addUnit(p_memUnit);
 
@@ -351,9 +351,28 @@ bool MGridScene::errorHandler(QList<ActionErrors> &errors) const
         return false;
     }
 }
-KaMemory MGridScene::memory() const
+KaMemory MGridScene::memory()
 {
+    updateMemory();
     return m_memory;
+}
+
+void MGridScene::updateMemory()
+{
+    QList<KaMemoryPart> parts;
+
+    foreach(MGridUnit* unit,m_units)
+    {
+        KaMemoryPart part;
+        part.setStart(unit->start());
+        part.setFinish(unit->finish());
+        part.setId(unit->id());
+        part.setState(unit->state());
+        parts.append(part);
+    }
+
+    m_memory.init(parts,m_memory.memorySize());
+    emit memoryChanged();
 }
 
 bool MGridScene::interactiveHighlight() const
@@ -366,6 +385,7 @@ bool MGridScene::interactiveHighlight() const
 void MGridScene::setInteractiveHighlight(bool interactiveHighlight)
 {
     m_interactiveHighlight = interactiveHighlight;
+    emit interactiveHighlightChanged(m_interactiveHighlight);
 }
 
 
@@ -420,7 +440,7 @@ void MGridScene::addUnit(MGridUnit *p_memUnit)
 {
     if(!p_memUnit)
         return;
-    m_unit_by_unitId.insert(p_memUnit->unitId(),p_memUnit);
+    m_unit_by_unitId.insert(p_memUnit->id(),p_memUnit);
     m_units.append(p_memUnit);
 }
 
@@ -430,7 +450,7 @@ void MGridScene::removeUnit(MGridUnit *p_memUnit)
         return;
 
     m_units.removeOne(p_memUnit);
-    m_unit_by_unitId.remove(p_memUnit->unitId());
+    m_unit_by_unitId.remove(p_memUnit->id());
 
     removeItem(p_memUnit);
 }
@@ -477,12 +497,14 @@ void MGridScene::setStartHighlight(long startHighlight)
     m_startHighlight = startHighlight;
 //    updateShownUnits();
     update();
+    emit startHighlightChanged(m_startHighlight);
 }
 
 
 void MGridScene::setLengthHighlight(long lengthHighlight)
 {
     m_lengthHighlight = lengthHighlight;
+    emit lengthHighlightChanged(m_lengthHighlight);
 }
 
 bool MGridScene::highlightMode() const
@@ -610,6 +632,7 @@ void MGridScene::setState(long from, long count, MemoryState state)
     p_mu->setState(state);
     p_mu->addItems(from,from+count-1);
 
+    emit memoryChanged();
 //    updateParenthesis();
 //    update();
 }

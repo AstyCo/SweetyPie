@@ -29,7 +29,11 @@ MemoryPlanningWidget::~MemoryPlanningWidget()
 
 void MemoryPlanningWidget::keyPressEvent(QKeyEvent *e)
 {
-    changeScene();
+    if(e->key()==Qt::Key_Space)
+    {
+        qDebug() << "ENTER";
+        changeScene();
+    }
 
     return QWidget::keyPressEvent(e);
 }
@@ -43,6 +47,7 @@ void MemoryPlanningWidget::init(MemoryViewMode mode)
     if(mode == MemoryGrid)
     {
         m_scene = new MGridScene(this);
+
         m_scene->setBackgroundBrush(QBrush(QColor(Qt::gray).lighter(130)));
 
         ui->memoryView->setScene(m_scene);
@@ -111,5 +116,6 @@ Memory::MemoryViewMode MemoryPlanningWidget::mode() const
 {
     return m_mode;
 }
+
 
 
