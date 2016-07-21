@@ -84,19 +84,19 @@ SOURCES += \
     intervalselectionmodel.cpp \
     memoryplanningwidget/memoryview.cpp \
     memoryplanningwidget/memoryplanningwidget.cpp \
-    memoryplanningwidget/memoryline/kamemoryabstractpart.cpp \
-    memoryplanningwidget/memoryline/kamemorypicker.cpp \
     memoryplanningwidget/kamemory.cpp \
     memoryplanningwidget/kamemorypart.cpp \
-    memoryplanningwidget/memoryline/kamemoryscene.cpp \
-    memoryplanningwidget/memoryline/kamemorygraphicspart.cpp \
-    memoryplanningwidget/memorygrid/labelitem.cpp \
-    memoryplanningwidget/memorygrid/memoryinteractiveunit.cpp \
-    memoryplanningwidget/memorygrid/memoryitem.cpp \
-    memoryplanningwidget/memorygrid/memoryscene.cpp \
-    memoryplanningwidget/memorygrid/memorystatus.cpp \
-    memoryplanningwidget/memorygrid/memoryunit.cpp \
-    memoryplanningwidget/memorygrid/memorywidget.cpp
+    memoryplanningwidget/memorygrid/mgrid_interactiveunit.cpp \
+    memoryplanningwidget/memorygrid/mgrid_labelitem.cpp \
+    memoryplanningwidget/memorygrid/mgrid_item.cpp \
+    memoryplanningwidget/memorygrid/mgrid_scene.cpp \
+    memoryplanningwidget/memorygrid/mgrid_status.cpp \
+    memoryplanningwidget/memorygrid/mgrid_unit.cpp \
+    memoryplanningwidget/memorygrid/mgrid_widget.cpp \
+    memoryplanningwidget/memoryline/mline_abstractpart.cpp \
+    memoryplanningwidget/memoryline/mline_graphicspart.cpp \
+    memoryplanningwidget/memoryline/mline_picker.cpp \
+    memoryplanningwidget/memoryline/mline_scene.cpp
 
 HEADERS += \
     ganttmodel.h \
