@@ -32,9 +32,7 @@ public:
 
     qreal spacing() const;
     void setSpacing(const qreal &spacing);
-
     void setMemory(const KaMemory& kaMemory/*const QList<MemoryItemPresentation>& mem_it_list,long memorySize*/);
-
     MGridUnit* newUnit(int unitId = -1);
     MGridUnit* unit(int unitId) const;
 
@@ -46,7 +44,6 @@ public:
 
     qreal itemEdge() const;
     void setItemEdge(qreal newEdgeLength);
-
 
     qreal itemBorder() const;
     void setItemBorder(qreal itemBorder);
@@ -61,12 +58,6 @@ public:
 
     qreal itemSize() const;
 
-    void updateParenthesis();
-
-    friend bool MGridtem::isHighlighted() const;
-    friend void MGridtem::hoverLeaveEvent(QGraphicsSceneHoverEvent *event);
-    friend void MGridUnit::setItems();
-
     bool highlightMode() const;
     void setHighlightMode(bool highlightMode);
 
@@ -74,32 +65,31 @@ public:
     void setStartHighlight(long startHighlight);
 
     long startHighlight() const;
+    long finishHighlight() const;
     long lengthHighlight() const;
-
-    MGridWidget *widget() const;
-
-    void addUnit(MGridUnit* p_memUnit);
-    void removeUnit(MGridUnit* p_memUnit);
-
-    QList<MGridUnit*> affectedUnits(long from, long to) const;
-    long freedCount(long from, long to) const;
 
     bool interactiveHighlight() const;
     void setInteractiveHighlight(bool interactiveHighlight);
 
     KaMemory memory();
 
-    void updateMemory();
-
 public slots:
     void transformChanged(const QTransform& transform);
 
     // +ACTIONS
-
+    /*
+     *  Empty,          ///< Пустая память - белый
+     *  Free,           ///< Свободно - серый
+     *  Recorded,       ///< Записано - зелёный
+     *  PendingWrite,   ///< Ожидание съёмки - оранжевый
+     *  PendingRead,    ///< Ожидание сброса - жёлтый
+     *  ErrorWrite,     ///< Ошибка записи - сиреневый
+     *  ErrorRead,      ///< Ошибка сброса - красный
+    */
     void setEmpty(long from, long count);
-    void setRead(long from, long count);
-    void setAvailable(long from, long count);
-    void setWritten(long from, long count);
+    void setFree(long from, long count);
+    void setPengingRead(long from, long count);
+    void setPengingWrite(long from, long count);
     
     // -ACTIONS
     
@@ -111,6 +101,8 @@ signals:
     void startHighlightChanged(long val);
     void lengthHighlightChanged(long val);
     void interactiveHighlightChanged(bool val);
+    void intervalHasSelected();
+    void intervalSelectionStarted();
     void memoryChanged();
 
 protected:
@@ -126,27 +118,41 @@ protected:
 private:
     void clearShownUnits();
     void updateShownUnits();
-
     void clearLastSelected();
-    void setLastSelected(MGridtem* p_mem);
+    void setLastSelected(MGridItem* p_mem);
     int  itemIndex(QGraphicsItem* item) const;
     void memoryStatusUpdate(const QRectF& rect = QRectF());
     bool inHighlightRange(long index) const;
+    QList<MGridUnit*> affectedUnits(long from, long to) const;
+    long freedCount(long from, long to) const;
+    void updateMemory();
+    void updateParenthesis();
+    void addUnit(MGridUnit* p_memUnit);
+    void removeUnit(MGridUnit* p_memUnit);
+    MGridWidget *widget() const;
 
     // +WARNINGS
 private:
     enum ActionErrors
     {
-        WriteToWritten = 1,
-        WriteToRead = 2,
-        ReadFromRead = 3,
-        ReadFromFreed = 4,
-        WriteToNotFreed = 5,
-        FreeOfWritten = 6,
-        FreeOfRead = 7,
+        WriteToNotRead = 1,
+        WriteToPendingRead = 2,
+        ReadOfReaded = 3,
+        ReadOfEmpty = 4,
+        WriteToNotEmpty = 5,
+        EmptyOfNotRead = 6,
+        EmptyOfPendingRead = 7,
         ActionErrors_count
     };
 
+    static QList<MemoryState> m_notReadStates,
+                              m_writeStates,
+                              m_errorStates;
+    struct Initializer
+    {
+        Initializer();
+    };
+    static Initializer initializerGuard;
 
     static QString warning(ActionErrors id);
     bool errorHandler(QList<ActionErrors>& errors) const;
@@ -154,29 +160,36 @@ private:
     // -WARNINGS
 
 private:
+
+    bool m_highlightMode;
+    bool m_interactiveHighlight;
+
+    long m_memorySize;
+
+    long m_startHighlight;
+    long m_lengthHighlight;
+
+    KaMemory m_memory;
+private:
+
     int m_lastSelectedIndex;
-    MGridtem* m_lastSelected;
+    MGridItem* m_lastSelected;
     MGridWidget* m_memoryWidget;
 
     MGridInteractiveUnit* m_interactiveUnit;
 
 
     QList<MGridUnit*> m_units;
-    QList<MGridtem*> m_items;
-
-    bool m_interactiveHighlight;
-
+    QList<MGridItem*> m_items;
     QMap<int , MGridUnit*> m_unit_by_unitId;
 
-    long m_memorySize;
-
-    bool m_highlightMode;
-    long m_startHighlight;
-    long m_lengthHighlight;
-
-    KaMemory m_memory;
-
     friend class MGridInteractiveUnit;
+
+    friend bool MGridItem::isHighlighted() const;
+    friend void MGridItem::hoverLeaveEvent(QGraphicsSceneHoverEvent *event);
+    friend void MGridItem::setParentUnit(MGridUnit*);
+    friend void MGridUnit::setItems();
+    friend long MGridUnit::removeItems(long,long);
 };
 
 #endif // MGRID_SCENE_H

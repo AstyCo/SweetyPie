@@ -62,7 +62,7 @@ int MGridWidget::toMemoryAdress(int pos) const
 
 
 
-void MGridWidget::setupMatrix(QList<MGridtem*> mem_items)
+void MGridWidget::setupMatrix(QList<MGridItem*> mem_items)
 {
 
     removeLabels();

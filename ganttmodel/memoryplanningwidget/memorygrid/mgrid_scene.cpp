@@ -12,6 +12,7 @@
 #include <QtCore/qmath.h>
 
 #include <QMessageBox>
+#include <QMutex>
 
 qreal qSqrt(qreal);
 
@@ -59,11 +60,11 @@ void MGridScene::mousePressEvent(QGraphicsSceneMouseEvent *event)
     QList<QGraphicsItem*> itemsAtPos = items(event->scenePos());
 
 
-    MGridtem* p_mem = NULL;
+    MGridItem* p_mem = NULL;
 
     foreach(QGraphicsItem* itemAtPos,itemsAtPos)
     {
-        if((p_mem=dynamic_cast<MGridtem*>(itemAtPos)))
+        if((p_mem=dynamic_cast<MGridItem*>(itemAtPos)))
             break;
     }
     if(!p_mem)
@@ -83,11 +84,11 @@ void MGridScene::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
     {
 
         QList<QGraphicsItem*> itemsAtPos = items(event->scenePos());
-        MGridtem * p_mem = NULL;
+        MGridItem * p_mem = NULL;
 
         foreach(QGraphicsItem* itemAtPos,itemsAtPos)
         {
-            if((p_mem=dynamic_cast<MGridtem*>(itemAtPos)))
+            if((p_mem=dynamic_cast<MGridItem*>(itemAtPos)))
                 break;
         }
 
@@ -105,7 +106,7 @@ void MGridScene::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
 
         for(int i = 0; i < sceneItems.size(); ++i)
         {
-            MGridtem* p_itemAt = dynamic_cast<MGridtem*>(sceneItems[i]);
+            MGridItem* p_itemAt = dynamic_cast<MGridItem*>(sceneItems[i]);
             if(!p_itemAt)
             {
                 continue;
@@ -178,7 +179,7 @@ void MGridScene::setMemory(const KaMemory& kaMemory/*const QList<MemoryItemPrese
 
     for(int i = 0; i<memorySize(); ++i)
     {
-        m_items.append(new MGridtem(i,itemEdge(),itemBorder(),m_memoryWidget));
+        m_items.append(new MGridItem(i,itemEdge(),itemBorder(),m_memoryWidget));
     }
 
     m_memoryWidget->setupMatrix(m_items);
@@ -267,7 +268,7 @@ qreal MGridScene::itemEdge() const
 
 void MGridScene::setItemEdge(qreal newEdgeLength)
 {
-    foreach(MGridtem* item, m_items)
+    foreach(MGridItem* item, m_items)
     {
         item->setEdgeLength(newEdgeLength);
     }
@@ -279,7 +280,7 @@ void MGridScene::clearLastSelected()
     m_lastSelectedIndex = -1;
 }
 
-void MGridScene::setLastSelected(MGridtem *p_mem)
+void MGridScene::setLastSelected(MGridItem *p_mem)
 {
     m_lastSelected = p_mem;
     if(!p_mem)
@@ -321,7 +322,7 @@ bool MGridScene::errorHandler(QList<ActionErrors> &errors) const
     qDebug() << QString::number(topErrorId);
 
 
-    if(errors.contains(WriteToNotFreed))
+    if(errors.contains(WriteToNotEmpty))
     {
         // no need to ask user - error
         QMessageBox::critical(views()[0], tr("Write error")
@@ -329,7 +330,7 @@ bool MGridScene::errorHandler(QList<ActionErrors> &errors) const
         return false;
     }
 
-    if(errors.contains(ReadFromFreed))
+    if(errors.contains(ReadOfEmpty))
     {
         // no need to ask user - error
         QMessageBox::critical(views()[0], tr("Read error")
@@ -384,6 +385,11 @@ bool MGridScene::interactiveHighlight() const
 
 void MGridScene::setInteractiveHighlight(bool interactiveHighlight)
 {
+    if(m_interactiveHighlight&&!interactiveHighlight)
+        emit intervalHasSelected();
+    else if(!m_interactiveHighlight&&interactiveHighlight)
+        emit intervalSelectionStarted();
+
     m_interactiveHighlight = interactiveHighlight;
     emit interactiveHighlightChanged(m_interactiveHighlight);
 }
@@ -394,30 +400,30 @@ QString MGridScene::warning(ActionErrors id)
 
     switch (id)
     {
-    case WriteToWritten:
-        return tr("WriteToWritten");
+    case WriteToNotRead:
+        return tr("WriteToNotRead");
         //        return "Запись в области ЗУ, содержащие еще не считанные данные!\
 //Информация с предыдущих съемок будет потеряна!";
-    case WriteToRead:
-        return tr("WriteToRead");
+    case WriteToPendingRead:
+        return tr("WriteToPendingRead");
 //        return "Запись в области ЗУ, содержащие считанные данные, прием\
 // которых не подтвержден! Информация с предыдущих съемок может быть потеряна!";
-    case ReadFromRead:
-        return tr("ReadFromRead");
+    case ReadOfReaded:
+        return tr("ReadOfReaded");
 //        return "Повторное считывание из области ЗУ!\
 // Возможно дублирование передаваемой информации!";
-    case ReadFromFreed:
-        return tr("ReadFromFreed");
+    case ReadOfEmpty:
+        return tr("ReadOfEmpty");
 //        return "Считывание из области ЗУ,\
 // не содержащей данные!";
-    case WriteToNotFreed:
-        return tr("WriteToAvailable");
+    case WriteToNotEmpty:
+        return tr("WriteToNotEmpty");
 //        return "Запись в неочищенные области ЗУ! Необходима предварительная очистка!";
-    case FreeOfWritten:
-        return tr("FreeOfWritten");
+    case EmptyOfNotRead:
+        return tr("EmptyOfNotRead");
 //        return "Очистка областей ЗУ, содержащих еще не считанные данные! Информация с предыдущих съемок будет потеряна!";
-    case FreeOfRead:
-         return tr("FreeOfRead");
+    case EmptyOfPendingRead:
+         return tr("EmptyOfPendingRead");
 //        return "Очистка областей ЗУ, содержащих считанные данные, прием которых не подтвержден!\
 // Информация с предыдущих съемок может быть потеряна!";
     default:
@@ -428,13 +434,16 @@ QString MGridScene::warning(ActionErrors id)
 
 long MGridScene::lengthHighlight() const
 {
-        return m_lengthHighlight;
-        }
+    if(!m_highlightMode)
+        return 0;
+    return m_lengthHighlight;
+}
 
 MGridWidget *MGridScene::widget() const
 {
-        return m_memoryWidget;
+    return m_memoryWidget;
 }
+
 
 void MGridScene::addUnit(MGridUnit *p_memUnit)
 {
@@ -485,7 +494,16 @@ long MGridScene::freedCount(long from, long to) const
 
 long MGridScene::startHighlight() const
 {
+    if(!m_highlightMode)
+        return 0;
     return m_startHighlight;
+}
+
+long MGridScene::finishHighlight() const
+{
+    if(!m_highlightMode)
+        return 0;
+    return m_startHighlight + m_lengthHighlight - 1;
 }
 
 
@@ -529,14 +547,14 @@ void MGridScene::setEmpty(long from, long count)
     for(int i = 0, j = from; i<count; ++i,++j)
     {
         Memory::MemoryState itemState = m_items[j]->state();
-//        if(itemState == Memory::Written)
-//        {
-//            errors.append(FreeOfWritten);
-//        }
-//        else if (itemState == Memory::Read)
-//        {
-//            errors.append(FreeOfRead);
-//        }
+        if(m_notReadStates.contains(itemState))
+        {
+            errors.append(EmptyOfNotRead);
+        }
+        else if (itemState == Memory::PendingRead)
+        {
+            errors.append(EmptyOfPendingRead);
+        }
     }
 
     if(errorHandler(errors))
@@ -545,7 +563,7 @@ void MGridScene::setEmpty(long from, long count)
     }
 }
 
-void MGridScene::setRead(long from, long count)
+void MGridScene::setPengingRead(long from, long count)
 {
 
     QList<ActionErrors> errors;
@@ -553,14 +571,14 @@ void MGridScene::setRead(long from, long count)
     for(int i = 0, j = from; i<count; ++i,++j)
     {
         Memory::MemoryState itemState = m_items[j]->state();
-//        if(itemState == Memory::Read)
-//        {
-//            errors.append(ReadFromRead);
-//        }
-//        else if (itemState == Memory::Freed)
-//        {
-//            errors.append(ReadFromFreed);
-//        }
+        if(itemState == Memory::PendingRead)
+        {
+            errors.append(ReadOfReaded);
+        }
+        else if (itemState == Memory::Empty)
+        {
+            errors.append(ReadOfEmpty);
+        }
     }
 
     if(errorHandler(errors))
@@ -570,7 +588,7 @@ void MGridScene::setRead(long from, long count)
 
 }
 
-void MGridScene::setAvailable(long from, long count)
+void MGridScene::setFree(long from, long count)
 {
 
     QList<ActionErrors> errors;
@@ -587,7 +605,7 @@ void MGridScene::setAvailable(long from, long count)
 
 }
 
-void MGridScene::setWritten(long from, long count)
+void MGridScene::setPengingWrite(long from, long count)
 {
 
     QList<ActionErrors> errors;
@@ -595,20 +613,20 @@ void MGridScene::setWritten(long from, long count)
     for(int i = 0, j = from; i<count; ++i,++j)
     {
         Memory::MemoryState itemState = m_items[j]->state();
-//        if(itemState == Memory::Written)
-//        {
-//            errors.append(WriteToWritten);
-//            errors.append(WriteToNotFreed);
-//        }
-//        else if (itemState == Memory::Read)
-//        {
-//            errors.append(WriteToRead);
-//            errors.append(WriteToNotFreed);
-//        }
-//        else if (itemState == Memory::Available)
-//        {
-//            errors.append(WriteToNotFreed);
-//        }
+        if(m_writeStates.contains(itemState))
+        {
+            errors.append(WriteToNotRead);
+            errors.append(WriteToNotEmpty);
+        }
+        else if (itemState == Memory::PendingRead)
+        {
+            errors.append(WriteToPendingRead);
+            errors.append(WriteToNotEmpty);
+        }
+        else if (itemState == Memory::Free)
+        {
+            errors.append(WriteToNotEmpty);
+        }
     }
 
     if(errorHandler(errors))
@@ -621,7 +639,6 @@ void MGridScene::setWritten(long from, long count)
 
 void MGridScene::setState(long from, long count, MemoryState state)
 {
-
     clear(from,count);
     if(state == Memory::Empty)
         return;
@@ -715,7 +732,7 @@ qreal MGridScene::itemBorder() const
 
 void MGridScene::setItemBorder(qreal itemBorder)
 {
-    foreach(MGridtem* item,m_items)
+    foreach(MGridItem* item,m_items)
         item->setBorderWidth(itemBorder);
 }
 
@@ -733,4 +750,21 @@ void MGridScene::setSpacing(const qreal &spacing)
 
 
 
+QList<MemoryState> MGridScene::m_notReadStates,
+                    MGridScene::m_writeStates,
+                    MGridScene::m_errorStates;
 
+
+
+MGridScene::Initializer::Initializer()
+{
+    m_notReadStates.append(Memory::Recorded);
+    m_notReadStates.append(Memory::PendingRead);
+    m_notReadStates.append(Memory::PendingWrite);
+
+    m_writeStates.append(Memory::Recorded);
+    m_writeStates.append(Memory::PendingWrite);
+
+    m_errorStates.append(Memory::ErrorRead);
+    m_errorStates.append(Memory::ErrorWrite);
+}

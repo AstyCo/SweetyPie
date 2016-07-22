@@ -8,7 +8,7 @@
 #include <QVariant>
 #include <QPen>
 
-class MGridtem;
+class MGridItem;
 
 class MGridInteractiveUnit : public QGraphicsItem
 {
@@ -51,7 +51,7 @@ private:
     QPainterPath m_shapeBorder;
     QPen m_borderPen;
 
-    QList<MGridtem*>* m_items;
+    QList<MGridItem*>* m_items;
     long m_start, m_finish;
 
     bool m_showBorders;

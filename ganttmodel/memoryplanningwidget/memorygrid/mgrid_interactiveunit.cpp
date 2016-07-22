@@ -127,12 +127,12 @@ void MGridInteractiveUnit::rebuildShape()
             utterRight = itemsRect.left(); // -||- right, left() is MAX
 
 
-    MGridtem  *utterLeftItem = NULL,
+    MGridItem  *utterLeftItem = NULL,
                 *utterRightItem = NULL;
 
     for(int i = m_start; i <= m_finish; ++i)
     {
-        MGridtem* item = m_items->at(i);
+        MGridItem* item = m_items->at(i);
         qreal   itemTop = item->geometry().top(),
                 itemBottom = item->geometry().bottom();
 

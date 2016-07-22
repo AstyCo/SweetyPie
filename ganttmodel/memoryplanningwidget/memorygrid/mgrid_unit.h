@@ -7,7 +7,7 @@
 #include <QVariant>
 #include <QPen>
 
-class MGridtem;
+class MGridItem;
 class MGridScene;
 
 class MGridUnit : public QGraphicsItem
@@ -68,7 +68,7 @@ private:
     int m_unitId;
     Memory::MemoryState m_state;
     MGridScene* m_scene;
-    QList<MGridtem*>* m_items;
+    QList<MGridItem*>* m_items;
 
     QPainterPath m_shapeBorder;
     QPen m_borderPen;

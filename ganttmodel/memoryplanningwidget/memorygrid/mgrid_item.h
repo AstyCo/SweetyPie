@@ -11,12 +11,12 @@
 class MGridUnit;
 class MGridScene;
 
-class MGridtem : public QGraphicsLayoutItem, public QGraphicsItem
+class MGridItem : public QGraphicsLayoutItem, public QGraphicsItem
 {
 public:
-    MGridtem(long index,qreal edgeLength = DEFAULT_EDGELENGTH,
+    MGridItem(long index,qreal edgeLength = DEFAULT_EDGELENGTH,
                qreal borderWidth = DEFAULT_BORDERWIDTH,QGraphicsItem *parent = 0);
-    virtual ~MGridtem();
+    virtual ~MGridItem();
 
     // Inherited from QGraphicsLayoutItem
     void setGeometry(const QRectF &geom);

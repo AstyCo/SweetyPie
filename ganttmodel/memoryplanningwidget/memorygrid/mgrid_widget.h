@@ -27,7 +27,7 @@ public:
 
     int itemPerRow() const;
     void setItemPerRow(int itemPerRow);
-    void setupMatrix(QList<MGridtem*> mem_items);
+    void setupMatrix(QList<MGridItem*> mem_items);
 
     bool labels() const;
     void setLabels(bool labels);
