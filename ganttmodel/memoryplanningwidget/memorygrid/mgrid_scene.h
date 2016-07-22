@@ -30,33 +30,41 @@ public:
     MGridScene( QObject * parent = 0 );
     ~MGridScene();
 
+    /// Расстояние между блоками
     qreal spacing() const;
     void setSpacing(const qreal &spacing);
     void setMemory(const KaMemory& kaMemory/*const QList<MemoryItemPresentation>& mem_it_list,long memorySize*/);
+    // Перенести в тестовое приложение
     MGridUnit* newUnit(int unitId = -1);
     MGridUnit* unit(int unitId) const;
 
+    // на сигнал и в widget
     void setItemInfo(const QString& text);
     void setUnitInfo(const QString& text);
 
-    int itemPerRow() const;
-    void setItemPerRow(int newItemPerRow);
 
+    /// Устанавливает размер блоков
     qreal itemEdge() const;
     void setItemEdge(qreal newEdgeLength);
 
+    // Должно быть private
+    int itemPerRow() const;
+    void setItemPerRow(int newItemPerRow);
+
+    /// Рамка блоков
     qreal itemBorder() const;
     void setItemBorder(qreal itemBorder);
 
+    // убрать
     long memorySize() const;
     void setMemorySize(long memorySize);
 
-    void viewResized(QSizeF viewSize);
 
     void showInteractiveRange(long start, long finish);
     void hideInteractiveRange();
 
     qreal itemSize() const;
+
 
     bool highlightMode() const;
     void setHighlightMode(bool highlightMode);
@@ -68,10 +76,23 @@ public:
     long finishHighlight() const;
     long lengthHighlight() const;
 
+    MGridWidget *widget() const;
+
+    // TODO
+    void addUnit(const KaMemoryPart &part);
+    void addUnit(MGridUnit* p_memUnit);
+    void removeUnit(MGridUnit* p_memUnit);
+    // TODO
+    void removeUnit(int id);
+
+    QList<MGridUnit*> affectedUnits(long from, long to) const;
+    long freedCount(long from, long to) const;
+
     bool interactiveHighlight() const;
     void setInteractiveHighlight(bool interactiveHighlight);
 
     KaMemory memory();
+
 
 public slots:
     void transformChanged(const QTransform& transform);
@@ -96,6 +117,9 @@ public slots:
 private:
     void setState(long from, long count, MemoryState state);
     void clear(long from,long count);
+
+    void viewResized(QSizeF viewSize);
+
 
 signals:
     void startHighlightChanged(long val);
@@ -164,7 +188,9 @@ private:
     bool m_highlightMode;
     bool m_interactiveHighlight;
 
+
     long m_memorySize;
+
 
     long m_startHighlight;
     long m_lengthHighlight;

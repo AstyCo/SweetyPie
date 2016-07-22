@@ -6,25 +6,55 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>630</width>
-    <height>458</height>
+    <width>662</width>
+    <height>413</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Form</string>
   </property>
   <layout class="QGridLayout" name="gridLayout">
-   <item row="0" column="0">
+   <item row="0" column="0" colspan="2">
+    <spacer name="horizontalSpacer">
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>316</width>
+       <height>20</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+   <item row="0" column="2">
+    <widget class="QRadioButton" name="radioButtonGridView">
+     <property name="text">
+      <string>Табличный вид</string>
+     </property>
+     <property name="checked">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
+   <item row="0" column="3">
+    <widget class="QRadioButton" name="radioButtonLineView">
+     <property name="text">
+      <string>Линейный вид</string>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="0">
     <widget class="QLabel" name="label">
      <property name="text">
       <string>Status</string>
      </property>
     </widget>
    </item>
-   <item row="0" column="1">
+   <item row="1" column="1" colspan="3">
     <widget class="MemoryView" name="memoryView"/>
    </item>
-   <item row="1" column="0" colspan="2">
+   <item row="2" column="0" colspan="4">
     <widget class="QLabel" name="label_2">
      <property name="text">
       <string>Planning table</string>

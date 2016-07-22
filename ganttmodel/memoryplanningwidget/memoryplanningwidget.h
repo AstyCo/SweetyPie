@@ -16,8 +16,8 @@ namespace Memory
 {
     enum MemoryViewMode
     {
-        MemoryLine,
-        MemoryGrid,
+        MemoryLine=1,
+        MemoryGrid=2,
         MemoryViewMode_count
     };
 }
@@ -31,11 +31,9 @@ public:
     ~MemoryPlanningWidget();
 
     void init(Memory::MemoryViewMode mode);
-    void changeScene();
     void setMemory(const KaMemory& kaMemory);
 
     QGraphicsScene *scene() const;
-    void adjustViewSize();
 
     Memory::MemoryViewMode mode() const;
 
@@ -44,6 +42,9 @@ protected:
 
 private:
     void clear();
+
+public slots:
+    void changeScene();
 
 private:
     Memory::MemoryViewMode m_mode;
