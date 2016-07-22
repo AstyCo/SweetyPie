@@ -53,6 +53,9 @@ public:
     qreal margins() const;
     void setMargins(const qreal &margins);
 
+protected:
+    void hoverLeaveEvent(QGraphicsSceneHoverEvent *event);
+
 public slots:
 
     void transformChanged(const QTransform& transform);

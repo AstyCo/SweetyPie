@@ -140,7 +140,7 @@ void MainWindow::testGanttModel()
 
 void MainWindow::testMemoryPlanningWidget()
 {
-    ui->memoryPlanningWidget->init(Memory::MemoryGrid);
+    ui->memoryPlanningWidget->setGridView();
 
     // Begin init values
     QList<KaMemoryPart> records;
@@ -178,7 +178,7 @@ void MainWindow::testMemoryPlanningWidget()
     KaMemory kaMemory;
     kaMemory.init(records,2048);
 
-    MGridScene * scene = (MGridScene*)ui->memoryPlanningWidget->scene();
+    MGridScene * scene = ui->memoryPlanningWidget->gridScene();
     ui->memoryPlanningWidget->setMemory(kaMemory);
 
     scene->setItemEdge(30);

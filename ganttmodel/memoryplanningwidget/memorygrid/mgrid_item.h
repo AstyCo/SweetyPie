@@ -28,12 +28,6 @@ public:
         QWidget *widget = 0);
 
 
-    void hoverEnterEvent(QGraphicsSceneHoverEvent *event);
-    void hoverLeaveEvent(QGraphicsSceneHoverEvent *event);
-
-    void mousePressEvent(QGraphicsSceneMouseEvent *event);
-
-
     QString toolTip() const;
     void setToolTip(const QString &toolTip);
 

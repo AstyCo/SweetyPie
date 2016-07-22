@@ -76,8 +76,6 @@ private:
     long m_start, m_finish;
     bool isEmpty;
 
-    int rand;
-
 };
 
 #endif // MGRID_UNIT_H

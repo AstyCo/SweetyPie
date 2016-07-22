@@ -3,6 +3,8 @@
 
 #include "mgrid_interactiveunit.h"
 #include "mgrid_scene.h"
+#include "mgrid_item.h"
+
 
 #include "kamemorypart.h"
 
@@ -30,7 +32,7 @@ MGridInteractiveUnit::MGridInteractiveUnit(MGridScene* scene,QGraphicsItem *pare
 
     m_items = &(scene->m_items);
 
-    m_borderPen=QPen(QBrush(Qt::red), spacing()+5 ,Qt::SolidLine ,Qt::SquareCap,Qt::MiterJoin);
+    m_borderPen=QPen(QBrush(Qt::darkRed), spacing()+5 ,Qt::SolidLine ,Qt::SquareCap,Qt::MiterJoin);
 
 }
 

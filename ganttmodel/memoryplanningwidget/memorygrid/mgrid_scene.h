@@ -3,10 +3,6 @@
 
 #include <ganttmodel_global.h>
 
-#include "mgrid_item.h"
-#include "mgrid_widget.h"
-#include "mgrid_unit.h"
-
 #include "kamemory.h"
 
 #include <QGraphicsScene>
@@ -19,7 +15,9 @@
 QT_FORWARD_DECLARE_CLASS(QStatusBar);
 
 class MGridInteractiveUnit;
-class KaMemory;
+class MGridItem;
+class MGridUnit;
+class MGridWidget;
 
 
 class GANTTMODELSHARED_EXPORT MGridScene : public QGraphicsScene
@@ -30,44 +28,26 @@ public:
     MGridScene( QObject * parent = 0 );
     ~MGridScene();
 
+    /// Инициализирует память
+    void setMemory(const KaMemory& kaMemory);
+
     /// Расстояние между блоками
     qreal spacing() const;
     void setSpacing(const qreal &spacing);
-    void setMemory(const KaMemory& kaMemory/*const QList<MemoryItemPresentation>& mem_it_list,long memorySize*/);
-    // Перенести в тестовое приложение
-    MGridUnit* newUnit(int unitId = -1);
-    MGridUnit* unit(int unitId) const;
-
-    // на сигнал и в widget
-    void setItemInfo(const QString& text);
-    void setUnitInfo(const QString& text);
-
 
     /// Устанавливает размер блоков
     qreal itemEdge() const;
     void setItemEdge(qreal newEdgeLength);
 
-    // Должно быть private
-    int itemPerRow() const;
-    void setItemPerRow(int newItemPerRow);
-
     /// Рамка блоков
     qreal itemBorder() const;
     void setItemBorder(qreal itemBorder);
 
-    // убрать
-    long memorySize() const;
-    void setMemorySize(long memorySize);
-
-
-    void showInteractiveRange(long start, long finish);
-    void hideInteractiveRange();
-
-    qreal itemSize() const;
-
-
-    bool highlightMode() const;
-    void setHighlightMode(bool highlightMode);
+    enum HighlightStyle
+    {
+        bordersAround = 0x1,
+        highlightedItems = 0x2,
+    };
 
     void setLengthHighlight(long lengthHighlight);
     void setStartHighlight(long startHighlight);
@@ -76,23 +56,10 @@ public:
     long finishHighlight() const;
     long lengthHighlight() const;
 
-    MGridWidget *widget() const;
-
-    // TODO
-    void addUnit(const KaMemoryPart &part);
-    void addUnit(MGridUnit* p_memUnit);
-    void removeUnit(MGridUnit* p_memUnit);
-    // TODO
-    void removeUnit(int id);
-
-    QList<MGridUnit*> affectedUnits(long from, long to) const;
-    long freedCount(long from, long to) const;
-
-    bool interactiveHighlight() const;
-    void setInteractiveHighlight(bool interactiveHighlight);
-
     KaMemory memory();
 
+    HighlightStyle highlightStyle() const;
+    void setHighlightStyle(int highlightStyle);
 
 public slots:
     void transformChanged(const QTransform& transform);
@@ -113,12 +80,6 @@ public slots:
     void setPengingWrite(long from, long count);
     
     // -ACTIONS
-    
-private:
-    void setState(long from, long count, MemoryState state);
-    void clear(long from,long count);
-
-    void viewResized(QSizeF viewSize);
 
 
 signals:
@@ -129,17 +90,17 @@ signals:
     void intervalSelectionStarted();
     void memoryChanged();
 
+    void itemInfoChanged(const QString& text);
+    void unitInfoChanged(const QString& text);
+
 protected:
     void mousePressEvent(QGraphicsSceneMouseEvent *event);
     void mouseMoveEvent(QGraphicsSceneMouseEvent *event);
     void mouseReleaseEvent(QGraphicsSceneMouseEvent *event);
 
-    void keyPressEvent(QKeyEvent *event);
-    void keyReleaseEvent(QKeyEvent *event);
-
-//    void drawForeground(QPainter *painter, const QRectF &rect);
 
 private:
+    void setState(long from, long count, MemoryState state);
     void clearShownUnits();
     void updateShownUnits();
     void clearLastSelected();
@@ -152,8 +113,32 @@ private:
     void updateMemory();
     void updateParenthesis();
     void addUnit(MGridUnit* p_memUnit);
+    MGridUnit* newUnit();
     void removeUnit(MGridUnit* p_memUnit);
+    void addUnit(const KaMemoryPart &part);
     MGridWidget *widget() const;
+    void setItemInfo(const QString& text);
+    void setUnitInfo(const QString& text);
+    void viewResized(QSizeF viewSize);
+    bool interactiveHighlight() const;
+    void setInteractiveHighlight(bool interactiveHighlight);
+    void showInteractiveRange(long start, long finish);
+    void hideInteractiveRange();
+    qreal itemSize() const;
+    bool highlightMode() const;
+    void setHighlightMode(bool highlightMode);
+    long memorySize() const;
+    int itemPerRow() const;
+    void setItemPerRow(int newItemPerRow);
+    void clear(long from,long count);
+    MGridItem *itemAtPos(const QPointF& pos) const;
+    MGridUnit *unitAtPos(const QPointF& pos) const;
+    bool isMouseOverUnit(MGridUnit* p_unit) const;
+    bool isMouseOverItem(MGridItem* p_item) const;
+    MGridItem *mouseOverItem() const;
+    void setMouseOverItem(MGridItem *mouseOverItem);
+    MGridUnit *mouseOverUnit() const;
+    void setMouseOverUnit(MGridUnit *mouseOverUnit);
 
     // +WARNINGS
 private:
@@ -185,12 +170,10 @@ private:
 
 private:
 
+    HighlightStyle m_highlightStyle;
+
     bool m_highlightMode;
     bool m_interactiveHighlight;
-
-
-    long m_memorySize;
-
 
     long m_startHighlight;
     long m_lengthHighlight;
@@ -198,7 +181,9 @@ private:
     KaMemory m_memory;
 private:
 
-    int m_lastSelectedIndex;
+    MGridItem *m_mouseOverItem;
+    MGridUnit *m_mouseOverUnit;
+    long m_lastSelectedIndex;
     MGridItem* m_lastSelected;
     MGridWidget* m_memoryWidget;
 
@@ -207,15 +192,13 @@ private:
 
     QList<MGridUnit*> m_units;
     QList<MGridItem*> m_items;
-    QMap<int , MGridUnit*> m_unit_by_unitId;
 
     friend class MGridInteractiveUnit;
+    friend class MGridItem;
+    friend class MGridUnit;
+    friend class MGridWidget;
 
-    friend bool MGridItem::isHighlighted() const;
-    friend void MGridItem::hoverLeaveEvent(QGraphicsSceneHoverEvent *event);
-    friend void MGridItem::setParentUnit(MGridUnit*);
-    friend void MGridUnit::setItems();
-    friend long MGridUnit::removeItems(long,long);
+    friend class MemoryView;
 };
 
 #endif // MGRID_SCENE_H
