@@ -198,6 +198,7 @@ void MGridScene::setMemory(const KaMemory& kaMemory/*const QList<MemoryItemPrese
 
 MGridUnit* MGridScene::newUnit(int unitId)
 {
+
     MGridUnit* p_memUnit = NULL;
     if(unitId == -1)
     {

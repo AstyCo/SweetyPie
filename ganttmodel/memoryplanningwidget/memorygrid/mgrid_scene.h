@@ -30,31 +30,37 @@ public:
     MGridScene( QObject * parent = 0 );
     ~MGridScene();
 
+    /// Расстояние между блоками
     qreal spacing() const;
     void setSpacing(const qreal &spacing);
 
     void setMemory(const KaMemory& kaMemory/*const QList<MemoryItemPresentation>& mem_it_list,long memorySize*/);
 
+    // Перенести в тестовое приложение
     MGridUnit* newUnit(int unitId = -1);
     MGridUnit* unit(int unitId) const;
 
+    // на сигнал и в widget
     void setItemInfo(const QString& text);
     void setUnitInfo(const QString& text);
 
-    int itemPerRow() const;
-    void setItemPerRow(int newItemPerRow);
 
+    /// Устанавливает размер блоков
     qreal itemEdge() const;
     void setItemEdge(qreal newEdgeLength);
 
+    // Должно быть private
+    int itemPerRow() const;
+    void setItemPerRow(int newItemPerRow);
 
+    /// Рамка блоков
     qreal itemBorder() const;
     void setItemBorder(qreal itemBorder);
 
+    // убрать
     long memorySize() const;
     void setMemorySize(long memorySize);
 
-    void viewResized(QSizeF viewSize);
 
     void showInteractiveRange(long start, long finish);
     void hideInteractiveRange();
@@ -63,6 +69,7 @@ public:
 
     void updateParenthesis();
 
+    // потораться избавиться
     friend bool MGridtem::isHighlighted() const;
     friend void MGridtem::hoverLeaveEvent(QGraphicsSceneHoverEvent *event);
     friend void MGridUnit::setItems();
@@ -78,8 +85,12 @@ public:
 
     MGridWidget *widget() const;
 
+    // TODO
+    void addUnit(const KaMemoryPart &part);
     void addUnit(MGridUnit* p_memUnit);
     void removeUnit(MGridUnit* p_memUnit);
+    // TODO
+    void removeUnit(int id);
 
     QList<MGridUnit*> affectedUnits(long from, long to) const;
     long freedCount(long from, long to) const;
@@ -106,6 +117,9 @@ public slots:
 private:
     void setState(long from, long count, MemoryState state);
     void clear(long from,long count);
+
+    void viewResized(QSizeF viewSize);
+
 
 signals:
     void startHighlightChanged(long val);

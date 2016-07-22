@@ -178,9 +178,10 @@ void MainWindow::testMemoryPlanningWidget()
     KaMemory kaMemory;
     kaMemory.init(records,2048);
 
+    MGridScene * scene = (MGridScene*)ui->memoryPlanningWidget->scene();
     ui->memoryPlanningWidget->setMemory(kaMemory);
 
-    ui->memoryPlanningWidget->show();
+    scene->setItemEdge(30);
 }
 
 void MainWindow::setInterval()

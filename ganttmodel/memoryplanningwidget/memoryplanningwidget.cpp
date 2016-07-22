@@ -107,11 +107,6 @@ QGraphicsScene *MemoryPlanningWidget::scene() const
     return m_scene;
 }
 
-void MemoryPlanningWidget::adjustViewSize()
-{
-    ui->memoryView->adjustSize();
-}
-
 Memory::MemoryViewMode MemoryPlanningWidget::mode() const
 {
     return m_mode;
