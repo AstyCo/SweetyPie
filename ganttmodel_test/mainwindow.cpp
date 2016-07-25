@@ -209,3 +209,8 @@ void MainWindow::on_pushButton_clicked()
 
    ui->widget->getPlot()->replot();
 }
+
+void MainWindow::on_checkBox_showLegend_toggled(bool checked)
+{
+  ui->widget->setShowLegend(checked);
+}

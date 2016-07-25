@@ -4,7 +4,7 @@ QList<Qt::GlobalColor> CurveStyle::defColors(QList<Qt::GlobalColor>()
    << Qt::red << Qt::green << Qt::blue
    << Qt::cyan << Qt::magenta << Qt::yellow << Qt::gray);
 
-void ChartSettings::save(QSettings &ss)
+void ChartSettings::save(QSettings &ss) const
 {
   ss.setValue("graph_y_r", (int)axisY_R);
   ss.setValue("graph_y_v", (int)axisY_V);

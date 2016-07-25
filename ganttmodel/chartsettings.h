@@ -50,7 +50,7 @@ struct GANTTMODELSHARED_EXPORT ChartSettings
   int keyStep;
   bool detailsPanelVisible;
 
-  void save(QSettings &ss);
+  void save(QSettings &ss) const;
   void load(const QSettings &ss);
 };
 

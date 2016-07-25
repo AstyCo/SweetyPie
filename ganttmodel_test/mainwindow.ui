@@ -54,9 +54,16 @@
         <item>
          <layout class="QHBoxLayout" name="horizontalLayout_2">
           <item>
+           <widget class="QCheckBox" name="checkBox_showLegend">
+            <property name="text">
+             <string>ShowLegend</string>
+            </property>
+           </widget>
+          </item>
+          <item>
            <widget class="QPushButton" name="pushButton">
             <property name="text">
-             <string>PushButton</string>
+             <string>ScaleDivChange</string>
             </property>
            </widget>
           </item>
