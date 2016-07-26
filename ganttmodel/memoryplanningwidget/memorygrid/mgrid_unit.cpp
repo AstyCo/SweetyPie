@@ -398,4 +398,9 @@ qreal MGridUnit::extraSize() const
     return spacing()/2 + m_scene->itemBorder();
 }
 
+KaMemoryPart MGridUnit::toKaMemoryPart() const
+{
+    return KaMemoryPart(start(),finish(),state(),id());
+}
+
 

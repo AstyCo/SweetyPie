@@ -13,6 +13,7 @@ int KaMemoryPart::id() const
 
 void KaMemoryPart::setId(int id)
 {
+    m_initialized = true;
     m_id = id;
 }
 MemoryState KaMemoryPart::state() const
@@ -23,6 +24,23 @@ MemoryState KaMemoryPart::state() const
 void KaMemoryPart::setState(const MemoryState &statusPart)
 {
     m_state = statusPart;
+}
+
+bool KaMemoryPart::operator ==(const KaMemoryPart &part)
+{
+    if(!m_initialized)
+    {
+        if(!part.m_initialized)
+            return true;
+        return false;
+    }
+    return start() == part.start() &&
+            finish() == part.finish();
+}
+
+bool KaMemoryPart::operator !=(const KaMemoryPart &part)
+{
+    return !(*this==part);
 }
 
 long KaMemoryPart::size() const
@@ -38,6 +56,7 @@ long KaMemoryPart::start() const
 
 void KaMemoryPart::setStart(long start)
 {
+    m_initialized = true;
     m_start = start;
 }
 
@@ -48,13 +67,29 @@ long KaMemoryPart::finish() const
 
 void KaMemoryPart::setFinish(long finish)
 {
+    m_initialized = true;
     m_finish = finish;
+}
+
+long KaMemoryPart::length() const
+{
+    return m_finish - m_start + 1;
 }
 KaMemoryPart::KaMemoryPart()
 {
+    m_initialized = false;
     m_state=Empty;
     m_start =0;
     m_finish = 0;
+}
+
+KaMemoryPart::KaMemoryPart(long start, long finish, MemoryState state, int id)
+{
+    setStart(start);
+    setFinish(finish);
+    setState(state);
+    setId(id);
+    m_initialized = true;
 }
 
 KaMemoryPart::~KaMemoryPart()
@@ -86,36 +121,36 @@ KaMemoryPart::~KaMemoryPart()
 //    return rez;
 //}
 
-QList<KaMemoryPart> KaMemoryPart::selectDeviceParts(int idKaDevice)
-{
-    QList<KaMemoryPart> rez;
-//    DbProcess dbp1(dbptConnectAndSqlCommand,"ka mem parts list","select * from koci.kamemorypart where id_device="+QString::number(idKaDevice));
-//    dbp1.startDbProcess();
-//    if(dbp1.getSqlResultIsActive())
-//    {
-//        QSqlQuery q1 = dbp1.getSqlResultToQuery();
-//        while(q1.next())
-//        {
-//            int tmpiddevice = q1.value(q1.record().indexOf("id_device")).toInt();
+//QList<KaMemoryPart> KaMemoryPart::selectDeviceParts(int idKaDevice)
+//{
+//    QList<KaMemoryPart> rez;
+////    DbProcess dbp1(dbptConnectAndSqlCommand,"ka mem parts list","select * from koci.kamemorypart where id_device="+QString::number(idKaDevice));
+////    dbp1.startDbProcess();
+////    if(dbp1.getSqlResultIsActive())
+////    {
+////        QSqlQuery q1 = dbp1.getSqlResultToQuery();
+////        while(q1.next())
+////        {
+////            int tmpiddevice = q1.value(q1.record().indexOf("id_device")).toInt();
 
-//            if(tmpiddevice==idKaDevice)
-//            {
-//                KaMemoryPart part;
-//                part.setData(q1.record());
-//                rez.append(part);
-//            }
-//        }
+////            if(tmpiddevice==idKaDevice)
+////            {
+////                KaMemoryPart part;
+////                part.setData(q1.record());
+////                rez.append(part);
+////            }
+////        }
 
-//    }
-    return rez;
-}
+////    }
+//    return rez;
+//}
 
-void KaMemoryPart::setData(const QList<MemoryState>& list)
-{
-//    setBegin(record.value("from").toInt());
-//    setEnd(record.value("to").toInt());
-//    setStatus((MemoryState)record.value("type").toInt());
-}
+//void KaMemoryPart::setData(const QList<MemoryState>& list)
+//{
+////    setBegin(record.value("from").toInt());
+////    setEnd(record.value("to").toInt());
+////    setStatus((MemoryState)record.value("type").toInt());
+//}
 
 
 
@@ -178,21 +213,15 @@ QString fixedNumPresentation(long num, int base, long max)
 
 QString operator+(const QString &qstr, MemoryState status)
 {
-    return qstr+MemoryState_to_Qstring(status);
+    return qstr+MemoryState_to_QString(status);
 }
 
-QString MemoryState_to_Qstring(MemoryState status)
+
+
+QString MemoryState_to_QString(MemoryState status)
 {
     switch(status)
     {
-//    case Freed:
-//        return "Empty";
-//    case Written:
-//        return "Busy";
-//    case Read:
-//        return "Read";
-//    case Available:
-//        return "Free";
     case Empty:
         return "Empty";
     case Free:
@@ -287,6 +316,30 @@ QColor MemoryState_to_QColor(MemoryState state, bool isActive /*= true*/)
         }
 //    }
     if(!isActive)
-        return result.lighter(150);
+        return result.lighter(130);
     return result;
+}
+
+
+QString MemoryState_to_trQString(MemoryState status)
+{
+    switch(status)
+    {
+    case Empty:
+        return QObject::tr("Empty");
+    case Free:
+        return QObject::tr("Free");
+    case Recorded:
+        return QObject::tr("Recorded");
+    case PendingWrite:
+        return QObject::tr("PendingWrite");
+    case PendingRead:
+        return QObject::tr("PendingRead");
+    case ErrorWrite:
+        return QObject::tr("ErrorWrite");
+    case ErrorRead:
+        return QObject::tr("ErrorRead");
+    default:
+        return "MemoryState::Undefined";
+    }
 }

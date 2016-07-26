@@ -24,7 +24,8 @@ using namespace Memory;
 
 QString fixedNumPresentation(long num,int base,long max);
 
-QString MemoryState_to_Qstring(MemoryState state);
+QString MemoryState_to_trQString(MemoryState state);
+QString MemoryState_to_QString(MemoryState state);
 QColor MemoryState_to_QColor(MemoryState state, bool isActive = true);
 
 QString operator+(const QString& qstr, MemoryState status);
@@ -56,30 +57,25 @@ private:
     // extra
     int m_id;
     //
+    bool m_initialized;
 public:
     KaMemoryPart();
+    KaMemoryPart(long start,long finish, MemoryState state, int id);
     ~KaMemoryPart();
 
-//    static QMultiMap<int, KaMemoryPart> selectAll();
-    static QList<KaMemoryPart> selectDeviceParts(int idKa);
+// //    static QMultiMap<int, KaMemoryPart> selectAll();
+//    static QList<KaMemoryPart> selectDeviceParts(int idKa);
 
-    void setData(const QList<MemoryState>& list);
+//    void setData(const QList<MemoryState>& list);
 
 
     MemoryState state() const;
     void setState(const MemoryState &state);
 
 
-    bool operator ==(const KaMemoryPart &part)
-    {
-        return start() == part.start() &&
-                finish() == part.finish();
-    }
+    bool operator ==(const KaMemoryPart &part);
 
-    bool operator !=(const KaMemoryPart &part)
-    {
-        return !(*this==part);
-    }
+    bool operator !=(const KaMemoryPart &part);
 
     long size() const;
 
@@ -87,6 +83,7 @@ public:
     void setStart(long start);
     long finish() const;
     void setFinish(long finish);
+    long length() const;
     int id() const;
     void setId(int id);
 };

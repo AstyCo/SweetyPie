@@ -27,7 +27,7 @@ IntervalSlider::IntervalSlider(QWidget *parent) :
 
     m_clippedHandle = NoHandle;
 
-    connect(this,SIGNAL(valueChanged(ClippedHandle,long)),this,SLOT(repaint()));
+    connect(this,SIGNAL(valueChanged(IntervalSlider::ClippedHandle,long)),this,SLOT(repaint()));
 
     adjustSize();
 

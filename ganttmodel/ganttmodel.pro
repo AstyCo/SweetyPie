@@ -96,7 +96,8 @@ SOURCES += \
     memoryplanningwidget/memoryline/mline_abstractpart.cpp \
     memoryplanningwidget/memoryline/mline_graphicspart.cpp \
     memoryplanningwidget/memoryline/mline_picker.cpp \
-    memoryplanningwidget/memoryline/mline_scene.cpp
+    memoryplanningwidget/memoryline/mline_scene.cpp \
+    memoryplanningwidget/kamemorylegend.cpp
 
 HEADERS += \
     ganttmodel.h \
@@ -141,7 +142,8 @@ HEADERS += \
     memoryplanningwidget/memoryline/mline_scene.h \
     memoryplanningwidget/kamemory.h \
     memoryplanningwidget/kamemorypart.h \
-    memoryplanningwidget/memory_globalvalues.h
+    memoryplanningwidget/memory_globalvalues.h \
+    memoryplanningwidget/kamemorylegend.h
 
 
 RESOURCES += \
@@ -155,3 +157,8 @@ FORMS += \
     memoryplanningwidget/memoryplanningwidget.ui
 
 include(build_config.pri)
+
+CODECFORTR = UTF-8
+
+TRANSLATIONS += \
+    locale/file_codec_locale_ru.ts

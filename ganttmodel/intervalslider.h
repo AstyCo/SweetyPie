@@ -96,7 +96,7 @@ signals:
     void beginMoved(long value);
     void endMoved(long value);
 
-    void valueChanged(ClippedHandle e, long value);
+    void valueChanged(IntervalSlider::ClippedHandle e, long value);
 
 };
 

@@ -54,5 +54,6 @@
         <file>icons/selection_interval_panel.png</file>
         <file>icons/options1.png</file>
         <file>icons/denial.png</file>
+        <file>icons/plus.png</file>
     </qresource>
 </RCC>

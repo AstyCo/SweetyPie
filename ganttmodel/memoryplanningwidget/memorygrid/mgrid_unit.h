@@ -52,6 +52,7 @@ public:
 
     qreal extraSize() const;
 
+    KaMemoryPart toKaMemoryPart() const;
 
 private:
     void rebuildShape();

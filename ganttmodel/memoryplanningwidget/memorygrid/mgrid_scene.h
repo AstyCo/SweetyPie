@@ -20,6 +20,7 @@ class MGridUnit;
 class MGridWidget;
 
 
+
 class GANTTMODELSHARED_EXPORT MGridScene : public QGraphicsScene
 {
     Q_OBJECT
@@ -31,6 +32,8 @@ public:
     /// Инициализирует память
     void setMemory(const KaMemory& kaMemory);
     KaMemory memory();
+    /// Возвращает размер памяти
+    long memorySize() const;
 
     /// Расстояние между блоками
     qreal spacing() const;
@@ -66,7 +69,11 @@ public:
     void setHighlightStyle(int highlightStyle);
 
     /// Возвращает список блоков, пересекающих выбранный интервал
-    QList<MGridUnit*> crossingUnits() const;
+    QList<KaMemoryPart> crossingParts() const;
+
+    /// Возвращает строку, представляющую блока памяти в унифицированном виде (ex. 0x0000-0xFFFF ...)
+    QString toAdress(long start,long finish);
+
 
 public slots:
 
@@ -80,11 +87,22 @@ public slots:
      *  ErrorWrite,     ///< Ошибка записи - сиреневый
      *  ErrorRead,      ///< Ошибка сброса - красный
     */
-    void setEmpty(long from, long count);
-    void setFree(long from, long count);
-    void setPengingRead(long from, long count);
-    void setPengingWrite(long from, long count);
-    
+
+    void setKaMemoryPart(const KaMemoryPart& part);
+
+    /// Устанавливает статус по адресам
+    KaMemoryPart setEmpty(long from, long count);
+    KaMemoryPart setFree(long from, long count);
+    KaMemoryPart setPendingRead(long from, long count);
+    KaMemoryPart setPendingWrite(long from, long count);
+
+
+    /// Устанавливает статус по текущему выделению
+    KaMemoryPart setEmpty();
+    KaMemoryPart setFree();
+    KaMemoryPart setPendingRead();
+    KaMemoryPart setPendingWrite();
+
     // -ACTIONS
 
 
@@ -107,7 +125,7 @@ protected:
 
 private:
     void clear();
-    void setState(long from, long count, MemoryState state);
+    KaMemoryPart setState(long from, long count, MemoryState state);
     void clearShownUnits();
     void updateShownUnits();
     void clearLastSelected();
@@ -133,7 +151,6 @@ private:
     qreal itemSize() const;
     bool highlightMode() const;
     void setHighlightMode(bool highlightMode);
-    long memorySize() const;
     int itemPerRow() const;
     void setItemPerRow(int newItemPerRow);
     void clearMemory(long from,long count);
@@ -148,7 +165,7 @@ private:
     void clearItems();
     void clearUnits();
     HighlightStyle highlightStyle() const;
-    QList<MGridUnit*> crossingUnits(long from, long to) const;
+    QList<MGridUnit*> crossingParts(long from, long to) const;
 
     // +WARNINGS
 private:

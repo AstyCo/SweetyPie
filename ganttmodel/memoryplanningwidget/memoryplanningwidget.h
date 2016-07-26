@@ -41,8 +41,19 @@ public slots:
 
     void setUnitInfo(const QString& text);
     void setItemInfo(const QString& text);
+    void updateParts();
 
-private:
+private slots:
+    void on_pushButtonEmpty_clicked();
+
+    void on_pushButtonFree_clicked();
+
+    void on_pushButtonPendingWrite_clicked();
+
+    void on_pushButtonPendingRead_clicked();
+
+protected:
+    void resizeEvent(QResizeEvent *);
 
 private:
     Ui::MemoryPlanningWidget *ui;
