@@ -66,6 +66,8 @@ void MGridItem::drawHighlighted(QPainter *painter, const QStyleOptionGraphicsIte
 {
     Q_UNUSED(widget);
 
+    QColor fillColor = (option->state & QStyle::State_Selected) ? color().dark(150) : color();
+
 
     if(borderWidth())
     {
