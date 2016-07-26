@@ -1,6 +1,9 @@
-#include "mgrid_item.h"
+
 #include "mgrid_scene.h"
 #include "memory_globalvalues.h"
+#include "mgrid_item.h"
+#include "mgrid_widget.h"
+#include "mgrid_unit.h"
 
 
 #include <QPainter>
@@ -29,7 +32,6 @@ MGridItem::MGridItem(long index,qreal edgeLength,qreal borderWidth,QGraphicsItem
     setBorderWidth(borderWidth);
     disableSizeModify();
 
-//    setFlags(ItemIsSelectable);
     setAcceptsHoverEvents(true);
 
     enableToolTip();
@@ -78,11 +80,11 @@ void MGridItem::drawHighlighted(QPainter *painter, const QStyleOptionGraphicsIte
     }
 
 
-    QColor fillColor = (option->state & QStyle::State_Selected) ? color().dark(150) : color();
-//    if (option->state & QStyle::State_MouseOver)
-//    {
-//        fillColor = fillColor.lighter(115);
-//    }
+    QColor fillColor = (option->state & QStyle::State_Selected) ? color().dark(200) : color();
+    if (m_scene->isMouseOverItem(this))
+    {
+        fillColor = fillColor.lighter(115);
+    }
 
     QRectF itemRect( borderWidth(), borderWidth(), edgeLength(), edgeLength());
     QColor squareColor = fillColor;
@@ -141,58 +143,6 @@ void MGridItem::setParentUnit(MGridUnit *parentUnit)
     m_parentUnit = parentUnit;
 }
 
-
-
-void MGridItem::hoverEnterEvent(QGraphicsSceneHoverEvent *event)
-{
-    if(!m_scene)
-        return QGraphicsItem::hoverEnterEvent(event);
-
-
-
-    m_scene->setItemInfo(QString::number(index()));
-
-//    m_scene->showInteractiveRange(index(),index()+100);
-    if(m_scene->interactiveHighlight())
-        m_scene->setStartHighlight(index());
-
-
-    return QGraphicsItem::hoverEnterEvent(event);
-}
-
-void MGridItem::hoverLeaveEvent(QGraphicsSceneHoverEvent *event)
-{
-//    if(!m_scene)
-//        return QGraphicsItem::hoverLeaveEvent(event);
-
-//    m_scene->hideInteractiveRange();
-//    m_scene->clearShownUnits();
-//    m_scene->update();
-
-    return QGraphicsItem::hoverLeaveEvent(event);
-}
-
-void MGridItem::mousePressEvent(QGraphicsSceneMouseEvent *event)
-{
-    qDebug()<<"MemoryItem::mousePressEvent";
-
-    if(!m_scene->interactiveHighlight())
-        return;
-
-    m_scene->setInteractiveHighlight(false);
-
-    if(QApplication::keyboardModifiers()&Qt::ShiftModifier)
-        m_scene->setEmpty(index(),m_scene->lengthHighlight());
-    else if (QApplication::keyboardModifiers()&Qt::ControlModifier)
-        m_scene->setPengingWrite(index(),m_scene->lengthHighlight());
-    else if (QApplication::keyboardModifiers()&Qt::AltModifier)
-        m_scene->setFree(index(),m_scene->lengthHighlight());
-    else
-        m_scene->setPengingRead(index(),m_scene->lengthHighlight());
-
-
-    return QGraphicsItem::mousePressEvent(event);
-}
 
 QString MGridItem::toolTip() const
 {

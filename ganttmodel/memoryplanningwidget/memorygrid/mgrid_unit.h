@@ -59,7 +59,6 @@ private:
     QPainterPath shapeBorder() const;
     void setShapeBorder(const QPainterPath &shapeBorder);
 
-    void setItems();
     friend class MGridScene;
 
 private:
@@ -75,8 +74,6 @@ private:
 
     long m_start, m_finish;
     bool isEmpty;
-
-    int rand;
 
 };
 

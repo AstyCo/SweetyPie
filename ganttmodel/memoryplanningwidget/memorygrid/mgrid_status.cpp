@@ -1,6 +1,7 @@
 #include "mgrid_status.h"
-
 #include "mgrid_scene.h"
+
+#include "memory_globalvalues.h"
 
 #include <QPainter>
 
@@ -8,8 +9,6 @@
 #include <QStyleOptionGraphicsItem>
 
 #include <QDebug>
-
-extern MGridScene* mem_scene;
 
 MGridStatus::MGridStatus(QGraphicsItem* parent)
     : QGraphicsItem(parent), QGraphicsLayoutItem()

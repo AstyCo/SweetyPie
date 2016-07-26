@@ -1,26 +1,23 @@
 #ifndef MEMORYPLANNINGWIDGET_HPP
 #define MEMORYPLANNINGWIDGET_HPP
 
-#include <QGraphicsScene>
+#include "ganttmodel_global.h"
+#include "memoryview.h"
 
-#include <ganttmodel_global.h>
+#include <QGraphicsScene>
 #include <QWidget>
+
 
 namespace Ui {
 class MemoryPlanningWidget;
 }
 
 class KaMemory;
+class MGridScene;
+class MLineScene;
 
-namespace Memory
-{
-    enum MemoryViewMode
-    {
-        MemoryLine=1,
-        MemoryGrid=2,
-        MemoryViewMode_count
-    };
-}
+
+
 
 class GANTTMODELSHARED_EXPORT MemoryPlanningWidget : public QWidget
 {
@@ -30,26 +27,29 @@ public:
     MemoryPlanningWidget(QWidget *parent = 0);
     ~MemoryPlanningWidget();
 
-    void init(Memory::MemoryViewMode mode);
+
     void setMemory(const KaMemory& kaMemory);
 
-    QGraphicsScene *scene() const;
-
-    Memory::MemoryViewMode mode() const;
-
-protected:
-    void keyPressEvent(QKeyEvent *); // FOR TEST
-
-private:
-    void clear();
+    MGridScene* gridScene() const;
+    MLineScene* lineScene() const;
 
 public slots:
     void changeScene();
 
+    void setGridView();
+    void setLineView();
+
+    void setUnitInfo(const QString& text);
+    void setItemInfo(const QString& text);
+
 private:
-    Memory::MemoryViewMode m_mode;
+
+private:
     Ui::MemoryPlanningWidget *ui;
-    QGraphicsScene* m_scene;
+    MGridScene* m_gridScene;
+    MLineScene* m_lineScene;
+
+    Memory::MemoryViewMode m_mode;
 };
 
 #endif // MEMORYPLANNINGWIDGET_HPP

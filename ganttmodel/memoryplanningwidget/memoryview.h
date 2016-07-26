@@ -9,6 +9,19 @@ class KaMemory;
 class MGridScene;
 class MLineScene;
 
+
+namespace Memory
+{
+    enum MemoryViewMode
+    {
+        MemoryLine=0x1,
+        MemoryGrid=0x2,
+        MemoryViewMode_count = 2
+    };
+}
+
+using namespace Memory;
+
 class MemoryView : public QGraphicsView
 {
 public:
@@ -21,10 +34,14 @@ public:
     void changeScene();
     void setMemory(const KaMemory& kaMemory);
 
+    MemoryViewMode mode() const;
+    void setMode(const MemoryViewMode &mode);
+
 public slots:
 
 private:
 
+    MemoryViewMode m_mode;
     MGridScene* m_gridScene;
     MLineScene* m_lineScene;
 

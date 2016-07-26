@@ -1,5 +1,7 @@
 #include "mgrid_unit.h"
 #include "mgrid_scene.h"
+#include "mgrid_item.h"
+
 
 #include "kamemorypart.h"
 
@@ -15,13 +17,10 @@ extern MGridScene* mem_scene;
 MGridUnit::MGridUnit(QGraphicsItem *parent /*= 0*/)
     : QGraphicsItem(parent)
 {
-//    setFlag(QGraphicsItem::ItemHasNoContents);
-
-    rand = qrand()%2;
     isEmpty = true;
 
     m_scene = dynamic_cast<MGridScene*>(scene());
-    setItems();
+    m_items = &(m_scene->m_items);
     if(!m_scene)
         qDebug() << "Not MemoryScene*";
 
@@ -30,7 +29,7 @@ MGridUnit::MGridUnit(QGraphicsItem *parent /*= 0*/)
 
     setZValue(1);
 
-    m_borderPen=QPen(QBrush(/*rand?Qt::red:Qt::blue*/QColor::fromRgb(200,200,200)/*.lighter())*/), extraSize() ,Qt::SolidLine,Qt::SquareCap,Qt::MiterJoin);
+    m_borderPen=QPen(QBrush(QColor::fromRgb(200,200,200)), extraSize() ,Qt::SolidLine,Qt::SquareCap,Qt::MiterJoin);
 
 }
 
@@ -49,9 +48,8 @@ void MGridUnit::paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
     Q_UNUSED(option);
     Q_UNUSED(widget);
 
-    if(!showBorder())
+    if(!m_scene->isMouseOverUnit(this))
         return;
-
 
     painter->setCompositionMode(QPainter::CompositionMode_Multiply);
 
@@ -156,15 +154,6 @@ void MGridUnit::hoverEnterEvent(QGraphicsSceneHoverEvent *event)
     if(!m_scene)
         return;
     setShowBorder(true);
-
-    m_scene->setUnitInfo(QString(   QObject::tr("Unit Group Id: ")
-                                    +QString::number(id())
-                                    +QString(QObject::tr("  Unit State: "))
-                                    +state()
-                                    +QObject::tr(" Unit Memory: ")
-                                    +"0x"+fixedNumPresentation(start(),16,2047)
-                                    +" - 0x"+fixedNumPresentation(finish(),16,2047)
-                         ));
 
     setZValue(100);
 
@@ -305,11 +294,6 @@ void MGridUnit::setShapeBorder(const QPainterPath &shapeBorder)
     m_shapeBorder = shapeBorder;
 }
 
-void MGridUnit::setItems()
-{
-    m_items = &(m_scene->m_items);
-}
-
 bool MGridUnit::showBorder() const
 {
     return m_unitSelected;
@@ -404,7 +388,7 @@ void MGridUnit::updateParenthesis()
         return;
     for(int i = m_start; i <= m_finish; ++i)
     {
-        m_items->at(i)->setParentItem(this);
+        m_items->at(i)->setParentUnit(this);
     }
     rebuildShape();
 }

@@ -30,8 +30,6 @@ void MemoryView::resizeEvent(QResizeEvent *event)
     if(m_gridScene)
     {
         m_gridScene->viewResized(event->size());
-        if(isTransformed())
-            m_gridScene->transformChanged(transform());
 
         qDebug()<< event->size();
         qDebug()<< sceneRect();
@@ -55,12 +53,14 @@ void MemoryView::resizeEvent(QResizeEvent *event)
 
 void MemoryView::setScene(QGraphicsScene *scene)
 {
-    init();
     QGraphicsView::setScene(scene);
 
     MGridScene* p_memoryScene = dynamic_cast<MGridScene*>(scene);
     if(p_memoryScene)
     {
+        m_mode = MemoryGrid;
+//        if(p_memoryScene == m_gridScene)
+//            return;
         m_gridScene = p_memoryScene;
 
         setContentsMargins(0, 0, 0, 0);
@@ -84,10 +84,15 @@ void MemoryView::setScene(QGraphicsScene *scene)
         return;
     }
 
-    MLineScene* p_kaMemoryScene = dynamic_cast<MLineScene*>(scene);
-    if(p_kaMemoryScene)
+    MLineScene* p_lineScene = dynamic_cast<MLineScene*>(scene);
+    if(p_lineScene)
     {
-        m_lineScene = p_kaMemoryScene;
+        m_mode = MemoryLine;
+
+//        if(p_lineScene == m_lineScene)
+//            return;
+
+        m_lineScene = p_lineScene;
 
         setContentsMargins(0, 0, 0, 0);
         setRenderHint(QPainter::Antialiasing,false);
@@ -99,7 +104,7 @@ void MemoryView::setScene(QGraphicsScene *scene)
     //    //===============
         viewport()->installEventFilter(this);
 
-        p_kaMemoryScene->setSceneRect(0,0,size().width(),126);
+        p_lineScene->setSceneRect(0,0,size().width(),126);
 
 //        setScene(p_kaMemoryScene);
 
@@ -123,17 +128,23 @@ void MemoryView::init()
 void MemoryView::changeScene()
 {
     KaMemory kaMemory;
-    if(m_gridScene)
+    if(m_mode == MemoryGrid)
     {
+        m_mode = MemoryLine;
         kaMemory = m_gridScene->memory();
-        m_lineScene = new MLineScene(parent());
-        setScene(m_lineScene);
+        if(!m_lineScene)
+            setScene(new MLineScene(parent()));
+        else
+            setScene(m_lineScene);
     }
-    else if(m_lineScene)
+    else if(m_mode == MemoryLine)
     {
+        m_mode = MemoryGrid;
         kaMemory = m_lineScene->memory();
-        m_gridScene = new MGridScene(parent());
-        setScene(m_gridScene);
+        if(!m_gridScene)
+            setScene(new MGridScene(parent()));
+        else
+            setScene(m_gridScene);
     }
     setMemory(kaMemory);
     adjustSize();
@@ -141,12 +152,22 @@ void MemoryView::changeScene()
 
 void MemoryView::setMemory(const KaMemory &kaMemory)
 {
-    if(m_gridScene)
+    if(m_mode == MemoryGrid)
         m_gridScene->setMemory(kaMemory);
-    else if(m_lineScene)
+    else if(m_mode == MemoryLine)
         m_lineScene->setMemory(kaMemory);
 
 }
+MemoryViewMode MemoryView::mode() const
+{
+    return m_mode;
+}
+
+void MemoryView::setMode(const MemoryViewMode &mode)
+{
+    m_mode = mode;
+}
+
 
 
 

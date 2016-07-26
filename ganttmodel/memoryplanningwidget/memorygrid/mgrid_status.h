@@ -1,3 +1,8 @@
+/*! \file
+ * MGrid_Status - Obsolete member of MGridWidget
+ *
+*/
+
 #ifndef MGRID_STATUS_H
 #define MGRID_STATUS_H
 
@@ -6,6 +11,7 @@
 
 #include <QString>
 #include <QFont>
+
 
 
 

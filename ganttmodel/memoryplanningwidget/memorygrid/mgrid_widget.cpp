@@ -1,8 +1,6 @@
 #include "mgrid_widget.h"
 #include "mgrid_scene.h"
 
-#include "mgrid_status.h"
-
 #include "mgrid_item.h"
 #include "mgrid_labelitem.h"
 
@@ -25,9 +23,8 @@ MGridWidget::MGridWidget(QGraphicsWidget *parent) :
 {
     setItemPerRow(64);
     m_spacing = DEFAULT_SPACING;
-    m_memoryStatus = NULL;
 
-
+    setAcceptHoverEvents(true);
 }
 
 MGridWidget::~MGridWidget()
@@ -94,31 +91,15 @@ void MGridWidget::setupMatrix(QList<MGridItem*> mem_items)
         }
         gridLayout->addItem(mem_items[i], toRow(i), toColumn(i));
     }
-    {
-        adjustSize();
-        // MemoryStatus
-        if(!m_memoryStatus)
-        {
-            m_memoryStatus = new MGridStatus(this);
-            m_memoryStatus->setStatusLabel(tr("Info:"));
-            m_memoryStatus->setItemInfo(tr("Item Info"));
-            m_memoryStatus->setUnitInfo(tr("Unit Info"));
-        }
 
-        gridLayout->addItem(m_memoryStatus,toRow(mem_items.size()-1)+1,0,1,itemPerRow()+(labels()?1:0));
-        gridLayout->setRowFixedHeight(toRow(mem_items.size()-1)+1,20);
-    }
-
-    qDebug() <<"MemoryStatus sz: ";
-    qDebug() << m_memoryStatus->boundingRect();
     setLayout(gridLayout);
 
     adjustSize();
 }
 
-QGraphicsLayout *MGridWidget::layout()
+bool MGridWidget::labels() const
 {
-    return QGraphicsWidget::layout();
+    return m_labels;
 }
 
 qreal MGridWidget::margins() const
@@ -131,6 +112,17 @@ void MGridWidget::setMargins(const qreal &margins)
     m_margins = margins;
 }
 
+
+// reaches mouse over's property control.
+void MGridWidget::hoverLeaveEvent(QGraphicsSceneHoverEvent *event)
+{
+    MGridScene* p_scene = dynamic_cast<MGridScene*>(scene());
+    if(!p_scene)
+        return;
+    p_scene->m_mouseOverItem = NULL;
+    p_scene->m_mouseOverUnit = NULL;
+}
+
 qreal MGridWidget::spacing() const
 {
     return m_spacing;
@@ -141,39 +133,7 @@ void MGridWidget::setSpacing(const qreal &spacing)
     m_spacing = spacing;
 }
 
-void MGridWidget::setStatusLabel(const QString &text)
-{
-    m_memoryStatus->setStatusLabel(text);
-}
 
-QString MGridWidget::statusLabel() const
-{
-    return m_memoryStatus->statusLabel();
-}
-
-void MGridWidget::setItemInfo(const QString &text)
-{
-    m_memoryStatus->setItemInfo(text);
-}
-
-QString MGridWidget::itemInfo() const
-{
-    return m_memoryStatus->itemInfo();
-}
-
-void MGridWidget::setUnitInfo(const QString &text)
-{
-    m_memoryStatus->setUnitInfo(text);
-}
-
-QString MGridWidget::unitInfo() const
-{
-    return m_memoryStatus->unitInfo();
-}
-bool MGridWidget::labels() const
-{
-    return m_labels;
-}
 
 void MGridWidget::setLabels(bool labels)
 {
@@ -188,10 +148,6 @@ void MGridWidget::paint(QPainter *painter, const QStyleOptionGraphicsItem *optio
     // empty
 }
 
-void MGridWidget::memoryStatusUpdate(const QRectF &rect)
-{
-    m_memoryStatus->update(rect);
-}
 
 QVariant MGridWidget::itemChange(QGraphicsItem::GraphicsItemChange change, const QVariant &value)
 {
@@ -212,10 +168,6 @@ void MGridWidget::removeLabels()
     }
 }
 
-void MGridWidget::transformChanged(const QTransform &transform)
-{
-    m_memoryStatus->transformChanged(transform);
-}
 
 int MGridWidget::itemPerRow() const
 {

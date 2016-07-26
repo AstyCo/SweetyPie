@@ -22,12 +22,10 @@ void MLineGraphicsPart::paint(QPainter *painter, const QStyleOptionGraphicsItem 
     else
         painter->setBrush(QBrush(statusColor()));
 
-    qDebug()<<begin()<<"-"<<end()<<" "<<width();
+//    qDebug()<<begin()<<"-"<<end()<<" "<<width();
     setX(xByVal(begin()));
 
     updateVisualElements();
-
-    qDebug() <<m_rect;
 
     painter->drawRect(m_rect);
 
