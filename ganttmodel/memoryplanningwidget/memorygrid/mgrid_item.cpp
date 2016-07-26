@@ -80,11 +80,6 @@ void MGridItem::drawHighlighted(QPainter *painter, const QStyleOptionGraphicsIte
     }
 
 
-    QColor fillColor = (option->state & QStyle::State_Selected) ? color().dark(200) : color();
-    if (m_scene->isMouseOverItem(this))
-    {
-        fillColor = fillColor.lighter(115);
-    }
 
     QRectF itemRect( borderWidth(), borderWidth(), edgeLength(), edgeLength());
     QColor squareColor = fillColor;

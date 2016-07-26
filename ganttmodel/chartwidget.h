@@ -219,6 +219,12 @@ public:
   QScrollArea *getPanelCurveDetails() const;
   QList<CurveStyle> getCurveStyles() const;
 
+  /// Показывать ли легенду, если боковая панель скрыта
+  bool showLegend() const;
+  /// true - показывать легенду, если боковая панель скрыта
+  /// false - всегда скрывать
+  void setShowLegend(bool show);
+
 public slots:
   /// Установить начало выделение интервала
   void setIntervalSelection(bool b);
@@ -309,6 +315,9 @@ protected:
 
   QTimer * m_timerOnline;
   int m_countLastPoints;
+  /// true - Показывать легенду, если боковая панель скрыта
+  /// false - Всегда скрывать легенду
+  bool m_showLegend;
 
   void updateCurvesIntervalStats();
 

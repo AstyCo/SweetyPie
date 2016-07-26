@@ -112,6 +112,7 @@ ChartWidget::ChartWidget(QWidget * parent) :
   m_selectedPointIndex = CurveIndex();
   m_selectionState = ssNone;
   m_hasSelection = false;
+  m_showLegend = false;
 
   setPanelCurveDetailsVisible(true);  
 
@@ -559,6 +560,22 @@ void ChartWidget::moveCanvas( int dx, int dy )
   plot->setAutoReplot( doAutoReplot );
   plot->replot();  
 }
+
+bool ChartWidget::showLegend() const
+{
+  return m_showLegend;
+}
+
+void ChartWidget::setShowLegend(bool show)
+{
+  m_showLegend = show;
+
+  if ((! ui->widgetDetail->isVisible()) && m_showLegend)
+    ui->m_plot->insertLegend(new QwtLegend(), QwtPlot::RightLegend);
+  else
+    ui->m_plot->insertLegend(NULL);
+}
+
 QList<CurveStyle> ChartWidget::getCurveStyles() const
 {
   return m_curveStyles;
@@ -578,7 +595,7 @@ void ChartWidget::onAction_panelCurveDetails_toggled(bool checked)
 {
   m_settings.detailsPanelVisible = checked;
   ui->m_detailsPanel->setVisible(checked);
-  if (! checked)
+  if ((! checked) && m_showLegend)
     ui->m_plot->insertLegend(new QwtLegend(), QwtPlot::RightLegend);
   else
     ui->m_plot->insertLegend(NULL);
