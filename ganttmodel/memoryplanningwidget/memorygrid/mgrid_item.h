@@ -14,7 +14,7 @@ class MGridScene;
 class MGridItem : public QGraphicsItem
 {
 public:
-    MGridItem(long index,qreal edgeLength = DEFAULT_EDGELENGTH,
+    MGridItem(long index,QGraphicsScene* scene,qreal edgeLength = DEFAULT_EDGELENGTH,
                qreal borderWidth = DEFAULT_BORDERWIDTH,QGraphicsItem *parent = 0);
     virtual ~MGridItem();
 
@@ -23,6 +23,7 @@ public:
     qreal right() const;
     qreal top() const;
     qreal bottom() const;
+    void setScene(MGridScene* scene);
 
     // Inherited from QGraphicsItem
     QRectF boundingRect() const;

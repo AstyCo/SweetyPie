@@ -14,20 +14,29 @@
 
 extern MGridScene* mem_scene;
 
-MGridUnit::MGridUnit(QGraphicsItem *parent /*= 0*/)
-    : QGraphicsItem(parent)
+MGridUnit::MGridUnit(QGraphicsScene *scene,QGraphicsItem *parent /*= 0*/)
+    : QGraphicsItem(parent,scene)
 {
     isEmpty = true;
 
-    m_scene = dynamic_cast<MGridScene*>(scene());
-    m_items = &(m_scene->m_items);
-    if(!m_scene)
-        qDebug() << "Not MemoryScene*";
+
+    setScene(dynamic_cast<MGridScene*>(scene));
 
     setShowBorder(false);
     setAcceptsHoverEvents(true);
 
     setZValue(1);
+}
+
+void MGridUnit::setScene(MGridScene* scene)
+{
+    m_scene = scene;
+    if(!m_scene)
+    {
+        qCritical("not MGridScene :: setScene");
+        return;
+    }
+    m_items = &(m_scene->m_items);
 
     m_borderPen=QPen(QBrush(QColor::fromRgb(200,200,200)), extraSize() ,Qt::SolidLine,Qt::SquareCap,Qt::MiterJoin);
 
@@ -124,13 +133,13 @@ void MGridUnit::setSize(long newSize)
     setFinish(start()+newSize-1);
 }
 
-qreal MGridUnit::spacing() const
-{
-    MGridScene* p_memScene = dynamic_cast<MGridScene*>(scene());
-    if(!p_memScene)
-        return DEFAULT_SPACING;
-    return p_memScene->spacing();
-}
+//qreal MGridUnit::spacing() const
+//{
+//    MGridScene* p_memScene = dynamic_cast<MGridScene*>(scene());
+//    if(!p_memScene)
+//        return DEFAULT_SPACING;
+//    return p_memScene->spacing();
+//}
 
 void MGridUnit::hoverEnterEvent(QGraphicsSceneHoverEvent *event)
 {
@@ -172,21 +181,12 @@ void MGridUnit::rebuildShape()
         itemsRect|=m_items->at(i)->geometry();
     }
 
-    qreal   top = itemsRect.top(),
-            bottom = itemsRect.bottom(),
-
-            utterLeft = itemsRect.right(), // using for search of utter left, right() is MAX
-            utterRight = itemsRect.left(); // -||- right, left() is MAX
-
-
     MGridItem  *utterLeftItem = m_items->at(m_start),
                 *utterRightItem = m_items->at(m_finish);
-    utterLeft = utterLeftItem->left();
-    utterRight = utterLeftItem->right();
+    qreal   utterLeft = utterLeftItem->left(),
+            utterRight = utterLeftItem->right();
 
     QPainterPath path;
-
-    qreal halfSpacing = m_scene->spacing() / 2;
 
     bool shapingTop = false,
          shapingBottom = false,
@@ -199,37 +199,37 @@ void MGridUnit::rebuildShape()
             && utterLeft>utterRight)
         shapingSeparate = true;
 
-    path.moveTo(utterLeftItem->geometry().topLeft()+QPointF(-halfSpacing,-halfSpacing));
-    path.lineTo(itemsRect.topRight()+QPointF(+halfSpacing,-halfSpacing));
+    path.moveTo(utterLeftItem->geometry().topLeft());
+    path.lineTo(itemsRect.topRight());
 
     if(shapingBottom)
     {
-        path.lineTo(QPointF(itemsRect.right()+halfSpacing,utterRightItem->top()-halfSpacing));
+        path.lineTo(QPointF(itemsRect.right(),utterRightItem->top()));
         if(shapingSeparate)
         {
-            path.lineTo(utterLeftItem->geometry().bottomLeft()+QPointF(-halfSpacing,+halfSpacing));
-            path.moveTo(utterRightItem->geometry().topRight()+QPointF(+halfSpacing,-halfSpacing));
+            path.lineTo(utterLeftItem->geometry().bottomLeft());
+            path.moveTo(utterRightItem->geometry().topRight());
         }
         else
-            path.lineTo(utterRightItem->geometry().topRight()+QPointF(+halfSpacing,-halfSpacing));
+            path.lineTo(utterRightItem->geometry().topRight());
     }
 
-    path.lineTo(utterRightItem->geometry().bottomRight()+QPointF(+halfSpacing,+halfSpacing));
-    path.lineTo(itemsRect.bottomLeft()+QPointF(-halfSpacing,+halfSpacing));
+    path.lineTo(utterRightItem->geometry().bottomRight());
+    path.lineTo(itemsRect.bottomLeft());
 
     if(shapingTop)
     {
-        path.lineTo(QPointF(itemsRect.left()-halfSpacing,utterLeftItem->bottom()+halfSpacing));
+        path.lineTo(QPointF(itemsRect.left(),utterLeftItem->bottom()));
         if(shapingSeparate)
         {
-            path.lineTo(utterRightItem->geometry().topRight()+QPointF(+halfSpacing,-halfSpacing));
-            path.moveTo(utterLeftItem->geometry().bottomLeft()+QPointF(-halfSpacing,+halfSpacing));
+            path.lineTo(utterRightItem->geometry().topRight());
+            path.moveTo(utterLeftItem->geometry().bottomLeft());
         }
         else
-            path.lineTo(utterLeftItem->geometry().bottomLeft()+QPointF(-halfSpacing,+halfSpacing));
+            path.lineTo(utterLeftItem->geometry().bottomLeft());
     }
 
-    path.lineTo(utterLeftItem->geometry().topLeft()+QPointF(-halfSpacing,-halfSpacing));
+    path.lineTo(utterLeftItem->geometry().topLeft());
 
     setShapeBorder(path);
 }
@@ -346,7 +346,9 @@ void MGridUnit::updateParenthesis()
 
 qreal MGridUnit::extraSize() const
 {
-    return spacing()/2 + m_scene->itemBorder();
+    if(!m_scene)
+        return 0;
+    return m_scene->itemBorder();
 }
 
 KaMemoryPart MGridUnit::toKaMemoryPart() const

@@ -87,12 +87,9 @@ SOURCES += \
     memoryplanningwidget/kamemory.cpp \
     memoryplanningwidget/kamemorypart.cpp \
     memoryplanningwidget/memorygrid/mgrid_interactiveunit.cpp \
-    memoryplanningwidget/memorygrid/mgrid_labelitem.cpp \
     memoryplanningwidget/memorygrid/mgrid_item.cpp \
     memoryplanningwidget/memorygrid/mgrid_scene.cpp \
-    memoryplanningwidget/memorygrid/mgrid_status.cpp \
     memoryplanningwidget/memorygrid/mgrid_unit.cpp \
-    memoryplanningwidget/memorygrid/mgrid_widget.cpp \
     memoryplanningwidget/memoryline/mline_abstractpart.cpp \
     memoryplanningwidget/memoryline/mline_graphicspart.cpp \
     memoryplanningwidget/memoryline/mline_picker.cpp \
@@ -132,11 +129,8 @@ HEADERS += \
     memoryplanningwidget/memoryline/mline_graphicspart.h \
     memoryplanningwidget/memorygrid/mgrid_interactiveunit.h \
     memoryplanningwidget/memorygrid/mgrid_item.h \
-    memoryplanningwidget/memorygrid/mgrid_labelitem.h \
     memoryplanningwidget/memorygrid/mgrid_scene.h \
-    memoryplanningwidget/memorygrid/mgrid_status.h \
     memoryplanningwidget/memorygrid/mgrid_unit.h \
-    memoryplanningwidget/memorygrid/mgrid_widget.h \
     memoryplanningwidget/memoryplanningwidget.h \
     memoryplanningwidget/memoryview.h \
     memoryplanningwidget/memoryline/mline_scene.h \

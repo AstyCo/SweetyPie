@@ -1,14 +1,11 @@
 #include "memoryplanningwidget.h"
 #include "ui_memoryplanningwidget.h"
 
-#include "mgrid_widget.h"
 #include "memoryview.h"
 #include "mgrid_scene.h"
 #include "mline_scene.h"
 #include "kamemorypart.h"
 #include "kamemory.h"
-#include "mgrid_status.h"
-
 #include <QDebug>
 #include <QBitmap>
 #include <QScrollBar>

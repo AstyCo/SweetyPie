@@ -2,7 +2,6 @@
 #include "mgrid_scene.h"
 #include "memory_globalvalues.h"
 #include "mgrid_item.h"
-#include "mgrid_widget.h"
 #include "mgrid_unit.h"
 
 
@@ -14,18 +13,15 @@
 #include <QApplication>
 #include <QDebug>
 
-MGridItem::MGridItem(long index,qreal edgeLength,qreal borderWidth,QGraphicsItem *parent/* = 0*/)
-    :  QGraphicsItem(parent)
+MGridItem::MGridItem(long index,QGraphicsScene *scene,qreal edgeLength,qreal borderWidth,QGraphicsItem *parent/* = 0*/)
+    :  QGraphicsItem(parent,scene)
 {
     setIndex(index);
 
     m_unit = dynamic_cast<MGridUnit*>(parent);
         // NULL if not MemoryUnit*
 
-    m_scene = dynamic_cast<MGridScene*>(scene());
-        // NULL if not MemoryScene*
-    if(!m_scene)
-        qDebug() << "not MemoryScene*";
+    m_scene = dynamic_cast<MGridScene*>(scene);
 
     setEdgeLength(edgeLength);
     setBorderWidth(borderWidth);

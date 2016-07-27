@@ -140,7 +140,7 @@ private:
     MGridUnit* newUnit();
     void removeUnit(MGridUnit* p_memUnit);
     void addUnit(const KaMemoryPart &part);
-    MGridWidget *widget() const;
+
     void setItemInfo(const QString& text);
     void setUnitInfo(const QString& text);
     void viewResized(QSizeF viewSize);
@@ -166,6 +166,7 @@ private:
     void clearUnits();
     HighlightStyle highlightStyle() const;
     QList<MGridUnit*> crossingParts(long from, long to) const;
+    void setupMatrix(const QVector<MGridItem*>& items);
 
     // +WARNINGS
 private:
@@ -209,14 +210,13 @@ private:
 
     qreal m_itemEdge;
     qreal m_itemBorder;
+    int m_itemPerRow;
 private:
 
     MGridItem *m_mouseOverItem;
     MGridUnit *m_mouseOverUnit;
     long m_lastSelectedIndex;
     MGridItem* m_lastSelected;
-    MGridWidget* m_mGridWidget;
-
     MGridInteractiveUnit* m_interactiveUnit;
 
 

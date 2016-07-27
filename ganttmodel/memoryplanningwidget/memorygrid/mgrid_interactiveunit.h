@@ -27,8 +27,6 @@ public:
     long finish() const;
     long size() const;
 
-    qreal spacing() const;
-
     void disable();
 
     void setRange(long start, long finish);
@@ -45,10 +43,13 @@ private:
     QPainterPath shapeBorder() const;
     void setShapeBorder(const QPainterPath &shapeBorder);
 
+    qreal extraSize() const;
+
 private:
 
     QPainterPath m_shapeBorder;
     QPen m_borderPen;
+    MGridScene *m_scene;
 
     QVector<MGridItem*>* m_items;
     long m_start, m_finish;

@@ -13,7 +13,7 @@ class MGridScene;
 class MGridUnit : public QGraphicsItem
 {
 public:
-    MGridUnit(QGraphicsItem *parent = 0);
+    MGridUnit(QGraphicsScene *scene,QGraphicsItem *parent = 0);
 
     QRectF boundingRect() const;
     QPainterPath shape() const;
@@ -55,6 +55,8 @@ public:
 
 private:
     void rebuildShape();
+
+    void setScene(MGridScene* scene);
 
     QPainterPath shapeBorder() const;
     void setShapeBorder(const QPainterPath &shapeBorder);

@@ -2,7 +2,6 @@
 #include "memoryview.h"
 
 #include "mgrid_item.h"
-#include "mgrid_widget.h"
 #include "mgrid_unit.h"
 
 #include "kamemory.h"
@@ -30,6 +29,7 @@ MGridScene::MGridScene( QObject * parent)
 
     m_itemEdge = DEFAULT_EDGELENGTH;
     m_itemBorder = DEFAULT_BORDERWIDTH;
+    m_itemPerRow = 0;
 
     clear();
 
@@ -41,26 +41,13 @@ MGridScene::MGridScene( QObject * parent)
 
     setHighlightStyle( bordersAround | highlightedItems);
 
+    m_interactiveUnit = new MGridInteractiveUnit(this);
 
-    m_mGridWidget = new MGridWidget;
-    m_interactiveUnit = new MGridInteractiveUnit(this,m_mGridWidget);
-
-//    m_memoryWidget->setPos(5,5);
-
-    m_mGridWidget->setLabels(false);
-
-    addItem(m_mGridWidget);
-
-    m_mGridWidget->setSpacing(DEFAULT_SPACING);
-    m_mGridWidget->setMargins(DEFAULT_MARGINS);
-    m_mGridWidget->setItemPerRow(64);
-
-
+    qDebug() <<"MGRIDSCENE";
 }
 
 MGridScene::~MGridScene()
 {
-    delete m_mGridWidget;
 }
 
 void MGridScene::mousePressEvent(QGraphicsSceneMouseEvent *event)
@@ -181,17 +168,16 @@ void MGridScene::updateShownUnits()
 
 void MGridScene::setMemory(const KaMemory& kaMemory)
 {
-    MGridUnit * p_memUnit = NULL;
-
     clear();
     m_memory = kaMemory;
 
     for(int i = 0; i<memorySize(); ++i)
     {
-        m_items.append(new MGridItem(i,itemEdge(),itemBorder(),m_mGridWidget));
+        MGridItem* newItem = new MGridItem(i,this,itemEdge(),itemBorder());
+        m_items.append(newItem);
     }
 
-    m_mGridWidget->setupMatrix(m_items);
+    setupMatrix(m_items);
 
     const QList<KaMemoryPart>& units = kaMemory.memoryParts();
 
@@ -202,34 +188,16 @@ void MGridScene::setMemory(const KaMemory& kaMemory)
 
 MGridUnit* MGridScene::newUnit()
 {
-
-    MGridUnit* p_memUnit = new MGridUnit(m_mGridWidget);
+    MGridUnit* p_memUnit = new MGridUnit(this);
     p_memUnit->setState(Memory::Empty);
 
     addUnit(p_memUnit);
     return p_memUnit;
 }
 
-//void MGridScene::setItemInfo(const QString &text)
-//{
-//    m_memoryWidget->setItemInfo(text);
-//    memoryStatusUpdate();
-//}
-
-//void MGridScene::setUnitInfo(const QString &text)
-//{
-//    m_memoryWidget->setUnitInfo(text);
-//    memoryStatusUpdate();
-//}
-
-//QStatusBar *MemoryScene::statusBar()
-//{
-//    return m_memoryWidget->m_statusBar;
-//}
-
 int MGridScene::itemPerRow() const
 {
-    return m_mGridWidget->itemPerRow();
+    return m_itemPerRow;
 }
 
 void MGridScene::setItemPerRow(int newItemPerRow)
@@ -237,8 +205,8 @@ void MGridScene::setItemPerRow(int newItemPerRow)
     if(newItemPerRow==itemPerRow()||!newItemPerRow)
         return;
 
-    m_mGridWidget->setItemPerRow(newItemPerRow);
-    m_mGridWidget->setupMatrix(m_items);
+    m_itemPerRow = newItemPerRow;
+    setupMatrix(m_items);
 
     foreach(MGridUnit* unit, m_units)
         unit->rebuildShape();
@@ -281,7 +249,6 @@ void MGridScene::setLastSelected(MGridItem *p_mem)
 {
     return; //DISABLED
 
-    qDebug() <<"setLastSelected";
     m_lastSelected = p_mem;
     if(!p_mem)
     {
@@ -509,18 +476,12 @@ long MGridScene::lengthHighlight() const
 
 void MGridScene::addUnit(const KaMemoryPart &part)
 {
-    MGridUnit* p_memUnit = new MGridUnit(m_mGridWidget);
+    MGridUnit* p_memUnit = new MGridUnit(this);
     p_memUnit->setState(part.state());
     p_memUnit->setId(part.id());
     p_memUnit->addItems(part.start(),part.finish());
 
     addUnit(p_memUnit);
-}
-
-
-MGridWidget *MGridScene::widget() const
-{
-    return m_mGridWidget;
 }
 
 void MGridScene::setItemInfo(const QString &text)
@@ -562,6 +523,22 @@ QList<MGridUnit *> MGridScene::crossingParts(long from, long to) const
             result.append(parUnit);
     }
     return result;
+}
+
+void MGridScene::setupMatrix(const QVector<MGridItem *> &items)
+{
+    if(!m_itemPerRow)
+        return;
+    int row = 0, col = 0;
+    for(int i=0;i<items.size();++i)
+    {
+        items[i]->setPos(col*itemSize(),row*itemSize());
+        if(++col%m_itemPerRow == 0)
+        {
+            col = 0;
+            row++;
+        }
+    }
 }
 
 QList<KaMemoryPart> MGridScene::crossingParts() const
@@ -815,7 +792,6 @@ void MGridScene::clearMemory(long from, long count)
 {
     if(from+count>=memorySize())
     {
-        qDebug() <<"MemoryScene::free";
         count = memorySize()-from-1;
     }
     QList<MGridUnit*> memoryUnits = crossingParts(from,from+count-1);
@@ -825,7 +801,6 @@ void MGridScene::clearMemory(long from, long count)
     {
         count-=unit->removeItems(qMax(unit->start(),from),count);
     }
-    qDebug() << "MemoryScene::free";
 }
 
 MGridItem *MGridScene::itemAtPos(const QPointF &pos) const
@@ -875,16 +850,13 @@ void MGridScene::viewResized(QSizeF viewSize)
     qreal viewWidth = viewSize.width();
 
     int newItemPerRow = (viewWidth)
-                              /(itemSize())
-                        - ((m_mGridWidget->labels())?1:0);
+                              /(itemSize());
 
     if(!newItemPerRow)
         return;
 
     if(itemPerRow()!=newItemPerRow)
     {
-
-        qDebug()<<"viewResized";
         setSceneRect(0,0,viewWidth,(memorySize()/newItemPerRow + 1)*itemSize());
         setItemPerRow(newItemPerRow);
         if(m_interactiveUnit)
@@ -908,7 +880,7 @@ void MGridScene::hideInteractiveRange()
 
 qreal MGridScene::itemSize() const
 {
-    return spacing()+itemEdge()+2*itemBorder();
+    return /*spacing()+*/itemEdge()+2*itemBorder();
 }
 
 void MGridScene::updateParenthesis()
@@ -937,15 +909,6 @@ void MGridScene::setItemBorder(qreal itemBorder)
 }
 
 
-qreal MGridScene::spacing() const
-{
-    return m_mGridWidget->spacing();
-}
-
-void MGridScene::setSpacing(const qreal &spacing)
-{
-    m_mGridWidget->setSpacing(spacing);
-}
 
 
 
