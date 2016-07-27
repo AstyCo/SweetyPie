@@ -123,51 +123,17 @@ void MGridInteractiveUnit::rebuildShape()
     }
 
     qreal   top = itemsRect.top(),
-            bottom = itemsRect.bottom(),
-
-            utterLeft = itemsRect.right(), // using for search of utter left, right() is MAX
-            utterRight = itemsRect.left(); // -||- right, left() is MAX
+            bottom = itemsRect.bottom();
 
 
-    MGridItem  *utterLeftItem = NULL,
-                *utterRightItem = NULL;
+    MGridItem  *utterLeftItem = m_items->at(m_start),
+                *utterRightItem = m_items->at(m_finish);
 
-    for(int i = m_start; i <= m_finish; ++i)
-    {
-        MGridItem* item = m_items->at(i);
-        qreal   itemTop = item->geometry().top(),
-                itemBottom = item->geometry().bottom();
+    qreal utterLeft = utterLeftItem->geometry().left(),
+            utterRight = utterRightItem->geometry().right();
 
-        if(itemTop == top)
-        {
-            // element of first row
-            qreal itemLeft = item->geometry().left();
-
-            if(itemLeft < utterLeft)
-            {
-                utterLeft = itemLeft;
-                utterLeftItem = item;
-            }
-        }
-        if(itemBottom == bottom)
-        {
-            // element of first row
-            qreal itemRight = item->geometry().right();
-
-            if(itemRight > utterRight)
-            {
-                utterRight = itemRight;
-                utterRightItem = item;
-            }
-        }
-    }
 
     QPainterPath path;
-    if(!utterLeftItem||!utterRightItem)
-    {
-        setShapeBorder(QPainterPath());
-        return;
-    }
 
     MGridScene* p_memScene = dynamic_cast<MGridScene*>(scene());
     if(!p_memScene)

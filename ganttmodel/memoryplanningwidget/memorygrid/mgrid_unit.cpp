@@ -184,57 +184,14 @@ void MGridUnit::rebuildShape()
         itemsPath.addRect(m_items->at(i)->geometry());
     }
 
-    qreal   top = itemsPath.boundingRect().top(),
-            bottom = itemsPath.boundingRect().bottom(),
+    MGridItem  *utterLeftItem = m_items->at(m_start),
+                *utterRightItem = m_items->at(m_finish);
 
-            utterLeft = itemsPath.boundingRect().right(), // using for search of utter left, right() is MAX
-            utterRight = itemsPath.boundingRect().left(); // -||- right, left() is MAX
+    qreal utterLeft = utterLeftItem->geometry().left(),
+            utterRight = utterRightItem->geometry().right();
 
-
-    MGridItem  *utterLeftItem = NULL,
-                *utterRightItem = NULL;
-
-    for(int i = m_start; i<= m_finish; ++i)
-    {
-        MGridItem* item = m_items->at(i);
-        qreal   itemTop = item->geometry().top(),
-                itemBottom = item->geometry().bottom();
-
-        if(itemTop == top)
-        {
-            // element of first row
-            qreal itemLeft = item->geometry().left();
-
-            if(itemLeft < utterLeft)
-            {
-                utterLeft = itemLeft;
-                utterLeftItem = item;
-            }
-        }
-        if(itemBottom == bottom)
-        {
-            // element of first row
-            qreal itemRight = item->geometry().right();
-
-            if(itemRight > utterRight)
-            {
-                utterRight = itemRight;
-                utterRightItem = item;
-            }
-        }
-    }
 
     QPainterPath path;
-    if(!utterLeftItem||!utterRightItem)
-    {
-        setShapeBorder(QPainterPath());
-        return;
-    }
-
-    if(!m_scene)
-    {
-        return ;
-    }
 
     qreal halfSpacing = m_scene->spacing() / 2;
 

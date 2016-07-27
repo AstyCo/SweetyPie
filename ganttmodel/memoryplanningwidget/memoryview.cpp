@@ -27,23 +27,18 @@ MemoryView::MemoryView(QGraphicsScene * scene, QWidget * parent) :
 
 void MemoryView::resizeEvent(QResizeEvent *event)
 {
-    if(m_gridScene)
+    if(m_mode == MemoryGrid)
     {
         m_gridScene->viewResized(event->size());
-
-        qDebug()<< event->size();
-        qDebug()<< sceneRect();
 
         verticalScrollBar()->setValue(0);
 
         return QGraphicsView::resizeEvent(event);
     }
     // ELSE
-    if(m_lineScene)
+    if(m_mode == MemoryLine)
     {
         m_lineScene->setSceneRect(0,0,event->size().width(),126);
-
-//        update();
         repaint();
         return;
     }
@@ -59,8 +54,6 @@ void MemoryView::setScene(QGraphicsScene *scene)
     if(p_memoryScene)
     {
         m_mode = MemoryGrid;
-//        if(p_memoryScene == m_gridScene)
-//            return;
         m_gridScene = p_memoryScene;
 
         setContentsMargins(0, 0, 0, 0);
@@ -70,9 +63,6 @@ void MemoryView::setScene(QGraphicsScene *scene)
 
         p_memoryScene->setBackgroundBrush(QBrush(QColor(Qt::gray).lighter(130)));
 
-//        setScene(p_memoryScene);
-
-        adjustSize();
 
         setFrameStyle(0);
         setAlignment(Qt::AlignLeft | Qt::AlignTop);
@@ -80,6 +70,8 @@ void MemoryView::setScene(QGraphicsScene *scene)
 
         setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
         setMaximumHeight(100000);
+
+
 
         return;
     }
@@ -130,7 +122,6 @@ void MemoryView::changeScene()
     KaMemory kaMemory;
     if(m_mode == MemoryGrid)
     {
-        m_mode = MemoryLine;
         kaMemory = m_gridScene->memory();
         if(!m_lineScene)
             setScene(new MLineScene(parent()));
@@ -139,7 +130,6 @@ void MemoryView::changeScene()
     }
     else if(m_mode == MemoryLine)
     {
-        m_mode = MemoryGrid;
         kaMemory = m_lineScene->memory();
         if(!m_gridScene)
             setScene(new MGridScene(parent()));
@@ -147,7 +137,7 @@ void MemoryView::changeScene()
             setScene(m_gridScene);
     }
     setMemory(kaMemory);
-    adjustSize();
+//    adjustSize();
 }
 
 void MemoryView::setMemory(const KaMemory &kaMemory)

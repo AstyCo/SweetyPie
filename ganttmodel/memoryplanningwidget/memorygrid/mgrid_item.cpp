@@ -49,9 +49,6 @@ void MGridItem::paint(QPainter *painter,
 {
     Q_UNUSED(widget);
 
-    if(zValue())
-        qDebug() <<zValue();
-
     painter->setCompositionMode(QPainter::CompositionMode_SourceOver);
     painter->setPen(Qt::NoPen);
 

@@ -74,7 +74,12 @@ void MGridScene::mousePressEvent(QGraphicsSceneMouseEvent *event)
     // ITEMS SELECT <disabled>
     MGridItem * p_mem = itemAtPos(event->scenePos());
     if(p_mem)
-        setLastSelected(p_mem);
+    {
+        if(m_highlightStyle&highlightedItems)
+            setHighlightMode(true);
+        setInteractiveHighlight(true);
+//        setLastSelected(p_mem); //DISABLED
+    }
 
     mouseMoveEvent(event);
     return QGraphicsScene::mousePressEvent(event);
@@ -851,7 +856,6 @@ long MGridScene::memorySize() const
 
 void MGridScene::viewResized(QSizeF viewSize)
 {
-    qDebug()<<"viewResized";
 
     qreal viewWidth = viewSize.width();
 
@@ -860,7 +864,11 @@ void MGridScene::viewResized(QSizeF viewSize)
                         - ((m_mGridWidget->labels())?1:0);
 
     if(itemPerRow()!=newItemPerRow)
+    {
+        qDebug()<<"viewResized";
+        setSceneRect(0,0,viewWidth,((memorySize()-1)/newItemPerRow + 1)*itemSize());
         setItemPerRow(newItemPerRow);
+    }
 
     setSceneRect(itemsBoundingRect());
 }
