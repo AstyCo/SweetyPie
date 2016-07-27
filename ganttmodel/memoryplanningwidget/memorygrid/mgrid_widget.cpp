@@ -59,46 +59,28 @@ int MGridWidget::toMemoryAdress(int pos) const
 
 
 
-void MGridWidget::setupMatrix(QList<MGridItem*> mem_items)
+void MGridWidget::setupMatrix(QVector<MGridItem*> mem_items)
 {
 
-    removeLabels();
-    QGraphicsGridLayout * gridLayout = new QGraphicsGridLayout;
-
-    gridLayout->setContentsMargins(-0, -0, 0, 0);
-    gridLayout->setSpacing(m_spacing);
-
-    if(labels())
-    {
-        MGridLabelItem* emptyLabelItem = new MGridLabelItem(QString(),this);
-        gridLayout->addItem(emptyLabelItem,0,0);
-        m_labelItems.append(emptyLabelItem);
-
-        for(int j=0;j<itemPerRow();++j)
-        {
-            MGridLabelItem* labelItem = new MGridLabelItem(QString::number(j),this);
-            gridLayout->addItem(labelItem,0,j+1);
-            m_labelItems.append(labelItem);
-        }
-    }
+    int row = 0, col = 0;
     for(int i=0;i<mem_items.size();++i)
     {
-        if(labels()&&!(i%itemPerRow()))
+
+        mem_items[i]->setPos(col*mem_items[i]->boundingRect().width(),row*mem_items[i]->boundingRect().height());
+
+        if(++col%itemPerRow() == 0)
         {
-            MGridLabelItem* labelItem = new MGridLabelItem(QString::number(i/itemPerRow()),this);
-            gridLayout->addItem(labelItem,i/itemPerRow()+1,0);
-            m_labelItems.append(labelItem);
+            col = 0;
+            row++;
         }
-        gridLayout->addItem(mem_items[i], toRow(i), toColumn(i));
     }
 
-    setLayout(gridLayout);
-
-    adjustSize();
 }
 
 bool MGridWidget::labels() const
 {
+    return false;
+    // Disabled
     return m_labels;
 }
 
@@ -176,6 +158,8 @@ int MGridWidget::itemPerRow() const
 
 void MGridWidget::setItemPerRow(int itemPerRow)
 {
+    if(m_itemPerRow == itemPerRow)
+        return;
     m_itemPerRow = itemPerRow;
 
 }

@@ -14,7 +14,7 @@ KaMemory MLineScene::memory() const
 void MLineScene::init(const QList<KaMemoryPart> &records, long memorySize)
 {
     KaMemory kaMemory;
-    kaMemory.init(records,2048);
+    kaMemory.init(records,memorySize);
     setMemory(kaMemory);
 }
 

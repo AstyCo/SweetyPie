@@ -15,12 +15,11 @@
 #include <QDebug>
 
 MGridItem::MGridItem(long index,qreal edgeLength,qreal borderWidth,QGraphicsItem *parent/* = 0*/)
-    : QGraphicsLayoutItem(), QGraphicsItem(parent)
+    :  QGraphicsItem(parent)
 {
-    setGraphicsItem(this);
     setIndex(index);
 
-    m_parentUnit = dynamic_cast<MGridUnit*>(parent);
+    m_unit = dynamic_cast<MGridUnit*>(parent);
         // NULL if not MemoryUnit*
 
     m_scene = dynamic_cast<MGridScene*>(scene());
@@ -30,10 +29,8 @@ MGridItem::MGridItem(long index,qreal edgeLength,qreal borderWidth,QGraphicsItem
 
     setEdgeLength(edgeLength);
     setBorderWidth(borderWidth);
-    disableSizeModify();
 
     setAcceptsHoverEvents(true);
-
     enableToolTip();
 
 }
@@ -43,14 +40,38 @@ MGridItem::~MGridItem()
 
 }
 
+QRectF MGridItem::geometry() const
+{
+    return QRectF(pos(),boundingRect().size());
+}
+
+qreal MGridItem::left() const
+{
+    return pos().x();
+}
+
+qreal MGridItem::right() const
+{
+    return pos().x()+boundingRect().width();
+}
+
+qreal MGridItem::top() const
+{
+    return pos().y();
+}
+
+qreal MGridItem::bottom() const
+{
+    return pos().y()+boundingRect().height();
+}
+
+
+
 
 void MGridItem::paint(QPainter *painter,
     const QStyleOptionGraphicsItem *option, QWidget *widget /*= 0*/)
 {
     Q_UNUSED(widget);
-
-    if(zValue())
-        qDebug() <<zValue();
 
     painter->setCompositionMode(QPainter::CompositionMode_SourceOver);
     painter->setPen(Qt::NoPen);
@@ -128,16 +149,14 @@ void MGridItem::drawBlurred(QPainter *painter, const QStyleOptionGraphicsItem *o
     painter->drawPath(path);
 }
 
-MGridUnit *MGridItem::parentUnit() const
+MGridUnit *MGridItem::unit() const
 {
-    return m_parentUnit;
+    return m_unit;
 }
 
-void MGridItem::setParentUnit(MGridUnit *parentUnit)
+void MGridItem::setUnit(MGridUnit *unit)
 {
-    if(!parentUnit)
-        setParentItem(m_scene->widget());
-    m_parentUnit = parentUnit;
+    m_unit = unit;
 }
 
 
@@ -153,9 +172,9 @@ void MGridItem::setToolTip(const QString &toolTip)
 
 void MGridItem::enableToolTip()
 {
-    setToolTip(QString("Dec: ")+fixedNumPresentation(index(),10,2047)+'\n'
-               +QString("Hex: 0x")+fixedNumPresentation(index(),16,2047)+'\n'
-               +QString("Bin:  ")+fixedNumPresentation(index(),2,2047));
+    setToolTip(QString("Dec: ")+fixedNumPresentation(index(),10,m_scene->memorySize())+'\n'
+               +QString("Hex: 0x")+fixedNumPresentation(index(),16,m_scene->memorySize())+'\n'
+               +QString("Bin:  ")+fixedNumPresentation(index(),2,m_scene->memorySize()));
 }
 
 void MGridItem::disableToolTip()
@@ -163,46 +182,22 @@ void MGridItem::disableToolTip()
     setToolTip(QString());
 }
 
-QVariant MGridItem::itemChange(QGraphicsItem::GraphicsItemChange change, const QVariant &value)
+void MGridItem::setUnitSelected(bool selected)
 {
-    if(change == QGraphicsItem::ItemParentHasChanged)
-    {
-
-        QGraphicsItem * newParentItem = value.value<QGraphicsItem*>();
-        if(!newParentItem)
-        {
-            m_parentUnit = NULL;
-            return QGraphicsItem::itemChange(change,value);
-        }
-
-        MGridUnit* newParent = dynamic_cast<MGridUnit*>(newParentItem);
-        if(!newParent)
-        {
-            return QGraphicsItem::itemChange(change,value);
-        }
-        m_parentUnit = newParent;
-        return QGraphicsItem::itemChange(change,value);
-    }
-
-    return QGraphicsItem::itemChange(change,value);
-}
-
-void MGridItem::setParentUnitSelected(bool selected)
-{
-    if(!m_parentUnit)
+    if(!m_unit)
     {
         return;
     }
 
-    m_parentUnit->setShowBorder(selected);
-    m_parentUnit->update();
+    m_unit->setShowBorder(selected);
+    m_unit->update();
 }
 
 MemoryState MGridItem::state() const
 {
-    if(m_parentUnit)
+    if(m_unit)
     {
-        return m_parentUnit->state();
+        return m_unit->state();
     }
 
     return Memory::Empty;
@@ -212,8 +207,8 @@ QColor MGridItem::color() const
 {
     bool highlightedItem = isHighlighted();
 
-    if(m_parentUnit)
-        return MemoryState_to_QColor(m_parentUnit->state(),highlightedItem);
+    if(m_unit)
+        return MemoryState_to_QColor(m_unit->state(),highlightedItem);
 
     return MemoryState_to_QColor(Memory::Empty,highlightedItem);
 }
@@ -254,10 +249,6 @@ void MGridItem::setIndex(long index)
 }
 qreal MGridItem::edgeLength() const
 {
-    if(m_sizeModifying)
-    {
-        return m_edgeLength*m_sizeModify;
-    }
     return m_edgeLength;
 }
 
@@ -265,15 +256,11 @@ void MGridItem::setEdgeLength(qreal edgeLength)
 {
     if(m_edgeLength == edgeLength)
         return;
+    prepareGeometryChange();
     m_edgeLength = edgeLength;
-    updateGeometry();
 }
 qreal MGridItem::borderWidth() const
 {
-    if(m_sizeModifying)
-    {
-        return m_borderWidth*m_sizeModify;
-    }
     return m_borderWidth;
 }
 
@@ -281,26 +268,8 @@ void MGridItem::setBorderWidth(const qreal &borderWidth)
 {
     if(borderWidth==m_borderWidth)
         return;
+    prepareGeometryChange();
     m_borderWidth = borderWidth;
-    updateGeometry();
-}
-
-void MGridItem::disableSizeModify()
-{
-    m_sizeModifying = false;
-    m_sizeModify = 1.0;
-}
-
-qreal MGridItem::sizeModify() const
-{
-    return m_sizeModify;
-}
-
-void MGridItem::setSizeModify(qreal sizeModify)
-{
-    m_sizeModifying = true;
-    m_sizeModify = sizeModify;
-    updateGeometry();
 }
 
 bool MGridItem::isHighlighted() const
@@ -323,29 +292,29 @@ QRectF MGridItem::boundingRect() const
 //    return path;
 //}
 
-void MGridItem::setGeometry(const QRectF &geom)
-{
-    prepareGeometryChange();
-    QGraphicsLayoutItem::setGeometry(geom);
-    setPos(geom.topLeft());
-}
+//void MGridItem::setGeometry(const QRectF &geom)
+//{
+//    prepareGeometryChange();
+//    QGraphicsLayoutItem::setGeometry(geom);
+//    setPos(geom.topLeft());
+//}
 
 //QRectF MemoryItem::geometry() const
 //{
 //    return QGraphicsLayoutItem::geometry();
 //}
 
-QSizeF MGridItem::sizeHint(Qt::SizeHint which, const QSizeF &constraint) const
-{
-    switch (which) {
-    case Qt::MinimumSize:
-    case Qt::PreferredSize:
-    case Qt::MaximumSize:
-        return QSizeF(edgeLength() + 2*borderWidth(),edgeLength() + 2*borderWidth());
-    default:
-        break;
-    }
-    return constraint;
-}
+//QSizeF MGridItem::sizeHint(Qt::SizeHint which, const QSizeF &constraint) const
+//{
+//    switch (which) {
+//    case Qt::MinimumSize:
+//    case Qt::PreferredSize:
+//    case Qt::MaximumSize:
+//        return QSizeF(edgeLength() + 2*borderWidth(),edgeLength() + 2*borderWidth());
+//    default:
+//        break;
+//    }
+//    return constraint;
+//}
 
 

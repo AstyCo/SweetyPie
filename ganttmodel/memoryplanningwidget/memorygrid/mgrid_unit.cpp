@@ -86,6 +86,13 @@ long MGridUnit::start() const
 
 void MGridUnit::setStart(long start)
 {
+    if(isEmpty)
+        return;
+    if(start<0)
+    {
+        m_start = 0;
+        return;
+    }
     m_start = start;
 }
 
@@ -96,6 +103,14 @@ long MGridUnit::finish() const
 
 void MGridUnit::setFinish(long finish)
 {
+    if(isEmpty)
+        return;
+    if(finish >= m_scene->memorySize())
+    {
+        m_finish = m_scene->memorySize()-1;
+        return;
+    }
+
     m_finish = finish;
 }
 
@@ -115,38 +130,6 @@ qreal MGridUnit::spacing() const
     if(!p_memScene)
         return DEFAULT_SPACING;
     return p_memScene->spacing();
-}
-
-QVariant MGridUnit::itemChange(QGraphicsItem::GraphicsItemChange change, const QVariant &value)
-{
-//    MemoryItem* p_mem = dynamic_cast<MemoryItem*>(value.value<QGraphicsItem*>());
-//    if(!p_mem)
-//    {
-//        return QGraphicsItem::itemChange(change,value);
-//    }
-
-//    if(change == QGraphicsItem::ItemChildAddedChange)
-//    {
-//        if(m_unitId)
-//        {
-////            qDebug() << "append to "+QString::number(m_unitId);
-//        }
-//        m_items.append(p_mem);
-//        update();
-//    }
-//    else if (change == QGraphicsItem::ItemChildRemovedChange)
-//    {
-//        if(m_unitId)
-//        {
-////            qDebug() << "remove from "+QString::number(m_unitId);
-//        }
-//        m_items.removeOne(p_mem);
-//        update();
-//    }
-
-//    rebuildShape();
-
-    return QGraphicsItem::itemChange(change,value); // MAYBE change to QVariant()
 }
 
 void MGridUnit::hoverEnterEvent(QGraphicsSceneHoverEvent *event)
@@ -171,90 +154,57 @@ void MGridUnit::hoverLeaveEvent(QGraphicsSceneHoverEvent *event)
 
 void MGridUnit::rebuildShape()
 {
+
     if(isEmpty)
+        return;
+
+
+    if(m_finish>m_items->size())
     {
-        setShapeBorder(QPainterPath());
-        return ;
-    }
-
-    QPainterPath itemsPath;
-
-    for(int i = m_start; i<= m_finish; ++i)
-    {
-        itemsPath.addRect(m_items->at(i)->geometry());
-    }
-
-    qreal   top = itemsPath.boundingRect().top(),
-            bottom = itemsPath.boundingRect().bottom(),
-
-            utterLeft = itemsPath.boundingRect().right(), // using for search of utter left, right() is MAX
-            utterRight = itemsPath.boundingRect().left(); // -||- right, left() is MAX
-
-
-    MGridItem  *utterLeftItem = NULL,
-                *utterRightItem = NULL;
-
-    for(int i = m_start; i<= m_finish; ++i)
-    {
-        MGridItem* item = m_items->at(i);
-        qreal   itemTop = item->geometry().top(),
-                itemBottom = item->geometry().bottom();
-
-        if(itemTop == top)
-        {
-            // element of first row
-            qreal itemLeft = item->geometry().left();
-
-            if(itemLeft < utterLeft)
-            {
-                utterLeft = itemLeft;
-                utterLeftItem = item;
-            }
-        }
-        if(itemBottom == bottom)
-        {
-            // element of first row
-            qreal itemRight = item->geometry().right();
-
-            if(itemRight > utterRight)
-            {
-                utterRight = itemRight;
-                utterRightItem = item;
-            }
-        }
-    }
-
-    QPainterPath path;
-    if(!utterLeftItem||!utterRightItem)
-    {
-        setShapeBorder(QPainterPath());
+        qDebug() << "MemoryInteractiveUnit::rebuildShape() out of range";
         return;
     }
 
-    if(!m_scene)
+    QRectF itemsRect;
+
+    for(int i = m_start; i <= m_finish; ++i)
     {
-        return ;
+        itemsRect|=m_items->at(i)->geometry();
     }
+
+    qreal   top = itemsRect.top(),
+            bottom = itemsRect.bottom(),
+
+            utterLeft = itemsRect.right(), // using for search of utter left, right() is MAX
+            utterRight = itemsRect.left(); // -||- right, left() is MAX
+
+
+    MGridItem  *utterLeftItem = m_items->at(m_start),
+                *utterRightItem = m_items->at(m_finish);
+    utterLeft = utterLeftItem->left();
+    utterRight = utterLeftItem->right();
+
+    QPainterPath path;
 
     qreal halfSpacing = m_scene->spacing() / 2;
 
     bool shapingTop = false,
          shapingBottom = false,
          shapingSeparate = false;
-    if(utterLeftItem->geometry().left()!=itemsPath.boundingRect().left())
+    if(utterLeftItem->left()!=itemsRect.left())
         shapingTop = true;
-    if(utterRightItem->geometry().right()!=itemsPath.boundingRect().right())
+    if(utterRightItem->right()!=itemsRect.right())
         shapingBottom = true;
     if(size()<m_scene->itemPerRow()
             && utterLeft>utterRight)
         shapingSeparate = true;
 
     path.moveTo(utterLeftItem->geometry().topLeft()+QPointF(-halfSpacing,-halfSpacing));
-    path.lineTo(itemsPath.boundingRect().topRight()+QPointF(+halfSpacing,-halfSpacing));
+    path.lineTo(itemsRect.topRight()+QPointF(+halfSpacing,-halfSpacing));
 
     if(shapingBottom)
     {
-        path.lineTo(QPointF(itemsPath.boundingRect().right()+halfSpacing,utterRightItem->geometry().top()-halfSpacing));
+        path.lineTo(QPointF(itemsRect.right()+halfSpacing,utterRightItem->top()-halfSpacing));
         if(shapingSeparate)
         {
             path.lineTo(utterLeftItem->geometry().bottomLeft()+QPointF(-halfSpacing,+halfSpacing));
@@ -265,11 +215,11 @@ void MGridUnit::rebuildShape()
     }
 
     path.lineTo(utterRightItem->geometry().bottomRight()+QPointF(+halfSpacing,+halfSpacing));
-    path.lineTo(itemsPath.boundingRect().bottomLeft()+QPointF(-halfSpacing,+halfSpacing));
+    path.lineTo(itemsRect.bottomLeft()+QPointF(-halfSpacing,+halfSpacing));
 
     if(shapingTop)
     {
-        path.lineTo(QPointF(itemsPath.boundingRect().left()-halfSpacing,utterLeftItem->geometry().bottom()+halfSpacing));
+        path.lineTo(QPointF(itemsRect.left()-halfSpacing,utterLeftItem->bottom()+halfSpacing));
         if(shapingSeparate)
         {
             path.lineTo(utterRightItem->geometry().topRight()+QPointF(+halfSpacing,-halfSpacing));
@@ -281,7 +231,7 @@ void MGridUnit::rebuildShape()
 
     path.lineTo(utterLeftItem->geometry().topLeft()+QPointF(-halfSpacing,-halfSpacing));
 
-    setShapeBorder(path);   
+    setShapeBorder(path);
 }
 
 QPainterPath MGridUnit::shapeBorder() const
@@ -291,6 +241,7 @@ QPainterPath MGridUnit::shapeBorder() const
 
 void MGridUnit::setShapeBorder(const QPainterPath &shapeBorder)
 {
+    prepareGeometryChange();
     m_shapeBorder = shapeBorder;
 }
 
@@ -348,7 +299,7 @@ long MGridUnit::removeItems(long from, long count)
 
         for(int i = 0, j = from; i<count; ++i,++j)
         {
-            m_items->at(j)->setParentUnit(NULL);
+            m_items->at(j)->setUnit(NULL);
         }
 
         m_scene->removeUnit(this);
@@ -366,7 +317,7 @@ long MGridUnit::removeItems(long from, long count)
 
     for(int i = 0, j = from; i<count; ++i,++j)
     {
-        m_items->at(j)->setParentUnit(NULL);
+        m_items->at(j)->setUnit(NULL);
     }
 
     if(from!=m_start)
@@ -388,7 +339,7 @@ void MGridUnit::updateParenthesis()
         return;
     for(int i = m_start; i <= m_finish; ++i)
     {
-        m_items->at(i)->setParentUnit(this);
+        m_items->at(i)->setUnit(this);
     }
     rebuildShape();
 }

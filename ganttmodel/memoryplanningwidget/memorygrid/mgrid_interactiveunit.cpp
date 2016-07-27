@@ -25,15 +25,19 @@ MGridInteractiveUnit::MGridInteractiveUnit(MGridScene* scene,QGraphicsItem *pare
         qDebug() << "MemoryInteractiveUnit no scene";
     }
 
-    m_initialized = false;
+    m_enabled = false;
 
     setAcceptsHoverEvents(false);
-    setShowBorders(false);
 
     m_items = &(scene->m_items);
 
     m_borderPen=QPen(QBrush(Qt::darkRed), spacing()+5 ,Qt::SolidLine ,Qt::SquareCap,Qt::MiterJoin);
 
+}
+
+void MGridInteractiveUnit::disable()
+{
+    m_enabled = false;
 }
 
 QRectF MGridInteractiveUnit::boundingRect() const
@@ -51,10 +55,8 @@ void MGridInteractiveUnit::paint(QPainter *painter, const QStyleOptionGraphicsIt
     Q_UNUSED(option);
     Q_UNUSED(widget);
 
-    if(!m_showBorders)
+    if(!m_enabled)
         return;
-
-
 
 //    QPen pen(QBrush(Qt::blue),DEFAULT_SPACING ,Qt::SolidLine,Qt::SquareCap,Qt::MiterJoin);
     painter->setPen(m_borderPen);
@@ -64,7 +66,7 @@ void MGridInteractiveUnit::paint(QPainter *painter, const QStyleOptionGraphicsIt
 
 bool MGridInteractiveUnit::inRange(long index) const
 {
-    return m_initialized&&(index>=m_start && index <=m_finish);
+    return m_enabled&&(index>=m_start && index <=m_finish);
 }
 
 
@@ -109,6 +111,8 @@ qreal MGridInteractiveUnit::spacing() const
 
 void MGridInteractiveUnit::rebuildShape()
 {
+    if(!m_enabled)
+        return;
     if(m_finish>m_items->size())
     {
         qDebug() << "MemoryInteractiveUnit::rebuildShape() out of range";
@@ -119,6 +123,7 @@ void MGridInteractiveUnit::rebuildShape()
 
     for(int i = m_start; i <= m_finish; ++i)
     {
+//        qDebug() <<QString::number(i)<<':'<<m_items->at(i)->geometry();
         itemsRect|=m_items->at(i)->geometry();
     }
 
@@ -234,12 +239,6 @@ void MGridInteractiveUnit::setShapeBorder(const QPainterPath &shapeBorder)
     m_shapeBorder = shapeBorder;
 }
 
-void MGridInteractiveUnit::setShowBorders(bool value)
-{
-    m_showBorders = value;
-    update();
-}
-
 long MGridInteractiveUnit::memorySize() const
 {
     if(!m_items)
@@ -258,13 +257,13 @@ void MGridInteractiveUnit::setRange(long start, long finish)
     }
     if(start<0||finish>=memorySize())
     {
-        setShowBorders(false);
         return;
     }
+
+    if(!m_enabled)
+        m_enabled = true;
     setStart(start);
     setFinish(finish);
-
-    setShowBorders(true);
 
     rebuildShape();
 }

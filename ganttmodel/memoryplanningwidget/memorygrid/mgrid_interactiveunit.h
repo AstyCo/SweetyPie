@@ -29,19 +29,18 @@ public:
 
     qreal spacing() const;
 
-    void setRange(long start, long finish);
+    void disable();
 
-    void setShowBorders(bool value);
+    void setRange(long start, long finish);
 
     long memorySize() const;
 
+    void rebuildShape();
 
 private:
     void setStart(long start);
     void setFinish(long finish);
     void setSize(long newSize);
-
-    void rebuildShape();
 
     QPainterPath shapeBorder() const;
     void setShapeBorder(const QPainterPath &shapeBorder);
@@ -51,12 +50,10 @@ private:
     QPainterPath m_shapeBorder;
     QPen m_borderPen;
 
-    QList<MGridItem*>* m_items;
+    QVector<MGridItem*>* m_items;
     long m_start, m_finish;
 
-    bool m_showBorders;
-
-    bool m_initialized;
+    bool m_enabled;
 
 };
 

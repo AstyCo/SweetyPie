@@ -37,7 +37,6 @@ public:
 
     qreal spacing() const;
 
-    QVariant itemChange(GraphicsItemChange change, const QVariant &value);
     void hoverEnterEvent(QGraphicsSceneHoverEvent *event);
     void hoverLeaveEvent(QGraphicsSceneHoverEvent *event);
 
@@ -68,7 +67,7 @@ private:
     int m_unitId;
     Memory::MemoryState m_state;
     MGridScene* m_scene;
-    QList<MGridItem*>* m_items;
+    QVector<MGridItem*>* m_items;
 
     QPainterPath m_shapeBorder;
     QPen m_borderPen;

@@ -8,7 +8,7 @@
 #include <QGraphicsScene>
 
 #include <QList>
-#include <QMap>
+#include <QVector>
 
 #include <QLabel>
 
@@ -155,7 +155,7 @@ private:
     void setItemPerRow(int newItemPerRow);
     void clearMemory(long from,long count);
     MGridItem *itemAtPos(const QPointF& pos) const;
-    MGridUnit *unitAtPos(const QPointF& pos) const;
+    MGridUnit *unitAtPos(const QPointF& pos) const; // Its better to not use this function
     bool isMouseOverUnit(MGridUnit* p_unit) const;
     bool isMouseOverItem(MGridItem* p_item) const;
     MGridItem *mouseOverItem() const;
@@ -221,7 +221,7 @@ private:
 
 
     QList<MGridUnit*> m_units;
-    QList<MGridItem*> m_items;
+    QVector<MGridItem*> m_items;
 
     friend class MGridInteractiveUnit;
     friend class MGridItem;

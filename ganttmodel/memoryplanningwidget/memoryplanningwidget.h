@@ -52,8 +52,6 @@ private slots:
 
     void on_pushButtonPendingRead_clicked();
 
-protected:
-    void resizeEvent(QResizeEvent *);
 
 private:
     Ui::MemoryPlanningWidget *ui;

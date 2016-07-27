@@ -188,8 +188,3 @@ void MemoryPlanningWidget::on_pushButtonPendingRead_clicked()
              << ' ' << MemoryState_to_trQString(part.state())
              << ' ' << "["+QString::number(part.id())+"]";
 }
-
-void MemoryPlanningWidget::resizeEvent(QResizeEvent *)
-{
-
-}

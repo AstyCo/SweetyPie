@@ -27,23 +27,19 @@ MemoryView::MemoryView(QGraphicsScene * scene, QWidget * parent) :
 
 void MemoryView::resizeEvent(QResizeEvent *event)
 {
-    if(m_gridScene)
+
+    if(m_mode == MemoryGrid)
     {
         m_gridScene->viewResized(event->size());
-
-        qDebug()<< event->size();
-        qDebug()<< sceneRect();
-
         verticalScrollBar()->setValue(0);
 
         return QGraphicsView::resizeEvent(event);
     }
     // ELSE
-    if(m_lineScene)
+    if(m_mode == MemoryLine)
     {
         m_lineScene->setSceneRect(0,0,event->size().width(),126);
 
-//        update();
         repaint();
         return;
     }
@@ -59,8 +55,6 @@ void MemoryView::setScene(QGraphicsScene *scene)
     if(p_memoryScene)
     {
         m_mode = MemoryGrid;
-//        if(p_memoryScene == m_gridScene)
-//            return;
         m_gridScene = p_memoryScene;
 
         setContentsMargins(0, 0, 0, 0);
@@ -69,10 +63,6 @@ void MemoryView::setScene(QGraphicsScene *scene)
         p_memoryScene->setParent(this);
 
         p_memoryScene->setBackgroundBrush(QBrush(QColor(Qt::gray).lighter(130)));
-
-//        setScene(p_memoryScene);
-
-        adjustSize();
 
         setFrameStyle(0);
         setAlignment(Qt::AlignLeft | Qt::AlignTop);
@@ -106,8 +96,6 @@ void MemoryView::setScene(QGraphicsScene *scene)
 
         p_lineScene->setSceneRect(0,0,size().width(),126);
 
-//        setScene(p_kaMemoryScene);
-
         setFrameStyle(0);
         setAlignment(Qt::AlignLeft | Qt::AlignTop);
         setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
@@ -131,23 +119,27 @@ void MemoryView::changeScene()
     if(m_mode == MemoryGrid)
     {
         m_mode = MemoryLine;
-        kaMemory = m_gridScene->memory();
         if(!m_lineScene)
+        {
             setScene(new MLineScene(parent()));
+            kaMemory = m_gridScene->memory();
+            setMemory(kaMemory);
+        }
         else
             setScene(m_lineScene);
     }
     else if(m_mode == MemoryLine)
     {
         m_mode = MemoryGrid;
-        kaMemory = m_lineScene->memory();
         if(!m_gridScene)
+        {
             setScene(new MGridScene(parent()));
+            kaMemory = m_lineScene->memory();
+            setMemory(kaMemory);
+        }
         else
             setScene(m_gridScene);
     }
-    setMemory(kaMemory);
-    adjustSize();
 }
 
 void MemoryView::setMemory(const KaMemory &kaMemory)

@@ -11,16 +11,18 @@
 class MGridUnit;
 class MGridScene;
 
-class MGridItem : public QGraphicsLayoutItem, public QGraphicsItem
+class MGridItem : public QGraphicsItem
 {
 public:
     MGridItem(long index,qreal edgeLength = DEFAULT_EDGELENGTH,
                qreal borderWidth = DEFAULT_BORDERWIDTH,QGraphicsItem *parent = 0);
     virtual ~MGridItem();
 
-    // Inherited from QGraphicsLayoutItem
-    void setGeometry(const QRectF &geom);
-    QSizeF sizeHint(Qt::SizeHint which, const QSizeF &constraint = QSizeF()) const;
+    QRectF geometry() const;
+    qreal left() const;
+    qreal right() const;
+    qreal top() const;
+    qreal bottom() const;
 
     // Inherited from QGraphicsItem
     QRectF boundingRect() const;
@@ -35,11 +37,7 @@ public:
     void disableToolTip();
 
 
-
-    QVariant itemChange(GraphicsItemChange change, const QVariant &value);
-
-
-    void setParentUnitSelected(bool selected);
+    void setUnitSelected(bool selected);
 
     Memory::MemoryState state() const;
     QColor color() const;
@@ -53,16 +51,10 @@ public:
     qreal borderWidth() const;
     void setBorderWidth(const qreal &borderWidth);
 
-    void disableSizeModify();
-
-
-    qreal sizeModify() const;
-    void setSizeModify(qreal sizeModify);
-
     bool isHighlighted() const;
 
-    MGridUnit *parentUnit() const;
-    void setParentUnit(MGridUnit *parentUnit);
+    MGridUnit *unit() const;
+    void setUnit(MGridUnit *unit);
 
 
 public slots:
@@ -84,10 +76,7 @@ private:
 
     long m_index;
 
-    MGridUnit* m_parentUnit;
-
-    qreal m_sizeModify;
-    bool m_sizeModifying;
+    MGridUnit* m_unit;
 
 };
 
