@@ -570,7 +570,7 @@ void ChartWidget::setShowLegend(bool show)
 {
   m_showLegend = show;
 
-  if ((! ui->widgetDetail->isVisible()) && m_showLegend)
+  if ((! m_settings.detailsPanelVisible) && m_showLegend)
     ui->m_plot->insertLegend(new QwtLegend(), QwtPlot::RightLegend);
   else
     ui->m_plot->insertLegend(NULL);
@@ -595,10 +595,7 @@ void ChartWidget::onAction_panelCurveDetails_toggled(bool checked)
 {
   m_settings.detailsPanelVisible = checked;
   ui->m_detailsPanel->setVisible(checked);
-  if ((! checked) && m_showLegend)
-    ui->m_plot->insertLegend(new QwtLegend(), QwtPlot::RightLegend);
-  else
-    ui->m_plot->insertLegend(NULL);
+  setShowLegend(m_showLegend);
 }
 
 void ChartWidget::onAction_grid_toggled(bool checked)
