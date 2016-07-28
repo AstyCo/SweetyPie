@@ -11,6 +11,13 @@
 class MGridUnit;
 class MGridScene;
 
+/*!
+ * \brief The MGridItem class
+ *
+ * Отвечает за отображение блоков памяти.
+ *
+ */
+
 class MGridItem : public QGraphicsItem
 {
 public:

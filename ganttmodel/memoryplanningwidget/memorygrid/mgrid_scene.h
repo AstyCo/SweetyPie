@@ -167,6 +167,7 @@ private:
     HighlightStyle highlightStyle() const;
     QList<MGridUnit*> crossingParts(long from, long to) const;
     void setupMatrix(const QVector<MGridItem*>& items);
+    void clearMouseOver();
 
     // +WARNINGS
 private:

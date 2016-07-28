@@ -135,8 +135,7 @@ void MGridScene::clear()
     m_items.clear();
     m_units.clear();
     m_lastSelected = NULL;
-    m_mouseOverItem = NULL;
-    m_mouseOverUnit = NULL;
+    clearMouseOver();
 }
 
 
@@ -319,6 +318,8 @@ MGridUnit *MGridScene::mouseOverUnit() const
 
 void MGridScene::setMouseOverUnit(MGridUnit *mouseOverUnit)
 {
+    if(m_mouseOverUnit == mouseOverUnit)
+        return;
     m_mouseOverUnit = mouseOverUnit;
     if(m_mouseOverUnit == NULL)
     {
@@ -364,6 +365,8 @@ MGridItem *MGridScene::mouseOverItem() const
 
 void MGridScene::setMouseOverItem(MGridItem *mouseOver)
 {
+    if(m_mouseOverItem == mouseOver)
+        return;
     m_mouseOverItem = mouseOver;
     if(m_mouseOverItem == NULL)
     {
@@ -539,6 +542,12 @@ void MGridScene::setupMatrix(const QVector<MGridItem *> &items)
             row++;
         }
     }
+}
+
+void MGridScene::clearMouseOver()
+{
+    setMouseOverItem(NULL);
+    setMouseOverUnit(NULL);
 }
 
 QList<KaMemoryPart> MGridScene::crossingParts() const

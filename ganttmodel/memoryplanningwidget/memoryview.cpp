@@ -160,6 +160,19 @@ void MemoryView::setMode(const MemoryViewMode &mode)
     m_mode = mode;
 }
 
+void MemoryView::leaveEvent(QEvent *)
+{
+    if(m_mode == MemoryGrid)
+    {
+        m_gridScene->clearMouseOver();
+        m_gridScene->update(viewport()->rect());
+    }
+    else if (m_mode == MemoryLine)
+    {
+
+    }
+}
+
 
 
 
