@@ -59,7 +59,8 @@ void ChartsGroupWidget::createActionsToolBar()
                   << caSelectTarget
                   << caClear
                   << caDetailsPanel
-                  << caSettingsDlg);
+                  << caSettingsDlg
+                  << caSelectIntervalPanel);
 
   connect(m_actionsToolBar->getChartAction(caScale), SIGNAL(triggered(bool)), SLOT(onAction_autoZoom_clicked()));
   connect(m_actionsToolBar->getChartAction(caGrid), SIGNAL(toggled(bool)), SLOT(onAction_grid_toggled(bool)));
@@ -71,13 +72,8 @@ void ChartsGroupWidget::createActionsToolBar()
   connect(m_actionsToolBar->getChartAction(caSettingsDlg), SIGNAL(triggered(bool)), SLOT(onAction_chartSettings_triggered()));
   m_actionsToolBar->insertSeparator(m_actionsToolBar->getChartAction(caClear));
 
-
+  connect(m_actionsToolBar->getChartAction(caSelectIntervalPanel), SIGNAL(toggled(bool)), SLOT(onAction_panelSelectionInterval_clicked()));
   connect(m_actionsToolBar->getChartAction(caDetailsPanel), SIGNAL(toggled(bool)), SLOT(onAction_panelCurveDetails_toggled(bool)));
-
-  m_actionSetPanelSelectInterval = new QAction(QIcon(":/icons/icons/selection_interval_panel.png"), tr("Панель выбора интервала"), m_actionsToolBar);
-  m_actionSetPanelSelectInterval->setCheckable(true);
-  connect(m_actionSetPanelSelectInterval, SIGNAL(toggled(bool)), SLOT(onAction_panelSelectionInterval_clicked()));
-  m_actionsToolBar->addAction(m_actionSetPanelSelectInterval);
 
   m_actionsToolBar->addSeparator();
 }
@@ -411,7 +407,7 @@ bool ChartsGroupWidget::panelSelectIntervalVisible() const
 
 void ChartsGroupWidget::setPanelSelectIntervalVisible(bool vis)
 {  
-  m_actionSetPanelSelectInterval->setChecked(vis);
+  m_actionsToolBar->getChartAction(caSelectIntervalPanel)->setChecked(vis);
 }
 
 
@@ -469,7 +465,7 @@ UtcDateTime ChartsGroupWidget::getSelIntervalEndDt()
 
 void ChartsGroupWidget::onAction_panelSelectionInterval_clicked()
 {  
-  m_panelSelectIntervalVisible = m_actionSetPanelSelectInterval->isChecked();
+  m_panelSelectIntervalVisible = m_actionsToolBar->getChartAction(caSelectIntervalPanel)->isChecked();
   ui->frame_SelectionPanel->setVisible(m_panelSelectIntervalVisible);
 }
 /*

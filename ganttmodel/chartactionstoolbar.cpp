@@ -13,7 +13,8 @@ void ChartActionsToolBar::setChartActions(const QSet<ChartActions> &chartActions
   m_enabledChartActionsSet = chartActions;
 
   foreach(ChartActions actType, m_actions.keys())
-      m_actions.value(actType)->setVisible(m_enabledChartActionsSet.contains(actType));
+          m_actions.value(actType)->setVisible(m_enabledChartActionsSet.contains(actType));
+
 }
 
 void ChartActionsToolBar::setChartActionVisible(ChartActions type, bool vis)
@@ -77,6 +78,10 @@ void ChartActionsToolBar::initActions()
   act = new QAction(QIcon(":/icons/icons/options1.png"),
                                    tr("Настройки отображения"), this);
   m_actions.insert(caSettingsDlg, act);
+
+  act = new QAction(QIcon(":/icons/icons/selection_interval_panel.png"), tr("Панель выбора интервала"), this);
+  act->setCheckable(true);
+  m_actions.insert(caSelectIntervalPanel, act);
 
   this->addActions(m_actions.values());
 }

@@ -132,7 +132,6 @@ private:
   Ui::ChartsGroupWidget *ui;
 
   ChartActionsToolBar *m_actionsToolBar;  
-  QAction *m_actionSetPanelSelectInterval;
   QList<ChartWidget *> m_charts;
   QList<QAction *> m_chartZoomActions;
   /// Текущие отображаемые графики имеют общую ось X

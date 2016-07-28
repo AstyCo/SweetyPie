@@ -808,7 +808,8 @@ void ChartWidget::createActionsToolBar()
                     << caZones
                     << caSelectInterval
                     << caMaxMinLines
-                    << caSelectTarget);
+                    << caSelectTarget
+                    << caSelectIntervalPanel);
 }
 
 void ChartWidget::createMenuIntervals()

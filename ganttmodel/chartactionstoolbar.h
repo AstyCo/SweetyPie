@@ -18,7 +18,8 @@ enum ChartActions
   caZones,
   caMaxMinLines,
   caDetailsPanel,
-  caSettingsDlg
+  caSettingsDlg,
+  caSelectIntervalPanel
 };
 
 class GANTTMODELSHARED_EXPORT ChartActionsToolBar : public QToolBar
