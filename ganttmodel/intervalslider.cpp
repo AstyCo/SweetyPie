@@ -232,8 +232,6 @@ void IntervalSlider::drawHandle(QPainter *painter, const QRect &sliderRect, int 
     QPalette::ColorRole handleRole,handleLineRole;
     QColor color;
 
-//    qDebug() << "pos: "+ QString::number(pos);
-
     if(handle == m_clippedHandle || (QApplication::keyboardModifiers()&Qt::ShiftModifier))
     {
         handleRole = QPalette::Mid;
@@ -256,8 +254,6 @@ void IntervalSlider::drawHandle(QPainter *painter, const QRect &sliderRect, int 
 
     int borderWidth = 1;
 
-
-//    qDebug() << palette().color(darkerThanHandleRole);
     painter->setPen(palette().color(handleLineRole));
     painter->setBrush(palette().color(handleRole));
 
@@ -271,10 +267,6 @@ void IntervalSlider::drawHandle(QPainter *painter, const QRect &sliderRect, int 
 
 
     painter->drawLine(handleMidLine);
-
-//    qDrawShadeLine( painter, lineX, handleRect.top()+borderWidth,
-//                    lineX, handleRect.bottom()-borderWidth,
-//                    palette(), true, 0, borderWidth );
 }
 
 void IntervalSlider::drawSlider(QPainter *painter, const QRect &sliderRect) const
@@ -302,7 +294,7 @@ void IntervalSlider::keyPressEvent(QKeyEvent *e)
 {
     if(e->modifiers() & Qt::ShiftModifier)
     {
-        repaint();
+        update();
     }
 }
 
@@ -310,8 +302,13 @@ void IntervalSlider::keyReleaseEvent(QKeyEvent *e)
 {
     if(e->key() == Qt::Key_Shift)
     {
-        repaint();
+        update();
     }
+}
+
+void IntervalSlider::leaveEvent(QEvent *)
+{
+    update();
 }
 
 int IntervalSlider::intervalSliderHeight() const
@@ -381,30 +378,30 @@ void IntervalSlider::mouseMoveEvent(QMouseEvent *e)
 
 void IntervalSlider::mouseReleaseEvent(QMouseEvent *e)
 {
-    mouseMoveEvent(e);
     m_clippedHandle=NoHandle;
+    mouseMoveEvent(e);
     repaint();
 }
 
 void IntervalSlider::mousePressEvent(QMouseEvent *e)
 {
-        const QPoint &p = e->pos();
+    const QPoint &p = e->pos();
 
-        int beginSpliter1 = valueToPoint(m_beginValue,BeginHandle)-halfHandleH(),
-            beginSpliter2 = beginSpliter1 + m_handleH;
+    int beginSpliter1 = valueToPoint(m_beginValue,BeginHandle)-halfHandleH(),
+        beginSpliter2 = beginSpliter1 + m_handleH;
 
-        int endSpliter1 = valueToPoint(m_endValue,EndHandle)-halfHandleH(),
-             endSpliter2 = endSpliter1 + m_handleH;
+    int endSpliter1 = valueToPoint(m_endValue,EndHandle)-halfHandleH(),
+         endSpliter2 = endSpliter1 + m_handleH;
 
-        if(p.x()>beginSpliter1 && p.x()<beginSpliter2)
-        {
-            m_clippedHandle=BeginHandle;
-        }
-        else if(p.x()>endSpliter1 && p.x()<endSpliter2)
-        {
-            m_clippedHandle=EndHandle;
-        }
-        else
-            m_clippedHandle=NoHandle;
-    return;
+    if(p.x()>beginSpliter1 && p.x()<beginSpliter2)
+    {
+        m_clippedHandle=BeginHandle;
+    }
+    else if(p.x()>endSpliter1 && p.x()<endSpliter2)
+    {
+        m_clippedHandle=EndHandle;
+    }
+    else
+        m_clippedHandle=NoHandle;
+    mouseMoveEvent(e);
 }

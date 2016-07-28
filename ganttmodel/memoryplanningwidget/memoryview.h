@@ -36,6 +36,7 @@ public:
 
     MemoryViewMode mode() const;
     void setMode(const MemoryViewMode &mode);
+    void leaveEvent(QEvent *);
 
 public slots:
 

@@ -14,7 +14,13 @@
 #include "mline_graphicspart.h"
 
 #define dx_border 10
+/*!
+ * \brief The MLineScene class
 
+
+
+
+*/
 
 class GANTTMODELSHARED_EXPORT MLineScene: public QGraphicsScene
 {

@@ -51,5 +51,7 @@ KaMemoryLegend::KaMemoryLegend(QWidget *parent) : QWidget(parent)
 
         verticalLayout->addLayout(horizontalLayout);
     }
+
+    setMaximumHeight(MemoryState_count*16);
 }
 

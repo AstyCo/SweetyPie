@@ -59,7 +59,8 @@ void MainWindow::testChartWidget()
 
   ui->widgetIntervalSlider->setMinValue(0);
   ui->widgetIntervalSlider->setMaxValue(TimeSpan(ui->widget->maximumDt() - ui->widget->minimumDt()).totalSeconds());
-  ui->widgetIntervalSlider->setEndHandle(ui->widgetIntervalSlider->maxValue());
+  ui->widgetIntervalSlider->setEndHandle(ui->widgetIntervalSlider->maxValue());  
+  ui->checkBox_showLegend->setChecked(true);
 
   connect(ui->widgetIntervalSlider, SIGNAL(valueChanged(IntervalSlider::ClippedHandle, long)), this, SLOT(setInterval()));
 

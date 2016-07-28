@@ -61,6 +61,9 @@ public:
 
     void keyPressEvent(QKeyEvent *e);
     void keyReleaseEvent(QKeyEvent *e);
+
+    void leaveEvent(QEvent *);
+
     int intervalSliderHeight() const;
 private:
     ClippedHandle m_clippedHandle;

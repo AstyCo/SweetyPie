@@ -10,6 +10,14 @@
 class MGridItem;
 class MGridScene;
 
+/*!
+ * \brief The MGridUnit class
+
+    Отвечает за отображение кусков памяти (интервалов).
+
+
+*/
+
 class MGridUnit : public QGraphicsItem
 {
 public:

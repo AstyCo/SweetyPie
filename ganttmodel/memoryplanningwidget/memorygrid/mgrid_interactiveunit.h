@@ -10,6 +10,14 @@
 
 class MGridItem;
 
+/*!
+ * \brief The MGridInteractiveUnit class
+ *
+ * Отвечает за отображение выбираемого интервала памяти.
+ *
+ *
+ */
+
 class MGridInteractiveUnit : public QGraphicsItem
 {
 public:
