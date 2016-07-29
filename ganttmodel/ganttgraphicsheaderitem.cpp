@@ -47,8 +47,6 @@ QSizeF GanttGraphicsHeaderItem::sizeHint(Qt::SizeHint which, const QSizeF &const
 
 void GanttGraphicsHeaderItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
 {
-
-    //QGraphicsItem::paint(painter, option, widget);
     //=========================
     QFont paintFont = painter->font();
     paintFont.setPointSize(8);
@@ -59,14 +57,10 @@ void GanttGraphicsHeaderItem::paint(QPainter *painter, const QStyleOptionGraphic
     myPen.setColor(QColor(Qt::black));
     painter->setPen(myPen);
 
-    //clearHeader();
-
     int lowHeight = 20;
     int lowWidth = 20; //TODO //почему при ZoomMinute и lowWidth>15 происходит наложение блоков
     int lowCount = lowItemsCount(m_begin, m_end, m_zoom);
 
-
-    //int upCount = 0;
     int lowPerUpCount = 0;
     QDateTime currentDT = m_begin;
     QDateTime bufferDT;

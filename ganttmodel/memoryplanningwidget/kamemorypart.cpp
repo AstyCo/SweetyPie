@@ -165,7 +165,6 @@ QString fixedNumPresentation(long num, int base, long max)
     if(max<num)
     {
         qDebug()<<"fixedNumPresentation num>max"+QString::number(num)+'>'+QString::number(max);
-
         return QString();
     }
 

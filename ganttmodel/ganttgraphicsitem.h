@@ -24,6 +24,9 @@ public:
     //QRectF boundingRect() const;
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
 
+protected:
+    void mousePressEvent(QGraphicsSceneMouseEvent *event);
+
 public slots:
 
     void calcSizeSlot();
@@ -32,9 +35,6 @@ private:
 
     //GanttGraphicsItemStage * m_graphicsStage;
     GanttItem * m_ganttItem;
-    //Scale m_scale;
-    //QDateTime m_headerBegin;
-    //QDateTime m_headerEnd;
     GanttGraphicsHeader * m_header;
 
 
@@ -43,7 +43,6 @@ private:
     /*QDateTime*/ int m_duration;
     QString m_text;
     QColor m_color; // цвет блока
-    //QSize m_size; // размер блока
     qreal m_width;
     qreal m_height;
     enum StageType{Simple, Union}; // тип блока: обычный или объединяющий

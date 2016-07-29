@@ -81,7 +81,6 @@ SOURCES += \
     chartsettingsdlg.cpp \
     chartsettings.cpp \
     plotnavigator.cpp \
-    intervalselectionmodel.cpp \
     memoryplanningwidget/memoryview.cpp \
     memoryplanningwidget/memoryplanningwidget.cpp \
     memoryplanningwidget/kamemory.cpp \
@@ -122,8 +121,6 @@ HEADERS += \
     chartsettingsdlg.h \
     chartsettings.h \
     plotnavigator.h \
-    intervalselectionmodel.h \
-    ganttitemstage.h \
     memoryplanningwidget/memoryline/mline_abstractpart.h \
     memoryplanningwidget/memoryline/mline_picker.h \
     memoryplanningwidget/memoryline/mline_graphicspart.h \

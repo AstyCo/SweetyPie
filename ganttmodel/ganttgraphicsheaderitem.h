@@ -55,8 +55,6 @@ private:
                    HeaderType headerType,
                    Zoom zoom,
                    qreal x, qreal y, qreal w, qreal h);
-
-    //QColor m_color;
     QDateTime m_begin;
     QDateTime m_end;
     Zoom m_zoom;

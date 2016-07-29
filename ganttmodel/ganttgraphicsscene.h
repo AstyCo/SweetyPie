@@ -43,17 +43,8 @@ public slots:
     void deleteGraphicsItem(QModelIndex index);
     void updateItems(GanttModel * model);
 
-    //void setGrid(bool flag);
-    //void setHeaderItem(QGraphicsItemGroup * header);
-
     void editAdd(QModelIndex index);
-    //void editDelete(QModelIndex parent);
-    //void editCut();
-    //void editPaste();
     void editMoveUp(QModelIndex index);
-    //void editMoveDown();
-    //void editPromote();
-    //void editDemote();
 
     void onScaleChanged(Scale zoom);
 

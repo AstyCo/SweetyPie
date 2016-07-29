@@ -200,6 +200,7 @@ void GanttGraphicsItem::paint(QPainter *painter, const QStyleOptionGraphicsItem 
     newPen.setColor(QColor(Qt::black));
     painter->setPen(newPen);
     bRect.adjust(0, 1, 0, -1);
+    qDebug() << dateStr;
     painter->drawText(bRect, Qt::AlignCenter/*Qt::AlignVCenter|Qt::AlignLeft*/, dateStr);
     //painter->setPen(oldPen);
 
@@ -227,6 +228,12 @@ void GanttGraphicsItem::paint(QPainter *painter, const QStyleOptionGraphicsItem 
     }
 
     painter->setPen(oldPen);
+}
+
+void GanttGraphicsItem::mousePressEvent(QGraphicsSceneMouseEvent *event)
+{
+
+    QGraphicsItem::mousePressEvent(event);
 }
 
 

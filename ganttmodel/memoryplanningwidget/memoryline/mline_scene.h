@@ -40,7 +40,7 @@ public:
     ~MLineScene();
     void drawBackground(QPainter *painter, const QRectF &rect);
 
-    void createLegend(qreal posX, qreal posY);
+    void createLegend(qreal posX, qreal posY); // OBSOLETE (moved to widget)
     void createStatistic(qreal posX, qreal posY);
 
     MLinePicker *picker() const;

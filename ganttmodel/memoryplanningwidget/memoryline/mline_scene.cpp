@@ -58,7 +58,7 @@ MLineScene::MLineScene(QObject *parent):
 
     addItem(_memSizeText);
 
-    createLegend(10, 70);
+//    createLegend(10, 70);
 }
 
 MLineScene::~MLineScene()

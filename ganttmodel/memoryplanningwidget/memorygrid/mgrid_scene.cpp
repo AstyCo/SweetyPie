@@ -42,8 +42,6 @@ MGridScene::MGridScene( QObject * parent)
     setHighlightStyle( bordersAround | highlightedItems);
 
     m_interactiveUnit = new MGridInteractiveUnit(this);
-
-    qDebug() <<"MGRIDSCENE";
 }
 
 MGridScene::~MGridScene()

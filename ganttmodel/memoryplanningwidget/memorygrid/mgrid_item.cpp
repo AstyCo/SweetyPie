@@ -279,38 +279,3 @@ QRectF MGridItem::boundingRect() const
     return QRectF( 0, 0, edgeLength() + 2*borderWidth(), edgeLength() + 2*borderWidth());
     //    return QRectF(QPointF(0,0), geometry().size());
 }
-
-//QPainterPath MemoryItem::shape() const
-//{
-//    QPainterPath path;
-//    path.addRect(boundingRect());
-// //    path.addRect(borderWidth(),borderWidth(),edgeLength(),edgeLength());
-//    return path;
-//}
-
-//void MGridItem::setGeometry(const QRectF &geom)
-//{
-//    prepareGeometryChange();
-//    QGraphicsLayoutItem::setGeometry(geom);
-//    setPos(geom.topLeft());
-//}
-
-//QRectF MemoryItem::geometry() const
-//{
-//    return QGraphicsLayoutItem::geometry();
-//}
-
-//QSizeF MGridItem::sizeHint(Qt::SizeHint which, const QSizeF &constraint) const
-//{
-//    switch (which) {
-//    case Qt::MinimumSize:
-//    case Qt::PreferredSize:
-//    case Qt::MaximumSize:
-//        return QSizeF(edgeLength() + 2*borderWidth(),edgeLength() + 2*borderWidth());
-//    default:
-//        break;
-//    }
-//    return constraint;
-//}
-
-

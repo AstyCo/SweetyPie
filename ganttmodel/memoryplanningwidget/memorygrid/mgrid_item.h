@@ -4,7 +4,6 @@
 #include "kamemorypart.h"
 #include "memory_globalvalues.h"
 
-#include <QGraphicsLayoutItem>
 #include <QGraphicsItem>
 #include <QColor>
 

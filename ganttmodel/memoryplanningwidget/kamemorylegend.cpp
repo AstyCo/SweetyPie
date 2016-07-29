@@ -17,9 +17,6 @@ KaMemoryLegend::KaMemoryLegend(QWidget *parent) : QWidget(parent)
 
     this->setSizePolicy(sizePolicy);
 
-//    verticalLayout->setSpacing(0);
-//    verticalLayout->setMargin(0);
-
     for(int i = 0; i<MemoryState_count; ++i)
     {
         MemoryState state = static_cast<MemoryState>(i);
@@ -52,6 +49,6 @@ KaMemoryLegend::KaMemoryLegend(QWidget *parent) : QWidget(parent)
         verticalLayout->addLayout(horizontalLayout);
     }
 
-    setMaximumHeight(MemoryState_count*16);
+    setMaximumHeight(MemoryState_count*(16+8)); //ps itemHeight+space
 }
 

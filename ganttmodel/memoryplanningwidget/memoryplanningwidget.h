@@ -6,6 +6,7 @@
 
 #include <QGraphicsScene>
 #include <QWidget>
+#include <QVector>
 
 
 namespace Ui {
@@ -33,6 +34,8 @@ public:
     MGridScene* gridScene() const;
     MLineScene* lineScene() const;
 
+    void setShowButtons(bool flag);
+
 public slots:
     void changeScene();
 
@@ -52,6 +55,9 @@ private slots:
 
     void on_pushButtonPendingRead_clicked();
 
+    void hideGridWidgets();
+    void showGridWidgets();
+
 
 private:
     Ui::MemoryPlanningWidget *ui;
@@ -59,6 +65,9 @@ private:
     MLineScene* m_lineScene;
 
     Memory::MemoryViewMode m_mode;
+    bool m_showButtons;
+
+    QVector<QWidget*> m_gridWidgets;
 };
 
 #endif // MEMORYPLANNINGWIDGET_HPP

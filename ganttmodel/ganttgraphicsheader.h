@@ -64,7 +64,6 @@ signals:
 public slots:
     void createHeader();
     void clearHeader();
-    //void zoom(Scale scale);
 
 };
 
