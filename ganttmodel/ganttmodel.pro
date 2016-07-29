@@ -93,7 +93,8 @@ SOURCES += \
     memoryplanningwidget/memoryline/mline_graphicspart.cpp \
     memoryplanningwidget/memoryline/mline_picker.cpp \
     memoryplanningwidget/memoryline/mline_scene.cpp \
-    memoryplanningwidget/kamemorylegend.cpp
+    memoryplanningwidget/kamemorylegend.cpp \
+
 
 HEADERS += \
     ganttmodel.h \

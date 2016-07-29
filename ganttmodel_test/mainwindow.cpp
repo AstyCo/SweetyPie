@@ -181,8 +181,10 @@ void MainWindow::testMemoryPlanningWidget()
 
     MGridScene * scene = ui->memoryPlanningWidget->gridScene();
     ui->memoryPlanningWidget->setMemory(kaMemory);
+    ui->memoryPlanningWidget->setShowButtons(true);
 
     scene->setItemEdge(30);
+
 }
 
 void MainWindow::setInterval()

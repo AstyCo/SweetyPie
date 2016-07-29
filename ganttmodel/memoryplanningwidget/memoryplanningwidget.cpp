@@ -164,7 +164,24 @@ MLineScene *MemoryPlanningWidget::lineScene() const
 
 void MemoryPlanningWidget::setShowButtons(bool flag)
 {
+    if(flag == m_showButtons)
+        return;
     m_showButtons = flag;
+
+    if(m_showButtons)
+    {
+        ui->pushButtonEmpty->show();
+        ui->pushButtonFree->show();
+        ui->pushButtonPendingRead->show();
+        ui->pushButtonPendingWrite->show();
+    }
+    else
+    {
+        ui->pushButtonEmpty->hide();
+        ui->pushButtonFree->hide();
+        ui->pushButtonPendingRead->hide();
+        ui->pushButtonPendingWrite->hide();
+    }
 }
 
 
