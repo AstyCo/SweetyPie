@@ -60,7 +60,7 @@ void MGridUnit::paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
     if(!m_scene->isMouseOverUnit(this))
         return;
 
-    painter->setCompositionMode(QPainter::CompositionMode_Multiply);
+//    painter->setCompositionMode(QPainter::CompositionMode_Multiply);
 
     painter->setPen(m_borderPen);
     painter->setOpacity(1);

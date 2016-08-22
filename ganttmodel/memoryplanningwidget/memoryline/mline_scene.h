@@ -2,7 +2,7 @@
 #define MLINE_SCENE_H
 
 
-#include <ganttmodel_global.h>
+#include <ganttproject_global.h>
 
 
 #include "kamemory.h"

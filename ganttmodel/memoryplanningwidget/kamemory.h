@@ -2,7 +2,7 @@
 #define KAMEMORY_H
 
 #include <QList>
-#include <ganttmodel_global.h>
+#include <ganttproject_global.h>
 
 #include "kamemorypart.h"
 

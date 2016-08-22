@@ -33,8 +33,8 @@ MemoryPlanningWidget::MemoryPlanningWidget(QWidget *parent) :
     ui->pushButtonPendingWrite->setIcon(buttonIcon);
 
 
-    ui->labelInfo->setMinimumSize(QSize(30,16));
-    ui->labelInfo->setMaximumSize(QSize(30,16));
+    ui->labelInfo->setMinimumSize(QSize(50,16));
+    ui->labelInfo->setMaximumSize(QSize(530,16));
     ui->labelItemInfo->setMinimumSize(QSize(100,16));
     ui->labelItemInfo->setMaximumSize(QSize(100,16));
 
@@ -48,8 +48,7 @@ MemoryPlanningWidget::MemoryPlanningWidget(QWidget *parent) :
                   << ui->pushButtonPendingWrite
                   << ui->labelInfo
                   << ui->labelItemInfo
-                  << ui->labelUnitInfo
-                  << ui->labelPlanningTable;
+                  << ui->labelUnitInfo;
 
     setShowButtons(false);
     hideGridWidgets();
@@ -101,7 +100,7 @@ void MemoryPlanningWidget::setGridView()
         connect(m_gridScene,SIGNAL(itemInfoChanged(const QString&)),this,SLOT(setItemInfo(const QString&)));
         connect(m_gridScene,SIGNAL(unitInfoChanged(const QString&)),this,SLOT(setUnitInfo(const QString&)));
         connect(m_gridScene,SIGNAL(startHighlightChanged(long)),this,SLOT(updateParts()));
-        m_gridScene->setBackgroundBrush(QBrush(QColor(Qt::gray).lighter(130)));
+//        m_gridScene->setBackgroundBrush(QBrush(QColor(Qt::gray).lighter(130)));
     }
 
     ui->memoryView->setScene(m_gridScene);
@@ -128,7 +127,7 @@ void MemoryPlanningWidget::setItemInfo(const QString &text)
 
 void MemoryPlanningWidget::updateParts()
 {
-    static QString base = tr("Crossing parts:\n\n");
+    static QString base = tr("Пересекаемые области памяти:\n\n");
     if(m_mode != MemoryGrid)
         return;
     QList<KaMemoryPart> parts = m_gridScene->crossingParts();
@@ -137,7 +136,7 @@ void MemoryPlanningWidget::updateParts()
 
     foreach(KaMemoryPart part, parts)
     {
-        text += '['+QString::number(part.id())+"] ";
+        text += '['+MemoryState_to_QString(part.state())+"] ";
         text += m_gridScene->toAdress(part.start(),part.finish())+'\n';
     }
     ui->crossingParts->setText(base+text);
@@ -193,7 +192,7 @@ void MemoryPlanningWidget::on_pushButtonEmpty_clicked()
     KaMemoryPart part = m_gridScene->setEmpty();
     qDebug() << "setEmpty " << part.start()
              << ' ' << part.finish()
-             << ' ' << MemoryState_to_trQString(part.state())
+             << ' ' << MemoryState_to_QString(part.state())
              << ' ' << "["+QString::number(part.id())+"]";
 }
 
@@ -202,7 +201,7 @@ void MemoryPlanningWidget::on_pushButtonFree_clicked()
     KaMemoryPart part = m_gridScene->setFree();
     qDebug() << "setFree " << part.start()
              << ' ' << part.finish()
-             << ' ' << MemoryState_to_trQString(part.state())
+             << ' ' << MemoryState_to_QString(part.state())
              << ' ' << "["+QString::number(part.id())+"]";
 }
 
@@ -211,7 +210,7 @@ void MemoryPlanningWidget::on_pushButtonPendingWrite_clicked()
     KaMemoryPart part = m_gridScene->setPendingWrite();
     qDebug() << "setPendingWrite " << part.start()
              << ' ' << part.finish()
-             << ' ' << MemoryState_to_trQString(part.state())
+             << ' ' << MemoryState_to_QString(part.state())
              << ' ' << "["+QString::number(part.id())+"]";
 }
 
@@ -220,7 +219,7 @@ void MemoryPlanningWidget::on_pushButtonPendingRead_clicked()
     KaMemoryPart part = m_gridScene->setPendingRead();
     qDebug() << "setPendingRead " << part.start()
              << ' ' << part.finish()
-             << ' ' << MemoryState_to_trQString(part.state())
+             << ' ' << MemoryState_to_QString(part.state())
              << ' ' << "["+QString::number(part.id())+"]";
 }
 

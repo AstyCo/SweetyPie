@@ -69,8 +69,24 @@ void MGridItem::paint(QPainter *painter,
 {
     Q_UNUSED(widget);
 
-    painter->setCompositionMode(QPainter::CompositionMode_SourceOver);
+//    painter->setCompositionMode(QPainter::CompositionMode_SourceOver);
     painter->setPen(Qt::NoPen);
+
+    if(borderWidth())
+    {
+        QRectF extSquareItem( 0, 0, edgeLength()+2*borderWidth(), edgeLength()+2*borderWidth());
+        QColor extSquareColor = GLOBAL_BORDER_COLOR;
+//        QPainterPath externalFigure;
+//        externalFigure.addRect(extSquareItem);
+
+        painter->fillRect(extSquareItem,QBrush(extSquareColor));
+
+
+//        painter->setOpacity(0.2);
+//        painter->fillPath(externalFigure, extSquareColor);
+//        painter->drawPath(externalFigure);
+//        painter->setOpacity(1);
+    }
 
     if(isHighlighted())
         drawHighlighted(painter,option,widget);
@@ -84,21 +100,6 @@ void MGridItem::drawHighlighted(QPainter *painter, const QStyleOptionGraphicsIte
     Q_UNUSED(widget);
 
     QColor fillColor = (option->state & QStyle::State_Selected) ? color().dark(150) : color();
-
-
-    if(borderWidth())
-    {
-        QRectF extSquareItem( 0, 0, edgeLength()+2*borderWidth(), edgeLength()+2*borderWidth());
-        QColor extSquareColor = GLOBAL_BORDER_COLOR;
-        QPainterPath externalFigure;
-        externalFigure.addRect(extSquareItem);
-        painter->setOpacity(0.2);
-        painter->fillPath(externalFigure, extSquareColor);
-        painter->drawPath(externalFigure);
-        painter->setOpacity(1);
-    }
-
-
 
     QRectF itemRect( borderWidth(), borderWidth(), edgeLength(), edgeLength());
     QColor squareColor = fillColor;
@@ -117,25 +118,7 @@ void MGridItem::drawBlurred(QPainter *painter, const QStyleOptionGraphicsItem *o
 {
     Q_UNUSED(widget);
 
-
-    if(borderWidth())
-    {
-        QRectF extSquareItem( 0, 0, edgeLength()+2*borderWidth(), edgeLength()+2*borderWidth());
-        QColor extSquareColor = GLOBAL_BORDER_COLOR;
-        QPainterPath externalFigure;
-        externalFigure.addRect(extSquareItem);
-        painter->setOpacity(0.2);
-        painter->fillPath(externalFigure, extSquareColor);
-        painter->drawPath(externalFigure);
-        painter->setOpacity(1);
-    }
-
-
     QColor fillColor = (option->state & QStyle::State_Selected) ? color().dark(150) : color();
-//    if (option->state & QStyle::State_MouseOver)
-//    {
-//        fillColor = fillColor.light(150);
-//    }
 
     QRectF squareItem( borderWidth(), borderWidth(), edgeLength(), edgeLength());
     QColor squareColor = fillColor;

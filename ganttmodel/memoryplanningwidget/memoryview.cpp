@@ -62,7 +62,7 @@ void MemoryView::setScene(QGraphicsScene *scene)
 
         p_memoryScene->setParent(this);
 
-        p_memoryScene->setBackgroundBrush(QBrush(QColor(Qt::gray).lighter(130)));
+//        p_memoryScene->setBackgroundBrush(QBrush(QColor(Qt::gray).lighter(130)));
 
         setFrameStyle(0);
         setAlignment(Qt::AlignLeft | Qt::AlignTop);

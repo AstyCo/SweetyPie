@@ -6,7 +6,7 @@
 #include <qwt/qwt_plot_item.h>
 #include <qwt/qwt_scale_map.h>
 
-#include "ganttmodel_global.h"
+#include "ganttproject_global.h"
 
 class GANTTMODELSHARED_EXPORT PlotInterval : public QwtPlotItem
 {

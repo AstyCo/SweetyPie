@@ -5,7 +5,7 @@
 #include <QMap>
 #include <QToolBar>
 
-#include "ganttmodel_global.h"
+#include "ganttproject_global.h"
 
 enum ChartActions
 {

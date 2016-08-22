@@ -54,23 +54,12 @@ INCLUDEPATH += "$$PWD/../ganttmodel"
 INCLUDEPATH += "$$PWD/../ganttmodel/memoryplanningwidget"
 INCLUDEPATH += "$$PWD/../ganttmodel/memoryplanningwidget/memoryline"
 INCLUDEPATH += "$$PWD/../ganttmodel/memoryplanningwidget/memorygrid"
-
+INCLUDEPATH += "$$PWD/../ganttmodel/gantt"
 
 
 DEFINES += GANTTMODEL_LIBRARY
 
 SOURCES += \
-    ganttmodel.cpp \
-    ganttitem.cpp \
-    ganttview.cpp \
-    ganttgraphicsview.cpp \
-    ganttgraphicsscene.cpp \
-    ganttgraphicsitem.cpp \
-    ganttgraphicsheader.cpp \
-    ganttgraphicsheaderrectitem.cpp \
-    ganttdatetimedelegate.cpp \
-    ganttgraphicsheaderitem.cpp \
-    ganttplayer.cpp \
     chartwidget.cpp \
     curvedetailsgroupbox.cpp \
     intervalslider.cpp \
@@ -94,24 +83,23 @@ SOURCES += \
     memoryplanningwidget/memoryline/mline_picker.cpp \
     memoryplanningwidget/memoryline/mline_scene.cpp \
     memoryplanningwidget/kamemorylegend.cpp \
+    gantt/ganttview.cpp \
+    gantt/ganttplayer.cpp \
+    gantt/ganttmodel.cpp \
+    gantt/ganttitem.cpp \
+    gantt/ganttgraphicsview.cpp \
+    gantt/ganttgraphicsscene.cpp \
+    gantt/ganttgraphicsitem.cpp \
+    gantt/ganttgraphicsheaderrectitem.cpp \
+    gantt/ganttgraphicsheaderitem.cpp \
+    gantt/ganttgraphicsheader.cpp \
+    gantt/ganttdatetimedelegate.cpp
 
 
 HEADERS += \
-    ganttmodel.h \
-    ganttitem.h \
-    ganttview.h \
-    ganttgraphicsview.h \
 #    ganttitemstage.h \
-    ganttgraphicsscene.h \
-    ganttgraphicsitem.h \
 #    ganttgraphicsitemstage.h \
 #    ganttdatetimegrid.h \
-    ganttgraphicsheader.h \
-    ganttgraphicsheaderrectitem.h \
-    ganttmodel_global.h \
-    ganttdatetimedelegate.h \
-    ganttgraphicsheaderitem.h \
-    ganttplayer.h \
     chartwidget.h \
     curvedetailsgroupbox.h \
     intervalslider.h \
@@ -135,7 +123,19 @@ HEADERS += \
     memoryplanningwidget/kamemory.h \
     memoryplanningwidget/kamemorypart.h \
     memoryplanningwidget/memory_globalvalues.h \
-    memoryplanningwidget/kamemorylegend.h
+    memoryplanningwidget/kamemorylegend.h \
+    gantt/ganttview.h \
+    gantt/ganttdatetimedelegate.h \
+    gantt/ganttgraphicsheader.h \
+    gantt/ganttgraphicsheaderitem.h \
+    gantt/ganttgraphicsheaderrectitem.h \
+    gantt/ganttgraphicsitem.h \
+    gantt/ganttgraphicsscene.h \
+    gantt/ganttgraphicsview.h \
+    gantt/ganttitem.h \
+    gantt/ganttmodel.h \
+    gantt/ganttplayer.h \
+    ganttproject_global.h
 
 
 RESOURCES += \

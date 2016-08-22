@@ -326,11 +326,11 @@ void MGridScene::setMouseOverUnit(MGridUnit *mouseOverUnit)
     else
     {
         m_mouseOverUnit->update();
-        emit setUnitInfo(QString(   QObject::tr("Unit Group Id: ")
+        emit setUnitInfo(QString(   /*QObject::tr("id: ")
                                         +QString::number(m_mouseOverUnit->id())
-                                        +QString(QObject::tr("  Unit State: "))
+                                        +*/QString(QObject::tr(" Состояние: "))
                                         +m_mouseOverUnit->state()
-                                        +QObject::tr(" Unit Memory: ")
+                                        +QObject::tr(" Адрес: ")
                                         +toAdress(m_mouseOverUnit->start(),m_mouseOverUnit->finish())
                              ));
     }

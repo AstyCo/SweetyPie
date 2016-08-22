@@ -1,7 +1,7 @@
 #ifndef KAMEMORYPART_HPP
 #define KAMEMORYPART_HPP
 
-#include <ganttmodel_global.h>
+#include <ganttproject_global.h>
 
 #include <QColor>
 
@@ -24,7 +24,6 @@ using namespace Memory;
 
 QString fixedNumPresentation(long num,int base,long max);
 
-QString MemoryState_to_trQString(MemoryState state);
 QString MemoryState_to_QString(MemoryState state);
 QColor MemoryState_to_QColor(MemoryState state, bool isActive = true);
 

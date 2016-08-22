@@ -14,7 +14,7 @@
 #include <timespan.h>
 #include <utcdatetime.h>
 
-#include "ganttmodel_global.h"
+#include "ganttproject_global.h"
 #include "plotinterval.h"
 #include "curvedetailsgroupbox.h"
 #include "plotkeyeventhandler.h"

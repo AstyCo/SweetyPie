@@ -216,128 +216,87 @@ QString operator+(const QString &qstr, MemoryState status)
 }
 
 
+QColor MemoryState_to_QColor(MemoryState state, bool isActive /*= true*/)
+{
+    QColor result;
+//    if(isActive)
+        switch (state) {
+        case Empty:
+            result = QColor(Qt::white);
+            break;
+        case Free:
+            result = QColor::fromRgb(0xCCD2D4);
+            break;
+        case Recorded:
+            result = QColor::fromRgb(0xE3E187);
+            break;
+        case PendingWrite:
+            result = QColor::fromRgb(0x73E884);
+            break;
+        case PendingRead:
+            result = QColor::fromRgb(0x99DDE3);
+            break;
+        case ErrorWrite:
+            result = QColor::fromRgb(0xE39753);
+            break;
+        case ErrorRead:
+            result = QColor::fromRgb(0x82A5C2);
+            break;
+        default:
+            result = QColor(Qt::black);
+            break;
+        }
+//    else
+//        switch (state) {
+//        case Empty:
+//            result = QColor(Qt::white);
+//            break;
+//        case Free:
+//            result = QColor::fromRgb(0x9FA5A6);
+//            break;
+//        case Recorded:
+//            result = QColor::fromRgb(0xFFF4A6);
+//            break;
+//        case PendingWrite:
+//            result = QColor::fromRgb(0xAAE8B0);
+//            break;
+//        case PendingRead:
+//            result = QColor::fromRgb(0xBFEAFF);
+//            break;
+//        case ErrorWrite:
+//            result = QColor::fromRgb(0xB071E8);
+//            break;
+//        case ErrorRead:
+//            result = QColor::fromRgb(0xC27C74);
+//            break;
+//        default:
+//            result = QColor(Qt::black);
+//            break;
+//        }
+    if(!isActive && state != Free)
+        return result.lighter(130);
+    return result;
+}
+
 
 QString MemoryState_to_QString(MemoryState status)
 {
     switch(status)
     {
     case Empty:
-        return "Empty";
+        return QObject::tr("Пусто");
     case Free:
-        return "Free";
+        return QObject::tr("Свободно");
     case Recorded:
-        return "Recorded";
+        return QObject::tr("Записано");
     case PendingWrite:
-        return "PendingWrite";
+        return QObject::tr("Ожидание записи");
     case PendingRead:
-        return "PendingRead";
+        return QObject::tr("Ожидание сброса");
     case ErrorWrite:
-        return "ErrorWrite";
+        return QObject::tr("Ошибка записи");
     case ErrorRead:
-        return "ErrorRead";
-    default:
-        return "MemoryState::Undefined";
-    }
-}
-
-
-QColor MemoryState_to_QColor(MemoryState state, bool isActive /*= true*/)
-{
-    QColor result;
-//    if(!isActive)
-//    {
-//        // "GRAY" COLORS
-//        switch(state)
-//        {
-//        case Memory::Freed:
-//            result = QColor::fromRgb(220,220,220);
-//            break;
-//        case Memory::Written:
-//            result = QColor::fromRgb(255,180,177);
-//            break;
-//        case Memory::Read:
-//            result = QColor::fromRgb(255,229,177);
-//            break;
-//        case Memory::Available:
-//            result = QColor::fromRgb(177,255,191);
-//            break;
-//        default:
-//            qDebug() << "MemoryState_to_QColor() default case";
-//            return Qt::black;
-//        }
-//    }
-//    else
-//    {
-        // "HIGHLIGHTED" COLORS
-//        switch(state)
-//        {
-//        case Memory::Freed:
-//            result = QColor::fromRgb(250,250,250);
-//            break;
-//        case Memory::Written:
-//            result = QColor::fromRgb(255,101,101);
-//            break;
-//        case Memory::Read:
-//            result = QColor::fromRgb(250,130,16);
-//            break;
-//        case Memory::Available:
-//            result = QColor::fromRgb(90,210,90);
-//            break;
-//        default:
-//            qDebug() << "MemoryState_to_QColor() default case";
-//            return Qt::black;
-//        }
-        switch (state) {
-        case Empty:
-            result = QColor(Qt::white);
-            break;
-        case Free:
-            result = QColor(Qt::gray);
-            break;
-        case Recorded:
-            result = QColor(Qt::green);
-            break;
-        case PendingWrite:
-            result = QColor(255, 165, 0);
-            break;
-        case PendingRead:
-            result = QColor(Qt::yellow);
-            break;
-        case ErrorWrite:
-            result = QColor(Qt::magenta);
-            break;
-        case ErrorRead:
-            result = QColor(Qt::red);
-            break;
-        default:
-            result = QColor(Qt::black);
-            break;
-        }
-//    }
-    if(!isActive)
-        return result.lighter(130);
-    return result;
-}
-
-
-QString MemoryState_to_trQString(MemoryState status)
-{
-    switch(status)
-    {
-    case Empty:
-        return QObject::tr("Empty");
-    case Free:
-        return QObject::tr("Free");
-    case Recorded:
-        return QObject::tr("Recorded");
-    case PendingWrite:
-        return QObject::tr("PendingWrite");
-    case PendingRead:
-        return QObject::tr("PendingRead");
-    case ErrorWrite:
-        return QObject::tr("ErrorWrite");
-    case ErrorRead:
-        return QObject::tr("ErrorRead");
+        return QObject::tr("Ошибка сброса");
     default:
         return "MemoryState::Undefined";
     }

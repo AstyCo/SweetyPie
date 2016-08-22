@@ -9,7 +9,7 @@
 #include <qwt/qwt_plot_curve.h>
 
 #include "chartsettings.h"
-#include "ganttmodel_global.h"
+#include "ganttproject_global.h"
 
 namespace Ui {
 class GraphSettingsDlg;

@@ -9,7 +9,7 @@
 
 #include <dimensions.h>
 
-#include "ganttmodel_global.h"
+#include "ganttproject_global.h"
 
 
 struct GANTTMODELSHARED_EXPORT CurveStyle

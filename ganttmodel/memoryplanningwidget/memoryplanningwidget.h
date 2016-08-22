@@ -1,7 +1,7 @@
 #ifndef MEMORYPLANNINGWIDGET_HPP
 #define MEMORYPLANNINGWIDGET_HPP
 
-#include "ganttmodel_global.h"
+#include "ganttproject_global.h"
 #include "memoryview.h"
 
 #include <QGraphicsScene>

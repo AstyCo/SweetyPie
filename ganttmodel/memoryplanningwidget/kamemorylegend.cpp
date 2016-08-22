@@ -41,7 +41,7 @@ KaMemoryLegend::KaMemoryLegend(QWidget *parent) : QWidget(parent)
         font.setWeight(75);
 
         labelText->setFont(font);
-        labelText->setText(MemoryState_to_trQString(state));
+        labelText->setText(MemoryState_to_QString(state));
         labelText->setSizePolicy(sizePolicy);
 
         horizontalLayout->addWidget(labelText);

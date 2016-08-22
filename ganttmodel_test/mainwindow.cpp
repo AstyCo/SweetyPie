@@ -16,6 +16,8 @@ MainWindow::MainWindow(QWidget *parent) :
 {
   ui->setupUi(this);
 
+  installEventFilter(ui->widgetIntervalSlider);
+
   testChartWidget();
   testChartGroupWidget();
   testGanttModel();
@@ -62,7 +64,7 @@ void MainWindow::testChartWidget()
   ui->widgetIntervalSlider->setEndHandle(ui->widgetIntervalSlider->maxValue());  
   ui->checkBox_showLegend->setChecked(true);
 
-  connect(ui->widgetIntervalSlider, SIGNAL(valueChanged(IntervalSlider::ClippedHandle, long)), this, SLOT(setInterval()));
+  connect(ui->widgetIntervalSlider, SIGNAL(valueChanged(IntervalSlider::ClippedHandle, long long)), this, SLOT(setInterval()));
 
 
 }
@@ -182,9 +184,6 @@ void MainWindow::testMemoryPlanningWidget()
     MGridScene * scene = ui->memoryPlanningWidget->gridScene();
     ui->memoryPlanningWidget->setMemory(kaMemory);
     ui->memoryPlanningWidget->setShowButtons(true);
-
-    scene->setItemEdge(30);
-
 }
 
 void MainWindow::setInterval()

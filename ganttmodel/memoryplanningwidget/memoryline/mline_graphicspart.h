@@ -5,7 +5,7 @@
 //#include "QSqlRecord"
 #include "kamemorypart.h"
 
-#include <ganttmodel_global.h>
+#include <ganttproject_global.h>
 
 using namespace Memory;
 
