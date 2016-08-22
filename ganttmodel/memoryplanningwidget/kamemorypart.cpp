@@ -240,7 +240,7 @@ QColor MemoryState_to_QColor(MemoryState state, bool isActive /*= true*/)
             result = QColor::fromRgb(0xE39753);
             break;
         case ErrorRead:
-            result = QColor::fromRgb(0x82A5C2);
+            result = QColor::fromRgb(0x308C9E);
             break;
         default:
             result = QColor(Qt::black);
