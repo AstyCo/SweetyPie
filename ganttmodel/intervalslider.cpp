@@ -200,7 +200,7 @@ int IntervalSlider::valueToPoint(long long value,ClippedHandle handle) const
     case NoHandle:
     {
         qreal x = (value - beginHandle())* 1.0/(endHandle() - beginHandle());
-        offset+=qMax(x,(qreal)0) * handleSize();
+        offset+=qMin(qMax(x,0.0),1.0) * handleSize();
         break;
     }
     default:
@@ -473,7 +473,6 @@ void IntervalSlider::mousePressEvent(QMouseEvent *e)
     if(p.x()>beginSpliter1 && p.x()<beginSpliter2)
     {
         m_clippedHandle=BeginHandle;
-        qDebug() << "m_clippedHandle=BeginHandle";
     }
     else if(p.x()>endSpliter1 && p.x()<endSpliter2)
     {
