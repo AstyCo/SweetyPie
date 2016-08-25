@@ -57,9 +57,6 @@ MemoryPlanningWidget::MemoryPlanningWidget(QWidget *parent) :
 
     connect(ui->radioButtonGridView,SIGNAL(toggled(bool)),this,SLOT(changeScene()));
 
-
-
-
 }
 
 MemoryPlanningWidget::~MemoryPlanningWidget()

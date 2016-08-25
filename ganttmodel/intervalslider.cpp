@@ -14,7 +14,10 @@
 IntervalSlider::IntervalSlider(QWidget *parent) :
     QWidget(parent)
 {
+    m_sliderV = 0;
+    m_offsetV = 0;
     m_borderWidth = 1;
+
     setOffsetV(7);
     setHandleSize(12);
     setSliderV(8);
@@ -120,6 +123,20 @@ void IntervalSlider::setLimits(long long minValue,long long maxValue)
     setEndHandle(maxValue);
 }
 
+void IntervalSlider::setHandles(long long beginHandle, long long endHandle)
+{
+    if(m_clippedHandle == BeginHandle)
+    {
+        setBeginHandle(beginHandle);
+        setEndHandle(endHandle);
+    }
+    else if(m_clippedHandle == EndHandle)
+    {
+        setEndHandle(endHandle);
+        setBeginHandle(beginHandle);
+    }
+}
+
 int IntervalSlider::handleSize() const
 {
     return m_handleH + 2 ; // 1 - borderwidth
@@ -213,13 +230,6 @@ int IntervalSlider::valueToPoint(long long value,ClippedHandle handle) const
     if(relPoint>relWidth)
         relPoint=relWidth;
 
-//    if(handle == EndHandle)
-//    {
-//        qDebug() << "relWidth: "<< QString::number(relWidth);
-//        qDebug() << "handleSize: "<< QString::number(handleSize());
-//        qDebug() << "endhandle point "<< QString::number(offset)<<'+'
-//                 <<QString::number(relPoint) << "\nwidth: "+QString::number(width());
-//    }
     return offset+relPoint;
 }
 
@@ -351,6 +361,23 @@ void IntervalSlider::leaveEvent(QEvent *)
     update();
 }
 
+
+bool IntervalSlider::posOverBeginHandle(const QPoint& pos) const
+{
+    int beginSpliter1 = valueToPoint(m_beginValue,BeginHandle)-halfHandleSize(),
+        beginSpliter2 = beginSpliter1 + handleSize();
+
+    return (pos.x()>beginSpliter1 && pos.x()<beginSpliter2);
+}
+
+bool IntervalSlider::posOverEndHandle(const QPoint& pos) const
+{
+    int endSpliter1 = valueToPoint(m_endValue,EndHandle)-halfHandleSize(),
+         endSpliter2 = endSpliter1 + handleSize();
+
+    return (pos.x()>endSpliter1 && pos.x()<endSpliter2);
+}
+
 int IntervalSlider::intervalSliderHeight() const
 {
     return m_sliderV+2*(m_offsetV+m_borderWidth);
@@ -387,6 +414,7 @@ QSize IntervalSlider::minimumSizeHint() const
 {
     return QSize(200, intervalSliderHeight());
 }
+
 
 bool IntervalSlider::moveHandles(long long deltaVal)
 {
@@ -464,20 +492,10 @@ void IntervalSlider::mousePressEvent(QMouseEvent *e)
 {
     const QPoint &p = e->pos();
 
-    int beginSpliter1 = valueToPoint(m_beginValue,BeginHandle)-halfHandleSize(),
-        beginSpliter2 = beginSpliter1 + handleSize();
-
-    int endSpliter1 = valueToPoint(m_endValue,EndHandle)-halfHandleSize(),
-         endSpliter2 = endSpliter1 + handleSize();
-
-    if(p.x()>beginSpliter1 && p.x()<beginSpliter2)
-    {
-        m_clippedHandle=BeginHandle;
-    }
-    else if(p.x()>endSpliter1 && p.x()<endSpliter2)
-    {
-        m_clippedHandle=EndHandle;
-    }
+    if(posOverBeginHandle(p))
+        m_clippedHandle = BeginHandle;
+    else if (posOverEndHandle(p))
+        m_clippedHandle = EndHandle;
     else
         m_clippedHandle=NoHandle;
 

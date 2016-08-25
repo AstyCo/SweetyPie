@@ -18,22 +18,30 @@
         <file>images/filequit.png</file>
         <file>images/filesave.png</file>
         <file>images/icon.png</file>
-        <file>images/list-first.png</file>
-        <file>images/list-last.png</file>
-        <file>images/next.png</file>
-        <file>images/pause.png</file>
-        <file>images/play.png</file>
-        <file>images/playback.png</file>
-        <file>images/previous.png</file>
-        <file>images/pull.png</file>
-        <file>images/rec.png</file>
-        <file>images/repeat.png</file>
-        <file>images/step-back.png</file>
-        <file>images/step-forward.png</file>
-        <file>images/stop.png</file>
-        <file>images/to-begin.png</file>
-        <file>images/to-end.png</file>
-        <file>images/turn-off.png</file>
+        <file>images/Buttons 64x64/back_off_64.png</file>
+        <file>images/Buttons 64x64/back_on_64.png</file>
+        <file>images/Buttons 64x64/back_step_off_64.png</file>
+        <file>images/Buttons 64x64/back_step_on_64.png</file>
+        <file>images/Buttons 64x64/begin_off_64.png</file>
+        <file>images/Buttons 64x64/begin_on_64.png</file>
+        <file>images/Buttons 64x64/end_off_64.png</file>
+        <file>images/Buttons 64x64/end_on_64.png</file>
+        <file>images/Buttons 64x64/forward_off_64.png</file>
+        <file>images/Buttons 64x64/forward_on_64.png</file>
+        <file>images/Buttons 64x64/forward_step_off_64.png</file>
+        <file>images/Buttons 64x64/forward_step_on_64.png</file>
+        <file>images/Buttons 64x64/next_off_64.png</file>
+        <file>images/Buttons 64x64/next_on_64.png</file>
+        <file>images/Buttons 64x64/pause_off_64.png</file>
+        <file>images/Buttons 64x64/pause_on_64.png</file>
+        <file>images/Buttons 64x64/prev_off_64.png</file>
+        <file>images/Buttons 64x64/prev_on_64.png</file>
+        <file>images/Buttons 64x64/rec_off_64.png</file>
+        <file>images/Buttons 64x64/rec_on_64.png</file>
+        <file>images/Buttons 64x64/reg_speed_on_64.png</file>
+        <file>images/Buttons 64x64/reg_step_on_64.png</file>
+        <file>images/Buttons 64x64/stop_off_64.png</file>
+        <file>images/Buttons 64x64/stop_on_64.png</file>
     </qresource>
     <qresource prefix="/icons">
         <file>icons/clear.png</file>

@@ -1,112 +1,136 @@
 #include "ganttgraphicsview.h"
+#include "ganttwidget.h"
+#include "ganttscene.h"
+#include "gantttreeview.h"
 
-#include "ganttgraphicsscene.h"
-
-#include "QDebug"
-#include <QVBoxLayout>
-#include <QSlider>
+#include <QResizeEvent>
 #include <QScrollBar>
 
-#include <qmath.h>
+#include <QDebug>
 
 GanttGraphicsView::GanttGraphicsView(QWidget *parent) :
     QGraphicsView(parent)
 {
-//    setViewportMargins(RULER_BREADTH,0,0,0);
-//    QHBoxLayout* gridLayout = new QHBoxLayout();
-//    gridLayout->setSpacing(0);
-//    gridLayout->setMargin(0);
-
-//    //mHorzRuler = new QDRuler(QDRuler::Horizontal, this);
-//    mVertRuler = new QDRuler(QDRuler::Vertical, this);
-
-//    //gridLayout->addWidget(mHorzRuler,0);
-//    gridLayout->addWidget(mVertRuler,0);
-//    gridLayout->addWidget(this->viewport(),1);
-
-//    this->setLayout(gridLayout);
+    initialize();
+}
 
 
-
-    this->setAlignment(Qt::AlignLeft | Qt::AlignTop); // устанавливает начало координат сцены в левый верхний угол
-    this->setTransformationAnchor(QGraphicsView::NoAnchor); // не изменяет сцену при изменении размера представления
-
-    setViewportMargins(30,0,0,0);
-    QHBoxLayout * hLayout = new QHBoxLayout;
-    hLayout->setSpacing(0);
-    hLayout->setMargin(0);
-
-    QVBoxLayout * zoomLayout = new QVBoxLayout;
-    zoomLayout->setSpacing(0);
-    zoomLayout->setMargin(0);
-
-    zoomSlider = new QSlider;
-//    zoomSlider->setMinimum(0);
-//    zoomSlider->setMaximum(1000);
-//    zoomSlider->setValue(250);
-
-    zoomSlider->setMinimum(2);
-    zoomSlider->setMaximum(5);
-    zoomSlider->setValue(5);
-    zoomSlider->setSingleStep(1);
-    zoomSlider->setTickInterval(1);
-    zoomSlider->setTickPosition(QSlider::TicksRight);
-
-    QWidget* fake = new QWidget();
-    fake->setBackgroundRole(QPalette::Window);
-    fake->setFixedSize(RULER_BREADTH,RULER_BREADTH);
-
-    zoomLayout->addWidget(zoomSlider);
-    zoomLayout->addWidget(fake);
-    hLayout->addLayout(zoomLayout);
-    hLayout->addWidget(this->viewport());
-
-    this->setLayout(hLayout);
+GanttGraphicsView::GanttGraphicsView(QGraphicsScene * scene, QWidget * parent) :
+    QGraphicsView(scene,parent)
+{
+    initialize();
+}
 
 
-    connect(zoomSlider, SIGNAL(valueChanged(int)), this, SLOT(setupMatrix(int)));
+void GanttGraphicsView::resizeEvent(QResizeEvent *event)
+{
+    QGraphicsView::resizeEvent(event);
+
+    if(!m_scene)
+        return;
+
+    emit viewResized(event->size());
+}
+
+void GanttGraphicsView::scrollContentsBy(int dx, int dy)
+{
+    QGraphicsView::scrollContentsBy(dx,dy);
+
+    if(!m_scene)
+        return;
+
+    if(dx)
+        m_scene->invalidate(QRectF(),QGraphicsScene::BackgroundLayer);
+
+    int vs = verticalScrollBar()->value();
+
+    m_scene->updateHeaderPos(vs);
+
+    if(!m_treeView)
+        return;
+
+    m_treeView->verticalScrollBar()->setValue(vs);
+
+    m_treeView->update();
+
 
 }
 
-void GanttGraphicsView::setupMatrix(int value)
+void GanttGraphicsView::mouseMoveEvent(QMouseEvent *event)
 {
-//    qreal scale = qPow(qreal(2), (zoomSlider->value() - 250) / qreal(50));
-//    QMatrix matrix;
-//    matrix.scale(scale, 1);
-//    setMatrix(matrix);
+    if(!m_scene)
+        return;
+    if(m_scene->headerMode() == GanttHeader::GanttDiagramMode)
+    {
+        QPoint pos = event->pos();
 
-    GanttGraphicsScene * myScene = (GanttGraphicsScene*)this->scene();
-    switch (value) {
-    case 1:
-        myScene->m_header->setZoom(ScaleSecond);
-        break;
-    case 2:
-        myScene->m_header->setZoom(ScaleMinute);
-        break;
-    case 3:
-        myScene->m_header->setZoom(ScaleHour);
-        break;
-    case 4:
-        myScene->m_header->setZoom(ScaleDay);
-        break;
-    case 5:
-        myScene->m_header->setZoom(ScaleMonth);        
-        break;
-    default:
-        break;
+        if(rect().contains(pos) && pos.y() > rect().bottom() - m_hSliderHeight)
+        {
+            setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
+        }
+        else
+        {
+            setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+        }
     }
-    myScene->m_header->createHeader();
-    myScene->update();
-    //qDebug()<<horizontalScrollBar()->maximum()<<value;
 
+    QGraphicsView::mouseMoveEvent(event);
 }
 
-void GanttGraphicsView::onCursorChanged(qreal cursor)
+void GanttGraphicsView::leaveEvent(QEvent *e)
 {
-    GanttGraphicsScene * myScene = (GanttGraphicsScene*)this->scene();
-    if(cursor >= myScene->m_header->m_backgroundRect.right())
-        horizontalScrollBar()->setValue(horizontalScrollBar()->value()+horizontalScrollBar()->pageStep()/*singleStep()/10*/);
-    if(cursor < myScene->m_header->m_backgroundRect.left())
-        horizontalScrollBar()->setValue(horizontalScrollBar()->value()-horizontalScrollBar()->pageStep()/*singleStep()/10*/);
+    setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+
+    QGraphicsView::leaveEvent(e);
 }
+
+
+
+void GanttGraphicsView::initialize()
+{
+    m_scene = NULL;
+    m_treeView = NULL;
+    m_hSliderHeight = 0;
+
+    setMinimumWidth(GANTTGRAPHICSVIEW_MIN_WIDTH);
+    setFrameStyle(0);
+    setAlignment(Qt::AlignLeft | Qt::AlignTop);
+    setHSliderHeight(15);
+}
+
+void GanttGraphicsView::setHSliderHeight(int hSliderHeight)
+{
+    if(m_hSliderHeight == hSliderHeight)
+        return;
+
+    m_hSliderHeight = hSliderHeight;
+    horizontalScrollBar()->setStyleSheet(
+                QString("QScrollBar {height:%1px;}").arg(m_hSliderHeight));
+}
+
+
+void GanttGraphicsView::setTreeView(GanttTreeView *treeView)
+{
+    m_treeView = treeView;
+}
+
+void GanttGraphicsView::changeExpanding(const QModelIndex &index)
+{
+    if(!m_treeView)
+        return;
+
+    if(m_treeView->model()->hasIndex(index.row(),index.column(),index.parent()))
+        m_treeView->setExpanded(index, !(m_treeView->isExpanded(index)));
+}
+
+void GanttGraphicsView::setScene(GanttScene *scene)
+{
+    m_scene = scene;
+    QGraphicsView::setScene(scene);
+
+    scene->onViewAdded(this);
+}
+
+
+
 

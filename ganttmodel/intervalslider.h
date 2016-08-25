@@ -50,10 +50,10 @@ public:
     explicit IntervalSlider(QWidget *parent = 0);
     ~IntervalSlider(){}
     long long endHandle() const;
-    void setEndHandle(long long endHandle);
+    virtual void setEndHandle(long long endHandle);
 
     long long beginHandle() const;
-    void setBeginHandle(long long beginHandle);
+    virtual void setBeginHandle(long long beginHandle);
 
     long long maxValue() const;
     void setMaxValue(long long maxValue);
@@ -62,6 +62,7 @@ public:
     void setMinValue(long long minValue);
 
     virtual void setLimits(long long minValue,long long maxValue);
+    virtual void setHandles(long long beginHandle,long long endHandle);
 
     int handleSize() const;
     void setHandleSize(int new_handle_value);
@@ -107,6 +108,9 @@ protected:
     void keyReleaseEvent(QKeyEvent *e);
 
     void leaveEvent(QEvent *);
+
+    bool posOverBeginHandle(const QPoint& pos) const;
+    bool posOverEndHandle(const QPoint& pos) const;
 
 protected:
     ClippedHandle m_clippedHandle;

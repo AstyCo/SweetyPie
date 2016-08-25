@@ -74,6 +74,11 @@ public:
     /// Возвращает строку, представляющую блока памяти в унифицированном виде (ex. 0x0000-0xFFFF ...)
     QString toAdress(long start,long finish);
 
+    /// Устанавливает режим выделения области памяти
+    void setHighlightMode(bool highlightMode);
+
+    /// Отвечает за возможность изменения выбранной области ( false - конец выделения )
+    void setInteractiveHighlight(bool interactiveHighlight);
 
 public slots:
 
@@ -145,12 +150,11 @@ private:
     void setUnitInfo(const QString& text);
     void viewResized(QSizeF viewSize);
     bool interactiveHighlight() const;
-    void setInteractiveHighlight(bool interactiveHighlight);
-    void showInteractiveRange(long start, long finish);
-    void hideInteractiveRange();
+
+    void updateInteractiveRange(long start, long finish);
     qreal itemSize() const;
     bool highlightMode() const;
-    void setHighlightMode(bool highlightMode);
+
     int itemPerRow() const;
     void setItemPerRow(int newItemPerRow);
     void clearMemory(long from,long count);

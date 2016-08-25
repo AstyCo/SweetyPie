@@ -42,6 +42,7 @@ MGridScene::MGridScene( QObject * parent)
     setHighlightStyle( bordersAround | highlightedItems);
 
     m_interactiveUnit = new MGridInteractiveUnit(this);
+
 }
 
 MGridScene::~MGridScene()
@@ -85,7 +86,7 @@ void MGridScene::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
         {
             setStartHighlight(p_mem->index());
         }
-        showInteractiveRange(startHighlight(),finishHighlight());
+        updateInteractiveRange(startHighlight(),finishHighlight());
     }
 
 
@@ -515,6 +516,10 @@ void MGridScene::removeUnit(MGridUnit *p_memUnit)
 QList<MGridUnit *> MGridScene::crossingParts(long from, long to) const
 {
     QList<MGridUnit*> result;
+
+    if(!highlightMode())
+        return result;
+
     for(int i = from; i <= to; ++i)
     {
         MGridUnit* parUnit = m_items[i]->unit();
@@ -550,6 +555,7 @@ void MGridScene::clearMouseOver()
 
 QList<KaMemoryPart> MGridScene::crossingParts() const
 {
+
     QList<MGridUnit*> units = crossingParts(startHighlight(),finishHighlight());
     QList<KaMemoryPart> result;
     foreach(MGridUnit* unit, units)
@@ -631,6 +637,12 @@ void MGridScene::setStartHighlight(long startHighlight)
 
 void MGridScene::setLengthHighlight(long lengthHighlight)
 {
+    if(!lengthHighlight)
+    {
+        setHighlightMode(false);
+        return;
+    }
+
     m_lengthHighlight = lengthHighlight;
     emit lengthHighlightChanged(m_lengthHighlight);
 }
@@ -871,18 +883,13 @@ void MGridScene::viewResized(QSizeF viewSize)
     }
 }
 
-void MGridScene::showInteractiveRange(long start, long finish)
+void MGridScene::updateInteractiveRange(long start, long finish)
 {
+    if(!highlightMode())
+        return;
     if(!m_interactiveUnit)
         return;
     m_interactiveUnit->setRange(start,finish);
-}
-
-void MGridScene::hideInteractiveRange()
-{
-    if(!m_interactiveUnit)
-        return;
-
 }
 
 qreal MGridScene::itemSize() const

@@ -107,17 +107,17 @@
       </widget>
       <widget class="QWidget" name="tab_3">
        <attribute name="title">
-        <string>GanttModel</string>
+        <string>Gantt</string>
        </attribute>
-       <layout class="QVBoxLayout" name="verticalLayout_3" stretch="1">
-        <item>
-         <widget class="GanttView" name="ganttWidget" native="true"/>
+       <layout class="QGridLayout" name="gridLayout_3">
+        <item row="0" column="0">
+         <widget class="GanttWidget" name="widget_2" native="true"/>
         </item>
        </layout>
       </widget>
       <widget class="QWidget" name="tab_4">
        <attribute name="title">
-        <string>MemoryPlanningWidget</string>
+        <string>Memory</string>
        </attribute>
        <layout class="QGridLayout" name="gridLayout_2">
         <item row="0" column="0">
@@ -143,6 +143,12 @@
  <layoutdefault spacing="6" margin="11"/>
  <customwidgets>
   <customwidget>
+   <class>GanttWidget</class>
+   <extends>QWidget</extends>
+   <header>ganttwidget.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
    <class>ChartWidget</class>
    <extends>QWidget</extends>
    <header>chartwidget.h</header>
@@ -158,12 +164,6 @@
    <class>ChartsGroupWidget</class>
    <extends>QWidget</extends>
    <header>chartsgroupwidget.h</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
-   <class>GanttView</class>
-   <extends>QWidget</extends>
-   <header location="global">ganttview.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>

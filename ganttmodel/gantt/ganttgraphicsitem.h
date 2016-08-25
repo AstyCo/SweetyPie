@@ -1,52 +1,53 @@
 #ifndef GANTTGRAPHICSITEM_H
 #define GANTTGRAPHICSITEM_H
 
-#include <QGraphicsLayoutItem>
-#include <QGraphicsItem>
-//#include "ganttgraphicsitemstage.h"
-#include "ganttitem.h"
-#include "ganttgraphicsheader.h"
+#include "ganttinfoleaf.h"
 
-class GanttGraphicsItem : public QObject, public QGraphicsLayoutItem, public QGraphicsRectItem/*public QGraphicsLinearLayout*/
+
+#include <QGraphicsObject>
+
+class GanttHeader;
+class GanttScene;
+
+class GanttGraphicsItem : public QGraphicsObject
 {
     Q_OBJECT
+
 public:
-    //(GanttItem * item, Scale scale, QDateTime headerBegin, QDateTime headerEnd, QGraphicsItem * parent = 0)
-    GanttGraphicsItem(GanttItem * item, GanttGraphicsHeader * header,/*QDateTime headerBegin, QDateTime headerEnd,*/ QGraphicsItem * parent = 0);
-    ~GanttGraphicsItem();
+    GanttGraphicsItem(GanttInfoLeaf *info,QGraphicsItem *parent = 0);
 
-
-    // Inherited from QGraphicsLayoutItem
-    void setGeometry(const QRectF &geom);
-    QSizeF sizeHint(Qt::SizeHint which, const QSizeF &constraint = QSizeF()) const;
-    //=================
-
-    //QRectF boundingRect() const;
+    //
+    QRectF boundingRect() const;
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
+
+
+
+    GanttInfoLeaf *info() const;
+
+    QRectF rect() const;
+
+    void setHeader(GanttHeader *header);
+
+public slots:
+    void setScene(GanttScene *scene);
+    void setBoundingRectSize(const QSizeF &boundingRectSize);
+
+    void updateItemGeometry();
+
+
 
 protected:
     void mousePressEvent(QGraphicsSceneMouseEvent *event);
 
-public slots:
-
-    void calcSizeSlot();
-
 private:
 
-    //GanttGraphicsItemStage * m_graphicsStage;
-    GanttItem * m_ganttItem;
-    GanttGraphicsHeader * m_header;
+    GanttHeader* m_header;
+    GanttInfoLeaf* m_info;
+    GanttScene *m_scene;
+
+    QSizeF m_boundingRectSize;
 
 
-    QDateTime m_begin;
-    QDateTime m_end;
-    /*QDateTime*/ int m_duration;
-    QString m_text;
-    QColor m_color; // цвет блока
-    qreal m_width;
-    qreal m_height;
-    enum StageType{Simple, Union}; // тип блока: обычный или объединяющий
-    StageType m_type;
 };
 
 #endif // GANTTGRAPHICSITEM_H

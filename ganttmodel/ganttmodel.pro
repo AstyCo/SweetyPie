@@ -83,23 +83,30 @@ SOURCES += \
     memoryplanningwidget/memoryline/mline_picker.cpp \
     memoryplanningwidget/memoryline/mline_scene.cpp \
     memoryplanningwidget/kamemorylegend.cpp \
-    gantt/ganttview.cpp \
-    gantt/ganttplayer.cpp \
-    gantt/ganttmodel.cpp \
-    gantt/ganttitem.cpp \
+    gantt/ganttintervalsliderzoom.cpp \
+    gantt/ganttplayersettings.cpp \
+    gantt/main.cpp \
+    gantt/playercontrolbutton.cpp \
+    gantt/qgraphicsrectitemwithtext.cpp \
+    gantt/ganttwidget.cpp \
+    gantt/gantttreeview.cpp \
+    gantt/gantttreemodel.cpp \
+    gantt/gantttreedelegate.cpp \
+    gantt/ganttcurrenttimeslider.cpp \
+    gantt/ganttscene.cpp \
+    gantt/ganttplayercontrol.cpp \
+    gantt/ganttintervalslider.cpp \
+    gantt/ganttinfonode.cpp \
+    gantt/ganttinfoleaf.cpp \
+    gantt/ganttinfoitem.cpp \
+    gantt/ganttheaderview.cpp \
+    gantt/ganttheader.cpp \
     gantt/ganttgraphicsview.cpp \
-    gantt/ganttgraphicsscene.cpp \
     gantt/ganttgraphicsitem.cpp \
-    gantt/ganttgraphicsheaderrectitem.cpp \
-    gantt/ganttgraphicsheaderitem.cpp \
-    gantt/ganttgraphicsheader.cpp \
-    gantt/ganttdatetimedelegate.cpp
+    appeventfilter.cpp
 
 
 HEADERS += \
-#    ganttitemstage.h \
-#    ganttgraphicsitemstage.h \
-#    ganttdatetimegrid.h \
     chartwidget.h \
     curvedetailsgroupbox.h \
     intervalslider.h \
@@ -124,18 +131,28 @@ HEADERS += \
     memoryplanningwidget/kamemorypart.h \
     memoryplanningwidget/memory_globalvalues.h \
     memoryplanningwidget/kamemorylegend.h \
-    gantt/ganttview.h \
-    gantt/ganttdatetimedelegate.h \
-    gantt/ganttgraphicsheader.h \
-    gantt/ganttgraphicsheaderitem.h \
-    gantt/ganttgraphicsheaderrectitem.h \
-    gantt/ganttgraphicsitem.h \
-    gantt/ganttgraphicsscene.h \
+    gantt/ganttintervalsliderzoom.h \
+    gantt/ganttplayersettings.h \
+    gantt/playercontrolbutton.h \
+    gantt/qgraphicsrectitemwithtext.h \
+    gantt/ganttwidget.h \
+    gantt/gantttreeview.h \
+    gantt/gantttreemodel.h \
+    gantt/gantttreedelegate.h \
+    gantt/ganttcurrenttimeslider.h \
+    gantt/ganttscene.h \
+    gantt/ganttplayercontrol.h \
+    gantt/ganttintervalslider.h \
+    gantt/ganttinfonode.h \
+    gantt/ganttinfoleaf.h \
+    gantt/ganttinfoitem.h \
+    gantt/ganttheaderview.h \
+    gantt/ganttheader.h \
     gantt/ganttgraphicsview.h \
-    gantt/ganttitem.h \
-    gantt/ganttmodel.h \
-    gantt/ganttplayer.h \
-    ganttproject_global.h
+    gantt/ganttgraphicsitem.h \
+    gantt/ganttglobalvalues.h \
+    ganttproject_global.h \
+    appeventfilter.h
 
 
 RESOURCES += \
@@ -146,7 +163,11 @@ FORMS += \
     curvedetailsgroupbox.ui \
     chartsgroupwidget.ui \
     chartsettingsdlg.ui \
-    memoryplanningwidget/memoryplanningwidget.ui
+    memoryplanningwidget/memoryplanningwidget.ui \
+    gantt/ganttintervalsliderzoom.ui \
+    gantt/ganttplayersettings.ui \
+    gantt/ganttwidget.ui \
+    gantt/mygantt_playercontrol.ui
 
 include(build_config.pri)
 
