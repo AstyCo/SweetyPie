@@ -15,6 +15,7 @@ class GanttGraphicsItem : public QGraphicsObject
 
 public:
     GanttGraphicsItem(GanttInfoLeaf *info,QGraphicsItem *parent = 0);
+    virtual ~GanttGraphicsItem();
 
     //
     QRectF boundingRect() const;
@@ -28,6 +29,12 @@ public:
 
     void setHeader(GanttHeader *header);
 
+signals:
+    void graphicsItemPressed();
+    void graphicsItemHoverEnter();
+    void graphicsItemHoverLeave();
+
+
 public slots:
     void setScene(GanttScene *scene);
     void setBoundingRectSize(const QSizeF &boundingRectSize);
@@ -38,6 +45,9 @@ public slots:
 
 protected:
     void mousePressEvent(QGraphicsSceneMouseEvent *event);
+
+    void hoverEnterEvent(QGraphicsSceneHoverEvent *event);
+    void hoverLeaveEvent(QGraphicsSceneHoverEvent *event);
 
 private:
 

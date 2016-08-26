@@ -15,6 +15,9 @@
 #define DEFAULT_ITEM_HEIGHT     (qreal(20))
 #define DEFAULT_HEADER_HEIGHT    (2*DEFAULT_ITEM_HEIGHT)
 
+#define DEFAULT_CURDT_ITEM_HEIGHT (qreal(5))
+#define DEFAULT_CURDT_ITEM_WIDTH (qreal(5))
+
 
 //the three values below are dependent
 #define MIN_WIDTH_FOR_TIME_VISUALIZING (qreal(30)) // in pixels

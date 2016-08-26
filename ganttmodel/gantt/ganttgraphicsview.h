@@ -27,6 +27,8 @@ public:
 
     void setHSliderHeight(int hSliderHeight);
 
+public slots:
+    void changeNodeExpanding();
 
 signals:
     void viewResized(const QSize& newSize);

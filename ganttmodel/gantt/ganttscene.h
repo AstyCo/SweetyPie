@@ -79,6 +79,14 @@ public:
 
     const GanttInfoLeaf *nextEvent(const UtcDateTime &curDt) const;
     const GanttInfoLeaf *prevEvent(const UtcDateTime &curDt) const;
+    void removeByInfo(const GanttInfoItem* item);
+    void removeByInfoLeaf(const GanttInfoLeaf* leaf);
+    void setEmpty(bool empty);
+
+    const QList<GanttGraphicsItem *>& dtItems() const;
+    void removeItem(QGraphicsItem *item);
+
+    void setDrawCurrentDtSlider(bool enable);
 
 signals:
     void limitsChanged(const UtcDateTime &start, const UtcDateTime &finish);
@@ -86,8 +94,15 @@ signals:
     void currentDtChanged(const UtcDateTime& dt);
     void viewResized();
 
+    void graphicsItemHoverEnter(const GanttInfoItem*);
+    void graphicsItemHoverLeave(const GanttInfoItem*);
+
+
+
+
 public slots:
     void onViewResize(const QSize& newSize);
+    void updateSceneRect();
 
     void makeStep(long long step);
     void moveSliderToNextEventStart();
@@ -108,6 +123,11 @@ private:
     void updateItems();
 
 private slots:
+    void onGraphicsItemHoverEnter();
+    void onGraphicsItemHoverLeave();
+
+
+    void onInfoLeafDelete();
     void onInfoChanged();
     void onLeafStartChanged();
     void onLeafFinishChanged();
@@ -123,5 +143,7 @@ private:
 
     friend class GanttWidget;
 };
+
+
 
 #endif // GANTTSCENE_H

@@ -13,6 +13,7 @@
 GanttSlider::GanttSlider(QGraphicsItem* parent) :
     QGraphicsObject(parent)
 {
+    m_draw = false;
     m_penWidth = 2;
     setCursor(Qt::OpenHandCursor);
     setZValue(20);
@@ -40,6 +41,9 @@ QRectF GanttSlider::boundingRect() const
 
 void GanttSlider::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
 {
+    if(!m_draw)
+        return;
+
     painter->setRenderHint(QPainter::Antialiasing,true);
 
     QBrush borderBrush(QColor(Qt::black).lighter(130));
@@ -162,6 +166,19 @@ bool GanttSlider::outOfBounds(const UtcDateTime &dt) const
 {
     return (dt<m_minDt || dt>m_maxDt);
 }
+bool GanttSlider::draw() const
+{
+    return m_draw;
+}
+
+void GanttSlider::setDraw(bool draw)
+{
+    m_draw = draw;
+    update();
+    emit drawChanged(draw);
+}
+
+
 UtcDateTime GanttSlider::maxDt() const
 {
     return m_maxDt;

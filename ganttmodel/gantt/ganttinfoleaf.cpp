@@ -6,6 +6,7 @@
 GanttInfoLeaf::GanttInfoLeaf(QObject *parent)
     :GanttInfoItem(parent)
 {
+    m_color = Qt::green;
     m_start = m_finish = UtcDateTime();
 
 
@@ -70,6 +71,12 @@ int GanttInfoLeaf::columnCount() const
 qreal GanttInfoLeaf::height() const
 {
     return DEFAULT_ITEM_WIDTH;
+}
+
+void GanttInfoLeaf::callForEachItemRecursively(void (*func)(GanttInfoItem *))
+{
+    if(func)
+        (*func)(this);
 }
 
 

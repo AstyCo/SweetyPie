@@ -131,6 +131,8 @@ public:
     void setVisItemCount(int visItemCount);
 
 
+    void setEmpty(bool isEmpty);
+
 private:
 
     bool onItemsAdditionHelper(GanttInfoItem* item);

@@ -19,17 +19,20 @@ class GanttScene;
 class GanttTreeModel;
 class GanttHeader;
 
+class GanttInfoNode;
+class GanttInfoItem;
+class GanttTreeView;
+
 class GANTTMODELSHARED_EXPORT GanttWidget : public QWidget
 {
     Q_OBJECT
 
 public:
     explicit GanttWidget(QWidget *parent = 0);
-
     ~GanttWidget();
 
+    void showPlayer(bool show);
 
-//    void addItems(const QString& title, const QList< std::tuple<QString,UtcDateTime,UtcDateTime> >& );
     void addItems(GanttInfoItem* item);
     void addItems(const QList<GanttInfoItem*>& items);
 
@@ -41,8 +44,19 @@ public:
     UtcDateTime maxDt() const;
     const UtcDateTime &outerMaxt() const;
 
+    GanttInfoNode *nodeByName(const QString&title) const;
+
+    static void callForEachItem(GanttInfoItem* item,GanttTreeView* view,GanttScene* scene,
+                         void (*func)(GanttInfoItem*,GanttTreeView*,GanttScene*));
+
+    void clear();
+
+
 signals:
     void currentDtChanged(const UtcDateTime& dt);
+
+    void graphicsItemHoverEnter(const GanttInfoItem*);
+    void graphicsItemHoverLeave(const GanttInfoItem*);
 
 private slots:
     void on_comboBox_mode_currentIndexChanged(int index);
@@ -51,9 +65,6 @@ private slots:
     void collapsed(const QModelIndex& index);
 
     void onSliderMoved();
-
-    void on_pushButton_slider_clicked();
-    void on_pushButton_header_clicked();
 
 public slots:
 //    void repaintDtHeader();
@@ -74,6 +85,8 @@ private slots:
 private:
     void updatePos(GanttInfoNode* from);
     void updatePosHelper(GanttInfoItem* item);
+
+    static void connectSignalsToNewItems(GanttInfoItem* items,GanttTreeView* view,GanttScene* scene);
 
 private:
     Ui::GanttWidget *ui;

@@ -36,6 +36,8 @@ public:
     UtcDateTime minDt() const;
     UtcDateTime maxDt() const;
 
+    bool draw() const;
+    void setDraw(bool draw);
 
 protected:
     void mouseMoveEvent(QGraphicsSceneMouseEvent *event);
@@ -46,6 +48,7 @@ protected:
 
 signals:
     void dtChanged(UtcDateTime dt);
+    void drawChanged(bool);
 
 public slots:
     void makeStep(long long deltaVal);
@@ -78,6 +81,7 @@ private:
     GanttScene* m_scene;
 
     bool m_initialized;
+    bool m_draw;
 };
 
 #endif // GANTTCURRENTTIMESLIDER_H

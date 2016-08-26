@@ -30,6 +30,9 @@ private slots:
     void on_checkBox_syncAxisX_toggled(bool checked);
     void on_pushButton_clicked();
     void on_checkBox_showLegend_toggled(bool checked);
+    void on_pushButton_ganttAddItems_clicked();
+    void on_pushButton_ganttClear_clicked();
+    void on_radioButton_ganttPlayer_toggled(bool checked);
 };
 
 #endif // MAINWINDOW_H

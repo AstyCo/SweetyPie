@@ -2,6 +2,7 @@
 #include "ganttwidget.h"
 #include "ganttscene.h"
 #include "gantttreeview.h"
+#include "ganttinfonode.h"
 
 #include <QResizeEvent>
 #include <QScrollBar>
@@ -106,6 +107,15 @@ void GanttGraphicsView::setHSliderHeight(int hSliderHeight)
     m_hSliderHeight = hSliderHeight;
     horizontalScrollBar()->setStyleSheet(
                 QString("QScrollBar {height:%1px;}").arg(m_hSliderHeight));
+}
+
+void GanttGraphicsView::changeNodeExpanding()
+{
+    GanttInfoNode *p_node = qobject_cast<GanttInfoNode*>(sender());
+    if(p_node)
+    {
+        changeExpanding(p_node->index());
+    }
 }
 
 

@@ -186,8 +186,7 @@ void GanttPlayerControl::uncheckAll()
 
     if(m_timer.first)
     {
-        disconnect(m_timer.first,SIGNAL(timeout()));
-        delete m_timer.first;
+        m_timer.first->deleteLater();
         m_timer.first = NULL;
     }
 }

@@ -17,7 +17,7 @@
 GanttIntervalSlider::GanttIntervalSlider(QWidget *parent )
     : IntervalSlider(parent)
 {
-
+    m_drawCurrentDt = false;
     setOffsetV(7);
     setHandleSize(6);
     setSliderV(8);
@@ -121,6 +121,8 @@ void GanttIntervalSlider::drawSliderLine(QPainter *painter, const QRect &sliderR
 
 void GanttIntervalSlider::drawCurrentTime(QPainter *painter, const QRect &sliderRect) const
 {
+    if(!m_drawCurrentDt)
+        return;
     QRect currentTimeRect(valueToPoint(dtToVal(m_currentTime),NoHandle)
                           - (m_currentTimeRectWidth)/2,
                           sliderRect.y(),
@@ -428,6 +430,11 @@ void GanttIntervalSlider::setCurrentTime(const UtcDateTime &dt)
     m_currentTime  = dt;
 
     update();
+}
+
+void GanttIntervalSlider::setDrawCurrentDt(bool draw)
+{
+    m_drawCurrentDt = draw;
 }
 
 void GanttIntervalSlider::checkLimits(const UtcDateTime &start, const UtcDateTime &finish)

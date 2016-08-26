@@ -1,7 +1,6 @@
 #ifndef GANTTINFONODE_H
 #define GANTTINFONODE_H
 
-#include "ganttinfoitem.h"
 #include "ganttinfoleaf.h"
 
 #include <QList>
@@ -10,8 +9,10 @@
 class GanttHeader;
 class GanttScene;
 
-class GanttInfoNode : public GanttInfoItem
+class GANTTMODELSHARED_EXPORT GanttInfoNode : public GanttInfoItem
 {
+    Q_OBJECT
+
 public:
     GanttInfoNode(QObject *parent = NULL);
 
@@ -20,9 +21,11 @@ public:
     GanttInfoItem *child(int index) const;
 
     int size() const;
-
+    bool isEmpty() const;
+    void clear();
     void append(GanttInfoItem* item);
     void append(const QList<GanttInfoItem*>& items);
+    bool removeOne(GanttInfoItem* item);
 
     int columnCount() const;
 
@@ -31,12 +34,21 @@ public:
     bool isExpanded() const;
     void setIsExpanded(bool isExpanded);
 
+    UtcDateTime calcDt() const;
+    void setCalcDt(const UtcDateTime &calcDt);
+    void callForEachItemRecursively(void (*func)(GanttInfoItem*));
+    
+signals:
+    void itemsChanged();
+    void calcDtChanged();
+    
 protected:
     int indexOf(const GanttInfoItem * p_item) const;
 
 private:
     QList<GanttInfoItem*> m_items;
-
+    
+    UtcDateTime m_calcDt;
     bool m_isExpanded;
 
     friend class GanttInfoItem;

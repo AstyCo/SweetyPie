@@ -6,11 +6,17 @@
 GanttInfoItem::GanttInfoItem(QObject *parent)
     :QObject(parent)
 {
+    m_linkCnt = 0;
+    m_deleted = false;
     m_parent = NULL;
 
     connect(this,SIGNAL(indexChanged()),this,SIGNAL(changed()));
     connect(this,SIGNAL(titleChanged()),this,SIGNAL(changed()));
     connect(this,SIGNAL(parentChanged()),this,SIGNAL(changed()));
+}
+
+GanttInfoItem::~GanttInfoItem()
+{
 }
 
 QString GanttInfoItem::title() const
@@ -40,9 +46,21 @@ int GanttInfoItem::indexOf(const GanttInfoItem* p_item) const
     return -1;
 }
 
+
 QModelIndex GanttInfoItem::index() const
 {
     return m_index;
+}
+
+void GanttInfoItem::increaseLinkCnt()
+{
+    ++m_linkCnt;
+}
+
+void GanttInfoItem::reduceLinkCnt()
+{
+    --m_linkCnt;
+    tryDeleteHimself();
 }
 
 void GanttInfoItem::setIndex(const QModelIndex &index)
@@ -61,6 +79,26 @@ void GanttInfoItem::setParent(GanttInfoNode *parent)
 
     m_parent = parent;
     emit parentChanged();
+}
+
+void GanttInfoItem::deleteInfoItem()
+{
+    emit aboutToBeDeleted();
+    tryDeleteHimself();
+}
+
+void GanttInfoItem::tryDeleteHimself()
+{
+    if(m_linkCnt>0)
+        return;
+
+    m_mutex.lock();
+    if(!m_deleted)
+    {
+        this->deleteLater();
+        m_deleted = true;
+    }
+    m_mutex.unlock();
 }
 
 qreal GanttInfoItem::pos() const

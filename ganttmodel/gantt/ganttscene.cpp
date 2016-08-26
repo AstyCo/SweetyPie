@@ -1,4 +1,5 @@
 #include "ganttscene.h"
+#include "ganttheader.h"
 
 #include "ganttgraphicsview.h"
 #include "ganttgraphicsitem.h"
@@ -101,9 +102,11 @@ void GanttScene::addItems(GanttInfoItem* item)
     m_header->onItemsAddition(item);
     addItemsHelper(item);
 
-    QRectF _sceneRect = sceneRect();
-    setSceneRect(_sceneRect.x(),_sceneRect.y(),_sceneRect.width()
-                 ,_sceneRect.height() + DEFAULT_ITEM_HEIGHT);
+    updateSceneRect();
+
+//    QRectF _sceneRect = sceneRect();
+//    setSceneRect(_sceneRect.x(),_sceneRect.y(),_sceneRect.width()
+//                 ,_sceneRect.height() + DEFAULT_ITEM_HEIGHT);
 }
 
 void GanttScene::addItems(const QList<GanttInfoItem *> &items)
@@ -113,9 +116,11 @@ void GanttScene::addItems(const QList<GanttInfoItem *> &items)
     foreach(GanttInfoItem* item, items)
         addItemsHelper(item);
 
-    QRectF _sceneRect = sceneRect();
-    setSceneRect(_sceneRect.x(),_sceneRect.y(),_sceneRect.width()
-                 ,_sceneRect.height() + items.count() * DEFAULT_ITEM_HEIGHT);
+    updateSceneRect();
+
+//    QRectF _sceneRect = sceneRect();
+//    setSceneRect(_sceneRect.x(),_sceneRect.y(),_sceneRect.width()
+//                 ,_sceneRect.height() + items.count() * DEFAULT_ITEM_HEIGHT);
 }
 
 GanttGraphicsItem *GanttScene::itemByInfo(const GanttInfoLeaf * key) const
@@ -140,6 +145,18 @@ void GanttScene::onViewResize(const QSize&newSize)
     updateSliderRect();
     emit viewResized();
 
+}
+
+void GanttScene::updateSceneRect()
+{
+    if(m_items.isEmpty())
+    {
+        setSceneRect(m_header->mapRectToScene(m_header->boundingRect()));
+    }
+    else
+        setSceneRect(itemsBoundingRect());
+
+    updateSliderRect();
 }
 
 void GanttScene::makeStep(long long step)
@@ -279,6 +296,27 @@ void GanttScene::onLeafFinishChanged(/*const UtcDateTime& lastFinish*/)
     m_infoByFinish.remove(m_infoByFinish.key(p_leaf));
     m_infoByFinish.insert(p_leaf->start(),p_leaf);
 }
+const QList<GanttGraphicsItem *>& GanttScene::dtItems() const
+{
+    return m_items;
+}
+
+void GanttScene::removeItem(QGraphicsItem *item)
+{
+//    GanttGraphicsItem* ganttItem = dynamic_cast<GanttGraphicsItem*>(item);
+//    if(ganttItem)
+//    {
+//        m_items.removeOne(ganttItem);
+//    }
+    QGraphicsScene::removeItem(item);
+}
+
+void GanttScene::setDrawCurrentDtSlider(bool enable)
+{
+    if(m_slider)
+        m_slider->setDraw(enable);
+}
+
 
 void GanttScene::updateSlider()
 {
@@ -296,6 +334,9 @@ void GanttScene::addItemsHelper(GanttInfoItem *item)
     {
         GanttGraphicsItem *p_item = new GanttGraphicsItem(leaf);
 
+        connect(p_item,SIGNAL(graphicsItemHoverEnter()),this,SLOT(onGraphicsItemHoverEnter()));
+        connect(p_item,SIGNAL(graphicsItemHoverLeave()),this,SLOT(onGraphicsItemHoverLeave()));
+
 
         p_item->setScene(this);
         p_item->setHeader(m_header);
@@ -303,13 +344,8 @@ void GanttScene::addItemsHelper(GanttInfoItem *item)
         m_items.append(p_item);
         m_itemByInfo.insert(leaf,p_item);
         m_infoByStart.insert(leaf->start(),leaf);
-        connect(leaf,SIGNAL(startChanged()),this,SLOT(onLeafStartChanged()));
         m_infoByFinish.insert(leaf->finish(),leaf);
-        connect(leaf,SIGNAL(finishChanged()),this,SLOT(onLeafFinishChanged()));
         p_item->updateItemGeometry();
-
-        connect(leaf,SIGNAL(changed()),this,SLOT(onInfoChanged()));
-
     }
     else
     {
@@ -328,18 +364,42 @@ void GanttScene::updateItems()
     for(int i = 0; i < m_items.size(); ++i)
     {
         GanttInfoLeaf* p_info = m_items[i]->info();
-        qreal startPos = m_header->dtToX(p_info->start()),
-              itemWidth = m_header->dtToX(p_info->finish()) - startPos;
-        qreal top = m_items[i]->rect().top(),
-                height = m_items[i]->rect().height();
+        if(p_info)
+        {
+            qreal startPos = m_header->dtToX(p_info->start()),
+                    itemWidth = m_header->dtToX(p_info->finish()) - startPos;
+            qreal top = m_items[i]->rect().top(),
+                    height = m_items[i]->rect().height();
 
 
-        m_items[i]->setPos(startPos, top);
-        m_items[i]->setBoundingRectSize(QSizeF(itemWidth, height));
+            m_items[i]->setPos(startPos, top);
+            m_items[i]->setBoundingRectSize(QSizeF(itemWidth, height));
+        }
     }
 
 
     update();
+}
+
+void GanttScene::onGraphicsItemHoverEnter()
+{
+    GanttGraphicsItem *item = qobject_cast<GanttGraphicsItem*>(sender());
+    if(item)
+        emit graphicsItemHoverEnter(item->info());
+}
+
+void GanttScene::onGraphicsItemHoverLeave()
+{
+    GanttGraphicsItem *item = qobject_cast<GanttGraphicsItem*>(sender());
+    if(item)
+        emit graphicsItemHoverLeave(item->info());
+}
+
+void GanttScene::onInfoLeafDelete()
+{
+    const GanttInfoLeaf* leaf = static_cast<const GanttInfoLeaf*>(sender());
+    removeByInfoLeaf(leaf);
+    QList<QGraphicsItem*> p_items = items();
 }
 
 void GanttScene::onInfoChanged()
@@ -569,6 +629,31 @@ const GanttInfoLeaf *GanttScene::prevEvent(const UtcDateTime &curDt) const
     }
 
     return NULL;
+}
+
+void GanttScene::removeByInfo(const GanttInfoItem *item)
+{ 
+}
+
+void GanttScene::removeByInfoLeaf(const GanttInfoLeaf *leaf)
+{
+    if(!leaf)
+        return;
+
+    GanttGraphicsItem* graphicsItem = itemByInfo(leaf);
+    if(graphicsItem)
+        m_items.removeOne(graphicsItem);
+    m_itemByInfo.remove(leaf);
+    m_infoByStart.remove(m_infoByStart.key(leaf));
+    m_infoByFinish.remove(m_infoByFinish.key(leaf));
+    if(graphicsItem)
+        graphicsItem->deleteLater();
+}
+
+void GanttScene::setEmpty(bool empty)
+{
+    if(m_header)
+        m_header->setEmpty(empty);
 }
 
 void GanttScene::updateSliderRect()

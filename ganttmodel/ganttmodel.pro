@@ -103,7 +103,8 @@ SOURCES += \
     gantt/ganttheader.cpp \
     gantt/ganttgraphicsview.cpp \
     gantt/ganttgraphicsitem.cpp \
-    appeventfilter.cpp
+    appeventfilter.cpp \
+    gantt/ganttcalcgraphicsitem.cpp
 
 
 HEADERS += \
@@ -152,7 +153,8 @@ HEADERS += \
     gantt/ganttgraphicsitem.h \
     gantt/ganttglobalvalues.h \
     ganttproject_global.h \
-    appeventfilter.h
+    appeventfilter.h \
+    gantt/ganttcalcgraphicsitem.h
 
 
 RESOURCES += \

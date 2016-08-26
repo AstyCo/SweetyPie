@@ -1042,6 +1042,11 @@ void GanttHeader::updateStretchFactor()
 {
     m_stretchFactor = modeToMicrosecond(m_mode) * 1.0 / getCoef(m_startDt,m_finishDt);
 }
+void GanttHeader::setEmpty(bool isEmpty)
+{
+    m_isEmpty = isEmpty;
+}
+
 void GanttHeader::setVisItemCount(int visItemCount)
 {
     m_visItemCount = qMax(1,visItemCount);

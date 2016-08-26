@@ -1,0 +1,28 @@
+<RCC>
+    <qresource prefix="/">
+        <file>Buttons 64x64/back_off_64.png</file>
+        <file>Buttons 64x64/back_on_64.png</file>
+        <file>Buttons 64x64/back_step_off_64.png</file>
+        <file>Buttons 64x64/back_step_on_64.png</file>
+        <file>Buttons 64x64/begin_off_64.png</file>
+        <file>Buttons 64x64/begin_on_64.png</file>
+        <file>Buttons 64x64/end_off_64.png</file>
+        <file>Buttons 64x64/end_on_64.png</file>
+        <file>Buttons 64x64/forward_off_64.png</file>
+        <file>Buttons 64x64/forward_on_64.png</file>
+        <file>Buttons 64x64/forward_step_off_64.png</file>
+        <file>Buttons 64x64/forward_step_on_64.png</file>
+        <file>Buttons 64x64/next_off_64.png</file>
+        <file>Buttons 64x64/next_on_64.png</file>
+        <file>Buttons 64x64/pause_off_64.png</file>
+        <file>Buttons 64x64/pause_on_64.png</file>
+        <file>Buttons 64x64/prev_off_64.png</file>
+        <file>Buttons 64x64/prev_on_64.png</file>
+        <file>Buttons 64x64/rec_off_64.png</file>
+        <file>Buttons 64x64/rec_on_64.png</file>
+        <file>Buttons 64x64/reg_speed_on_64.png</file>
+        <file>Buttons 64x64/reg_step_on_64.png</file>
+        <file>Buttons 64x64/stop_off_64.png</file>
+        <file>Buttons 64x64/stop_on_64.png</file>
+    </qresource>
+</RCC>

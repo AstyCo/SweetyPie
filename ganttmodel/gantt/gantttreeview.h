@@ -7,6 +7,9 @@
 
 class GanttGraphicsView;
 class GanttHeaderView;
+class GanttTreeModel;
+class GanttInfoNode;
+class GanttInfoItem;
 
 class GanttTreeView : public QTreeView
 {
@@ -16,10 +19,12 @@ public:
     GanttTreeView(QWidget * parent = 0);
 
     void setGraphicsView(GanttGraphicsView *graphicsView);
-
+    void setModel(QAbstractItemModel *model);
 
 public slots:
     void repaintHeader();
+    void updateVisibility();
+    void updateItemVisibility(const GanttInfoItem* = NULL);
 
 protected:
     void scrollContentsBy(int dx, int dy);
@@ -28,9 +33,13 @@ protected:
     void leaveEvent(QEvent *);
 
 private:
+    void updateVisibilityHelper(const GanttInfoNode* node);
+
+private:
 
     GanttGraphicsView* m_graphicsView;
     GanttHeaderView* m_header;
+    GanttTreeModel *m_model;
 
     int m_hSliderHeight;
 

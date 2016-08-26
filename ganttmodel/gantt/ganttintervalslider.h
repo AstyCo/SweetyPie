@@ -49,6 +49,7 @@ private:
 
 public slots:
     void setCurrentTime(const UtcDateTime &dt);
+    void setDrawCurrentDt(bool draw);
     void checkLimits(const UtcDateTime &start, const UtcDateTime &finish);
     void updateRange();
     void setMinTimeSize(long long minTimeSize);
@@ -78,6 +79,7 @@ private:
     long long m_shiftRange;
     long long m_minTimeSize;
     QPoint m_lastPos;
+    bool m_drawCurrentDt;
 };
 
 #endif // GANTTSLIDER_H

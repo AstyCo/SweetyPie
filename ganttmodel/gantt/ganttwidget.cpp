@@ -20,6 +20,9 @@ GanttWidget::GanttWidget(QWidget *parent) :
 {
     ui->setupUi(this);
 
+    ui->playerControl->hide();
+    ui->playerSettings->hide();
+
     if(layout())
     {
         layout()->setMargin(0);
@@ -44,7 +47,13 @@ GanttWidget::GanttWidget(QWidget *parent) :
 
     ui->playerControl->setSettings(ui->playerSettings);
 
+    connect(m_scene,SIGNAL(graphicsItemHoverEnter(const GanttInfoItem*)),this,SIGNAL(graphicsItemHoverEnter(const GanttInfoItem*)));
+    connect(m_scene,SIGNAL(graphicsItemHoverLeave(const GanttInfoItem*)),this,SIGNAL(graphicsItemHoverLeave(const GanttInfoItem*)));
+
+
     connect(m_scene->slider(),SIGNAL(dtChanged(UtcDateTime)),ui->intervalSlider,SLOT(setCurrentTime(UtcDateTime)));
+    connect(m_scene->slider(),SIGNAL(drawChanged(bool)),ui->intervalSlider,SLOT(setDrawCurrentDt(bool)));
+
 
     connect(ui->ganttView, SIGNAL(viewResized(QSize)),m_scene,SLOT(onViewResize(QSize)));
     connect(ui->ganttView, SIGNAL(viewResized(QSize)),ui->intervalSlider,SLOT(updateRange()));
@@ -72,11 +81,6 @@ GanttWidget::GanttWidget(QWidget *parent) :
 
     connect(m_scene,SIGNAL(currentDtChanged(UtcDateTime)),ui->treeView,SLOT(repaintHeader()));
 
-
-
-    QList<GanttInfoItem*> testList = generateTest();
-
-    addItems(testList);
 }
 
 GanttWidget::~GanttWidget()
@@ -84,18 +88,38 @@ GanttWidget::~GanttWidget()
     delete ui;
 }
 
+void GanttWidget::showPlayer(bool show)
+{
+    ui->playerControl->setVisible(show);
+    ui->playerSettings->setVisible(show);
+
+    if(m_scene)
+        m_scene->setDrawCurrentDtSlider(show);
+}
+
 void GanttWidget::addItems(GanttInfoItem* item)
 {
+    if(!m_scene)
+    {
+        Q_ASSERT(false);
+        return;
+    }
 
     m_model->addItems(item);
     m_scene->addItems(item);
 
+    callForEachItem(item,ui->treeView,m_scene,
+                    &connectSignalsToNewItems);
 }
 
 void GanttWidget::addItems(const QList<GanttInfoItem *> &items)
 {
     m_model->addItems(items);
     m_scene->addItems(items);
+
+    foreach(GanttInfoItem* item,items)
+        callForEachItem(item,ui->treeView,m_scene,
+                        &connectSignalsToNewItems);
 }
 
 
@@ -140,9 +164,11 @@ void GanttWidget::on_comboBox_mode_currentIndexChanged(int index)
 void GanttWidget::expanded(const QModelIndex &index)
 {
     GanttInfoNode * node = m_model->nodeForIndex(index);
-    node->setIsExpanded(true);
-
-    return updatePos(node);
+    if(node)
+    {
+        node->setIsExpanded(true);
+        updatePos(node);
+    }
 }
 
 void GanttWidget::collapsed(const QModelIndex &index)
@@ -203,6 +229,37 @@ void GanttWidget::updatePosHelper(GanttInfoItem *item)
     }
 }
 
+void GanttWidget::connectSignalsToNewItems(GanttInfoItem *item,GanttTreeView* view,GanttScene* scene)
+{
+//    GanttInfoNode *node = qobject_cast<GanttInfoNode*>(item);
+
+//    if(node)
+//    {
+//        connect(node,SIGNAL(itemsChanged()),view,SLOT(updateItemVisibility()));
+//    }
+    if(!item)
+        return;
+
+//    connect(item,SIGNAL(deleted()),scene,SLOT(onInfoDelete()));
+
+
+    GanttInfoLeaf *leaf = qobject_cast<GanttInfoLeaf*>(item);
+
+    if(leaf)
+    {
+        if(scene)
+        {
+            connect(leaf,SIGNAL(startChanged()),scene,SLOT(onLeafStartChanged()));
+            connect(leaf,SIGNAL(finishChanged()),scene,SLOT(onLeafFinishChanged()));
+            connect(leaf,SIGNAL(changed()),scene,SLOT(onInfoChanged()));
+
+            connect(leaf,SIGNAL(aboutToBeDeleted()),scene,SLOT(onInfoLeafDelete()));
+
+        }
+
+    }
+}
+
 UtcDateTime GanttWidget::maxDt() const
 {
     return m_maxDt;
@@ -213,6 +270,35 @@ const UtcDateTime &GanttWidget::outerMaxt() const
     if(m_stackLimits.isEmpty())
         return maxDt();
     return m_stackLimits.at(0).second;
+}
+
+GanttInfoNode *GanttWidget::nodeByName(const QString &title) const
+{
+    return dynamic_cast<GanttInfoNode*>(m_model->itemForName(title));
+}
+
+void GanttWidget::callForEachItem(GanttInfoItem *item,GanttTreeView* view,GanttScene* scene,
+                                  void (*func)(GanttInfoItem *,GanttTreeView*,GanttScene*))
+{
+    if(!item)
+        return;
+    (*func)(item,view,scene);
+
+    GanttInfoNode *p_node = qobject_cast<GanttInfoNode*>(item);
+    if(p_node)
+    {
+        for(int i = 0; i < p_node->size(); ++i)
+            callForEachItem(p_node->child(i) , view, scene
+                            ,func);
+    }
+}
+
+void GanttWidget::clear()
+{
+    if(m_model)
+        m_model->clear();
+
+//    ui->treeView->update();
 }
 
 
@@ -228,30 +314,6 @@ const UtcDateTime &GanttWidget::outerMinDt() const
     return m_stackLimits.at(0).first;
 }
 
-
-
-
-
-
-void GanttWidget::on_pushButton_slider_clicked()
-{
-    //    m_scene->slider()->setVisible(!(m_scene->slider()->isVisible()));
-
-    if(UtcDateTime(m_scene->m_header->m_minDt).addSecs(13*SECONDS_IN_MINUTE) > UtcDateTime(m_scene->m_header->m_maxDt).addSecs(-13*SECONDS_IN_MINUTE))
-        m_scene->setRange( UtcDateTime(m_scene->m_header->m_minDt).addSecs(SECONDS_IN_MINUTE/2)
-                           ,UtcDateTime(m_scene->m_header->m_maxDt).addSecs(-SECONDS_IN_MINUTE/2) );
-    else
-        m_scene->setRange( UtcDateTime(m_scene->m_header->m_minDt).addSecs(13*SECONDS_IN_MINUTE)
-                           ,UtcDateTime(m_scene->m_header->m_maxDt).addSecs(-13*SECONDS_IN_MINUTE) );
-}
-
-void GanttWidget::on_pushButton_header_clicked()
-{
-    if(m_scene->headerMode() == GanttHeader::TimelineMode)
-        m_scene->setHeaderMode(GanttHeader::GanttDiagramMode);
-    else
-        m_scene->setHeaderMode(GanttHeader::TimelineMode);
-}
 
 
 void GanttWidget::updateRange(const UtcDateTime& min, const UtcDateTime& max)
@@ -296,6 +358,7 @@ void GanttWidget::newLimits(const UtcDateTime &min, const UtcDateTime &max)
 {
     if(min == m_minDt && max == m_maxDt)
         return;
+
     pushLimits();
     updateRange(min,max);
 }
@@ -319,7 +382,7 @@ void GanttWidget::pushLimits()
 QList<GanttInfoItem*> generateTest()
 {
     QList<GanttInfoItem*> testList;
-    for(int i = 0; i<1000; ++i)
+    for(int i = 0; i<5000; ++i)
     {
         GanttInfoNode *node = new GanttInfoNode;
 

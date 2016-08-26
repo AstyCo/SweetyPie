@@ -19,6 +19,11 @@ GanttTreeModel::GanttTreeModel(GanttInfoNode *root,QObject * parent)
     initIndexes(m_root);
 }
 
+GanttTreeModel::~GanttTreeModel()
+{
+    clear();
+}
+
 QVariant GanttTreeModel::data(const QModelIndex &index, int role) const
 {
     if(!index.isValid())
@@ -176,10 +181,58 @@ void GanttTreeModel::initIndexes(GanttInfoItem *item)
     GanttInfoNode *p_node = dynamic_cast<GanttInfoNode*>(item);
     if(p_node)
     {
-        for(int i = 0; i < p_node->size(); ++i)
-            initIndexes(p_node->child(i));
+        if(!p_node->isEmpty())
+        {
+            beginInsertRows(p_node->index(),0, p_node->size() - 1);
+            for(int i = 0; i < p_node->size(); ++i)
+                initIndexes(p_node->child(i));
+            endInsertRows();
+        }
     }
 }
+
+GanttInfoItem *GanttTreeModel::itemForNameHelper(const QString &title,GanttInfoNode* node) const
+{
+    if(!node)
+        return NULL;
+
+    for(int i = 0; i < node->size(); ++i)
+    {
+        GanttInfoItem *p_item = node->child(i) , *tmp;
+        if(p_item->title() == title)
+            return p_item;
+
+        GanttInfoNode *p_node = dynamic_cast<GanttInfoNode*>(p_item);
+        if(p_node && (tmp = itemForNameHelper(title,p_node)))
+            return tmp;
+    }
+    return NULL;
+}
+GanttInfoNode *GanttTreeModel::root() const
+{
+    return m_root;
+}
+
+
+void deleteFunc(GanttInfoItem* item)
+{
+    GanttInfoNode *parent = item->parent();
+
+    if(parent)
+    {
+        item->deleteInfoItem();
+    }
+}
+
+void GanttTreeModel::clear()
+{
+    beginRemoveRows(QModelIndex(),0,m_root->size());
+    m_root->callForEachItemRecursively(&deleteFunc);
+    m_root->clear();
+    endRemoveRows();
+
+}
+
 
 
 
@@ -284,12 +337,21 @@ void GanttTreeModel::addItems(const QList<GanttInfoItem *> &items)
 {
     m_root->append(items);
     initIndexes(m_root);
+
+    emit itemsAdded();
 }
 
 void GanttTreeModel::addItems(GanttInfoItem *item)
 {
     m_root->append(item);
     initIndexes(m_root);
+
+    emit itemsAdded(item);
+}
+
+GanttInfoItem *GanttTreeModel::itemForName(const QString &title) const
+{
+    return itemForNameHelper(title,m_root);
 }
 
 
