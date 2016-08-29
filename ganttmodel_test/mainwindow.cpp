@@ -24,7 +24,7 @@ MainWindow::MainWindow(QWidget *parent) :
   testChartWidget();
   testChartGroupWidget();
   testGanttModel();
-//  testMemoryPlanningWidget();
+  testMemoryPlanningWidget();
 }
 
 MainWindow::~MainWindow()
@@ -109,6 +109,15 @@ QList<GanttInfoItem*> generateTest()
         GanttInfoNode *node = new GanttInfoNode;
 
         node->setTitle("node"+QString::number(i));
+        int year = 2014 + qrand()%2,
+                month = 1 + qrand()%3,
+                day = 1 + qrand()%2,
+                hour = qrand()%2,
+                minute = qrand()%60,
+                sec = qrand()%60,
+                microsec = qrand()%1000000;
+
+        node->setCalcDt(UtcDateTime(year,month,day,hour,minute,sec,microsec));
 
         QColor color = QColor::fromRgb(qrand()%255,qrand()%255,qrand()%255);
         int max = qrand()%4;
@@ -177,7 +186,7 @@ void MainWindow::testMemoryPlanningWidget()
         newPeace.setStart(vacantPos);
         vacantPos+=memoryPeaceLength;
 
-        if(vacantPos>16000)
+        if(vacantPos>20000)
             break;
 
         newPeace.setFinish(vacantPos);
@@ -195,10 +204,11 @@ void MainWindow::testMemoryPlanningWidget()
     // end init values
 
     KaMemory kaMemory;
-    kaMemory.init(records,16000);
+    kaMemory.init(records,20000);
 
     MGridScene * scene = ui->memoryPlanningWidget->gridScene();
     ui->memoryPlanningWidget->setMemory(kaMemory);
+    scene->setLimits(200,1750);
     ui->memoryPlanningWidget->setShowButtons(true);
 }
 

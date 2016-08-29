@@ -3,13 +3,14 @@
 
 
 #include "ganttheader.h"
-#include "ganttcurrenttimeslider.h"
+#include "ganttcurrentdtslider.h"
 
 #include <QGraphicsScene>
 #include <QMap>
 
 class GanttGraphicsView;
-class GanttGraphicsItem;
+class GanttGraphicsObject;
+class GanttCalcGraphicsObject;
 
 class QModelIndex;
 
@@ -31,7 +32,7 @@ public:
     void addItems(GanttInfoItem* items);
     void addItems(const QList<GanttInfoItem*>& items);
 
-    GanttGraphicsItem* itemByInfo(const GanttInfoLeaf* key) const;
+    QGraphicsObject* itemByInfo(const GanttInfoItem *key) const;
 
     void updateHeaderPos(int dy);
     void updateSliderRect();
@@ -45,7 +46,7 @@ public:
 
     UtcDateTime slidersDt() const;
 
-    GanttSlider *slider() const;
+    GanttCurrentDtSlider *slider() const;
 
     void setRange(UtcDateTime min, UtcDateTime max);
 
@@ -83,10 +84,15 @@ public:
     void removeByInfoLeaf(const GanttInfoLeaf* leaf);
     void setEmpty(bool empty);
 
-    const QList<GanttGraphicsItem *>& dtItems() const;
+    const QList<GanttGraphicsObject *>& dtItems() const;
     void removeItem(QGraphicsItem *item);
 
     void setDrawCurrentDtSlider(bool enable);
+
+    QGraphicsItem *currentItem() const;
+
+    void setSceneRect(const QRectF &rect);
+    void setSceneRect(qreal x,qreal y, qreal width, qreal height);
 
 signals:
     void limitsChanged(const UtcDateTime &start, const UtcDateTime &finish);
@@ -97,6 +103,7 @@ signals:
     void graphicsItemHoverEnter(const GanttInfoItem*);
     void graphicsItemHoverLeave(const GanttInfoItem*);
 
+    void currentItemChanged(QGraphicsItem*);
 
 
 
@@ -110,6 +117,7 @@ public slots:
     void moveSliderToViewStart();
     void moveSliderToViewFinish();
     void moveSliderToStart();
+    void setCurrentItem(QGraphicsItem *currentItem);
 
 
 
@@ -126,7 +134,7 @@ private slots:
     void onGraphicsItemHoverEnter();
     void onGraphicsItemHoverLeave();
 
-
+    void onInfoDelete();
     void onInfoLeafDelete();
     void onInfoChanged();
     void onLeafStartChanged();
@@ -134,12 +142,14 @@ private slots:
 
 private:
 
-    QList<GanttGraphicsItem*> m_items;
-    QMap<const GanttInfoLeaf*, GanttGraphicsItem*> m_itemByInfo;
+    QList<GanttGraphicsObject*> m_items;
+    QList<GanttCalcGraphicsObject*> m_calcItems;
+    QMap<const /*GanttInfoLeaf*/GanttInfoItem*, /*GanttGraphicsObject*/QGraphicsObject*> m_itemByInfo;
     QMap<UtcDateTime,const GanttInfoLeaf*> m_infoByStart,
                                             m_infoByFinish;
     GanttHeader *m_header;
-    GanttSlider *m_slider;
+    GanttCurrentDtSlider *m_slider;
+    QGraphicsItem *m_currentItem;
 
     friend class GanttWidget;
 };

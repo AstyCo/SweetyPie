@@ -2,7 +2,8 @@
 #include "ganttheader.h"
 
 #include "ganttgraphicsview.h"
-#include "ganttgraphicsitem.h"
+#include "ganttgraphicsobject.h"
+#include "ganttcalcgraphicsobject.h"
 
 #include "ganttinfoleaf.h"
 #include "ganttinfonode.h"
@@ -20,13 +21,13 @@
 GanttScene::GanttScene(QObject * parent) :
     QGraphicsScene(parent)
 {
-    setItemIndexMethod(QGraphicsScene::NoIndex);
+    m_currentItem = NULL;
 
     setSceneRect(0,0,GANTTSCENE_MIN_WIDTH,0);
 
     m_header = new GanttHeader;
     m_header->setScene(this);
-    m_slider = new GanttSlider;
+    m_slider = new GanttCurrentDtSlider;
     m_slider->setScene(this);
 
     connect(m_slider,SIGNAL(dtChanged(UtcDateTime)),this,SIGNAL(currentDtChanged(UtcDateTime)));
@@ -123,7 +124,7 @@ void GanttScene::addItems(const QList<GanttInfoItem *> &items)
 //                 ,_sceneRect.height() + items.count() * DEFAULT_ITEM_HEIGHT);
 }
 
-GanttGraphicsItem *GanttScene::itemByInfo(const GanttInfoLeaf * key) const
+QGraphicsObject *GanttScene::itemByInfo(const GanttInfoItem *key) const
 {
     return m_itemByInfo.value(key);
 }
@@ -149,9 +150,10 @@ void GanttScene::onViewResize(const QSize&newSize)
 
 void GanttScene::updateSceneRect()
 {
-    if(m_items.isEmpty())
+    if(m_items.isEmpty() && m_calcItems.isEmpty())
     {
-        setSceneRect(m_header->mapRectToScene(m_header->boundingRect()));
+        if(m_header)
+            setSceneRect(m_header->mapRectToScene(m_header->boundingRect()));
     }
     else
         setSceneRect(itemsBoundingRect());
@@ -296,14 +298,64 @@ void GanttScene::onLeafFinishChanged(/*const UtcDateTime& lastFinish*/)
     m_infoByFinish.remove(m_infoByFinish.key(p_leaf));
     m_infoByFinish.insert(p_leaf->start(),p_leaf);
 }
-const QList<GanttGraphicsItem *>& GanttScene::dtItems() const
+
+QGraphicsItem *GanttScene::currentItem() const
+{
+    return m_currentItem;
+}
+
+void GanttScene::setSceneRect(const QRectF &rect)
+{
+    QGraphicsScene::setSceneRect(rect);
+    if(!views().isEmpty())
+    {
+        QScrollBar *bar = views()[0]->verticalScrollBar();
+        bar->setMaximum(rect.height());
+    }
+}
+
+void GanttScene::setSceneRect(qreal x, qreal y, qreal width, qreal height)
+{
+    setSceneRect(QRectF(x,y,width,height));
+}
+
+void GanttScene::setCurrentItem(QGraphicsItem *currentItem)
+{
+    if(m_currentItem == currentItem)
+        return;
+
+    m_currentItem = currentItem;
+    if(m_currentItem && !views().isEmpty())
+    {
+        QGraphicsView *p_view = views()[0];
+        GanttGraphicsObject* graphicsItem = dynamic_cast<GanttGraphicsObject*>(m_currentItem);
+        if(graphicsItem)
+        {
+            qDebug() <<"pos: " << QString::number(graphicsItem->info()->pos());
+            p_view->verticalScrollBar()->setValue(graphicsItem->info()->pos() - 2*DEFAULT_ITEM_HEIGHT);
+        }
+
+        GanttCalcGraphicsObject* calcGraphicsItem = dynamic_cast<GanttCalcGraphicsObject*>(m_currentItem);
+        if(calcGraphicsItem)
+        {
+            qDebug() <<"pos: " << QString::number(calcGraphicsItem->info()->pos());
+//            int sliderMax = p_view->verticalScrollBar()->maximum();
+            p_view->verticalScrollBar()->setValue(calcGraphicsItem->info()->pos() - 2*DEFAULT_ITEM_HEIGHT);
+        }
+
+
+    }
+
+    emit currentItemChanged(m_currentItem);
+}
+const QList<GanttGraphicsObject *>& GanttScene::dtItems() const
 {
     return m_items;
 }
 
 void GanttScene::removeItem(QGraphicsItem *item)
 {
-//    GanttGraphicsItem* ganttItem = dynamic_cast<GanttGraphicsItem*>(item);
+    //    GanttGraphicsItem* ganttItem = dynamic_cast<GanttGraphicsItem*>(item);
 //    if(ganttItem)
 //    {
 //        m_items.removeOne(ganttItem);
@@ -332,7 +384,7 @@ void GanttScene::addItemsHelper(GanttInfoItem *item)
     GanttInfoLeaf *leaf = dynamic_cast<GanttInfoLeaf*>(item);
     if(leaf)
     {
-        GanttGraphicsItem *p_item = new GanttGraphicsItem(leaf);
+        GanttGraphicsObject *p_item = new GanttGraphicsObject(leaf);
 
         connect(p_item,SIGNAL(graphicsItemHoverEnter()),this,SLOT(onGraphicsItemHoverEnter()));
         connect(p_item,SIGNAL(graphicsItemHoverLeave()),this,SLOT(onGraphicsItemHoverLeave()));
@@ -352,6 +404,20 @@ void GanttScene::addItemsHelper(GanttInfoItem *item)
         GanttInfoNode *node = dynamic_cast<GanttInfoNode*>(item);
         if(node)
         {
+            GanttCalcGraphicsObject *p_item = new GanttCalcGraphicsObject(node);
+
+            connect(p_item,SIGNAL(graphicsItemHoverEnter()),this,SLOT(onGraphicsItemHoverEnter()));
+            connect(p_item,SIGNAL(graphicsItemHoverLeave()),this,SLOT(onGraphicsItemHoverLeave()));
+
+
+            p_item->setScene(this);
+            p_item->setHeader(m_header);
+
+            m_calcItems.append(p_item);
+            m_itemByInfo.insert(node,p_item);
+
+            p_item->updateItemGeometry();
+
             foreach(GanttInfoItem* item, node->m_items)
                 addItemsHelper(item);
         }
@@ -368,12 +434,25 @@ void GanttScene::updateItems()
         {
             qreal startPos = m_header->dtToX(p_info->start()),
                     itemWidth = m_header->dtToX(p_info->finish()) - startPos;
-            qreal top = m_items[i]->rect().top(),
-                    height = m_items[i]->rect().height();
+            qreal top = m_items[i]->y(),
+                    height = m_items[i]->sceneBoundingRect().height();
 
 
             m_items[i]->setPos(startPos, top);
             m_items[i]->setBoundingRectSize(QSizeF(itemWidth, height));
+        }
+    }
+
+    for(int i=0; i<m_calcItems.size(); ++i)
+    {
+        GanttInfoNode* p_info = m_calcItems[i]->info();
+
+        if(p_info)
+        {
+            qreal calcPos = m_header->dtToX(p_info->calcDt());
+            qreal top = m_calcItems[i]->y();
+
+            m_calcItems[i]->setPos(calcPos, top);
         }
     }
 
@@ -383,23 +462,48 @@ void GanttScene::updateItems()
 
 void GanttScene::onGraphicsItemHoverEnter()
 {
-    GanttGraphicsItem *item = qobject_cast<GanttGraphicsItem*>(sender());
+    GanttGraphicsObject *item = qobject_cast<GanttGraphicsObject*>(sender());
     if(item)
+    {
+        setCurrentItem(item);
         emit graphicsItemHoverEnter(item->info());
+    }
+
+    GanttCalcGraphicsObject *calcItem = qobject_cast<GanttCalcGraphicsObject*>(sender());
+    if(calcItem)
+    {
+        setCurrentItem(calcItem);
+        emit graphicsItemHoverEnter(calcItem->info());
+    }
+
+
 }
 
 void GanttScene::onGraphicsItemHoverLeave()
 {
-    GanttGraphicsItem *item = qobject_cast<GanttGraphicsItem*>(sender());
+    setCurrentItem(NULL);
+    GanttGraphicsObject *item = qobject_cast<GanttGraphicsObject*>(sender());
     if(item)
         emit graphicsItemHoverLeave(item->info());
+
+    GanttCalcGraphicsObject *calcItem = qobject_cast<GanttCalcGraphicsObject*>(sender());
+    if(calcItem)
+        emit graphicsItemHoverLeave(calcItem->info());
 }
+
+void GanttScene::onInfoDelete()
+{
+    const GanttInfoItem* item = static_cast<const GanttInfoItem*>(sender());
+    removeByInfo(item);
+}
+
+
 
 void GanttScene::onInfoLeafDelete()
 {
     const GanttInfoLeaf* leaf = static_cast<const GanttInfoLeaf*>(sender());
     removeByInfoLeaf(leaf);
-    QList<QGraphicsItem*> p_items = items();
+//    QList<QGraphicsItem*> p_items = items();
 }
 
 void GanttScene::onInfoChanged()
@@ -413,7 +517,7 @@ void GanttScene::onInfoChanged()
         m_header->updateHeader();
 }
 
-GanttSlider *GanttScene::slider() const
+GanttCurrentDtSlider *GanttScene::slider() const
 {
     return m_slider;
 }
@@ -633,6 +737,32 @@ const GanttInfoLeaf *GanttScene::prevEvent(const UtcDateTime &curDt) const
 
 void GanttScene::removeByInfo(const GanttInfoItem *item)
 { 
+    if(!item)
+        return;
+
+    const GanttInfoLeaf *leaf = qobject_cast<const GanttInfoLeaf*>(item);
+    if(leaf)
+    {
+        GanttGraphicsObject* graphicsItem = qobject_cast<GanttGraphicsObject*>(itemByInfo(leaf));
+        if(graphicsItem)
+            m_items.removeOne(graphicsItem);
+        m_itemByInfo.remove(leaf);
+        m_infoByStart.remove(m_infoByStart.key(leaf));
+        m_infoByFinish.remove(m_infoByFinish.key(leaf));
+        if(graphicsItem)
+            graphicsItem->deleteLater();
+    }
+
+    const GanttInfoNode *node = qobject_cast<const GanttInfoNode *>(item);
+    if(node)
+    {
+        GanttCalcGraphicsObject* graphicsItem = qobject_cast<GanttCalcGraphicsObject*>(itemByInfo(node));
+        if(graphicsItem)
+            m_calcItems.removeOne(graphicsItem);
+        m_itemByInfo.remove(node);
+        if(graphicsItem)
+            graphicsItem->deleteLater();
+    }
 }
 
 void GanttScene::removeByInfoLeaf(const GanttInfoLeaf *leaf)
@@ -640,7 +770,7 @@ void GanttScene::removeByInfoLeaf(const GanttInfoLeaf *leaf)
     if(!leaf)
         return;
 
-    GanttGraphicsItem* graphicsItem = itemByInfo(leaf);
+    GanttGraphicsObject* graphicsItem = qobject_cast<GanttGraphicsObject*>(itemByInfo(leaf));
     if(graphicsItem)
         m_items.removeOne(graphicsItem);
     m_itemByInfo.remove(leaf);

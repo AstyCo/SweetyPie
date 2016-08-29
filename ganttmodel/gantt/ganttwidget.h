@@ -59,7 +59,7 @@ signals:
     void graphicsItemHoverLeave(const GanttInfoItem*);
 
 private slots:
-    void on_comboBox_mode_currentIndexChanged(int index);
+//    void on_comboBox_mode_currentIndexChanged(int index);
 
     void expanded(const QModelIndex& index);
     void collapsed(const QModelIndex& index);
@@ -76,7 +76,8 @@ public slots:
     void prevLimits();
     // ZOOM -
 
-
+    void setCurrentItem(const GanttInfoItem* item);
+    void onTreeViewEntered(const QModelIndex& index);
 
 private slots:
     void pushLimits();

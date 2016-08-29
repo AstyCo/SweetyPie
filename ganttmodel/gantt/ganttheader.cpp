@@ -296,6 +296,8 @@ UtcDateTime GanttHeader::startByDt(const UtcDateTime &dt,GanttPrecisionMode mode
             return UtcDateTime(dt.date());
         case months1:
             return UtcDateTime(QDate(dt.year(),dt.month(),1));
+        case years1:
+            return UtcDateTime(QDate(dt.year(),1,1));
         default:
             qWarning("GanttHeader::initRange() out of range");
             return UtcDateTime();
@@ -477,6 +479,15 @@ UtcDateTime GanttHeader::finishByDt(const UtcDateTime &dt,GanttPrecisionMode mod
                 res = res.addMonths(1);
             return res;
         }
+        case years1:
+        {
+            UtcDateTime res = UtcDateTime(
+                        (QDate(dt.year(),1,1))
+                        );
+            if(res < dt)
+                res = res.addYears(1);
+            return res;
+        }
         default:
             qWarning("GanttHeader::initRange() out of range");
             return UtcDateTime();
@@ -533,6 +544,13 @@ UtcDateTime GanttHeader::nextStart(const UtcDateTime &start,GanttPrecisionMode m
         case months1:
         {
             UtcDateTime res = start.addMonths(1);
+            if(res > m_widget->maxDt())
+                return start;
+            return res;
+        }
+        case years1:
+        {
+            UtcDateTime res = start.addYears(1);
             if(res > m_widget->maxDt())
                 return start;
             return res;
@@ -636,6 +654,13 @@ UtcDateTime GanttHeader::nextStart(const UtcDateTime &start,GanttPrecisionMode m
                 return start;
             return res;
         }
+        case years1:
+        {
+            UtcDateTime res = start.addYears(1);
+            if(res > m_widget->maxDt())
+                return start;
+            return res;
+        }
         default:
             qWarning("GanttHeader::nextStart out of range");
             return start;
@@ -692,6 +717,13 @@ UtcDateTime GanttHeader::prevFinish(const UtcDateTime &finish,GanttPrecisionMode
         case months1:
         {
             UtcDateTime res = finish.addMonths(-1);
+            if(res < m_widget->minDt())
+                return finish;
+            return res;
+        }
+        case years1:
+        {
+            UtcDateTime res = finish.addYears(-1);
             if(res < m_widget->minDt())
                 return finish;
             return res;
@@ -791,6 +823,13 @@ UtcDateTime GanttHeader::prevFinish(const UtcDateTime &finish,GanttPrecisionMode
         case months1:
         {
             UtcDateTime res = finish.addMonths(-1);
+            if(res < m_widget->minDt())
+                return finish;
+            return res;
+        }
+        case years1:
+        {
+            UtcDateTime res = finish.addYears(-1);
             if(res < m_widget->minDt())
                 return finish;
             return res;
@@ -951,6 +990,16 @@ bool GanttHeader::onItemsAdditionHelper(GanttInfoItem *item)
         GanttInfoNode *node = dynamic_cast<GanttInfoNode*>(item);
         if(node)
         {
+
+            if(m_isEmpty)
+            {
+                m_isEmpty = false;
+                m_minDt = node->calcDt();
+                m_maxDt = node->calcDt();
+            }
+
+            newRange |= verifyBoundsByNode(node);
+
             foreach(GanttInfoItem* item, node->m_items)
             {
                 newRange |= onItemsAdditionHelper(item);
@@ -984,6 +1033,8 @@ QString GanttHeader::formatForMode(GanttHeader::GanttPrecisionMode mode)
         return "dd";
     case months1:
         return "MMM";
+    case years1:
+        return "yyyy";
     default:
         qWarning("GanttHeader::formatForMode out of range");
         return QString();
@@ -998,21 +1049,23 @@ QString GanttHeader::textForDtStep(int step) const
     case seconds5:
     case seconds15:
     case seconds30:
-        return m_startDt.addSecs( modeToSecond(m_mode) * step).toString("mm:ss");
+        return m_startDt.addSecs( modeToSecond(m_mode) * step).toString(formatForMode(m_mode));
     case minutes1:
     case minutes5:
     case minutes15:
     case minutes30:
-        return m_startDt.addSecs(modeToSecond(m_mode) * step).toString("hh:mm");
+        return m_startDt.addSecs(modeToSecond(m_mode) * step).toString(formatForMode(m_mode));
     case hours1:
     case hours6:
     case hours12:
-        return m_startDt.addSecs(modeToSecond(m_mode) * step).toString("hh:00");
+        return m_startDt.addSecs(modeToSecond(m_mode) * step).toString(formatForMode(m_mode));
 
     case days1:
-        return m_startDt.addDays(step).toString("d");
+        return m_startDt.addDays(step).toString(formatForMode(m_mode));
     case months1:
-        return m_startDt.addMonths(step).toString("MMM");
+        return m_startDt.addMonths(step).toString(formatForMode(m_mode));
+    case years1:
+        return m_startDt.addYears(step).toString(formatForMode(m_mode));
     default:
         qWarning("GanttHeader::textForDtStep out of range");
        return QString();
@@ -1126,6 +1179,32 @@ bool GanttHeader::verifyBoundsByLeaf(const GanttInfoLeaf *leaf)
     return newRange;
 }
 
+bool GanttHeader::verifyBoundsByNode(const GanttInfoNode *node)
+{
+    if(!node)
+        return false;
+    if(!node->calcDt().isValid())
+    {
+        qWarning("node\'s calc time not valid!");
+        return false;
+    }
+
+    bool newRange = false;
+    if(m_minDt > node->calcDt())
+    {
+        m_minDt = node->calcDt();
+        newRange = true;
+    }
+
+    if(m_maxDt < node->calcDt())
+    {
+        m_maxDt = node->calcDt();
+        newRange = true;
+    }
+
+    return newRange;
+}
+
 long long GanttHeader::modeToMicrosecond(GanttPrecisionMode mode, const QDate& date)
 {
 
@@ -1171,6 +1250,10 @@ long long GanttHeader::modeToMicrosecond(GanttPrecisionMode mode, const QDate& d
         if(!date.isValid())
             return 28*((long long)SECONDS_IN_DAY)*_MICROSECONDS_IN_SECOND;
         return date.daysInMonth()*((long long)SECONDS_IN_DAY)*_MICROSECONDS_IN_SECOND;
+    case years1:
+        if(!date.isValid())
+            return 345*((long long)SECONDS_IN_DAY)*_MICROSECONDS_IN_SECOND;
+        return date.daysInYear()*((long long)SECONDS_IN_DAY)*_MICROSECONDS_IN_SECOND;
     default:
         qWarning("long long GanttHeader::modeToMicrosecond(GanttHeader::GanttHeaderMode mode) out of range");
         return 0;
@@ -1209,6 +1292,10 @@ long long GanttHeader::modeToSecond(GanttHeader::GanttPrecisionMode mode, const 
         if(!date.isValid())
             return 28*((long long)SECONDS_IN_DAY);
         return date.daysInMonth()*((long long)SECONDS_IN_DAY);
+    case years1:
+        if(!date.isValid())
+            return 345*((long long)SECONDS_IN_DAY);
+        return date.daysInYear()*((long long)SECONDS_IN_DAY);
     default:
         qWarning("GanttHeader::modeToSecond out of range");
         return 0;
@@ -1247,6 +1334,8 @@ int GanttHeader::modeToSegmentCount(GanttHeader::GanttPrecisionMode mode, const 
         if(!date.isValid())
             return 6;
         return date.daysInMonth();
+    case years1:
+        return 12;
     default:
         qWarning("GanttHeader::modeToSecond out of range");
         return 1;
@@ -1289,6 +1378,8 @@ bool GanttHeader::isDrawn(const UtcDateTime &dt, GanttHeader::GanttPrecisionMode
         return !(dt.hour());
     case months1:
         return !(dt.day() - 1);
+    case years1:
+        return !(-dt.daysTo(UtcDateTime(QDate(dt.year(),1,1))));
     default:
         qWarning("GanttHeader::isDrawn out of range");
         return false;

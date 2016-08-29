@@ -29,6 +29,7 @@ public:
 
     enum GanttPrecisionMode
     {
+        years1,
         months1,
         days1,
 
@@ -103,6 +104,7 @@ public:
     void setRange(UtcDateTime min, UtcDateTime max);
 
     bool verifyBoundsByLeaf(const GanttInfoLeaf* leaf);
+    bool verifyBoundsByNode(const GanttInfoNode* node);
 
 
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);

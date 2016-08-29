@@ -97,6 +97,8 @@ void MemoryPlanningWidget::setGridView()
         connect(m_gridScene,SIGNAL(itemInfoChanged(const QString&)),this,SLOT(setItemInfo(const QString&)));
         connect(m_gridScene,SIGNAL(unitInfoChanged(const QString&)),this,SLOT(setUnitInfo(const QString&)));
         connect(m_gridScene,SIGNAL(startHighlightChanged(long)),this,SLOT(updateParts()));
+        connect(m_gridScene,SIGNAL(lengthHighlightChanged(long)),this,SLOT(updateParts()));
+
 //        m_gridScene->setBackgroundBrush(QBrush(QColor(Qt::gray).lighter(130)));
     }
 

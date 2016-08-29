@@ -28,12 +28,11 @@ MGridInteractiveUnit::MGridInteractiveUnit(MGridScene* scene,QGraphicsItem *pare
 
     m_enabled = false;
 
-    setAcceptsHoverEvents(false);
-
     m_items = &(m_scene->m_items);
 
     m_borderPen=QPen(QBrush(Qt::darkRed), m_scene->itemBorder() ,Qt::SolidLine ,Qt::SquareCap,Qt::MiterJoin);
 
+    setZValue(1000);
 }
 
 void MGridInteractiveUnit::disable()
@@ -56,13 +55,16 @@ void MGridInteractiveUnit::paint(QPainter *painter, const QStyleOptionGraphicsIt
     Q_UNUSED(option);
     Q_UNUSED(widget);
 
+    qDebug() << "paint";
     if(!m_enabled)
         return;
-
+    qDebug() <<"success";
 //    QPen pen(QBrush(Qt::blue),DEFAULT_SPACING ,Qt::SolidLine,Qt::SquareCap,Qt::MiterJoin);
     painter->setPen(m_borderPen);
-    painter->setOpacity(1);
+    qDebug() << m_borderPen;
+    qDebug() << m_shapeBorder;
     painter->drawPath(m_shapeBorder);
+//    painter->fillPath(m_shapeBorder,QBrush(Qt::blue));
 }
 
 bool MGridInteractiveUnit::inRange(long index) const

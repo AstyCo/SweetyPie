@@ -12,7 +12,7 @@
 #define DEFAULT_EDGELENGTH  (qreal(14))
 #define DEFAULT_LABELCOLOR  (Qt::white)
 #define DEFAULT_LABEL  (QString())
-#define DEFAULT_BORDERWIDTH  (qreal(0.5))
+#define DEFAULT_BORDERWIDTH  (qreal(1))
 
 #define GLOBAL_BORDER_COLOR (Qt::gray)
 #define GLOBAL_EMPTY_LABEL_COLOR (Qt::gray)

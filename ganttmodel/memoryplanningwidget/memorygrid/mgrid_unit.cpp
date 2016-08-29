@@ -38,7 +38,7 @@ void MGridUnit::setScene(MGridScene* scene)
     }
     m_items = &(m_scene->m_items);
 
-    m_borderPen=QPen(QBrush(QColor::fromRgb(200,200,200)), extraSize() ,Qt::SolidLine,Qt::SquareCap,Qt::MiterJoin);
+    m_borderPen=QPen(QBrush(QColor(160,160,160)), extraSize() ,Qt::SolidLine,Qt::SquareCap,Qt::MiterJoin);
 
 }
 
@@ -63,7 +63,6 @@ void MGridUnit::paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
 //    painter->setCompositionMode(QPainter::CompositionMode_Multiply);
 
     painter->setPen(m_borderPen);
-    painter->setOpacity(1);
     painter->drawPath(m_shapeBorder);
 
 }

@@ -25,7 +25,15 @@ using namespace Memory;
 MGridScene::MGridScene( QObject * parent)
     :QGraphicsScene(parent)
 {
-    clearLastSelected();
+    qDebug() << "MGridScene constructor";
+    m_selectionMode = SelectionMode_count;
+    setSelectionMode(areaSelection);
+
+    m_lastSelected = NULL;
+    m_mouseOverItem = NULL;
+    m_mouseOverUnit = NULL;
+    m_interactiveUnit = NULL;
+
 
     m_itemEdge = DEFAULT_EDGELENGTH;
     m_itemBorder = DEFAULT_BORDERWIDTH;
@@ -35,14 +43,13 @@ MGridScene::MGridScene( QObject * parent)
 
     m_highlightMode = false;
     m_interactiveHighlight = false;
-    m_lengthHighlight = 0;
+    m_lengthSelection = 0;
 
-    setLengthHighlight(100);
+    setLengthSelection(100);
 
-    setHighlightStyle( bordersAround | highlightedItems);
+    setHighlightStyle( bordersAround | highlightedArea | highlightedItems);
 
     m_interactiveUnit = new MGridInteractiveUnit(this);
-
 }
 
 MGridScene::~MGridScene()
@@ -57,11 +64,16 @@ void MGridScene::mousePressEvent(QGraphicsSceneMouseEvent *event)
         setHighlightMode(true);
     setInteractiveHighlight(true);
 
-    // ITEMS SELECT <disabled>
+    // ITEMS SELECT
     MGridItem * p_mem = itemAtPos(event->scenePos());
     if(p_mem)
-//        setLastSelected(p_mem);
     {
+        if(m_selectionMode == areaSelection)
+        {
+            setLengthSelection(0);
+            if(setStartSelection(p_mem->index()))
+                setLastSelected(p_mem);
+        }
         if(m_highlightStyle&highlightedItems)
             setHighlightMode(true);
         setInteractiveHighlight(true);
@@ -82,33 +94,37 @@ void MGridScene::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
     // INTERACTIVE SELECTION
     if(m_interactiveHighlight)
     {
-        if(p_mem)
+        if((m_selectionMode == positionSelection) && p_mem)
         {
-            setStartHighlight(p_mem->index());
+            setStartSelection(p_mem->index());
         }
-        updateInteractiveRange(startHighlight(),finishHighlight());
-    }
-
-
-    // ITEMS SELECT <disabled>
-    if(m_lastSelected)
-    {
-        if(p_mem)
+        if((m_selectionMode == areaSelection) && m_lastSelected)
         {
-            clearSelection();
-
-            long newSelectedIndex = p_mem->index();
-
-            long min = qMin(m_lastSelectedIndex,newSelectedIndex),
-                    max = qMax(m_lastSelectedIndex,newSelectedIndex);
-
-            for(int i = 0; i < m_items.size(); ++i)
+            if(p_mem && (m_selectionMode == areaSelection) && m_lastSelected)
             {
-                if(m_items[i]->index()>= min && m_items[i]->index()<= max)
-                    m_items[i]->setSelected(true);
+                if(p_mem->index() < m_lastSelected->index())
+                {
+                    if(setStartSelection(p_mem->index()))
+                    {
+                        long length = m_lastSelected->index() - p_mem->index() + 1;
+                        setLengthSelection(length);
+                    }
+                }
+                else
+                {
+                    long length = p_mem->index() - m_lastSelected->index() + 1;
+                    setLengthSelection(length);
+                }
             }
         }
+        if(lengthSelection())
+            updateInteractiveRange(startSelection(),finishSelection());
     }
+
+
+
+
+
 
     return QGraphicsScene::mouseMoveEvent(event);
 }
@@ -155,7 +171,7 @@ void MGridScene::clearShownUnits()
 
 void MGridScene::updateShownUnits()
 {
-    for(int i = m_startHighlight; i<m_startHighlight+m_lengthHighlight; ++i)
+    for(int i = m_startSelection; i<m_startSelection+m_lengthSelection; ++i)
     {
         MGridUnit* pmem_unit = m_items[i]->unit();
         if(!pmem_unit)
@@ -174,6 +190,8 @@ void MGridScene::setMemory(const KaMemory& kaMemory)
         MGridItem* newItem = new MGridItem(i,this,itemEdge(),itemBorder());
         m_items.append(newItem);
     }
+
+    setLimits(0,memorySize());
 
     setupMatrix(m_items);
 
@@ -240,22 +258,11 @@ void MGridScene::setItemEdge(qreal newEdgeLength)
 void MGridScene::clearLastSelected()
 {
     m_lastSelected = NULL;
-    m_lastSelectedIndex = -1;
 }
 
 void MGridScene::setLastSelected(MGridItem *p_mem)
 {
-    return; //DISABLED
-
     m_lastSelected = p_mem;
-    if(!p_mem)
-    {
-        m_lastSelectedIndex = -1;
-    }
-    else
-    {
-        m_lastSelectedIndex = p_mem->index();
-    }
 }
 
 int MGridScene::itemIndex(QGraphicsItem *item) const
@@ -266,13 +273,19 @@ int MGridScene::itemIndex(QGraphicsItem *item) const
 
 bool MGridScene::inHighlightRange(long index) const
 {
+    if(m_highlightStyle&highlightedArea)
+    {
+        return m_min <= index && index <= m_max;
+    }
+
     if(!m_highlightMode)
         return true;
-    return m_startHighlight <= index && index < m_startHighlight+m_lengthHighlight;
+    return m_startSelection <= index && index < m_startSelection+m_lengthSelection;
 }
 
 bool MGridScene::errorHandler(QList<ActionErrors> &errors) const
 {
+    return true;
     if(errors.isEmpty())
         return true;
 
@@ -309,6 +322,19 @@ bool MGridScene::errorHandler(QList<ActionErrors> &errors) const
         qDebug() << "MemoryScene::errorHandler default behavior";
         return false;
     }
+}
+
+MGridScene::SelectionMode MGridScene::selectionMode() const
+{
+    return m_selectionMode;
+}
+
+void MGridScene::setSelectionMode(const SelectionMode &selectionMode)
+{
+    if(m_selectionMode == selectionMode)
+        return;
+
+    m_selectionMode = selectionMode;
 }
 MGridUnit *MGridScene::mouseOverUnit() const
 {
@@ -385,7 +411,7 @@ MGridScene::HighlightStyle MGridScene::highlightStyle() const
 
 void MGridScene::setHighlightStyle(int highlightStyle)
 {
-    if((highlightStyle&(~(0x1|0x2))))
+    if((highlightStyle&(~(0x1|0x2|0x4))))
     {
         qWarning("highlightStyle out of range");
         return;
@@ -433,6 +459,17 @@ void MGridScene::setInteractiveHighlight(bool interactiveHighlight)
     emit interactiveHighlightChanged(m_interactiveHighlight);
 }
 
+void MGridScene::setLimits(long min, long max)
+{
+    if(min>max)
+    {
+        Q_ASSERT(false);
+        return;
+    }
+    m_min = min;
+    m_max = max;
+}
+
 
 QString MGridScene::warning(ActionErrors id)
 {
@@ -471,9 +508,9 @@ QString MGridScene::warning(ActionErrors id)
     }
 }
 
-long MGridScene::lengthHighlight() const
+long MGridScene::lengthSelection() const
 {
-    return m_lengthHighlight;
+    return m_lengthSelection;
 }
 
 void MGridScene::addUnit(const KaMemoryPart &part)
@@ -556,7 +593,10 @@ void MGridScene::clearMouseOver()
 QList<KaMemoryPart> MGridScene::crossingParts() const
 {
 
-    QList<MGridUnit*> units = crossingParts(startHighlight(),finishHighlight());
+    QList<MGridUnit*> units;
+
+    if(lengthSelection())
+        units = crossingParts(startSelection(),finishSelection());
     QList<KaMemoryPart> result;
     foreach(MGridUnit* unit, units)
     {
@@ -610,41 +650,43 @@ long MGridScene::freedCount(long from, long to) const
     return result;
 }
 
-long MGridScene::startHighlight() const
+long MGridScene::startSelection() const
 {
-    return m_startHighlight;
+    return m_startSelection;
 }
 
-long MGridScene::finishHighlight() const
+long MGridScene::finishSelection() const
 {
-    return m_startHighlight + m_lengthHighlight - 1;
+    return m_startSelection + m_lengthSelection - 1;
 }
 
 
-void MGridScene::setStartHighlight(long startHighlight)
+bool MGridScene::setStartSelection(long startHighlight)
 {
-    if(startHighlight==m_startHighlight)
-        return;
-    if(m_highlightStyle&highlightedItems)
-        m_highlightMode = true;
-    if(startHighlight+m_lengthHighlight>memorySize())
-        return;
-    m_startHighlight = startHighlight;
+    if(startHighlight==m_startSelection)
+        return false;
+    if(startHighlight+m_lengthSelection-1>m_max || m_min > startHighlight)
+        return false;
+    m_startSelection = startHighlight;
     update();
-    emit startHighlightChanged(m_startHighlight);
+    emit startHighlightChanged(m_startSelection);
+    return true;
 }
 
 
-void MGridScene::setLengthHighlight(long lengthHighlight)
+bool MGridScene::setLengthSelection(long lengthHighlight)
 {
     if(!lengthHighlight)
     {
         setHighlightMode(false);
-        return;
     }
 
-    m_lengthHighlight = lengthHighlight;
-    emit lengthHighlightChanged(m_lengthHighlight);
+    if(!(m_selectionMode == positionSelection) && m_startSelection + lengthHighlight - 1 > m_max)
+        return false;
+
+    m_lengthSelection = lengthHighlight;
+    emit lengthHighlightChanged(m_lengthSelection);
+    return true;
 }
 
 bool MGridScene::highlightMode() const
@@ -764,30 +806,30 @@ KaMemoryPart MGridScene::setPendingWrite(long from, long count)
 
 KaMemoryPart MGridScene::setEmpty()
 {
-    if(!lengthHighlight())
+    if(!lengthSelection())
         return KaMemoryPart();
-    return setEmpty(startHighlight(),lengthHighlight());
+    return setEmpty(startSelection(),lengthSelection());
 }
 
 KaMemoryPart MGridScene::setFree()
 {
-    if(!lengthHighlight())
+    if(!lengthSelection())
         return KaMemoryPart();
-    return setFree(startHighlight(),lengthHighlight());
+    return setFree(startSelection(),lengthSelection());
 }
 
 KaMemoryPart MGridScene::setPendingRead()
 {
-    if(!lengthHighlight())
+    if(!lengthSelection())
         return KaMemoryPart();
-    return setPendingRead(startHighlight(),lengthHighlight());
+    return setPendingRead(startSelection(),lengthSelection());
 }
 
 KaMemoryPart MGridScene::setPendingWrite()
 {
-    if(!lengthHighlight())
+    if(!lengthSelection())
         return KaMemoryPart();
-    return setPendingWrite(startHighlight(),lengthHighlight());
+    return setPendingWrite(startSelection(),lengthSelection());
 }
 
 KaMemoryPart MGridScene::setState(long from, long count, MemoryState state)
@@ -835,18 +877,18 @@ MGridItem *MGridScene::itemAtPos(const QPointF &pos) const
     return m_items[index];
 }
 
-MGridUnit *MGridScene::unitAtPos(const QPointF &pos) const
-{
-    QList<QGraphicsItem*> itemsAtPos = items(pos);
-    MGridUnit * p_mem = NULL;
+//MGridUnit *MGridScene::unitAtPos(const QPointF &pos) const
+//{
+//    QList<QGraphicsItem*> itemsAtPos = items(pos);
+//    MGridUnit * p_mem = NULL;
 
-    foreach(QGraphicsItem* itemAtPos,itemsAtPos)
-    {
-        if((p_mem=dynamic_cast<MGridUnit*>(itemAtPos)))
-            break;
-    }
-    return p_mem;
-}
+//    foreach(QGraphicsItem* itemAtPos,itemsAtPos)
+//    {
+//        if((p_mem=dynamic_cast<MGridUnit*>(itemAtPos)))
+//            break;
+//    }
+//    return p_mem;
+//}
 
 bool MGridScene::isMouseOverUnit(MGridUnit *p_unit) const
 {

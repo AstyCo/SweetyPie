@@ -67,9 +67,10 @@ QVariant GanttTreeModel::data(const QModelIndex &index, int role) const
     {
         switch (index.column())
         {
-        case titleField:
+        case 0:
             return node->title();
-        case startField:
+        case 1:
+            return node->calcDt().dateTime();
         case finishField:
         case durationField:
             return QVariant();

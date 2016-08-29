@@ -47,8 +47,8 @@ GanttIntervalSlider::GanttIntervalSlider(QWidget *parent )
 void GanttIntervalSlider::drawHandle(QPainter *painter, const QRect &handleRect, bool is_selected) const
 {
     painter->setPen(Qt::black);
-    qreal penWidth = 0;
-    QColor color = (is_selected)?(Qt::black):(QColor(Qt::blue));
+    qreal penWidth = 1.0;
+    QColor color = (is_selected)?(Qt::blue):(QColor(Qt::cyan));
     QPen pen(Qt::black,penWidth,Qt::SolidLine,Qt::SquareCap,Qt::MiterJoin);
     painter->setPen(pen);
 
@@ -154,14 +154,15 @@ void GanttIntervalSlider::mouseMoveEvent(QMouseEvent *e)
     }
     else if(m_clippedHandle==EndHandle)
     {
+        UtcDateTime tmp;
         val = pointToValue(e->pos(),EndHandle);
         if(m_shiftModifier)
         {
             moveHandles(0);
         }
-        else if(m_scene->finishByDt(valToDt(endHandle())) != closestFinishDt(val))
+        else if(m_scene->finishByDt(valToDt(endHandle())) != (tmp = closestFinishDt(val)))
             {
-                setEndHandle(dtToVal(m_scene->finishByDt(closestFinishDt(val))));
+                setEndHandle(dtToVal(tmp));
             }
     }
     m_lastPos = e->pos();
@@ -340,11 +341,7 @@ UtcDateTime GanttIntervalSlider::closestFinishDt(long long val) const
     }
     UtcDateTime valDt = valToDt(val);
     GanttHeader::GanttPrecisionMode mode = m_scene->calculateTimeMode(beginDt(), valDt);
-
-    UtcDateTime res = closestFinishDtHelper(valDt,mode)
-            ,tmpVar;
-
-    return res;
+    return closestFinishDtHelper(valDt,mode);
 }
 
 UtcDateTime GanttIntervalSlider::beginDt() const
@@ -387,30 +384,37 @@ UtcDateTime GanttIntervalSlider::closestStartDtHelper(const UtcDateTime& valDt, 
 {
     UtcDateTime start = m_scene->startByDt(valDt,mode),
                 nextStart = m_scene->nextStart(start,mode);
-
-    if(m_scene->calculateTimeMode(start,valToDt(endHandle())) != mode)
-        return nextStart;
+    UtcDateTime closestInCurrentMode;
 
     if(valDt.toMicrosecondsSinceEpoch() - start.toMicrosecondsSinceEpoch()
             > nextStart.toMicrosecondsSinceEpoch() - valDt.toMicrosecondsSinceEpoch() )
-        return nextStart;
+        closestInCurrentMode = nextStart;
     else
-        return start;
+        closestInCurrentMode = start;
+
+    GanttHeader::GanttPrecisionMode newMode = m_scene->calculateTimeMode(start,valToDt(endHandle()));
+    if((int)newMode > (int)mode)
+        return closestStartDtHelper(valDt,newMode);
+    return closestInCurrentMode;
+
 }
 
 UtcDateTime GanttIntervalSlider::closestFinishDtHelper(const UtcDateTime &valDt, GanttHeader::GanttPrecisionMode mode) const
 {
     UtcDateTime finish = m_scene->finishByDt(valDt,mode),
                 prevFinish = m_scene->prevFinish(finish,mode);
-
-    if(m_scene->calculateTimeMode(valToDt(beginHandle()),prevFinish) != mode)
-        return finish;
+    UtcDateTime closestInCurrentMode;
 
     if(valDt.toMicrosecondsSinceEpoch() - prevFinish.toMicrosecondsSinceEpoch()
             > finish.toMicrosecondsSinceEpoch() - valDt.toMicrosecondsSinceEpoch() )
-        return finish;
+        closestInCurrentMode = finish;
     else
-        return prevFinish;
+        closestInCurrentMode = prevFinish;
+
+    GanttHeader::GanttPrecisionMode newMode = m_scene->calculateTimeMode(valToDt(beginHandle()),closestInCurrentMode);
+    if((int)newMode > (int)mode)
+        return closestFinishDtHelper(valDt,newMode);
+    return closestInCurrentMode;
 }
 
 bool GanttIntervalSlider::outOfLimits(const UtcDateTime &dt) const

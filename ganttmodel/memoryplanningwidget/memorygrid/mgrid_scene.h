@@ -51,19 +51,20 @@ public:
     {
         bordersAround = 0x1,
         highlightedItems = 0x2,
+        highlightedArea = 0x4
     };
 
     /// Устанавливает длину выделяемого участка
-    void setLengthHighlight(long lengthHighlight);
+    bool setLengthSelection(long lengthSelection);
     /// Устанавливает начало выделяемого участка
-    void setStartHighlight(long startHighlight);
+    bool setStartSelection(long startSelection);
 
     /// Начало выделяемого участка
-    long startHighlight() const;
+    long startSelection() const;
     /// Конец выделяемого участка
-    long finishHighlight() const;
+    long finishSelection() const;
     /// Длина выделяемого участка
-    long lengthHighlight() const;
+    long lengthSelection() const;
 
     /// Устанавливает стиль выделения (с рамкой/ с подсвечиванием/ комбинированный)
     void setHighlightStyle(int highlightStyle);
@@ -79,6 +80,20 @@ public:
 
     /// Отвечает за возможность изменения выбранной области ( false - конец выделения )
     void setInteractiveHighlight(bool interactiveHighlight);
+
+    void setLimits(long min, long max);
+
+    enum SelectionMode
+    {
+        areaSelection,
+        positionSelection,
+
+        SelectionMode_count
+    };
+
+
+    SelectionMode selectionMode() const;
+    void setSelectionMode(const SelectionMode &selectionMode);
 
 public slots:
 
@@ -159,7 +174,6 @@ private:
     void setItemPerRow(int newItemPerRow);
     void clearMemory(long from,long count);
     MGridItem *itemAtPos(const QPointF& pos) const;
-    MGridUnit *unitAtPos(const QPointF& pos) const; // Its better to not use this function
     bool isMouseOverUnit(MGridUnit* p_unit) const;
     bool isMouseOverItem(MGridItem* p_item) const;
     MGridItem *mouseOverItem() const;
@@ -208,19 +222,20 @@ private:
     bool m_highlightMode;
     bool m_interactiveHighlight;
 
-    long m_startHighlight;
-    long m_lengthHighlight;
+    long m_startSelection;
+    long m_lengthSelection;
 
     KaMemory m_memory;
 
     qreal m_itemEdge;
     qreal m_itemBorder;
     int m_itemPerRow;
+    SelectionMode m_selectionMode;
+    long m_min,m_max;
 private:
 
     MGridItem *m_mouseOverItem;
     MGridUnit *m_mouseOverUnit;
-    long m_lastSelectedIndex;
     MGridItem* m_lastSelected;
     MGridInteractiveUnit* m_interactiveUnit;
 

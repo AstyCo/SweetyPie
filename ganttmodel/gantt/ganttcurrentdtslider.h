@@ -9,12 +9,12 @@
 class GanttHeader;
 class GanttScene;
 
-class GanttSlider : public QGraphicsObject
+class GanttCurrentDtSlider : public QGraphicsObject
 {
     Q_OBJECT
 
 public:
-    GanttSlider(QGraphicsItem * parent = 0);
+    GanttCurrentDtSlider(QGraphicsItem * parent = 0);
 
     void setScene(GanttScene* scene);
 
@@ -38,6 +38,8 @@ public:
 
     bool draw() const;
     void setDraw(bool draw);
+
+    void setVisible(bool visible);
 
 protected:
     void mouseMoveEvent(QGraphicsSceneMouseEvent *event);
@@ -81,7 +83,7 @@ private:
     GanttScene* m_scene;
 
     bool m_initialized;
-    bool m_draw;
+    bool m_draw, m_visible;
 };
 
 #endif // GANTTCURRENTTIMESLIDER_H

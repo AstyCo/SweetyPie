@@ -92,7 +92,6 @@ SOURCES += \
     gantt/gantttreeview.cpp \
     gantt/gantttreemodel.cpp \
     gantt/gantttreedelegate.cpp \
-    gantt/ganttcurrenttimeslider.cpp \
     gantt/ganttscene.cpp \
     gantt/ganttplayercontrol.cpp \
     gantt/ganttintervalslider.cpp \
@@ -102,9 +101,10 @@ SOURCES += \
     gantt/ganttheaderview.cpp \
     gantt/ganttheader.cpp \
     gantt/ganttgraphicsview.cpp \
-    gantt/ganttgraphicsitem.cpp \
     appeventfilter.cpp \
-    gantt/ganttcalcgraphicsitem.cpp
+    gantt/ganttcalcgraphicsobject.cpp \
+    gantt/ganttgraphicsobject.cpp \
+    gantt/ganttcurrentdtslider.cpp
 
 
 HEADERS += \
@@ -140,7 +140,6 @@ HEADERS += \
     gantt/gantttreeview.h \
     gantt/gantttreemodel.h \
     gantt/gantttreedelegate.h \
-    gantt/ganttcurrenttimeslider.h \
     gantt/ganttscene.h \
     gantt/ganttplayercontrol.h \
     gantt/ganttintervalslider.h \
@@ -150,11 +149,12 @@ HEADERS += \
     gantt/ganttheaderview.h \
     gantt/ganttheader.h \
     gantt/ganttgraphicsview.h \
-    gantt/ganttgraphicsitem.h \
     gantt/ganttglobalvalues.h \
     ganttproject_global.h \
     appeventfilter.h \
-    gantt/ganttcalcgraphicsitem.h
+    gantt/ganttgraphicsobject.h \
+    gantt/ganttcalcgraphicsobject.h \
+    gantt/ganttcurrentdtslider.h
 
 
 RESOURCES += \

@@ -1,4 +1,4 @@
-#include "ganttgraphicsitem.h"
+#include "ganttgraphicsobject.h"
 #include "ganttscene.h"
 
 #include "ganttheader.h"
@@ -7,7 +7,7 @@
 #include <QGraphicsSceneMouseEvent>
 #include <QPainter>
 
-GanttGraphicsItem::GanttGraphicsItem(GanttInfoLeaf *info,QGraphicsItem *parent) :
+GanttGraphicsObject::GanttGraphicsObject(GanttInfoLeaf *info,QGraphicsItem *parent) :
     QGraphicsObject(parent)
 {
     m_scene = NULL;
@@ -27,14 +27,14 @@ GanttGraphicsItem::GanttGraphicsItem(GanttInfoLeaf *info,QGraphicsItem *parent) 
     setAcceptHoverEvents(true);
 }
 
-GanttGraphicsItem::~GanttGraphicsItem()
+GanttGraphicsObject::~GanttGraphicsObject()
 {
 
     if(m_scene)
     {
         m_scene->removeItem(this);
         setParentItem(NULL);
-        m_scene->update(rect());
+        m_scene->update(sceneBoundingRect());
         if(m_scene->dtItems().isEmpty())
         {
             m_scene->setEmpty(true);
@@ -46,35 +46,35 @@ GanttGraphicsItem::~GanttGraphicsItem()
         m_info->reduceLinkCnt();
 }
 
-QRectF GanttGraphicsItem::boundingRect() const
+QRectF GanttGraphicsObject::boundingRect() const
 {
     return QRectF(QPointF(0,0),m_boundingRectSize);
 }
 
-void GanttGraphicsItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
+void GanttGraphicsObject::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
 {
     Q_UNUSED(option);
     Q_UNUSED(widget);
-    if(!m_info)
+    if(!m_info || !m_scene)
         return;
-
+    QColor color = (m_scene->currentItem() == this)?(m_info->getColor().darker(130)):(m_info->getColor());
     QRectF drawRect = boundingRect().adjusted(0,5,0,-5);
-    painter->fillRect(drawRect,QBrush(m_info->getColor()));
+    painter->fillRect(drawRect,QBrush(color));
     painter->drawRect(drawRect);
 }
 
-void GanttGraphicsItem::setScene(GanttScene *scene)
+void GanttGraphicsObject::setScene(GanttScene *scene)
 {
     m_scene = scene;
     m_scene->addItem(this);
 }
-void GanttGraphicsItem::setBoundingRectSize(const QSizeF &boundingRectSize)
+void GanttGraphicsObject::setBoundingRectSize(const QSizeF &boundingRectSize)
 {
     prepareGeometryChange();
     m_boundingRectSize = boundingRectSize;
 }
 
-void GanttGraphicsItem::updateItemGeometry()
+void GanttGraphicsObject::updateItemGeometry()
 {
     if(!m_header || !m_info)
         return;
@@ -85,17 +85,13 @@ void GanttGraphicsItem::updateItemGeometry()
     setBoundingRectSize(QSizeF(itemWidth, DEFAULT_ITEM_WIDTH));
     setPos(startPos, 2*DEFAULT_ITEM_WIDTH + m_info->pos());
 }
-GanttInfoLeaf *GanttGraphicsItem::info() const
+
+GanttInfoLeaf *GanttGraphicsObject::info() const
 {
     return m_info;
 }
 
-QRectF GanttGraphicsItem::rect() const
-{
-    return QRectF(pos(),m_boundingRectSize);
-}
-
-void GanttGraphicsItem::mousePressEvent(QGraphicsSceneMouseEvent *event)
+void GanttGraphicsObject::mousePressEvent(QGraphicsSceneMouseEvent *event)
 {
     Q_UNUSED(event);
 
@@ -110,21 +106,21 @@ void GanttGraphicsItem::mousePressEvent(QGraphicsSceneMouseEvent *event)
     QGraphicsItem::mousePressEvent(event);
 }
 
-void GanttGraphicsItem::hoverEnterEvent(QGraphicsSceneHoverEvent *event)
+void GanttGraphicsObject::hoverEnterEvent(QGraphicsSceneHoverEvent *event)
 {
     emit graphicsItemHoverEnter();
 
     QGraphicsItem::hoverEnterEvent(event);
 }
 
-void GanttGraphicsItem::hoverLeaveEvent(QGraphicsSceneHoverEvent *event)
+void GanttGraphicsObject::hoverLeaveEvent(QGraphicsSceneHoverEvent *event)
 {
     emit graphicsItemHoverLeave();
 
     QGraphicsItem::hoverLeaveEvent(event);
 }
 
-void GanttGraphicsItem::setHeader(GanttHeader *header)
+void GanttGraphicsObject::setHeader(GanttHeader *header)
 {
     m_header = header;
 }

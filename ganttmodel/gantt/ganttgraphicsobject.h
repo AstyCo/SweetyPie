@@ -9,15 +9,14 @@
 class GanttHeader;
 class GanttScene;
 
-class GanttGraphicsItem : public QGraphicsObject
+class GanttGraphicsObject : public QGraphicsObject
 {
     Q_OBJECT
 
 public:
-    GanttGraphicsItem(GanttInfoLeaf *info,QGraphicsItem *parent = 0);
-    virtual ~GanttGraphicsItem();
+    GanttGraphicsObject(GanttInfoLeaf *info,QGraphicsItem *parent = 0);
+    virtual ~GanttGraphicsObject();
 
-    //
     QRectF boundingRect() const;
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
 
@@ -25,7 +24,6 @@ public:
 
     GanttInfoLeaf *info() const;
 
-    QRectF rect() const;
 
     void setHeader(GanttHeader *header);
 

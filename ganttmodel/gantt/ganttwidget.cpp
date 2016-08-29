@@ -8,7 +8,8 @@
 #include "ganttinfoleaf.h"
 #include "ganttinfonode.h"
 
-#include "ganttgraphicsitem.h"
+#include "ganttgraphicsobject.h"
+#include "ganttcalcgraphicsobject.h"
 
 #include <QScrollBar>
 
@@ -60,6 +61,7 @@ GanttWidget::GanttWidget(QWidget *parent) :
     connect(ui->ganttView, SIGNAL(viewResized(QSize)),ui->intervalSlider,SLOT(updateMinTimeSize(QSize)));
 
 
+    connect(ui->treeView,SIGNAL(entered(QModelIndex)), this, SLOT(onTreeViewEntered(QModelIndex)));
     connect(ui->treeView,SIGNAL(expanded(QModelIndex)), this,SLOT(expanded(QModelIndex)));
     connect(ui->treeView,SIGNAL(collapsed(QModelIndex)), this,SLOT(collapsed(QModelIndex)));
 //    connect(m_scene->slider(),SIGNAL(sliderPosChanged(qreal)),this,SLOT(repaintDtHeader()));
@@ -131,41 +133,42 @@ UtcDateTime GanttWidget::slidersDt() const
     return m_scene->slidersDt();
 }
 
-void GanttWidget::on_comboBox_mode_currentIndexChanged(int index)
-{
-    GanttHeader::GanttPrecisionMode newMode;
+//void GanttWidget::on_comboBox_mode_currentIndexChanged(int index)
+//{
+//    GanttHeader::GanttPrecisionMode newMode;
 
-    switch(index)
-    {
-    case 0:
-        newMode = GanttHeader::months1;
-        break;
-    case 1:
-        newMode = GanttHeader::days1;
-        break;
-    case 2:
-        newMode = GanttHeader::hours1;
-        break;
-    case 3:
-        newMode = GanttHeader::minutes1;
-        break;
-    case 4:
-        newMode = GanttHeader::seconds1;
-        break;
-    default:
-        return;
-    }
+//    switch(index)
+//    {
+//    case 0:
+//        newMode = GanttHeader::months1;
+//        break;
+//    case 1:
+//        newMode = GanttHeader::days1;
+//        break;
+//    case 2:
+//        newMode = GanttHeader::hours1;
+//        break;
+//    case 3:
+//        newMode = GanttHeader::minutes1;
+//        break;
+//    case 4:
+//        newMode = GanttHeader::seconds1;
+//        break;
+//    default:
+//        return;
+//    }
 
-    m_scene->setMode(newMode);
+//    m_scene->setMode(newMode);
 
 
-}
+//}
 
 void GanttWidget::expanded(const QModelIndex &index)
 {
     GanttInfoNode * node = m_model->nodeForIndex(index);
     if(node)
     {
+        setCurrentItem(node);
         node->setIsExpanded(true);
         updatePos(node);
     }
@@ -174,9 +177,12 @@ void GanttWidget::expanded(const QModelIndex &index)
 void GanttWidget::collapsed(const QModelIndex &index)
 {
     GanttInfoNode * node = m_model->nodeForIndex(index);
-    node->setIsExpanded(false);
-
-    return updatePos(node);
+    if(node)
+    {
+        setCurrentItem(NULL);
+        node->setIsExpanded(false);
+        updatePos(node);
+    }
 }
 
 
@@ -209,20 +215,30 @@ void GanttWidget::updatePos(GanttInfoNode *from)
 
 void GanttWidget::updatePosHelper(GanttInfoItem *item)
 {
-    GanttInfoLeaf *leaf = dynamic_cast<GanttInfoLeaf*>(item);
+    GanttInfoLeaf *leaf = qobject_cast<GanttInfoLeaf*>(item);
     if(leaf)
     {
-        GanttGraphicsItem *graphicsItem = m_scene->itemByInfo(leaf);
-
-        graphicsItem->setPos(graphicsItem->scenePos().x(),2*DEFAULT_ITEM_WIDTH + leaf->pos());
-        if(graphicsItem->rect().bottom()>m_curSceneMax)
-            m_curSceneMax = graphicsItem->rect().bottom();
+        GanttGraphicsObject *graphicsItem = qobject_cast<GanttGraphicsObject *>(m_scene->itemByInfo(leaf));
+        if(graphicsItem)
+        {
+            graphicsItem->setPos(graphicsItem->scenePos().x(),2*DEFAULT_ITEM_WIDTH + leaf->pos());
+            if(graphicsItem->sceneBoundingRect().bottom()>m_curSceneMax)
+                m_curSceneMax = graphicsItem->sceneBoundingRect().bottom();
+        }
     }
     else
     {
-        GanttInfoNode *node = dynamic_cast<GanttInfoNode*>(item);
+        GanttInfoNode *node = qobject_cast<GanttInfoNode*>(item);
         if(node)
         {
+            GanttCalcGraphicsObject *graphicsItem = qobject_cast<GanttCalcGraphicsObject *>(m_scene->itemByInfo(node));
+            if(graphicsItem)
+            {
+                graphicsItem->setPos(graphicsItem->scenePos().x(),2*DEFAULT_ITEM_WIDTH + node->pos());
+                if(graphicsItem->sceneBoundingRect().bottom()>m_curSceneMax)
+                    m_curSceneMax = graphicsItem->sceneBoundingRect().bottom();
+            }
+
             foreach(GanttInfoItem* item, node->m_items)
                 updatePosHelper(item);
         }
@@ -231,16 +247,10 @@ void GanttWidget::updatePosHelper(GanttInfoItem *item)
 
 void GanttWidget::connectSignalsToNewItems(GanttInfoItem *item,GanttTreeView* view,GanttScene* scene)
 {
-//    GanttInfoNode *node = qobject_cast<GanttInfoNode*>(item);
-
-//    if(node)
-//    {
-//        connect(node,SIGNAL(itemsChanged()),view,SLOT(updateItemVisibility()));
-//    }
     if(!item)
         return;
 
-//    connect(item,SIGNAL(deleted()),scene,SLOT(onInfoDelete()));
+    connect(item,SIGNAL(aboutToBeDeleted()),scene,SLOT(onInfoDelete()));
 
 
     GanttInfoLeaf *leaf = qobject_cast<GanttInfoLeaf*>(item);
@@ -253,7 +263,7 @@ void GanttWidget::connectSignalsToNewItems(GanttInfoItem *item,GanttTreeView* vi
             connect(leaf,SIGNAL(finishChanged()),scene,SLOT(onLeafFinishChanged()));
             connect(leaf,SIGNAL(changed()),scene,SLOT(onInfoChanged()));
 
-            connect(leaf,SIGNAL(aboutToBeDeleted()),scene,SLOT(onInfoLeafDelete()));
+//            connect(leaf,SIGNAL(aboutToBeDeleted()),scene,SLOT(onInfoLeafDelete()));
 
         }
 
@@ -372,6 +382,24 @@ void GanttWidget::prevLimits()
     m_stackLimits.pop_back();
 
     updateRange(limits.first,limits.second);
+}
+
+void GanttWidget::setCurrentItem(const GanttInfoItem *info)
+{
+    if(m_scene)
+    {
+        QGraphicsItem *item = m_scene->itemByInfo(info);
+        if(item)
+            m_scene->setCurrentItem(item);
+    }
+}
+
+void GanttWidget::onTreeViewEntered(const QModelIndex &index)
+{
+    if(m_model)
+    {
+        setCurrentItem(m_model->itemForIndex(index));
+    }
 }
 
 void GanttWidget::pushLimits()

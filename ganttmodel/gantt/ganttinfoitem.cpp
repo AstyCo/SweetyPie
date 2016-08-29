@@ -114,7 +114,7 @@ qreal GanttInfoItem::pos() const
     if(!p_parent->isExpanded())
         return base;
 
-    qreal offset = (p_parent->parent())?(DEFAULT_ITEM_WIDTH):(0); // if m_root don't need extra offset
+    qreal offset = (p_parent->parent())?(DEFAULT_ITEM_HEIGHT):(0); // if m_root don't need extra offset
     const QList<GanttInfoItem*>& items = p_parent->m_items;
     // looking for this item, stops when found
     for(int i = 0; i < items.size(); ++i)
