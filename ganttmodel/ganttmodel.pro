@@ -166,8 +166,6 @@ FORMS += \
     chartsgroupwidget.ui \
     chartsettingsdlg.ui \
     memoryplanningwidget/memoryplanningwidget.ui \
-    gantt/ganttintervalsliderzoom.ui \
-    gantt/ganttplayersettings.ui \
     gantt/ganttwidget.ui \
     gantt/mygantt_playercontrol.ui
 

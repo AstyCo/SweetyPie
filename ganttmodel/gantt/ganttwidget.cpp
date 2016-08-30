@@ -306,6 +306,9 @@ void GanttWidget::clear()
 {
     if(m_model)
         m_model->clear();
+//    if(m_scene)
+//        m_scene->clear();
+
 
 //    ui->treeView->update();
 }
@@ -387,7 +390,7 @@ void GanttWidget::setCurrentItem(const GanttInfoItem *info)
 {
     if(m_scene)
     {
-        QGraphicsItem *item = m_scene->itemByInfo(info);
+        QGraphicsObject *item = m_scene->itemByInfo(info);
         if(item)
             m_scene->setCurrentItem(item);
     }

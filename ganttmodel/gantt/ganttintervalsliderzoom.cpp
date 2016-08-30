@@ -1,20 +1,31 @@
 #include "ganttintervalsliderzoom.h"
-#include "ui_ganttintervalsliderzoom.h"
+
+#include <QAction>
 
 #include <QDebug>
 
 GanttIntervalSliderZoom::GanttIntervalSliderZoom(QWidget *parent) :
-    QWidget(parent),
-    ui(new Ui::GanttIntervalSliderZoom)
+    QToolBar(parent)
 {
-    ui->setupUi(this);
+    setToolButtonStyle(Qt::ToolButtonIconOnly);
 
-    connect(ui->increaseButton,SIGNAL(clicked(bool)),this,SIGNAL(increaseButtonClicked(bool)));
-    connect(ui->restoreButton,SIGNAL(clicked(bool)),this,SIGNAL(restoreButtonClicked(bool)));
-
+    setStyleSheet("QToolBar { border: 0px }");
+    initActions();
 }
 
 GanttIntervalSliderZoom::~GanttIntervalSliderZoom()
 {
-    delete ui;
+}
+
+void GanttIntervalSliderZoom::initActions()
+{
+    QAction *p_action;
+
+    p_action = new QAction(QIcon(":/images/Buttons 64x64/reverse-arrow.png"),QString::fromUtf8("Вернуться к старым границам"),this);
+    connect(p_action,SIGNAL(triggered(bool)),this,SIGNAL(restoreButtonClicked(bool)));
+    addAction(p_action);
+
+    p_action = new QAction(QIcon(":/images/Buttons 64x64/save.png"),QString::fromUtf8("Перейти к новым границам"),this);
+    connect(p_action,SIGNAL(triggered(bool)),this,SIGNAL(increaseButtonClicked(bool)));
+    addAction(p_action);
 }

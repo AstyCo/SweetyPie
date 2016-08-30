@@ -97,6 +97,8 @@ public:
 
     bool isVisible(const QGraphicsItem* which) const;
 
+    void clear();
+
 signals:
     void limitsChanged(const UtcDateTime &start, const UtcDateTime &finish);
 
@@ -119,7 +121,7 @@ public slots:
     void moveSliderToViewStart();
     void moveSliderToViewFinish();
     void moveSliderToStart();
-    void setCurrentItem(QGraphicsItem *currentItem);
+    void setCurrentItem(QGraphicsObject *currentItem);
 
 
 
@@ -152,7 +154,7 @@ private:
                                             m_infoByFinish;
     GanttHeader *m_header;
     GanttCurrentDtSlider *m_slider;
-    QGraphicsItem *m_currentItem;
+    QPointer<QGraphicsObject> m_currentItem;
     QPointer<GanttGraphicsView> m_view;
 
     friend class GanttWidget;

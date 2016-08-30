@@ -38,7 +38,7 @@ void MGridUnit::setScene(MGridScene* scene)
     }
     m_items = &(m_scene->m_items);
 
-    m_borderPen=QPen(QBrush(QColor(160,160,160)), extraSize() ,Qt::SolidLine,Qt::SquareCap,Qt::MiterJoin);
+    m_borderPen=QPen(QBrush(QColor(80,80,80)), extraSize() ,Qt::SolidLine,Qt::SquareCap,Qt::MiterJoin);
 
 }
 
@@ -60,7 +60,9 @@ void MGridUnit::paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
     if(!m_scene->isMouseOverUnit(this))
         return;
 
-//    painter->setCompositionMode(QPainter::CompositionMode_Multiply);
+//    qDebug() << "paint" << QString::number(zValue()) << m_shapeBorder;
+//    qDebug() << "size  items "<< QString::number(size()) +" " + QString::number(m_scene->itemPerRow());
+//    qDebug() << "size  items "<<QString::number(m_items->at(m_start)->left())+' '+QString::number(m_items->at(m_finish)->right());
 
     painter->setPen(m_borderPen);
     painter->drawPath(m_shapeBorder);
@@ -160,6 +162,7 @@ void MGridUnit::hoverLeaveEvent(QGraphicsSceneHoverEvent *event)
     return QGraphicsItem::hoverLeaveEvent(event);
 }
 
+
 void MGridUnit::rebuildShape()
 {
 
@@ -183,7 +186,7 @@ void MGridUnit::rebuildShape()
     MGridItem  *utterLeftItem = m_items->at(m_start),
                 *utterRightItem = m_items->at(m_finish);
     qreal   utterLeft = utterLeftItem->left(),
-            utterRight = utterLeftItem->right();
+            utterRight = utterRightItem->right();
 
     QPainterPath path;
 

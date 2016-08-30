@@ -320,7 +320,12 @@ bool GanttScene::isVisible(const QGraphicsItem *which) const
     return viewRect.contains(which->sceneBoundingRect());
 }
 
-void GanttScene::setCurrentItem(QGraphicsItem *currentItem)
+void GanttScene::clear()
+{
+    m_currentItem = NULL;
+}
+
+void GanttScene::setCurrentItem(QGraphicsObject *currentItem)
 {
     if(m_currentItem == currentItem)
         return;
@@ -335,9 +340,9 @@ void GanttScene::setCurrentItem(QGraphicsItem *currentItem)
 
     if(m_currentItem)
     {
-        if(GanttGraphicsObject *graphicsObject = dynamic_cast<GanttGraphicsObject*>(m_currentItem))
+        if(GanttGraphicsObject *graphicsObject = dynamic_cast<GanttGraphicsObject*>(m_currentItem.data()))
             info = graphicsObject->info();
-        if(GanttCalcGraphicsObject *graphicsObject = dynamic_cast<GanttCalcGraphicsObject*>(m_currentItem))
+        if(GanttCalcGraphicsObject *graphicsObject = dynamic_cast<GanttCalcGraphicsObject*>(m_currentItem.data()))
             info = graphicsObject->info();
 
         GanttInfoLeaf *leaf = qobject_cast<GanttInfoLeaf*>(info);
