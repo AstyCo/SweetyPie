@@ -55,16 +55,10 @@ void MGridInteractiveUnit::paint(QPainter *painter, const QStyleOptionGraphicsIt
     Q_UNUSED(option);
     Q_UNUSED(widget);
 
-    qDebug() << "paint";
     if(!m_enabled)
         return;
-    qDebug() <<"success";
-//    QPen pen(QBrush(Qt::blue),DEFAULT_SPACING ,Qt::SolidLine,Qt::SquareCap,Qt::MiterJoin);
     painter->setPen(m_borderPen);
-    qDebug() << m_borderPen;
-    qDebug() << m_shapeBorder;
     painter->drawPath(m_shapeBorder);
-//    painter->fillPath(m_shapeBorder,QBrush(Qt::blue));
 }
 
 bool MGridInteractiveUnit::inRange(long index) const

@@ -1,4 +1,5 @@
 #include "ganttheaderview.h"
+#include "ganttglobalvalues.h"
 
 #include "ganttwidget.h"
 #include "gantttreeview.h"
@@ -54,7 +55,7 @@ void GanttHeaderView::paintEvent(QPaintEvent *e)
     utcRect.moveTop((dtRect.bottom() - utcRect.height())/2);
     utcRect.moveLeft(dtRect.right() - HEADERVIEW_MARGIN);
 
-    painter.fillRect(rect(),QBrush(Qt::blue));
+    painter.fillRect(rect(),QBrush(HEADER_COLOR));
 
     painter.setPen(headerPen);
 

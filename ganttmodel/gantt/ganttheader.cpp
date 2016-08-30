@@ -69,10 +69,10 @@ void GanttHeader::paint(QPainter *painter, const QStyleOptionGraphicsItem *optio
         QRect headerRect(rect.left(),rect.top(),rect.width(),DEFAULT_HEADER_HEIGHT);
         // Header background
         QLinearGradient linearGradient(QPointF(rect.left(),rect.top()),QPointF(rect.left(),rect.top() + DEFAULT_HEADER_HEIGHT));
-        linearGradient.setColorAt(0, Qt::cyan);
+        linearGradient.setColorAt(0, SLIDER_COLOR);
         linearGradient.setColorAt(0.4, Qt::white);
         linearGradient.setColorAt(0.6, Qt::white);
-        linearGradient.setColorAt(1, Qt::cyan);
+        linearGradient.setColorAt(1, SLIDER_COLOR);
         painter->fillRect(headerRect, linearGradient);
         // Center horizontal line
         painter->drawLine(QPointF(0,DEFAULT_ITEM_HEIGHT),QPointF(rect.right(),DEFAULT_ITEM_HEIGHT));
@@ -1081,9 +1081,16 @@ void GanttHeader::updateWidget()
     m_widget->updateRange(m_minDt,m_maxDt);
 }
 
-void GanttHeader::updateVisItemCount()
+//void GanttHeader::updateVisItemCount(qreal item_width)
+//{
+//    setVisItemCount((m_currentWidth-item_width)/item_width);
+//}
+
+qreal GanttHeader::calculateVisItemCount(qreal item_width) const
 {
-    setVisItemCount((m_currentWidth-MIN_WIDTH_FOR_TIME_VISUALIZING)/MIN_WIDTH_FOR_TIME_VISUALIZING);
+    if(!item_width)
+        return 1;
+    return (m_currentWidth-item_width)/item_width;
 }
 
 qreal GanttHeader::getCoef(const UtcDateTime &min, const UtcDateTime &max) const
@@ -1391,7 +1398,7 @@ void GanttHeader::setCurrentWidth(int currentWidth)
     if(m_currentWidth == currentWidth)
         return;
     m_currentWidth = currentWidth;
-    updateVisItemCount();
+    setVisItemCount(calculateVisItemCount(MIN_WIDTH_FOR_TIME_VISUALIZING));
 
     updateHeader();
 
@@ -1414,7 +1421,12 @@ GanttHeader::GanttPrecisionMode GanttHeader::calculateTimeMode(const UtcDateTime
     for(int i = GanttPrecisionMode_count-1; i >= 0; --i)
     {
         GanttPrecisionMode i_mode = static_cast<GanttPrecisionMode>(i);
-        if(coef <= modeToMicrosecond(i_mode))
+        qreal monthCoef;
+        if(i_mode == months1)
+            monthCoef = (min.microsecondsTo(max)*1.0/ calculateVisItemCount(MIN_WIDTH_FOR_MONTH_VISUALIZING));
+        const qreal &usageCoef = (i_mode == months1)?(monthCoef):(coef);
+
+        if(usageCoef <= modeToMicrosecond(i_mode))
         {
             mode = i_mode;
             break;

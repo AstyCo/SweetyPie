@@ -50,6 +50,7 @@ GanttWidget::GanttWidget(QWidget *parent) :
 
     connect(m_scene,SIGNAL(graphicsItemHoverEnter(const GanttInfoItem*)),this,SIGNAL(graphicsItemHoverEnter(const GanttInfoItem*)));
     connect(m_scene,SIGNAL(graphicsItemHoverLeave(const GanttInfoItem*)),this,SIGNAL(graphicsItemHoverLeave(const GanttInfoItem*)));
+    connect(m_scene,SIGNAL(currentItemChanged(const GanttInfoItem*)),this,SIGNAL(currentItemChanged(const GanttInfoItem*)));
 
 
     connect(m_scene->slider(),SIGNAL(dtChanged(UtcDateTime)),ui->intervalSlider,SLOT(setCurrentTime(UtcDateTime)));
@@ -61,7 +62,7 @@ GanttWidget::GanttWidget(QWidget *parent) :
     connect(ui->ganttView, SIGNAL(viewResized(QSize)),ui->intervalSlider,SLOT(updateMinTimeSize(QSize)));
 
 
-    connect(ui->treeView,SIGNAL(entered(QModelIndex)), this, SLOT(onTreeViewEntered(QModelIndex)));
+    connect(ui->treeView,SIGNAL(clicked(QModelIndex)), this, SLOT(onTreeViewEntered(QModelIndex)));
     connect(ui->treeView,SIGNAL(expanded(QModelIndex)), this,SLOT(expanded(QModelIndex)));
     connect(ui->treeView,SIGNAL(collapsed(QModelIndex)), this,SLOT(collapsed(QModelIndex)));
 //    connect(m_scene->slider(),SIGNAL(sliderPosChanged(qreal)),this,SLOT(repaintDtHeader()));
@@ -168,7 +169,6 @@ void GanttWidget::expanded(const QModelIndex &index)
     GanttInfoNode * node = m_model->nodeForIndex(index);
     if(node)
     {
-        setCurrentItem(node);
         node->setIsExpanded(true);
         updatePos(node);
     }
@@ -179,7 +179,6 @@ void GanttWidget::collapsed(const QModelIndex &index)
     GanttInfoNode * node = m_model->nodeForIndex(index);
     if(node)
     {
-        setCurrentItem(NULL);
         node->setIsExpanded(false);
         updatePos(node);
     }

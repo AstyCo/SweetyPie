@@ -25,6 +25,7 @@ public:
     GanttInfoNode *info() const;
 
 signals:
+    void graphicsItemPressed();
     void graphicsItemHoverEnter();
     void graphicsItemHoverLeave();
 
@@ -32,6 +33,8 @@ public slots:
     void updateItemGeometry();
 
 protected:
+    void mousePressEvent(QGraphicsSceneMouseEvent *event);
+
     void hoverEnterEvent(QGraphicsSceneHoverEvent *event);
     void hoverLeaveEvent(QGraphicsSceneHoverEvent *event);
 

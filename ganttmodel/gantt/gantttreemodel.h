@@ -54,6 +54,7 @@ public:
 signals:
     void itemsAdded(GanttInfoItem*);
     void itemsAdded();
+    void needCollapse(GanttInfoNode*);
 
 public slots:
     void clear();

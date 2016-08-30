@@ -93,13 +93,13 @@ GanttInfoLeaf *GanttGraphicsObject::info() const
 
 void GanttGraphicsObject::mousePressEvent(QGraphicsSceneMouseEvent *event)
 {
-    Q_UNUSED(event);
-
     if(!m_scene || !m_info)
         return;
 
     if(m_info->parent() && (this == m_scene->itemAt(event->scenePos())))
-        m_scene->changeExpanding(m_info->parent()->index());
+        if((!m_info->parent()->isExpanded() && (event->button() == Qt::LeftButton))
+                || (m_info->parent()->isExpanded() && (event->button() == Qt::RightButton)))
+            m_scene->changeExpanding(m_info->parent()->index());
 
     emit graphicsItemPressed();
 

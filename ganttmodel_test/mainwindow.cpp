@@ -186,7 +186,7 @@ void MainWindow::testMemoryPlanningWidget()
         newPeace.setStart(vacantPos);
         vacantPos+=memoryPeaceLength;
 
-        if(vacantPos>20000)
+        if(vacantPos>2000)
             break;
 
         newPeace.setFinish(vacantPos);
@@ -204,7 +204,7 @@ void MainWindow::testMemoryPlanningWidget()
     // end init values
 
     KaMemory kaMemory;
-    kaMemory.init(records,20000);
+    kaMemory.init(records,2000);
 
     MGridScene * scene = ui->memoryPlanningWidget->gridScene();
     ui->memoryPlanningWidget->setMemory(kaMemory);

@@ -65,29 +65,20 @@ void GanttScene::drawBackground(QPainter *painter, const QRectF &rect)
 {
     QGraphicsScene::drawBackground(painter,rect);
 
+    qreal   bgBottom = rect.bottom()
+            ,bgLeft = rect.left() - 1
+            ,bgRight = rect.right() + 1;
 
-    qreal   /*bgTop = rect.top()
-            ,*/bgBottom = rect.bottom()
-            ,bgLeft = rect.left()
-            ,bgRight = rect.right();
-
-    QPen pen;
-    pen.setStyle(Qt::DotLine);
+    QPen pen(Qt::gray, qreal(0.5));
+    pen.setStyle(Qt::SolidLine);
     painter->setPen(pen);
 
-//    qreal  startX = (qCeil(rect.x() / m_header->secondHeaderWidth()))*m_header->secondHeaderWidth();
-//    while(startX<bgRight)
-//    {
-//        painter->drawLine(QPointF(startX,bgTop),QPointF(startX,bgBottom));
-//        startX+=m_header->secondHeaderWidth();
-//    }
-
-    qreal startY = (qCeil(rect.y() / DEFAULT_ITEM_WIDTH))*DEFAULT_ITEM_WIDTH;
+    qreal startY = (qCeil(rect.y() / DEFAULT_ITEM_HEIGHT))*DEFAULT_ITEM_HEIGHT;
 
     while(startY<bgBottom)
     {
         painter->drawLine(QPointF(bgLeft,startY),QPointF(bgRight,startY));
-        startY+=DEFAULT_ITEM_WIDTH;
+        startY+=DEFAULT_ITEM_HEIGHT;
     }
 }
 
@@ -213,8 +204,12 @@ void GanttScene::moveSliderToStart()
         m_slider->moveToBegin();
 }
 
-void GanttScene::onViewAdded(QGraphicsView* view)
+void GanttScene::onViewAdded(GanttGraphicsView* view)
 {
+
+    if(!view)
+        return;
+    m_view = view;
     m_header->init();
     onViewResize(view->size());
 }
@@ -233,7 +228,7 @@ void GanttScene::setHeaderMode(GanttHeader::GanttHeaderMode mode)
         }
         if(!views().isEmpty())
         {
-            onViewAdded(views()[0]);
+            onViewAdded(qobject_cast<GanttGraphicsView*>(views()[0]));
             views()[0]->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
         }
     }
@@ -307,11 +302,6 @@ QGraphicsItem *GanttScene::currentItem() const
 void GanttScene::setSceneRect(const QRectF &rect)
 {
     QGraphicsScene::setSceneRect(rect);
-    if(!views().isEmpty())
-    {
-        QScrollBar *bar = views()[0]->verticalScrollBar();
-        bar->setMaximum(rect.height());
-    }
 }
 
 void GanttScene::setSceneRect(qreal x, qreal y, qreal width, qreal height)
@@ -319,34 +309,51 @@ void GanttScene::setSceneRect(qreal x, qreal y, qreal width, qreal height)
     setSceneRect(QRectF(x,y,width,height));
 }
 
+bool GanttScene::isVisible(const QGraphicsItem *which) const
+{
+    if(m_view.isNull())
+        return false;
+
+    QRectF viewRect = m_view->mapToScene(m_view->viewport()->geometry()).boundingRect()
+            .adjusted(0,DEFAULT_HEADER_HEIGHT,0,0);
+
+    return viewRect.contains(which->sceneBoundingRect());
+}
+
 void GanttScene::setCurrentItem(QGraphicsItem *currentItem)
 {
     if(m_currentItem == currentItem)
         return;
 
+    QGraphicsItem *lastItem = m_currentItem;
+    GanttInfoItem *info = NULL;
     m_currentItem = currentItem;
-    if(m_currentItem && !views().isEmpty())
+    if(lastItem)
     {
-        QGraphicsView *p_view = views()[0];
-        GanttGraphicsObject* graphicsItem = dynamic_cast<GanttGraphicsObject*>(m_currentItem);
-        if(graphicsItem)
-        {
-            qDebug() <<"pos: " << QString::number(graphicsItem->info()->pos());
-            p_view->verticalScrollBar()->setValue(graphicsItem->info()->pos() - 2*DEFAULT_ITEM_HEIGHT);
-        }
-
-        GanttCalcGraphicsObject* calcGraphicsItem = dynamic_cast<GanttCalcGraphicsObject*>(m_currentItem);
-        if(calcGraphicsItem)
-        {
-            qDebug() <<"pos: " << QString::number(calcGraphicsItem->info()->pos());
-//            int sliderMax = p_view->verticalScrollBar()->maximum();
-            p_view->verticalScrollBar()->setValue(calcGraphicsItem->info()->pos() - 2*DEFAULT_ITEM_HEIGHT);
-        }
-
-
+        lastItem->update();
     }
 
-    emit currentItemChanged(m_currentItem);
+    if(m_currentItem)
+    {
+        if(GanttGraphicsObject *graphicsObject = dynamic_cast<GanttGraphicsObject*>(m_currentItem))
+            info = graphicsObject->info();
+        if(GanttCalcGraphicsObject *graphicsObject = dynamic_cast<GanttCalcGraphicsObject*>(m_currentItem))
+            info = graphicsObject->info();
+
+        GanttInfoLeaf *leaf = qobject_cast<GanttInfoLeaf*>(info);
+        if(leaf && !leaf->parent()->isExpanded())
+            changeExpanding(leaf->parent()->index());
+
+        QRectF itemRect = m_currentItem->mapToScene(m_currentItem->boundingRect()).boundingRect();
+        if(!m_view.isNull() && !isVisible(m_currentItem))
+        {
+            m_view->ensureVisible(itemRect
+                                  .adjusted(0,-DEFAULT_HEADER_HEIGHT,0,0)
+                                  ,0,0);
+        }
+        m_currentItem->update();
+    }
+    emit currentItemChanged(info);
 }
 const QList<GanttGraphicsObject *>& GanttScene::dtItems() const
 {
@@ -388,6 +395,8 @@ void GanttScene::addItemsHelper(GanttInfoItem *item)
 
         connect(p_item,SIGNAL(graphicsItemHoverEnter()),this,SLOT(onGraphicsItemHoverEnter()));
         connect(p_item,SIGNAL(graphicsItemHoverLeave()),this,SLOT(onGraphicsItemHoverLeave()));
+        connect(p_item,SIGNAL(graphicsItemPressed()),this,SLOT(onGraphicsItemPress()));
+
 
 
         p_item->setScene(this);
@@ -408,6 +417,7 @@ void GanttScene::addItemsHelper(GanttInfoItem *item)
 
             connect(p_item,SIGNAL(graphicsItemHoverEnter()),this,SLOT(onGraphicsItemHoverEnter()));
             connect(p_item,SIGNAL(graphicsItemHoverLeave()),this,SLOT(onGraphicsItemHoverLeave()));
+            connect(p_item,SIGNAL(graphicsItemPressed()),this,SLOT(onGraphicsItemPress()));
 
 
             p_item->setScene(this);
@@ -435,7 +445,7 @@ void GanttScene::updateItems()
             qreal startPos = m_header->dtToX(p_info->start()),
                     itemWidth = m_header->dtToX(p_info->finish()) - startPos;
             qreal top = m_items[i]->y(),
-                    height = m_items[i]->sceneBoundingRect().height();
+                    height = DEFAULT_ITEM_HEIGHT;
 
 
             m_items[i]->setPos(startPos, top);
@@ -460,19 +470,34 @@ void GanttScene::updateItems()
     update();
 }
 
-void GanttScene::onGraphicsItemHoverEnter()
+void GanttScene::onGraphicsItemPress()
 {
     GanttGraphicsObject *item = qobject_cast<GanttGraphicsObject*>(sender());
     if(item)
     {
         setCurrentItem(item);
-        emit graphicsItemHoverEnter(item->info());
     }
 
     GanttCalcGraphicsObject *calcItem = qobject_cast<GanttCalcGraphicsObject*>(sender());
     if(calcItem)
     {
         setCurrentItem(calcItem);
+    }
+}
+
+void GanttScene::onGraphicsItemHoverEnter()
+{
+    GanttGraphicsObject *item = qobject_cast<GanttGraphicsObject*>(sender());
+    if(item)
+    {
+//        setCurrentItem(item);
+        emit graphicsItemHoverEnter(item->info());
+    }
+
+    GanttCalcGraphicsObject *calcItem = qobject_cast<GanttCalcGraphicsObject*>(sender());
+    if(calcItem)
+    {
+//        setCurrentItem(calcItem);
         emit graphicsItemHoverEnter(calcItem->info());
     }
 
@@ -481,7 +506,6 @@ void GanttScene::onGraphicsItemHoverEnter()
 
 void GanttScene::onGraphicsItemHoverLeave()
 {
-    setCurrentItem(NULL);
     GanttGraphicsObject *item = qobject_cast<GanttGraphicsObject*>(sender());
     if(item)
         emit graphicsItemHoverLeave(item->info());
@@ -512,7 +536,6 @@ void GanttScene::onInfoChanged()
     if(!leaf)
         return;
 
-    bool newRange = false;
     if(m_header->verifyBoundsByLeaf(leaf))
         m_header->updateHeader();
 }

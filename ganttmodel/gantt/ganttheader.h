@@ -141,7 +141,8 @@ private:
     QString textForDtStep(int step_segment) const;
     void updateWidget();
 
-    void updateVisItemCount();
+//    void updateVisItemCount(qreal item_width);
+    qreal calculateVisItemCount(qreal item_width) const;
     qreal getCoef(const UtcDateTime &min, const UtcDateTime &max) const;
     void updateStretchFactor();
 

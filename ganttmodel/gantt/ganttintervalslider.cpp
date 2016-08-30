@@ -48,7 +48,7 @@ void GanttIntervalSlider::drawHandle(QPainter *painter, const QRect &handleRect,
 {
     painter->setPen(Qt::black);
     qreal penWidth = 1.0;
-    QColor color = (is_selected)?(Qt::blue):(QColor(Qt::cyan));
+    QColor color = (is_selected)?(HEADER_COLOR):(SLIDER_COLOR);
     QPen pen(Qt::black,penWidth,Qt::SolidLine,Qt::SquareCap,Qt::MiterJoin);
     painter->setPen(pen);
 
@@ -71,14 +71,15 @@ void GanttIntervalSlider::drawSliderLine(QPainter *painter, const QRect &sliderR
             endRectLeft = innerRectLeft + innerRectWidth,
             endRectWidth = width - valueToPoint(m_endValue,EndHandle);
     QLinearGradient foregroundGradient(QPoint(0,top),QPoint(0,top + m_sliderV));
-    foregroundGradient.setColorAt(0,Qt::cyan);
-    foregroundGradient.setColorAt(0.5,QColor(Qt::cyan).lighter(180));
-    foregroundGradient.setColorAt(1,Qt::cyan);
+    QColor sliderColor = SLIDER_COLOR;
+    foregroundGradient.setColorAt(0,sliderColor);
+    foregroundGradient.setColorAt(0.5,sliderColor.lighter(180));
+    foregroundGradient.setColorAt(1,sliderColor);
 
     QLinearGradient backgroundGradient(QPoint(0,top),QPoint(0,top + m_sliderV));
-    backgroundGradient.setColorAt(0,QColor(Qt::cyan));
+    backgroundGradient.setColorAt(0,sliderColor);
     backgroundGradient.setColorAt(0.5,Qt::white);
-    backgroundGradient.setColorAt(1,QColor(Qt::cyan));
+    backgroundGradient.setColorAt(1,sliderColor);
 
     painter->setPen(Qt::gray);
     painter->drawRect(QRect(beginRectLeft,
@@ -91,7 +92,7 @@ void GanttIntervalSlider::drawSliderLine(QPainter *painter, const QRect &sliderR
                             top,
                             width,
                             m_sliderV
-                            ), QBrush(QColor(Qt::cyan).lighter(190)));
+                            ), QBrush(sliderColor.lighter(190)));
 
     if(beginRectWidth > 0)
     {

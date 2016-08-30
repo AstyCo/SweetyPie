@@ -18,8 +18,12 @@
 #define DEFAULT_CURDT_ITEM_HEIGHT (qreal(5))
 #define DEFAULT_CURDT_ITEM_WIDTH (qreal(5))
 
+#define SLIDER_COLOR (QColor(125,179,250))
+#define HEADER_COLOR (QColor(32,97,196))
+
 
 //the three values below are dependent
+#define MIN_WIDTH_FOR_MONTH_VISUALIZING (qreal(50))
 #define MIN_WIDTH_FOR_TIME_VISUALIZING (qreal(30)) // in pixels
 #define LITTLE_HATCH_COUNT (5)
 #define MIN_DISTANCE_BETWEEN_HATCHES (qreal(5))

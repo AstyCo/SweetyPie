@@ -25,6 +25,8 @@ public slots:
     void repaintHeader();
     void updateVisibility();
     void updateItemVisibility(const GanttInfoItem* = NULL);
+    void collapseNode(GanttInfoNode*);
+
 
 protected:
     void scrollContentsBy(int dx, int dy);

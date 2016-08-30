@@ -57,6 +57,7 @@ signals:
 
     void graphicsItemHoverEnter(const GanttInfoItem*);
     void graphicsItemHoverLeave(const GanttInfoItem*);
+    void currentItemChanged(const GanttInfoItem*);
 
 private slots:
 //    void on_comboBox_mode_currentIndexChanged(int index);

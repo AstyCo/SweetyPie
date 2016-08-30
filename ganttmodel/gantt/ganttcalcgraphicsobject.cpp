@@ -6,6 +6,7 @@
 #include "ganttinfonode.h"
 
 #include <QPainter>
+#include <QGraphicsSceneMouseEvent>
 
 #include <QDebug>
 
@@ -79,6 +80,21 @@ void GanttCalcGraphicsObject::updateItemGeometry()
     qreal calcPos = m_header->dtToX(m_info->calcDt());
 
     setPos(calcPos, 2*DEFAULT_ITEM_WIDTH + m_info->pos());
+}
+
+void GanttCalcGraphicsObject::mousePressEvent(QGraphicsSceneMouseEvent *event)
+{
+    if(!m_scene || !m_info)
+        return;
+
+    if((this == m_scene->itemAt(event->scenePos())))
+        if((!m_info->isExpanded() && (event->button() == Qt::LeftButton))
+                || (m_info->isExpanded() && (event->button() == Qt::RightButton)))
+            m_scene->changeExpanding(m_info->index());
+
+    emit graphicsItemPressed();
+
+    QGraphicsItem::mousePressEvent(event);
 }
 
 void GanttCalcGraphicsObject::hoverEnterEvent(QGraphicsSceneHoverEvent *event)

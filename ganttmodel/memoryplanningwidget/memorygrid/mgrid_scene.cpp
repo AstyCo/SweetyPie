@@ -25,7 +25,6 @@ using namespace Memory;
 MGridScene::MGridScene( QObject * parent)
     :QGraphicsScene(parent)
 {
-    qDebug() << "MGridScene constructor";
     m_selectionMode = SelectionMode_count;
     setSelectionMode(areaSelection);
 

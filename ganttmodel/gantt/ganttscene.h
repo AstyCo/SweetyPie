@@ -7,6 +7,7 @@
 
 #include <QGraphicsScene>
 #include <QMap>
+#include <QPointer>
 
 class GanttGraphicsView;
 class GanttGraphicsObject;
@@ -37,7 +38,7 @@ public:
     void updateHeaderPos(int dy);
     void updateSliderRect();
 
-    void onViewAdded(QGraphicsView* view);
+    void onViewAdded(GanttGraphicsView* view);
 
     void setHeaderMode(GanttHeader::GanttHeaderMode mode);
     GanttHeader::GanttHeaderMode headerMode() const;
@@ -94,6 +95,8 @@ public:
     void setSceneRect(const QRectF &rect);
     void setSceneRect(qreal x,qreal y, qreal width, qreal height);
 
+    bool isVisible(const QGraphicsItem* which) const;
+
 signals:
     void limitsChanged(const UtcDateTime &start, const UtcDateTime &finish);
 
@@ -102,8 +105,7 @@ signals:
 
     void graphicsItemHoverEnter(const GanttInfoItem*);
     void graphicsItemHoverLeave(const GanttInfoItem*);
-
-    void currentItemChanged(QGraphicsItem*);
+    void currentItemChanged(const GanttInfoItem*);
 
 
 
@@ -131,6 +133,7 @@ private:
     void updateItems();
 
 private slots:
+    void onGraphicsItemPress();
     void onGraphicsItemHoverEnter();
     void onGraphicsItemHoverLeave();
 
@@ -150,6 +153,7 @@ private:
     GanttHeader *m_header;
     GanttCurrentDtSlider *m_slider;
     QGraphicsItem *m_currentItem;
+    QPointer<GanttGraphicsView> m_view;
 
     friend class GanttWidget;
 };

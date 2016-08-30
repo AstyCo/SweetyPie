@@ -104,6 +104,15 @@ void GanttTreeView::updateVisibilityHelper(const GanttInfoNode *node)
     }
 }
 
+void GanttTreeView::collapseNode(GanttInfoNode *node)
+{
+    if(node)
+    {
+        collapse(node->index());
+        emit collapsed(node->index());
+    }
+}
+
 
 void GanttTreeView::setGraphicsView(GanttGraphicsView *graphicsView)
 {
@@ -118,6 +127,7 @@ void GanttTreeView::setModel(QAbstractItemModel *model)
 
 //    connect(m_model,SIGNAL(itemsAdded()),this,SLOT(updateVisibility()));
 //    connect(m_model,SIGNAL(itemsAdded(GanttInfoItem*)),this,SLOT(updateItemVisibility(const GanttInfoItem*)));
+    connect(m_model,SIGNAL(needCollapse(GanttInfoNode*)),this,SLOT(collapseNode(GanttInfoNode*)));
 
     QTreeView::setModel(model);
 }
