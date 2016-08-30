@@ -60,7 +60,7 @@ signals:
     void currentItemChanged(const GanttInfoItem*);
 
 private slots:
-//    void on_comboBox_mode_currentIndexChanged(int index);
+//    void on_comboBox_mode_currentIndexChanged(int inde);
 
     void expanded(const QModelIndex& index);
     void collapsed(const QModelIndex& index);

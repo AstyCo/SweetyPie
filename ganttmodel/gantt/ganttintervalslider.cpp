@@ -76,32 +76,34 @@ void GanttIntervalSlider::drawSliderLine(QPainter *painter, const QRect &sliderR
     foregroundGradient.setColorAt(0.5,sliderColor.lighter(180));
     foregroundGradient.setColorAt(1,sliderColor);
 
-    QLinearGradient backgroundGradient(QPoint(0,top),QPoint(0,top + m_sliderV));
-    backgroundGradient.setColorAt(0,sliderColor);
-    backgroundGradient.setColorAt(0.5,Qt::white);
-    backgroundGradient.setColorAt(1,sliderColor);
+//    QLinearGradient backgroundGradient(QPoint(0,top),QPoint(0,top + m_sliderV));
+//    backgroundGradient.setColorAt(0,sliderColor);
+//    backgroundGradient.setColorAt(0.5,Qt::white);
+//    backgroundGradient.setColorAt(1,sliderColor);
 
     painter->setPen(Qt::gray);
+
+    painter->fillRect(QRect(innerRectLeft,
+                            top,
+                            innerRectWidth,
+                            m_sliderV
+                            ), foregroundGradient);
+
     painter->drawRect(QRect(beginRectLeft,
                             top,
                             width,
                             m_sliderV
                             ));
 
-    painter->fillRect(QRect(beginRectLeft,
-                            top,
-                            width,
-                            m_sliderV
-                            ), QBrush(sliderColor.lighter(190)));
 
     if(beginRectWidth > 0)
     {
-        QRect beforeBeginRect(beginRectLeft,
-                              top,
+        QRect beforeBeginRect(beginRectLeft+1,
+                              top+1,
                               beginRectWidth,
-                              m_sliderV);
+                              m_sliderV-1);
 
-        painter->fillRect(beforeBeginRect,foregroundGradient);
+        painter->fillRect(beforeBeginRect,  QBrush(sliderColor.lighter(190)));
 
     }
 
@@ -109,11 +111,11 @@ void GanttIntervalSlider::drawSliderLine(QPainter *painter, const QRect &sliderR
     if(endRectWidth > 0)
     {
         QRect afterEndRect(endRectLeft,
-                        top,
-                        endRectWidth,
-                        m_sliderV);
+                        top+1,
+                        endRectWidth-1,
+                        m_sliderV-1);
 
-        painter->fillRect(afterEndRect,foregroundGradient);
+        painter->fillRect(afterEndRect,  QBrush(sliderColor.lighter(190)));
     }
 
     if(!outOfLimits(m_currentTime))
