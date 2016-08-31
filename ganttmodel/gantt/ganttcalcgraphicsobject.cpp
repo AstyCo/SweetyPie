@@ -91,15 +91,16 @@ void GanttCalcGraphicsObject::updateItemGeometry()
 
 void GanttCalcGraphicsObject::mousePressEvent(QGraphicsSceneMouseEvent *event)
 {
-    if(!m_scene || !m_info)
-        return;
+//    if(!m_scene || !m_info)
+//        return;
 
-    if((this == m_scene->itemAt(event->scenePos())))
-        if((!m_info->isExpanded() && (event->button() == Qt::LeftButton))
-                /*|| (m_info->isExpanded() && (event->button() == Qt::RightButton))*/)
-            m_scene->changeExpanding(m_info->index());
-
-    emit graphicsItemPressed();
+//    if((this == m_scene->itemAt(event->scenePos())))
+//        if((!m_info->isExpanded() && (event->button() == Qt::LeftButton))
+//                /*|| (m_info->isExpanded() && (event->button() == Qt::RightButton))*/)
+//        {
+//            m_scene->changeExpanding(m_info->index());
+//            emit graphicsItemPressed();
+//        }
 
     QGraphicsItem::mousePressEvent(event);
 }

@@ -134,7 +134,6 @@ void GanttTreeView::setModel(QAbstractItemModel *model)
 
 void GanttTreeView::setCurrentIndex(const QModelIndex &index)
 {
-    qDebug() << "GanttTreeView::setCurrentIndex";
     QAbstractItemView::setCurrentIndex(index);
 }
 

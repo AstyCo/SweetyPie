@@ -5,6 +5,7 @@
 #include "ganttgraphicsobject.h"
 #include "ganttcalcgraphicsobject.h"
 #include "ganttdtcrossobject.h"
+#include "gantthovergraphicsobject.h"
 
 #include "ganttinfoleaf.h"
 #include "ganttinfonode.h"
@@ -32,6 +33,8 @@ GanttScene::GanttScene(QObject * parent) :
     m_slider->setScene(this);
     m_crossObject = new GanttDtCrossObject;
     m_crossObject->setScene(this);
+    m_hoverObject = new GanttHoverGraphicsObject;
+    m_hoverObject->setScene(this);
 
     connect(m_slider,SIGNAL(dtChanged(UtcDateTime)),this,SIGNAL(currentDtChanged(UtcDateTime)));
 
@@ -150,7 +153,7 @@ void GanttScene::updateSceneRect()
             setSceneRect(m_header->mapRectToScene(m_header->boundingRect()));
     }
     else
-        setSceneRect(itemsBoundingRect());
+        setSceneRect(elementsBoundingRect());
 
     updateSliderRect();
 }
@@ -270,27 +273,37 @@ UtcDateTime GanttScene::slidersDt() const
 
 void GanttScene::mousePressEvent(QGraphicsSceneMouseEvent *event)
 {
-    if(event->button() == Qt::RightButton)
+    QGraphicsScene::mousePressEvent(event);
+    if(event->buttons() & Qt::LeftButton)
     {
-        if(!m_crossObject.isNull())
+        QGraphicsObject *object = objectForPos(event->scenePos());
+        if(object)
         {
-            m_crossObject->setVisible(true);
+            qDebug()<<"object pos "<< object->scenePos();
+            setCurrentItem(object);
         }
     }
 
-    QGraphicsScene::mousePressEvent(event);
+    mouseMoveEvent(event);
 }
 
 void GanttScene::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
 {
-    if(event->buttons() && Qt::RightButton)
+    if(event->buttons() & Qt::RightButton)
     {
         if(!m_view.isNull())
         {
             QRectF viewRect = m_view->mapToScene(m_view->viewport()->geometry()).boundingRect()
                     .adjusted(0,DEFAULT_HEADER_HEIGHT,0,0);
             if(viewRect.contains(event->scenePos()) && !m_crossObject.isNull())
-                    m_crossObject->setPos(event->scenePos());
+            {
+                m_crossObject->setVisible(true);
+                m_crossObject->setPos(event->scenePos());
+            }
+            else
+            {
+                m_crossObject->setVisible(false);
+            }
         }
     }
 
@@ -341,6 +354,7 @@ QGraphicsItem *GanttScene::currentItem() const
 
 void GanttScene::setSceneRect(const QRectF &rect)
 {
+    qDebug() << rect;
     QGraphicsScene::setSceneRect(rect);
 }
 
@@ -358,6 +372,16 @@ bool GanttScene::isVisible(const QGraphicsItem *which) const
             .adjusted(0,DEFAULT_HEADER_HEIGHT,0,0);
 
     return viewRect.contains(which->sceneBoundingRect());
+}
+
+QRectF GanttScene::elementsBoundingRect()
+{
+    QRectF res = (m_header)?(m_header->sceneBoundingRect()):(QRectF());
+    foreach(GanttGraphicsObject* object,m_items)
+        res|=object->sceneBoundingRect();
+    foreach(GanttCalcGraphicsObject *object,m_calcItems)
+        res|=object->sceneBoundingRect();
+    return res;
 }
 
 void GanttScene::clear()
@@ -380,6 +404,7 @@ void GanttScene::setCurrentItem(QGraphicsObject *currentItem)
 
     if(m_currentItem)
     {
+
         if(GanttGraphicsObject *graphicsObject = dynamic_cast<GanttGraphicsObject*>(m_currentItem.data()))
             info = graphicsObject->info();
         if(GanttCalcGraphicsObject *graphicsObject = dynamic_cast<GanttCalcGraphicsObject*>(m_currentItem.data()))
@@ -397,8 +422,31 @@ void GanttScene::setCurrentItem(QGraphicsObject *currentItem)
                                   ,0,0);
         }
         m_currentItem->update();
+        if(m_hoverObject)
+        {
+            m_hoverObject->setPos(m_currentItem->pos());
+            m_hoverObject->setVisible(true);
+        }
     }
+    else
+        if(m_hoverObject)
+            m_hoverObject->setVisible(false);
     emit currentItemChanged(info);
+}
+
+QGraphicsObject *GanttScene::objectForPos(const QPointF &pos)
+{
+    int y = ((int) pos.y()) / DEFAULT_ITEM_HEIGHT * DEFAULT_ITEM_HEIGHT;
+    QList<QGraphicsItem*> itemsInTheArea = items(0,y,sceneRect().width(),DEFAULT_ITEM_HEIGHT);
+
+    foreach(QGraphicsItem* item, itemsInTheArea)
+    {
+        if(QGraphicsObject *object = dynamic_cast<GanttGraphicsObject*>(item))
+            return object;
+        if(QGraphicsObject *object = dynamic_cast<GanttCalcGraphicsObject*>(item))
+            return object;
+    }
+    return NULL;
 }
 const QList<GanttGraphicsObject *>& GanttScene::dtItems() const
 {

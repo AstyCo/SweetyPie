@@ -105,7 +105,8 @@ SOURCES += \
     gantt/ganttcalcgraphicsobject.cpp \
     gantt/ganttgraphicsobject.cpp \
     gantt/ganttcurrentdtslider.cpp \
-    gantt/ganttdtcrossobject.cpp
+    gantt/ganttdtcrossobject.cpp \
+    gantt/gantthovergraphicsobject.cpp
 
 
 HEADERS += \
@@ -156,7 +157,8 @@ HEADERS += \
     gantt/ganttgraphicsobject.h \
     gantt/ganttcalcgraphicsobject.h \
     gantt/ganttcurrentdtslider.h \
-    gantt/ganttdtcrossobject.h
+    gantt/ganttdtcrossobject.h \
+    gantt/gantthovergraphicsobject.h
 
 
 RESOURCES += \
