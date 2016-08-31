@@ -113,6 +113,8 @@ void GanttWidget::addItems(GanttInfoItem* item)
 
     callForEachItem(item,ui->treeView,m_scene,
                     &connectSignalsToNewItems);
+
+//    ui->treeView->resizeColumnsToContents();
 }
 
 void GanttWidget::addItems(const QList<GanttInfoItem *> &items)
@@ -123,6 +125,8 @@ void GanttWidget::addItems(const QList<GanttInfoItem *> &items)
     foreach(GanttInfoItem* item,items)
         callForEachItem(item,ui->treeView,m_scene,
                         &connectSignalsToNewItems);
+
+//        ui->treeView->resizeColumnsToContents();
 }
 
 
@@ -377,6 +381,13 @@ void GanttWidget::newLimits(const UtcDateTime &min, const UtcDateTime &max)
 
 void GanttWidget::prevLimits()
 {
+    if(ui->intervalSlider->beginHandle()!=ui->intervalSlider->minValue()
+            || ui->intervalSlider->endHandle()!=ui->intervalSlider->maxValue())
+    {
+        updateSliderLimits();
+        return;
+    }
+
     if(m_stackLimits.isEmpty())
         return;
 

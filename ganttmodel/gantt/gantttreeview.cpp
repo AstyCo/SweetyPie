@@ -28,14 +28,14 @@ GanttTreeView::GanttTreeView(QWidget * parent )
     setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     setMouseTracking(true);
 
-    setSelectionBehavior(QAbstractItemView::SelectItems);
-    setSelectionMode(QAbstractItemView::NoSelection);
+    setSelectionBehavior(QAbstractItemView::SelectRows);
+//    setSelectionMode(QAbstractItemView::NoSelection);
     setFrameStyle(0);
 
 
 
-    setItemDelegateForColumn(1, new GanttTreeDelegate(this));
-    setItemDelegateForColumn(2, new GanttTreeDelegate(this));
+//    setItemDelegateForColumn(1, new GanttTreeDelegate(this));
+//    setItemDelegateForColumn(2, new GanttTreeDelegate(this));
 
 }
 
@@ -130,6 +130,12 @@ void GanttTreeView::setModel(QAbstractItemModel *model)
     connect(m_model,SIGNAL(needCollapse(GanttInfoNode*)),this,SLOT(collapseNode(GanttInfoNode*)));
 
     QTreeView::setModel(model);
+}
+
+void GanttTreeView::setCurrentIndex(const QModelIndex &index)
+{
+    qDebug() << "GanttTreeView::setCurrentIndex";
+    QAbstractItemView::setCurrentIndex(index);
 }
 
 

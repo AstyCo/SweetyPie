@@ -104,7 +104,8 @@ SOURCES += \
     appeventfilter.cpp \
     gantt/ganttcalcgraphicsobject.cpp \
     gantt/ganttgraphicsobject.cpp \
-    gantt/ganttcurrentdtslider.cpp
+    gantt/ganttcurrentdtslider.cpp \
+    gantt/ganttdtcrossobject.cpp
 
 
 HEADERS += \
@@ -154,7 +155,8 @@ HEADERS += \
     appeventfilter.h \
     gantt/ganttgraphicsobject.h \
     gantt/ganttcalcgraphicsobject.h \
-    gantt/ganttcurrentdtslider.h
+    gantt/ganttcurrentdtslider.h \
+    gantt/ganttdtcrossobject.h
 
 
 RESOURCES += \

@@ -22,6 +22,7 @@ public:
     void setModel(QAbstractItemModel *model);
 
 public slots:
+    void setCurrentIndex(const QModelIndex &index);
     void repaintHeader();
     void updateVisibility();
     void updateItemVisibility(const GanttInfoItem* = NULL);

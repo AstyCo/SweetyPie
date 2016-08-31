@@ -12,6 +12,7 @@
 class GanttGraphicsView;
 class GanttGraphicsObject;
 class GanttCalcGraphicsObject;
+class GanttDtCrossObject;
 
 class QModelIndex;
 
@@ -127,6 +128,8 @@ public slots:
 
 protected:
     void mousePressEvent(QGraphicsSceneMouseEvent *event);
+    void mouseMoveEvent(QGraphicsSceneMouseEvent *event);
+    void mouseReleaseEvent(QGraphicsSceneMouseEvent *event);
 
 private:
 
@@ -156,6 +159,7 @@ private:
     GanttCurrentDtSlider *m_slider;
     QPointer<QGraphicsObject> m_currentItem;
     QPointer<GanttGraphicsView> m_view;
+    QPointer<GanttDtCrossObject> m_crossObject;
 
     friend class GanttWidget;
 };

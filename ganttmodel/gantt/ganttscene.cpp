@@ -4,6 +4,7 @@
 #include "ganttgraphicsview.h"
 #include "ganttgraphicsobject.h"
 #include "ganttcalcgraphicsobject.h"
+#include "ganttdtcrossobject.h"
 
 #include "ganttinfoleaf.h"
 #include "ganttinfonode.h"
@@ -29,6 +30,8 @@ GanttScene::GanttScene(QObject * parent) :
     m_header->setScene(this);
     m_slider = new GanttCurrentDtSlider;
     m_slider->setScene(this);
+    m_crossObject = new GanttDtCrossObject;
+    m_crossObject->setScene(this);
 
     connect(m_slider,SIGNAL(dtChanged(UtcDateTime)),this,SIGNAL(currentDtChanged(UtcDateTime)));
 
@@ -267,8 +270,45 @@ UtcDateTime GanttScene::slidersDt() const
 
 void GanttScene::mousePressEvent(QGraphicsSceneMouseEvent *event)
 {
-//    m_header->setPos(event->scenePos());
+    if(event->button() == Qt::RightButton)
+    {
+        if(!m_crossObject.isNull())
+        {
+            m_crossObject->setVisible(true);
+        }
+    }
+
     QGraphicsScene::mousePressEvent(event);
+}
+
+void GanttScene::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
+{
+    if(event->buttons() && Qt::RightButton)
+    {
+        if(!m_view.isNull())
+        {
+            QRectF viewRect = m_view->mapToScene(m_view->viewport()->geometry()).boundingRect()
+                    .adjusted(0,DEFAULT_HEADER_HEIGHT,0,0);
+            if(viewRect.contains(event->scenePos()) && !m_crossObject.isNull())
+                    m_crossObject->setPos(event->scenePos());
+        }
+    }
+
+
+    QGraphicsScene::mouseMoveEvent(event);
+}
+
+void GanttScene::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
+{
+    if(event->button() == Qt::RightButton)
+    {
+        if(!m_crossObject.isNull())
+        {
+            m_crossObject->setVisible(false);
+        }
+    }
+
+    QGraphicsScene::mouseReleaseEvent(event);
 }
 
 void GanttScene::onLeafStartChanged(/*const UtcDateTime& lastStart*/)

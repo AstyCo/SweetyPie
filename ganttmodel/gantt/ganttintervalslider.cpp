@@ -150,7 +150,7 @@ void GanttIntervalSlider::mouseMoveEvent(QMouseEvent *e)
         {
             moveHandles(0);
         }
-        else if(m_scene->startByDt(valToDt(beginHandle())) != closestStartDt(val))
+        else if(valToDt(beginHandle()) != closestStartDt(val))
         {
             setBeginHandle(dtToVal(closestStartDt(val)));
         }
@@ -278,6 +278,11 @@ void GanttIntervalSlider::setEndHandle(long long endHandle)
     IntervalSlider::setEndHandle(endHandle);
 }
 
+void GanttIntervalSlider::reset()
+{
+    setLimits(m_minValue,m_maxValue);
+}
+
 void GanttIntervalSlider::setMinTimeSize(long long minTimeSize)
 {
     m_minTimeSize = minTimeSize;
@@ -324,14 +329,9 @@ UtcDateTime GanttIntervalSlider::closestStartDt(long long val) const
         return UtcDateTime();
     }
 
-
     UtcDateTime valDt = valToDt(val);
     GanttHeader::GanttPrecisionMode mode = m_scene->calculateTimeMode(valDt, endDt());
-
-    UtcDateTime res = closestStartDtHelper(valDt,mode)
-            ,tmpVar;
-
-    return res;
+    return closestStartDtHelper(valDt,mode);
 }
 
 UtcDateTime GanttIntervalSlider::closestFinishDt(long long val) const
@@ -390,10 +390,13 @@ UtcDateTime GanttIntervalSlider::closestStartDtHelper(const UtcDateTime& valDt, 
     UtcDateTime closestInCurrentMode;
 
     if(valDt.toMicrosecondsSinceEpoch() - start.toMicrosecondsSinceEpoch()
-            > nextStart.toMicrosecondsSinceEpoch() - valDt.toMicrosecondsSinceEpoch() )
+            > nextStart.toMicrosecondsSinceEpoch() - valDt.toMicrosecondsSinceEpoch())
         closestInCurrentMode = nextStart;
     else
         closestInCurrentMode = start;
+
+    if(qAbs(closestInCurrentMode.microsecondsTo(valDt))>qAbs(beginDt().microsecondsTo(valDt)))
+        closestInCurrentMode = beginDt();
 
     GanttHeader::GanttPrecisionMode newMode = m_scene->calculateTimeMode(start,valToDt(endHandle()));
     if((int)newMode > (int)mode)
@@ -413,6 +416,9 @@ UtcDateTime GanttIntervalSlider::closestFinishDtHelper(const UtcDateTime &valDt,
         closestInCurrentMode = finish;
     else
         closestInCurrentMode = prevFinish;
+
+    if(qAbs(closestInCurrentMode.microsecondsTo(valDt))>qAbs(endDt().microsecondsTo(valDt)))
+        closestInCurrentMode = endDt();
 
     GanttHeader::GanttPrecisionMode newMode = m_scene->calculateTimeMode(valToDt(beginHandle()),closestInCurrentMode);
     if((int)newMode > (int)mode)
