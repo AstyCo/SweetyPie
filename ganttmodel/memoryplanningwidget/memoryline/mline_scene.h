@@ -5,7 +5,7 @@
 #include <ganttproject_global.h>
 
 
-#include "kamemory.h"
+#include "memory.h"
 #include "QList"
 #include <QGraphicsScene>
 #include <QPainter>
@@ -26,7 +26,7 @@ class GANTTMODELSHARED_EXPORT MLineScene: public QGraphicsScene
 {
     Q_OBJECT
 private:
-    KaMemory _memory;
+    Memory _memory;
     bool m_isPickerEnabled;
 
     MLinePicker * m_picker;
@@ -47,11 +47,11 @@ public:
 
     MLineGraphicsPart * selectedKaMemoryPart();
 
-    KaMemory memory() const;
+    Memory memory() const;
 
-    void init(const QList<KaMemoryPart>& list, long memorySize);
+    void init(const QList<MemoryPart>& list, long memorySize);
 
-    void setMemory(const KaMemory &memory);
+    void setMemory(const Memory &memory);
 };
 
 #endif // MLINE_SCENE_H

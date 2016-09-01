@@ -13,7 +13,7 @@ namespace Ui {
 class MemoryPlanningWidget;
 }
 
-class KaMemory;
+class Memory;
 class MGridScene;
 class MLineScene;
 
@@ -29,7 +29,7 @@ public:
     ~MemoryPlanningWidget();
 
 
-    void setMemory(const KaMemory& kaMemory);
+    void setMemory(const Memory& kaMemory);
 
     MGridScene* gridScene() const;
     MLineScene* lineScene() const;
@@ -64,7 +64,7 @@ private:
     MGridScene* m_gridScene;
     MLineScene* m_lineScene;
 
-    Memory::MemoryViewMode m_mode;
+    MemoryView::MemoryViewMode m_mode;
     bool m_showButtons;
 
     QVector<QWidget*> m_gridWidgets;

@@ -1,24 +1,24 @@
 
-#include "kamemory.h"
+#include "memory.h"
 #include "mline_scene.h"
 
 #include <QDebug>
 #include <QCursor>
 #include "QGraphicsTextItem"
 
-KaMemory MLineScene::memory() const
+Memory MLineScene::memory() const
 {
     return _memory;
 }
 
-void MLineScene::init(const QList<KaMemoryPart> &records, long memorySize)
+void MLineScene::init(const QList<MemoryPart> &records, long memorySize)
 {
-    KaMemory kaMemory;
+    Memory kaMemory;
     kaMemory.init(records,memorySize);
     setMemory(kaMemory);
 }
 
-void MLineScene::setMemory(const KaMemory &memory)
+void MLineScene::setMemory(const Memory &memory)
 {
     _memory = memory;
 

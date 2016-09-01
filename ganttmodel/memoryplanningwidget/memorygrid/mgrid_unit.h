@@ -1,7 +1,7 @@
 #ifndef MGRID_UNIT_H
 #define MGRID_UNIT_H
 
-#include "kamemorypart.h"
+#include "memorypart.h"
 
 #include <QGraphicsItem>
 #include <QVariant>
@@ -31,8 +31,8 @@ public:
     int id() const;
     void setId(int id);
 
-    Memory::MemoryState state() const;
-    void setState(const Memory::MemoryState &state);
+    MemoryPart::MemoryState state() const;
+    void setState(const MemoryPart::MemoryState &state);
 
     long start() const;
     void setStart(long start);
@@ -51,7 +51,7 @@ public:
     bool showBorder() const;
     void setShowBorder(bool showBorder);
 
-    QColor color() const;
+    QColor color();
 
     void addItems(long start, long finish);
     long removeItems(long from, long count); ///< returns count of actually removed items
@@ -59,7 +59,7 @@ public:
 
     qreal extraSize() const;
 
-    KaMemoryPart toKaMemoryPart() const;
+    MemoryPart toKaMemoryPart() const;
 
 private:
     void rebuildShape();
@@ -75,7 +75,7 @@ private:
     bool m_unitSelected;
 
     int m_unitId;
-    Memory::MemoryState m_state;
+    MemoryPart::MemoryState m_state;
     MGridScene* m_scene;
     QVector<MGridItem*>* m_items;
 

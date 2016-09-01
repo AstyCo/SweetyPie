@@ -1,8 +1,8 @@
-
-#include "mgrid_scene.h"
-#include "memory_globalvalues.h"
 #include "mgrid_item.h"
 #include "mgrid_unit.h"
+#include "memoryview.h"
+#include "mgrid_scene.h"
+#include "memory_globalvalues.h"
 
 
 #include <QPainter>
@@ -172,14 +172,14 @@ void MGridItem::setUnitSelected(bool selected)
     m_unit->update();
 }
 
-MemoryState MGridItem::state() const
+MemoryPart::MemoryState MGridItem::state() const
 {
     if(m_unit)
     {
         return m_unit->state();
     }
 
-    return Memory::Empty;
+    return MemoryPart::Empty;
 }
 
 QColor MGridItem::color() const
@@ -189,7 +189,7 @@ QColor MGridItem::color() const
     if(m_unit)
         return MemoryState_to_QColor(m_unit->state(),highlightedItem);
 
-    return MemoryState_to_QColor(Memory::Empty,highlightedItem);
+    return MemoryState_to_QColor(MemoryPart::Empty,highlightedItem);
 }
 
 //int MemoryItem::parentUnitId() const

@@ -4,7 +4,7 @@
 #include "mgrid_item.h"
 #include "mgrid_unit.h"
 
-#include "kamemory.h"
+#include "memory.h"
 #include "mgrid_interactiveunit.h"
 
 #include <QGraphicsSceneMouseEvent>
@@ -18,9 +18,6 @@
 #include <QMutex>
 
 qreal qSqrt(qreal);
-
-
-using namespace Memory;
 
 MGridScene::MGridScene( QObject * parent)
     :QGraphicsScene(parent)
@@ -179,7 +176,7 @@ void MGridScene::updateShownUnits()
     }
 }
 
-void MGridScene::setMemory(const KaMemory& kaMemory)
+void MGridScene::setMemory(const Memory& kaMemory)
 {
     clear();
     m_memory = kaMemory;
@@ -194,7 +191,7 @@ void MGridScene::setMemory(const KaMemory& kaMemory)
 
     setupMatrix(m_items);
 
-    const QList<KaMemoryPart>& units = kaMemory.memoryParts();
+    const QList<MemoryPart>& units = kaMemory.memoryParts();
 
     for(int i = 0; i < units.size(); ++i)
         addUnit(units[i]);
@@ -204,7 +201,7 @@ void MGridScene::setMemory(const KaMemory& kaMemory)
 MGridUnit* MGridScene::newUnit()
 {
     MGridUnit* p_memUnit = new MGridUnit(this);
-    p_memUnit->setState(Memory::Empty);
+    p_memUnit->setState(MemoryPart::Empty);
 
     addUnit(p_memUnit);
     return p_memUnit;
@@ -418,7 +415,7 @@ void MGridScene::setHighlightStyle(int highlightStyle)
     m_highlightStyle = static_cast<HighlightStyle>(highlightStyle);
 }
 
-KaMemory MGridScene::memory()
+Memory MGridScene::memory()
 {
     updateMemory();
     return m_memory;
@@ -426,11 +423,11 @@ KaMemory MGridScene::memory()
 
 void MGridScene::updateMemory()
 {
-    QList<KaMemoryPart> parts;
+    QList<MemoryPart> parts;
 
     foreach(MGridUnit* unit,m_units)
     {
-        KaMemoryPart part;
+        MemoryPart part;
         part.setStart(unit->start());
         part.setFinish(unit->finish());
         part.setId(unit->id());
@@ -512,7 +509,7 @@ long MGridScene::lengthSelection() const
     return m_lengthSelection;
 }
 
-void MGridScene::addUnit(const KaMemoryPart &part)
+void MGridScene::addUnit(const MemoryPart &part)
 {
     MGridUnit* p_memUnit = new MGridUnit(this);
     p_memUnit->setState(part.state());
@@ -589,14 +586,14 @@ void MGridScene::clearMouseOver()
     setMouseOverUnit(NULL);
 }
 
-QList<KaMemoryPart> MGridScene::crossingParts() const
+QList<MemoryPart> MGridScene::crossingParts() const
 {
 
     QList<MGridUnit*> units;
 
     if(lengthSelection())
         units = crossingParts(startSelection(),finishSelection());
-    QList<KaMemoryPart> result;
+    QList<MemoryPart> result;
     foreach(MGridUnit* unit, units)
     {
         result.append(unit->toKaMemoryPart());
@@ -610,23 +607,23 @@ QString MGridScene::toAdress(long start, long finish)
             +" - 0x"+fixedNumPresentation(finish,16,memorySize()-1);
 }
 
-void MGridScene::setKaMemoryPart(const KaMemoryPart &part)
+void MGridScene::setKaMemoryPart(const MemoryPart &part)
 {
     long start = part.start(),
             length = part.length();
 
     switch(part.state())
     {
-    case Empty:
+    case MemoryPart::Empty:
         setEmpty(start,length);
         break;
-    case Free:
+    case MemoryPart::Free:
         setFree(start,length);
         break;
-    case PendingRead:
+    case MemoryPart::PendingRead:
         setPendingRead(start,length);
         break;
-    case PendingWrite:
+    case MemoryPart::PendingWrite:
         setPendingWrite(start,length);
         break;
     default:
@@ -702,18 +699,18 @@ void MGridScene::setHighlightMode(bool highlightMode)
 }
 
 
-KaMemoryPart MGridScene::setEmpty(long from, long count)
+MemoryPart MGridScene::setEmpty(long from, long count)
 {
     QList<ActionErrors> errors;
     // ANALYSIS
     for(int i = 0, j = from; i<count; ++i,++j)
     {
-        Memory::MemoryState itemState = m_items[j]->state();
+        MemoryPart::MemoryState itemState = m_items[j]->state();
         if(m_notReadStates.contains(itemState))
         {
             errors.append(EmptyOfNotRead);
         }
-        if (itemState == Memory::PendingRead)
+        if (itemState == MemoryPart::PendingRead)
         {
             errors.append(EmptyOfPendingRead);
         }
@@ -721,25 +718,25 @@ KaMemoryPart MGridScene::setEmpty(long from, long count)
 
     if(errorHandler(errors))
     {
-        return setState(from,count,Memory::Empty);
+        return setState(from,count,MemoryPart::Empty);
     }
 
-    return KaMemoryPart();
+    return MemoryPart();
 }
 
-KaMemoryPart MGridScene::setPendingRead(long from, long count)
+MemoryPart MGridScene::setPendingRead(long from, long count)
 {
 
     QList<ActionErrors> errors;
     // ANALYSIS
     for(int i = 0, j = from; i<count; ++i,++j)
     {
-        Memory::MemoryState itemState = m_items[j]->state();
-        if(itemState == Memory::PendingRead)
+        MemoryPart::MemoryState itemState = m_items[j]->state();
+        if(itemState == MemoryPart::PendingRead)
         {
             errors.append(ReadOfReaded);
         }
-        else if (itemState == Memory::Empty)
+        else if (itemState == MemoryPart::Empty)
         {
             errors.append(ReadOfEmpty);
         }
@@ -747,13 +744,13 @@ KaMemoryPart MGridScene::setPendingRead(long from, long count)
 
     if(errorHandler(errors))
     {
-        return setState(from,count,Memory::PendingRead);
+        return setState(from,count,MemoryPart::PendingRead);
     }
 
-    return KaMemoryPart();
+    return MemoryPart();
 }
 
-KaMemoryPart MGridScene::setFree(long from, long count)
+MemoryPart MGridScene::setFree(long from, long count)
 {
 
     QList<ActionErrors> errors;
@@ -765,31 +762,31 @@ KaMemoryPart MGridScene::setFree(long from, long count)
 
     if(errorHandler(errors))
     {
-        return setState(from,count,Memory::Free);
+        return setState(from,count,MemoryPart::Free);
     }
 
-    return KaMemoryPart();
+    return MemoryPart();
 }
 
-KaMemoryPart MGridScene::setPendingWrite(long from, long count)
+MemoryPart MGridScene::setPendingWrite(long from, long count)
 {
 
     QList<ActionErrors> errors;
     // ANALYSIS
     for(int i = 0, j = from; i<count; ++i,++j)
     {
-        Memory::MemoryState itemState = m_items[j]->state();
+        MemoryPart::MemoryState itemState = m_items[j]->state();
         if(m_writeStates.contains(itemState))
         {
             errors.append(WriteToNotRead);
             errors.append(WriteToNotEmpty);
         }
-        else if (itemState == Memory::PendingRead)
+        else if (itemState == MemoryPart::PendingRead)
         {
             errors.append(WriteToPendingRead);
             errors.append(WriteToNotEmpty);
         }
-        else if (itemState == Memory::Free)
+        else if (itemState == MemoryPart::Free)
         {
             errors.append(WriteToNotEmpty);
         }
@@ -797,46 +794,46 @@ KaMemoryPart MGridScene::setPendingWrite(long from, long count)
 
     if(errorHandler(errors))
     {
-        return setState(from,count,Memory::PendingWrite);
+        return setState(from,count,MemoryPart::PendingWrite);
     }
 
-    return KaMemoryPart();
+    return MemoryPart();
 }
 
-KaMemoryPart MGridScene::setEmpty()
+MemoryPart MGridScene::setEmpty()
 {
     if(!lengthSelection())
-        return KaMemoryPart();
+        return MemoryPart();
     return setEmpty(startSelection(),lengthSelection());
 }
 
-KaMemoryPart MGridScene::setFree()
+MemoryPart MGridScene::setFree()
 {
     if(!lengthSelection())
-        return KaMemoryPart();
+        return MemoryPart();
     return setFree(startSelection(),lengthSelection());
 }
 
-KaMemoryPart MGridScene::setPendingRead()
+MemoryPart MGridScene::setPendingRead()
 {
     if(!lengthSelection())
-        return KaMemoryPart();
+        return MemoryPart();
     return setPendingRead(startSelection(),lengthSelection());
 }
 
-KaMemoryPart MGridScene::setPendingWrite()
+MemoryPart MGridScene::setPendingWrite()
 {
     if(!lengthSelection())
-        return KaMemoryPart();
+        return MemoryPart();
     return setPendingWrite(startSelection(),lengthSelection());
 }
 
-KaMemoryPart MGridScene::setState(long from, long count, MemoryState state)
+MemoryPart MGridScene::setState(long from, long count, MemoryPart::MemoryState state)
 {
     MGridUnit* p_mu = NULL;
     clearMemory(from,count);
 
-    if(state != Memory::Empty)
+    if(state != MemoryPart::Empty)
     {
         p_mu = newUnit();
         p_mu->setState(state);
@@ -845,7 +842,7 @@ KaMemoryPart MGridScene::setState(long from, long count, MemoryState state)
 
     update();
     emit memoryChanged();
-    return (p_mu)?(p_mu->toKaMemoryPart()):(KaMemoryPart());
+    return (p_mu)?(p_mu->toKaMemoryPart()):(MemoryPart());
 }
 
 void MGridScene::clearMemory(long from, long count)
@@ -968,7 +965,7 @@ void MGridScene::setItemBorder(qreal itemBorder)
 
 
 
-QList<MemoryState> MGridScene::m_notReadStates,
+QList<MemoryPart::MemoryState> MGridScene::m_notReadStates,
                     MGridScene::m_writeStates,
                     MGridScene::m_errorStates;
 
@@ -977,13 +974,13 @@ MGridScene::Initializer MGridScene::initializerGuard;
 
 MGridScene::Initializer::Initializer()
 {
-    m_notReadStates.append(Memory::Recorded);
-    m_notReadStates.append(Memory::PendingRead);
-    m_notReadStates.append(Memory::PendingWrite);
+    m_notReadStates.append(MemoryPart::Recorded);
+    m_notReadStates.append(MemoryPart::PendingRead);
+    m_notReadStates.append(MemoryPart::PendingWrite);
 
-    m_writeStates.append(Memory::Recorded);
-    m_writeStates.append(Memory::PendingWrite);
+    m_writeStates.append(MemoryPart::Recorded);
+    m_writeStates.append(MemoryPart::PendingWrite);
 
-    m_errorStates.append(Memory::ErrorRead);
-    m_errorStates.append(Memory::ErrorWrite);
+    m_errorStates.append(MemoryPart::ErrorRead);
+    m_errorStates.append(MemoryPart::ErrorWrite);
 }

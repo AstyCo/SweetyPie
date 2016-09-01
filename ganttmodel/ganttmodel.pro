@@ -72,8 +72,6 @@ SOURCES += \
     plotnavigator.cpp \
     memoryplanningwidget/memoryview.cpp \
     memoryplanningwidget/memoryplanningwidget.cpp \
-    memoryplanningwidget/kamemory.cpp \
-    memoryplanningwidget/kamemorypart.cpp \
     memoryplanningwidget/memorygrid/mgrid_interactiveunit.cpp \
     memoryplanningwidget/memorygrid/mgrid_item.cpp \
     memoryplanningwidget/memorygrid/mgrid_scene.cpp \
@@ -128,8 +126,6 @@ HEADERS += \
     memoryplanningwidget/memoryplanningwidget.h \
     memoryplanningwidget/memoryview.h \
     memoryplanningwidget/memoryline/mline_scene.h \
-    memoryplanningwidget/kamemory.h \
-    memoryplanningwidget/kamemorypart.h \
     memoryplanningwidget/memory_globalvalues.h \
     memoryplanningwidget/kamemorylegend.h \
     gantt/ganttintervalsliderzoom.h \

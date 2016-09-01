@@ -1,11 +1,10 @@
 #include "kamemorylegend.h"
-#include "kamemorypart.h"
+#include "memorypart.h"
+#include "memoryview.h"
 
 #include <QLabel>
 #include <QVBoxLayout>
 #include <QHBoxLayout>
-
-using namespace Memory;
 
 KaMemoryLegend::KaMemoryLegend(QWidget *parent) : QWidget(parent)
 {
@@ -17,16 +16,16 @@ KaMemoryLegend::KaMemoryLegend(QWidget *parent) : QWidget(parent)
 
     this->setSizePolicy(sizePolicy);
 
-    for(int i = 0; i<MemoryState_count; ++i)
+    for(int i = 0; i<MemoryPart::MemoryState_count; ++i)
     {
-        MemoryState state = static_cast<MemoryState>(i);
+        MemoryPart::MemoryState state = static_cast<MemoryPart::MemoryState>(i);
         QHBoxLayout *horizontalLayout = new QHBoxLayout;
 
         QLabel *labelColor = new QLabel(this);
         labelColor->setSizePolicy(sizePolicy);
         labelColor->setObjectName(MemoryState_to_QString(state)+"Color");
         labelColor->setStyleSheet(
-           QString::fromLatin1("background-color: %1").arg(MemoryState_to_QColor(state).name()));
+           QString::fromLatin1("background-color: %1").arg(MemoryState_to_QColor(state,true).name()));
         labelColor->setMinimumSize(QSize(16, 16));
         labelColor->setMaximumSize(QSize(16, 16));
         labelColor->setFrameShape(QFrame::Box);
@@ -49,6 +48,6 @@ KaMemoryLegend::KaMemoryLegend(QWidget *parent) : QWidget(parent)
         verticalLayout->addLayout(horizontalLayout);
     }
 
-    setMaximumHeight(MemoryState_count*(16+8)); //ps itemHeight+space
+    setMaximumHeight(MemoryPart::MemoryState_count*(16+8)); //ps itemHeight+space
 }
 

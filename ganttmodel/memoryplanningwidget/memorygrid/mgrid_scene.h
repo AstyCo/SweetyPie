@@ -3,7 +3,7 @@
 
 #include <ganttproject_global.h>
 
-#include "kamemory.h"
+#include "memory.h"
 
 #include <QGraphicsScene>
 
@@ -30,8 +30,8 @@ public:
     ~MGridScene();
 
     /// Инициализирует память
-    void setMemory(const KaMemory& kaMemory);
-    KaMemory memory();
+    void setMemory(const Memory& kaMemory);
+    Memory memory();
     /// Возвращает размер памяти
     long memorySize() const;
 
@@ -70,7 +70,7 @@ public:
     void setHighlightStyle(int highlightStyle);
 
     /// Возвращает список блоков, пересекающих выбранный интервал
-    QList<KaMemoryPart> crossingParts() const;
+    QList<MemoryPart> crossingParts() const;
 
     /// Возвращает строку, представляющую блока памяти в унифицированном виде (ex. 0x0000-0xFFFF ...)
     QString toAdress(long start,long finish);
@@ -108,20 +108,20 @@ public slots:
      *  ErrorRead,      ///< Ошибка сброса - красный
     */
 
-    void setKaMemoryPart(const KaMemoryPart& part);
+    void setKaMemoryPart(const MemoryPart& part);
 
     /// Устанавливает статус по адресам
-    KaMemoryPart setEmpty(long from, long count);
-    KaMemoryPart setFree(long from, long count);
-    KaMemoryPart setPendingRead(long from, long count);
-    KaMemoryPart setPendingWrite(long from, long count);
+    MemoryPart setEmpty(long from, long count);
+    MemoryPart setFree(long from, long count);
+    MemoryPart setPendingRead(long from, long count);
+    MemoryPart setPendingWrite(long from, long count);
 
 
     /// Устанавливает статус по текущему выделению
-    KaMemoryPart setEmpty();
-    KaMemoryPart setFree();
-    KaMemoryPart setPendingRead();
-    KaMemoryPart setPendingWrite();
+    MemoryPart setEmpty();
+    MemoryPart setFree();
+    MemoryPart setPendingRead();
+    MemoryPart setPendingWrite();
 
     // -ACTIONS
 
@@ -145,7 +145,7 @@ protected:
 
 private:
     void clear();
-    KaMemoryPart setState(long from, long count, MemoryState state);
+    MemoryPart setState(long from, long count, MemoryPart::MemoryState state);
     void clearShownUnits();
     void updateShownUnits();
     void clearLastSelected();
@@ -159,7 +159,7 @@ private:
     void addUnit(MGridUnit* p_memUnit);
     MGridUnit* newUnit();
     void removeUnit(MGridUnit* p_memUnit);
-    void addUnit(const KaMemoryPart &part);
+    void addUnit(const MemoryPart &part);
 
     void setItemInfo(const QString& text);
     void setUnitInfo(const QString& text);
@@ -201,7 +201,7 @@ private:
         ActionErrors_count
     };
 
-    static QList<MemoryState> m_notReadStates,
+    static QList<MemoryPart::MemoryState> m_notReadStates,
                               m_writeStates,
                               m_errorStates;
     struct Initializer
@@ -225,7 +225,7 @@ private:
     long m_startSelection;
     long m_lengthSelection;
 
-    KaMemory m_memory;
+    Memory m_memory;
 
     qreal m_itemEdge;
     qreal m_itemBorder;

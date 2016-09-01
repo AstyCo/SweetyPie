@@ -1,7 +1,7 @@
 #ifndef MGRID_INTERACTIVEUNIT_H
 #define MGRID_INTERACTIVEUNIT_H
 
-#include "kamemorypart.h"
+#include "memorypart.h"
 #include "mgrid_scene.h"
 
 #include <QGraphicsItem>
