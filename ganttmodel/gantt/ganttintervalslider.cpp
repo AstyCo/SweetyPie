@@ -398,7 +398,7 @@ UtcDateTime GanttIntervalSlider::closestStartDtHelper(const UtcDateTime& valDt, 
     if(qAbs(closestInCurrentMode.microsecondsTo(valDt))>qAbs(beginDt().microsecondsTo(valDt)))
         closestInCurrentMode = beginDt();
 
-    GanttHeader::GanttPrecisionMode newMode = m_scene->calculateTimeMode(start,valToDt(endHandle()));
+    GanttHeader::GanttPrecisionMode newMode = m_scene->calculateTimeMode(closestInCurrentMode,valToDt(endHandle()));
     if((int)newMode > (int)mode)
         return closestStartDtHelper(valDt,newMode);
     return closestInCurrentMode;
