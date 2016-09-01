@@ -171,7 +171,7 @@ void MainWindow::testMemoryPlanningWidget()
     ui->memoryPlanningWidget->setGridView();
 
     // Begin init values
-    QList<KaMemoryPart> records;
+    QList<MemoryPart> records;
     int memoryPeaceLength,spaceBetweenUnits;
     int vacantPos = 0;
     int id = 1;
@@ -181,7 +181,7 @@ void MainWindow::testMemoryPlanningWidget()
         memoryPeaceLength = qrand()%100;
         spaceBetweenUnits = qrand()%15;
 
-        KaMemoryPart newPeace;
+        MemoryPart newPeace;
         vacantPos+=spaceBetweenUnits;
         newPeace.setStart(vacantPos);
         vacantPos+=memoryPeaceLength;
@@ -192,8 +192,8 @@ void MainWindow::testMemoryPlanningWidget()
         newPeace.setFinish(vacantPos);
         vacantPos+=1;
 
-        newPeace.setState(static_cast<MemoryState>(qrand()%Memory::MemoryState_count));
-        if(newPeace.state()==Memory::Empty)
+        newPeace.setState(static_cast<MemoryPart::MemoryState>(qrand()%MemoryPart::MemoryState_count));
+        if(newPeace.state()==MemoryPart::Empty)
             newPeace.setId(0);
         else
         {
@@ -203,7 +203,7 @@ void MainWindow::testMemoryPlanningWidget()
     }
     // end init values
 
-    KaMemory kaMemory;
+    Memory kaMemory;
     kaMemory.init(records,2000);
 
     MGridScene * scene = ui->memoryPlanningWidget->gridScene();

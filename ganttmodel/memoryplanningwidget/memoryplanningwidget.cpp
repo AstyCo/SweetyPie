@@ -4,13 +4,13 @@
 #include "memoryview.h"
 #include "mgrid_scene.h"
 #include "mline_scene.h"
-#include "kamemorypart.h"
-#include "kamemory.h"
+
+#include "memorypart.h"
+#include "memory.h"
 #include <QDebug>
 #include <QBitmap>
 #include <QScrollBar>
 
-using namespace Memory;
 
 MemoryPlanningWidget::MemoryPlanningWidget(QWidget *parent) :
     QWidget(parent),
@@ -18,10 +18,10 @@ MemoryPlanningWidget::MemoryPlanningWidget(QWidget *parent) :
 {
     ui->setupUi(this);
 
-    ui->pushButtonEmpty->setStyleSheet(QString("background-color: %1").arg(MemoryState_to_QColor(Memory::Empty).name()));
-    ui->pushButtonFree->setStyleSheet(QString("background-color: %1").arg(MemoryState_to_QColor(Memory::Free).name()));
-    ui->pushButtonPendingRead->setStyleSheet(QString("background-color: %1").arg(MemoryState_to_QColor(Memory::PendingRead).name()));
-    ui->pushButtonPendingWrite->setStyleSheet(QString("background-color: %1").arg(MemoryState_to_QColor(Memory::PendingWrite).name()));
+    ui->pushButtonEmpty->setStyleSheet(QString("background-color: %1").arg(MemoryState_to_QColor(MemoryPart::Empty).name()));
+    ui->pushButtonFree->setStyleSheet(QString("background-color: %1").arg(MemoryState_to_QColor(MemoryPart::Free).name()));
+    ui->pushButtonPendingRead->setStyleSheet(QString("background-color: %1").arg(MemoryState_to_QColor(MemoryPart::PendingRead).name()));
+    ui->pushButtonPendingWrite->setStyleSheet(QString("background-color: %1").arg(MemoryState_to_QColor(MemoryPart::PendingWrite).name()));
 
 
     QPixmap pixmap(":/icons/icons/plus.png");
@@ -68,16 +68,16 @@ MemoryPlanningWidget::~MemoryPlanningWidget()
 void MemoryPlanningWidget::changeScene()
 {
     ui->memoryView->changeScene();
-    if(m_mode == MemoryGrid)
+    if(m_mode == MemoryView::MemoryGrid)
     {
-        m_mode = MemoryLine;
+        m_mode = MemoryView::MemoryLine;
         m_lineScene = static_cast<MLineScene*>(ui->memoryView->scene());
 
         hideGridWidgets();
     }
-    else if(m_mode == MemoryLine)
+    else if(m_mode == MemoryView::MemoryLine)
     {
-        m_mode = MemoryGrid;
+        m_mode = MemoryView::MemoryGrid;
         m_gridScene = static_cast<MGridScene*>(ui->memoryView->scene());
 
         showGridWidgets();
@@ -88,7 +88,7 @@ void MemoryPlanningWidget::setGridView()
 {
 //    clear();
 
-    m_mode = MemoryGrid;
+    m_mode = MemoryView::MemoryGrid;
 
     if(!m_gridScene)
     {
@@ -110,7 +110,7 @@ void MemoryPlanningWidget::setGridView()
 
 void MemoryPlanningWidget::setLineView()
 {
-    if(m_mode == MemoryGrid)
+    if(m_mode == MemoryView::MemoryGrid)
         changeScene();
 }
 
@@ -127,13 +127,13 @@ void MemoryPlanningWidget::setItemInfo(const QString &text)
 void MemoryPlanningWidget::updateParts()
 {
     static QString base = tr("Пересекаемые области памяти:\n\n");
-    if(m_mode != MemoryGrid)
+    if(m_mode != MemoryView::MemoryGrid)
         return;
-    QList<KaMemoryPart> parts = m_gridScene->crossingParts();
+    QList<MemoryPart> parts = m_gridScene->crossingParts();
 
     QString text;
 
-    foreach(KaMemoryPart part, parts)
+    foreach(MemoryPart part, parts)
     {
         text += '['+MemoryState_to_QString(part.state())+"] ";
         text += m_gridScene->toAdress(part.start(),part.finish())+'\n';
@@ -141,21 +141,21 @@ void MemoryPlanningWidget::updateParts()
     ui->crossingParts->setText(base+text);
 }
 
-void MemoryPlanningWidget::setMemory(const KaMemory &kaMemory)
+void MemoryPlanningWidget::setMemory(const Memory &kaMemory)
 {
     ui->memoryView->setMemory(kaMemory);
 }
 
 MGridScene *MemoryPlanningWidget::gridScene() const
 {
-    if(m_mode == MemoryGrid)
+    if(m_mode == MemoryView::MemoryGrid)
         return m_gridScene;
     return NULL;
 }
 
 MLineScene *MemoryPlanningWidget::lineScene() const
 {
-    if(m_mode == MemoryLine)
+    if(m_mode == MemoryView::MemoryLine)
         return m_lineScene;
     return NULL;
 }
@@ -188,22 +188,22 @@ void MemoryPlanningWidget::setShowButtons(bool flag)
 
 void MemoryPlanningWidget::on_pushButtonEmpty_clicked()
 {
-    KaMemoryPart part = m_gridScene->setEmpty();
+    MemoryPart part = m_gridScene->setEmpty();
 }
 
 void MemoryPlanningWidget::on_pushButtonFree_clicked()
 {
-    KaMemoryPart part = m_gridScene->setFree();
+    MemoryPart part = m_gridScene->setFree();
 }
 
 void MemoryPlanningWidget::on_pushButtonPendingWrite_clicked()
 {
-    KaMemoryPart part = m_gridScene->setPendingWrite();
+    MemoryPart part = m_gridScene->setPendingWrite();
 }
 
 void MemoryPlanningWidget::on_pushButtonPendingRead_clicked()
 {
-    KaMemoryPart part = m_gridScene->setPendingRead();
+    MemoryPart part = m_gridScene->setPendingRead();
 }
 
 void MemoryPlanningWidget::hideGridWidgets()

@@ -62,7 +62,7 @@ QVariant MLineGraphicsPart::itemChange(QGraphicsItem::GraphicsItemChange change,
 
 
 
-void MLineGraphicsPart::setKaMemoryPart(const KaMemoryPart &part)
+void MLineGraphicsPart::setKaMemoryPart(const MemoryPart &part)
 {
     _status = part.state();
     setBegin(part.start());
@@ -73,12 +73,12 @@ void MLineGraphicsPart::setKaMemoryPart(const KaMemoryPart &part)
 
 
 
-MemoryState MLineGraphicsPart::status() const
+MemoryPart::MemoryState MLineGraphicsPart::status() const
 {
     return _status;
 }
 
-void MLineGraphicsPart::setStatus(const MemoryState &status)
+void MLineGraphicsPart::setStatus(const MemoryPart::MemoryState &status)
 {
     _status = status;
 }
@@ -105,25 +105,25 @@ void MLineGraphicsPart::updateVisualElements()
 QColor MLineGraphicsPart::statusColor() const
 {
     switch (_status) {
-    case Empty:
+    case MemoryPart::Empty:
         return QColor(Qt::white);
         break;
-    case Free:
+    case MemoryPart::Free:
         return QColor(Qt::gray);
         break;
-    case Recorded:
+    case MemoryPart::Recorded:
         return QColor(Qt::green);
         break;
-    case PendingWrite:
+    case MemoryPart::PendingWrite:
         return QColor(255, 165, 0);
         break;
-    case PendingRead:
+    case MemoryPart::PendingRead:
         return QColor(Qt::yellow);
         break;
-    case ErrorWrite:
+    case MemoryPart::ErrorWrite:
         return QColor(Qt::magenta);
         break;
-    case ErrorRead:
+    case MemoryPart::ErrorRead:
         return QColor(Qt::red);
         break;
     default:
@@ -137,7 +137,7 @@ QColor MLineGraphicsPart::statusColor() const
 MLineGraphicsPart::MLineGraphicsPart(QGraphicsItem *parent):
     MLineAbstractPart(parent)
 {
-    _status=Empty;
+    _status=MemoryPart::Empty;
     setFlags(ItemIsSelectable);
 
 

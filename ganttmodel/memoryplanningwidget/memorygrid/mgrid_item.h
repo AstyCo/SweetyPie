@@ -1,7 +1,7 @@
 #ifndef MGRID_ITEM_H
 #define MGRID_ITEM_H
 
-#include "kamemorypart.h"
+#include "memorypart.h"
 #include "memory_globalvalues.h"
 
 #include <QGraphicsItem>
@@ -46,7 +46,7 @@ public:
 
     void setUnitSelected(bool selected);
 
-    Memory::MemoryState state() const;
+    MemoryPart::MemoryState state() const;
     QColor color() const;
 
     long index() const;

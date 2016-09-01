@@ -2,7 +2,7 @@
 #include "mgrid_scene.h"
 #include "mline_scene.h"
 
-#include "kamemory.h"
+#include "memory.h"
 
 #include <QDebug>
 #include <QResizeEvent>
@@ -115,7 +115,7 @@ void MemoryView::init()
 
 void MemoryView::changeScene()
 {
-    KaMemory kaMemory;
+    Memory kaMemory;
     if(m_mode == MemoryGrid)
     {
         m_mode = MemoryLine;
@@ -142,7 +142,7 @@ void MemoryView::changeScene()
     }
 }
 
-void MemoryView::setMemory(const KaMemory &kaMemory)
+void MemoryView::setMemory(const Memory &kaMemory)
 {
     if(m_mode == MemoryGrid)
         m_gridScene->setMemory(kaMemory);
@@ -150,12 +150,12 @@ void MemoryView::setMemory(const KaMemory &kaMemory)
         m_lineScene->setMemory(kaMemory);
 
 }
-MemoryViewMode MemoryView::mode() const
+MemoryView::MemoryViewMode MemoryView::mode() const
 {
     return m_mode;
 }
 
-void MemoryView::setMode(const MemoryViewMode &mode)
+void MemoryView::setMode(const MemoryView::MemoryViewMode &mode)
 {
     m_mode = mode;
 }
@@ -176,3 +176,39 @@ void MemoryView::leaveEvent(QEvent *)
 
 
 
+
+QColor MemoryState_to_QColor(MemoryPart::MemoryState state, bool isActive)
+{
+    QColor result;
+    //    if(isActive)
+    switch (state) {
+    case MemoryPart::Empty:
+        result = QColor(Qt::white);
+        break;
+    case MemoryPart::Free:
+        result = QColor::fromRgb(0xCCD2D4);
+        break;
+    case MemoryPart::Recorded:
+        result = QColor::fromRgb(0xE3E187);
+        break;
+    case MemoryPart::PendingWrite:
+        result = QColor::fromRgb(0x73E884);
+        break;
+    case MemoryPart::PendingRead:
+        result = QColor::fromRgb(0x99DDE3);
+        break;
+    case MemoryPart::ErrorWrite:
+        result = QColor::fromRgb(0xE39753);
+        break;
+    case MemoryPart::ErrorRead:
+        result = QColor::fromRgb(0x308C9E);
+        break;
+    default:
+        result = QColor(Qt::black);
+        break;
+    }
+
+    if(!isActive && state != MemoryPart::Free)
+        return result.lighter(130);
+    return result;
+}

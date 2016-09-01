@@ -3,17 +3,16 @@
 
 #include "mline_abstractpart.h"
 //#include "QSqlRecord"
-#include "kamemorypart.h"
+#include "memorypart.h"
 
 #include <ganttproject_global.h>
 
-using namespace Memory;
 
 class MLineGraphicsPart : public MLineAbstractPart
 {
     Q_OBJECT
 private:
-    MemoryState _status;
+    MemoryPart::MemoryState _status;
     QColor statusColor() const;
 
 public:
@@ -25,10 +24,10 @@ public:
     QRectF boundingRect() const;  ///< used for update-on-fly
     QVariant itemChange(GraphicsItemChange change, const QVariant &value);
 
-    void setKaMemoryPart(const KaMemoryPart &part);
+    void setKaMemoryPart(const MemoryPart &part);
 
-    MemoryState status() const;
-    void setStatus(const MemoryState &status);
+    MemoryPart::MemoryState status() const;
+    void setStatus(const MemoryPart::MemoryState &status);
 private:
     // VISUAL ELEMENTS
     void updateVisualElements();

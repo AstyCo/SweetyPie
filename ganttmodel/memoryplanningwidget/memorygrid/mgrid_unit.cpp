@@ -1,9 +1,7 @@
 #include "mgrid_unit.h"
 #include "mgrid_scene.h"
 #include "mgrid_item.h"
-
-
-#include "kamemorypart.h"
+#include "memoryview.h"
 
 #include "memory_globalvalues.h"
 
@@ -79,12 +77,12 @@ void MGridUnit::setId(int unitId)
     m_unitId = unitId;
 }
 
-Memory::MemoryState MGridUnit::state() const
+MemoryPart::MemoryState MGridUnit::state() const
 {
     return m_state;
 }
 
-void MGridUnit::setState(const Memory::MemoryState &status)
+void MGridUnit::setState(const MemoryPart::MemoryState &status)
 {
     m_state = status;
 }
@@ -257,9 +255,9 @@ void MGridUnit::setShowBorder(bool unitSelected)
     m_unitSelected = unitSelected;
 }
 
-QColor MGridUnit::color() const
+QColor MGridUnit::color()
 {
-    return MemoryState_to_QColor(m_state);
+    return MemoryState_to_QColor(m_state,true);
 }
 
 void MGridUnit::addItems(long start, long finish)
@@ -353,9 +351,9 @@ qreal MGridUnit::extraSize() const
     return m_scene->itemBorder();
 }
 
-KaMemoryPart MGridUnit::toKaMemoryPart() const
+MemoryPart MGridUnit::toKaMemoryPart() const
 {
-    return KaMemoryPart(start(),finish(),state(),id());
+    return MemoryPart(start(),finish(),state(),id());
 }
 
 

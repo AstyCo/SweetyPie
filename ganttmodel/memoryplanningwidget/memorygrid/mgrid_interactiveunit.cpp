@@ -6,7 +6,7 @@
 #include "mgrid_item.h"
 
 
-#include "kamemorypart.h"
+#include "memorypart.h"
 
 #include "memory_globalvalues.h"
 
