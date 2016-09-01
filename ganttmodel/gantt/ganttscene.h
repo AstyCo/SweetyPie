@@ -12,6 +12,8 @@
 class GanttGraphicsView;
 class GanttGraphicsObject;
 class GanttCalcGraphicsObject;
+class GanttDtCrossObject;
+class GanttHoverGraphicsObject;
 
 class QModelIndex;
 
@@ -96,6 +98,9 @@ public:
     void setSceneRect(qreal x,qreal y, qreal width, qreal height);
 
     bool isVisible(const QGraphicsItem* which) const;
+    QRectF elementsBoundingRect();
+
+    void clear();
 
 signals:
     void limitsChanged(const UtcDateTime &start, const UtcDateTime &finish);
@@ -119,12 +124,14 @@ public slots:
     void moveSliderToViewStart();
     void moveSliderToViewFinish();
     void moveSliderToStart();
-    void setCurrentItem(QGraphicsItem *currentItem);
+    void setCurrentItem(QGraphicsObject *currentItem);
 
-
+    QGraphicsObject *objectForPos(const QPointF& pos);
 
 protected:
     void mousePressEvent(QGraphicsSceneMouseEvent *event);
+    void mouseMoveEvent(QGraphicsSceneMouseEvent *event);
+    void mouseReleaseEvent(QGraphicsSceneMouseEvent *event);
 
 private:
 
@@ -152,8 +159,10 @@ private:
                                             m_infoByFinish;
     GanttHeader *m_header;
     GanttCurrentDtSlider *m_slider;
-    QGraphicsItem *m_currentItem;
+    QPointer<QGraphicsObject> m_currentItem;
     QPointer<GanttGraphicsView> m_view;
+    QPointer<GanttDtCrossObject> m_crossObject;
+    QPointer<GanttHoverGraphicsObject> m_hoverObject;
 
     friend class GanttWidget;
 };

@@ -1,13 +1,10 @@
 #ifndef GANTTINTERVALSLIDERZOOM_H
 #define GANTTINTERVALSLIDERZOOM_H
 
-#include <QWidget>
+#include <QToolBar>
 
-namespace Ui {
-class GanttIntervalSliderZoom;
-}
 
-class GanttIntervalSliderZoom : public QWidget
+class GanttIntervalSliderZoom : public QToolBar
 {
     Q_OBJECT
 
@@ -18,10 +15,9 @@ public:
 signals:
     void increaseButtonClicked(bool);
     void restoreButtonClicked(bool);
-
-
 private:
-    Ui::GanttIntervalSliderZoom *ui;
+    void initActions();
+
 };
 
 #endif // GANTTINTERVALSLIDERZOOM_H

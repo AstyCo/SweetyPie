@@ -22,8 +22,11 @@ qreal qSqrt(qreal);
 MGridScene::MGridScene( QObject * parent)
     :QGraphicsScene(parent)
 {
+    m_highlightStyle = noHighlightStyle;
     m_selectionMode = SelectionMode_count;
-    setSelectionMode(areaSelection);
+
+    setSelectionMode(noSelection);
+    setHighlightStyle( bordersAround | highlightedArea | highlightedItems);
 
     m_lastSelected = NULL;
     m_mouseOverItem = NULL;
@@ -43,8 +46,6 @@ MGridScene::MGridScene( QObject * parent)
 
     setLengthSelection(100);
 
-    setHighlightStyle( bordersAround | highlightedArea | highlightedItems);
-
     m_interactiveUnit = new MGridInteractiveUnit(this);
 }
 
@@ -54,25 +55,22 @@ MGridScene::~MGridScene()
 
 void MGridScene::mousePressEvent(QGraphicsSceneMouseEvent *event)
 {
-    // INTERACTIVE SELECTION
 
-    if(m_highlightStyle&highlightedItems)
-        setHighlightMode(true);
-    setInteractiveHighlight(true);
-
-    // ITEMS SELECT
-    MGridItem * p_mem = itemAtPos(event->scenePos());
-    if(p_mem)
+    if(m_interactiveHighlight)
     {
-        if(m_selectionMode == areaSelection)
+        MGridItem * p_mem = itemAtPos(event->scenePos());
+        if(p_mem)
         {
-            setLengthSelection(0);
-            if(setStartSelection(p_mem->index()))
-                setLastSelected(p_mem);
+            if(m_selectionMode == areaSelection)
+            {
+                setLengthSelection(0);
+                if(setStartSelection(p_mem->index()))
+                    setLastSelected(p_mem);
+            }
+            if(m_highlightStyle&highlightedItems)
+                setHighlightMode(true);
+            setInteractiveHighlight(true);
         }
-        if(m_highlightStyle&highlightedItems)
-            setHighlightMode(true);
-        setInteractiveHighlight(true);
     }
     mouseMoveEvent(event);
     return QGraphicsScene::mousePressEvent(event);
@@ -116,11 +114,6 @@ void MGridScene::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
         if(lengthSelection())
             updateInteractiveRange(startSelection(),finishSelection());
     }
-
-
-
-
-
 
     return QGraphicsScene::mouseMoveEvent(event);
 }
@@ -330,6 +323,13 @@ void MGridScene::setSelectionMode(const SelectionMode &selectionMode)
     if(m_selectionMode == selectionMode)
         return;
 
+    if(selectionMode != noSelection)
+        setInteractiveHighlight(true);
+    else
+    {
+        setInteractiveHighlight(false);
+    }
+
     m_selectionMode = selectionMode;
 }
 MGridUnit *MGridScene::mouseOverUnit() const
@@ -341,6 +341,10 @@ void MGridScene::setMouseOverUnit(MGridUnit *mouseOverUnit)
 {
     if(m_mouseOverUnit == mouseOverUnit)
         return;
+
+    if(m_mouseOverUnit)
+        m_mouseOverUnit->update();
+
     m_mouseOverUnit = mouseOverUnit;
     if(m_mouseOverUnit == NULL)
     {
@@ -388,6 +392,10 @@ void MGridScene::setMouseOverItem(MGridItem *mouseOver)
 {
     if(m_mouseOverItem == mouseOver)
         return;
+
+    if(m_mouseOverItem)
+        m_mouseOverItem->update();
+
     m_mouseOverItem = mouseOver;
     if(m_mouseOverItem == NULL)
     {
@@ -412,7 +420,12 @@ void MGridScene::setHighlightStyle(int highlightStyle)
         qWarning("highlightStyle out of range");
         return;
     }
+
     m_highlightStyle = static_cast<HighlightStyle>(highlightStyle);
+
+    if(m_highlightStyle&highlightedItems)
+        setHighlightMode(true);
+
 }
 
 Memory MGridScene::memory()

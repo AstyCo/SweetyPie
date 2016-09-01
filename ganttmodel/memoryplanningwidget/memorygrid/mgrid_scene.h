@@ -49,6 +49,7 @@ public:
 
     enum HighlightStyle
     {
+        noHighlightStyle = 0,
         bordersAround = 0x1,
         highlightedItems = 0x2,
         highlightedArea = 0x4
@@ -81,19 +82,22 @@ public:
     /// Отвечает за возможность изменения выбранной области ( false - конец выделения )
     void setInteractiveHighlight(bool interactiveHighlight);
 
+    /// Устанавливает какую часть памяти можно модифицировать
     void setLimits(long min, long max);
 
     enum SelectionMode
     {
-        areaSelection,
-        positionSelection,
+        noSelection, ///< выделение недоступно
+        areaSelection, ///< выделение области памяти, определяемой пользователем
+        positionSelection, ///< выделение области памяти фиксированного размера
 
         SelectionMode_count
     };
 
+    /// Устанавливает режим выделения (см. SelectionMode)
+    void setSelectionMode(const SelectionMode &selectionMode);
 
     SelectionMode selectionMode() const;
-    void setSelectionMode(const SelectionMode &selectionMode);
 
 public slots:
 

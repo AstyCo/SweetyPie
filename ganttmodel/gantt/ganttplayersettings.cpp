@@ -1,5 +1,4 @@
 #include "ganttplayersettings.h"
-#include "ui_ganttplayersettings.h"
 
 #include <QMenu>
 #include <QToolButton>
@@ -7,18 +6,17 @@
 #include <QDebug>
 
 GanttPlayerSettings::GanttPlayerSettings(QWidget *parent) :
-    QToolBar(parent),
-    ui(new Ui::GanttPlayerSettings)
+    QToolBar(parent)
 {
-    ui->setupUi(this);
 
     setToolButtonStyle(Qt::ToolButtonIconOnly);
+    setStyleSheet("QToolBar { border: 0px }");
+
     initActions();
 }
 
 GanttPlayerSettings::~GanttPlayerSettings()
 {
-    delete ui;
 }
 
 void GanttPlayerSettings::initActions()

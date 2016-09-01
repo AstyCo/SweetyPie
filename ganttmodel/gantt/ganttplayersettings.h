@@ -3,10 +3,6 @@
 
 #include <QToolBar>
 
-namespace Ui {
-class GanttPlayerSettings;
-}
-
 class GanttPlayerSettings : public QToolBar
 {
     Q_OBJECT
@@ -24,7 +20,6 @@ private:
     void initActions();
 
 private:
-    Ui::GanttPlayerSettings *ui;
 
 };
 

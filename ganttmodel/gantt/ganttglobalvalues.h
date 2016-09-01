@@ -12,7 +12,7 @@
 #define DEFAULT_ITEM_WIDTH      (qreal(20))
 #define DEFAULT_MONTH_WIDTH     (qreal(35))
 
-#define DEFAULT_ITEM_HEIGHT     (qreal(20))
+#define DEFAULT_ITEM_HEIGHT     (20)
 #define DEFAULT_HEADER_HEIGHT    (2*DEFAULT_ITEM_HEIGHT)
 
 #define DEFAULT_CURDT_ITEM_HEIGHT (qreal(5))

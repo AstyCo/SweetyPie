@@ -76,32 +76,34 @@ void GanttIntervalSlider::drawSliderLine(QPainter *painter, const QRect &sliderR
     foregroundGradient.setColorAt(0.5,sliderColor.lighter(180));
     foregroundGradient.setColorAt(1,sliderColor);
 
-    QLinearGradient backgroundGradient(QPoint(0,top),QPoint(0,top + m_sliderV));
-    backgroundGradient.setColorAt(0,sliderColor);
-    backgroundGradient.setColorAt(0.5,Qt::white);
-    backgroundGradient.setColorAt(1,sliderColor);
+//    QLinearGradient backgroundGradient(QPoint(0,top),QPoint(0,top + m_sliderV));
+//    backgroundGradient.setColorAt(0,sliderColor);
+//    backgroundGradient.setColorAt(0.5,Qt::white);
+//    backgroundGradient.setColorAt(1,sliderColor);
 
     painter->setPen(Qt::gray);
+
+    painter->fillRect(QRect(innerRectLeft,
+                            top,
+                            innerRectWidth,
+                            m_sliderV
+                            ), foregroundGradient);
+
     painter->drawRect(QRect(beginRectLeft,
                             top,
                             width,
                             m_sliderV
                             ));
 
-    painter->fillRect(QRect(beginRectLeft,
-                            top,
-                            width,
-                            m_sliderV
-                            ), QBrush(sliderColor.lighter(190)));
 
     if(beginRectWidth > 0)
     {
-        QRect beforeBeginRect(beginRectLeft,
-                              top,
+        QRect beforeBeginRect(beginRectLeft+1,
+                              top+1,
                               beginRectWidth,
-                              m_sliderV);
+                              m_sliderV-1);
 
-        painter->fillRect(beforeBeginRect,foregroundGradient);
+        painter->fillRect(beforeBeginRect,  QBrush(sliderColor.lighter(190)));
 
     }
 
@@ -109,11 +111,11 @@ void GanttIntervalSlider::drawSliderLine(QPainter *painter, const QRect &sliderR
     if(endRectWidth > 0)
     {
         QRect afterEndRect(endRectLeft,
-                        top,
-                        endRectWidth,
-                        m_sliderV);
+                        top+1,
+                        endRectWidth-1,
+                        m_sliderV-1);
 
-        painter->fillRect(afterEndRect,foregroundGradient);
+        painter->fillRect(afterEndRect,  QBrush(sliderColor.lighter(190)));
     }
 
     if(!outOfLimits(m_currentTime))
@@ -148,7 +150,7 @@ void GanttIntervalSlider::mouseMoveEvent(QMouseEvent *e)
         {
             moveHandles(0);
         }
-        else if(m_scene->startByDt(valToDt(beginHandle())) != closestStartDt(val))
+        else if(valToDt(beginHandle()) != closestStartDt(val))
         {
             setBeginHandle(dtToVal(closestStartDt(val)));
         }
@@ -276,6 +278,11 @@ void GanttIntervalSlider::setEndHandle(long long endHandle)
     IntervalSlider::setEndHandle(endHandle);
 }
 
+void GanttIntervalSlider::reset()
+{
+    setLimits(m_minValue,m_maxValue);
+}
+
 void GanttIntervalSlider::setMinTimeSize(long long minTimeSize)
 {
     m_minTimeSize = minTimeSize;
@@ -322,14 +329,9 @@ UtcDateTime GanttIntervalSlider::closestStartDt(long long val) const
         return UtcDateTime();
     }
 
-
     UtcDateTime valDt = valToDt(val);
     GanttHeader::GanttPrecisionMode mode = m_scene->calculateTimeMode(valDt, endDt());
-
-    UtcDateTime res = closestStartDtHelper(valDt,mode)
-            ,tmpVar;
-
-    return res;
+    return closestStartDtHelper(valDt,mode);
 }
 
 UtcDateTime GanttIntervalSlider::closestFinishDt(long long val) const
@@ -388,10 +390,13 @@ UtcDateTime GanttIntervalSlider::closestStartDtHelper(const UtcDateTime& valDt, 
     UtcDateTime closestInCurrentMode;
 
     if(valDt.toMicrosecondsSinceEpoch() - start.toMicrosecondsSinceEpoch()
-            > nextStart.toMicrosecondsSinceEpoch() - valDt.toMicrosecondsSinceEpoch() )
+            > nextStart.toMicrosecondsSinceEpoch() - valDt.toMicrosecondsSinceEpoch())
         closestInCurrentMode = nextStart;
     else
         closestInCurrentMode = start;
+
+    if(qAbs(closestInCurrentMode.microsecondsTo(valDt))>qAbs(beginDt().microsecondsTo(valDt)))
+        closestInCurrentMode = beginDt();
 
     GanttHeader::GanttPrecisionMode newMode = m_scene->calculateTimeMode(start,valToDt(endHandle()));
     if((int)newMode > (int)mode)
@@ -411,6 +416,9 @@ UtcDateTime GanttIntervalSlider::closestFinishDtHelper(const UtcDateTime &valDt,
         closestInCurrentMode = finish;
     else
         closestInCurrentMode = prevFinish;
+
+    if(qAbs(closestInCurrentMode.microsecondsTo(valDt))>qAbs(endDt().microsecondsTo(valDt)))
+        closestInCurrentMode = endDt();
 
     GanttHeader::GanttPrecisionMode newMode = m_scene->calculateTimeMode(valToDt(beginHandle()),closestInCurrentMode);
     if((int)newMode > (int)mode)

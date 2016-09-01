@@ -102,7 +102,9 @@ SOURCES += \
     appeventfilter.cpp \
     gantt/ganttcalcgraphicsobject.cpp \
     gantt/ganttgraphicsobject.cpp \
-    gantt/ganttcurrentdtslider.cpp
+    gantt/ganttcurrentdtslider.cpp \
+    gantt/ganttdtcrossobject.cpp \
+    gantt/gantthovergraphicsobject.cpp
 
 
 HEADERS += \
@@ -150,7 +152,9 @@ HEADERS += \
     appeventfilter.h \
     gantt/ganttgraphicsobject.h \
     gantt/ganttcalcgraphicsobject.h \
-    gantt/ganttcurrentdtslider.h
+    gantt/ganttcurrentdtslider.h \
+    gantt/ganttdtcrossobject.h \
+    gantt/gantthovergraphicsobject.h
 
 
 RESOURCES += \
@@ -162,8 +166,6 @@ FORMS += \
     chartsgroupwidget.ui \
     chartsettingsdlg.ui \
     memoryplanningwidget/memoryplanningwidget.ui \
-    gantt/ganttintervalsliderzoom.ui \
-    gantt/ganttplayersettings.ui \
     gantt/ganttwidget.ui \
     gantt/mygantt_playercontrol.ui
 

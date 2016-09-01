@@ -13,7 +13,12 @@
 GanttCalcGraphicsObject::GanttCalcGraphicsObject(GanttInfoNode* node, QGraphicsItem *parent)
     :QGraphicsObject(parent)
 {
-    m_shapePath.addEllipse(QRectF(0,0,DEFAULT_ITEM_WIDTH,DEFAULT_ITEM_HEIGHT));
+    m_shapePath.moveTo(0,0);
+    m_shapePath.lineTo(0,(DEFAULT_ITEM_HEIGHT-6)/2);
+    m_shapePath.addEllipse(QPointF(0,(DEFAULT_ITEM_HEIGHT/2)),3,3);
+    m_shapePath.moveTo(0,DEFAULT_ITEM_HEIGHT - (DEFAULT_ITEM_HEIGHT-6)/2);
+    m_shapePath.lineTo(0,DEFAULT_ITEM_HEIGHT);
+
     m_info = node;
 
     if(m_info)
@@ -58,6 +63,8 @@ void GanttCalcGraphicsObject::paint(QPainter *painter, const QStyleOptionGraphic
     Q_UNUSED(option);
     Q_UNUSED(widget);
     QColor color = (m_scene->currentItem() == this)?(QColor(Qt::red).darker(130)):(QColor(Qt::red));
+    painter->setRenderHint(QPainter::Antialiasing,true);
+    painter->drawPath(m_shapePath);
     painter->fillPath(m_shapePath,QBrush(color.lighter(130)));
 }
 
@@ -84,15 +91,16 @@ void GanttCalcGraphicsObject::updateItemGeometry()
 
 void GanttCalcGraphicsObject::mousePressEvent(QGraphicsSceneMouseEvent *event)
 {
-    if(!m_scene || !m_info)
-        return;
+//    if(!m_scene || !m_info)
+//        return;
 
-    if((this == m_scene->itemAt(event->scenePos())))
-        if((!m_info->isExpanded() && (event->button() == Qt::LeftButton))
-                || (m_info->isExpanded() && (event->button() == Qt::RightButton)))
-            m_scene->changeExpanding(m_info->index());
-
-    emit graphicsItemPressed();
+//    if((this == m_scene->itemAt(event->scenePos())))
+//        if((!m_info->isExpanded() && (event->button() == Qt::LeftButton))
+//                /*|| (m_info->isExpanded() && (event->button() == Qt::RightButton))*/)
+//        {
+//            m_scene->changeExpanding(m_info->index());
+//            emit graphicsItemPressed();
+//        }
 
     QGraphicsItem::mousePressEvent(event);
 }

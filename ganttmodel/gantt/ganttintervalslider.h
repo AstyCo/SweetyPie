@@ -38,6 +38,7 @@ public:
 
     void setBeginHandle(long long beginHandle);
     void setEndHandle(long long endHandle);
+    void reset();
 
 
 private:

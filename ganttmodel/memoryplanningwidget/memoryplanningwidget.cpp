@@ -4,6 +4,7 @@
 #include "memoryview.h"
 #include "mgrid_scene.h"
 #include "mline_scene.h"
+
 #include "memorypart.h"
 #include "memory.h"
 #include <QDebug>
@@ -188,37 +189,21 @@ void MemoryPlanningWidget::setShowButtons(bool flag)
 void MemoryPlanningWidget::on_pushButtonEmpty_clicked()
 {
     MemoryPart part = m_gridScene->setEmpty();
-    qDebug() << "setEmpty " << part.start()
-             << ' ' << part.finish()
-             << ' ' << MemoryState_to_QString(part.state())
-             << ' ' << "["+QString::number(part.id())+"]";
 }
 
 void MemoryPlanningWidget::on_pushButtonFree_clicked()
 {
     MemoryPart part = m_gridScene->setFree();
-    qDebug() << "setFree " << part.start()
-             << ' ' << part.finish()
-             << ' ' << MemoryState_to_QString(part.state())
-             << ' ' << "["+QString::number(part.id())+"]";
 }
 
 void MemoryPlanningWidget::on_pushButtonPendingWrite_clicked()
 {
     MemoryPart part = m_gridScene->setPendingWrite();
-    qDebug() << "setPendingWrite " << part.start()
-             << ' ' << part.finish()
-             << ' ' << MemoryState_to_QString(part.state())
-             << ' ' << "["+QString::number(part.id())+"]";
 }
 
 void MemoryPlanningWidget::on_pushButtonPendingRead_clicked()
 {
     MemoryPart part = m_gridScene->setPendingRead();
-    qDebug() << "setPendingRead " << part.start()
-             << ' ' << part.finish()
-             << ' ' << MemoryState_to_QString(part.state())
-             << ' ' << "["+QString::number(part.id())+"]";
 }
 
 void MemoryPlanningWidget::hideGridWidgets()
