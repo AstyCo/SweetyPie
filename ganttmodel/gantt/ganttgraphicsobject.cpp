@@ -16,7 +16,7 @@ GanttGraphicsObject::GanttGraphicsObject(GanttInfoLeaf *info,QGraphicsItem *pare
     m_info = info;
     if(m_info)
     {
-        setToolTip( QString::fromUtf8("Имя:") + '\t' + '\t' + m_info->title()
+        setToolTip( QString::fromUtf8("Операция:") + '\t' + '\t' + m_info->title()
                     + '\n' + QString::fromUtf8("Начало:") + '\t' + m_info->start().toString("dd.MM.yyyy HH:mm:ss")
                     + '\n' + QString::fromUtf8("Окончание:") + '\t' + m_info->finish().toString("dd.MM.yyyy HH:mm:ss"));
         connect(m_info, SIGNAL(changed()),this,SLOT(updateItemGeometry()));

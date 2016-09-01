@@ -71,8 +71,7 @@ void GanttDtCrossObject::updatePaths()
         QPainterPath linesPath ;
         linesPath.moveTo(rel.x(),0);
         linesPath.lineTo(0,0);
-        linesPath.lineTo(0,rel.y() + DEFAULT_HEADER_HEIGHT);
-
+        linesPath.lineTo(0,mapFromScene(QPointF(0,m_scene->headerBottom())).y());
 
         qreal offsetX = 4,
                 offsetY = 0;
@@ -91,10 +90,6 @@ void GanttDtCrossObject::updatePaths()
             textRect.moveTo(-textRect.width()-offsetX,offsetY - 5);
         }
 
-//        prepareGeometryChange();
-//        m_datePath = QPainterPath();
-//        m_datePath.addText(QPointF(offsetX,offsetY), m_scene->font(), dateTime);
-//        m_datePath.addRect(m_datePath.controlPointRect().adjusted(-adjust,-adjust,adjust,adjust));
         prepareGeometryChange();
         m_linesPath = linesPath;
         m_textRect = textRect;

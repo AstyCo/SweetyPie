@@ -192,7 +192,9 @@ long long IntervalSlider::pointToValue(const QPoint &p,ClippedHandle handle) con
         offset = 0;
         break;
     }
-    long long relValue =((1.0*x-offset) / relWidth * (m_maxValue-m_minValue))+0.5;
+    long long relValue =(m_maxValue-m_minValue)?
+            (((1.0*x-offset) / relWidth * (m_maxValue-m_minValue))+0.5)
+              :(0);
     if (relValue<0)
         relValue=0;
     if(relValue>m_maxValue-m_minValue)
@@ -224,7 +226,9 @@ int IntervalSlider::valueToPoint(long long value,ClippedHandle handle) const
         break;
     }
 
-    int relPoint = relativeValue*1.0/(m_maxValue-m_minValue) * relWidth + 0.5;
+    int relPoint = (m_maxValue-m_minValue)?
+            (relativeValue*1.0/(m_maxValue-m_minValue) * relWidth + 0.5)
+              :((handle == EndHandle)?relWidth:0);
     if(relPoint<0)
         relPoint=0;
     if(relPoint>relWidth)

@@ -23,7 +23,7 @@ GanttCalcGraphicsObject::GanttCalcGraphicsObject(GanttInfoNode* node, QGraphicsI
 
     if(m_info)
     {
-        setToolTip( QString::fromUtf8("Имя:") + '\t' + '\t' + m_info->title()
+        setToolTip( QString::fromUtf8("НУ-РЕШ-ВИТОК:") + '\t' + '\t' + m_info->title()
                     + '\n' + QString::fromUtf8("Время рассчета:") + '\t' + m_info->calcDt().toString("dd.MM.yyyy HH:mm:ss"));
 
         connect(m_info, SIGNAL(changed()),this,SLOT(updateItemGeometry()));

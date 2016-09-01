@@ -93,11 +93,17 @@ GanttWidget::~GanttWidget()
 
 void GanttWidget::showPlayer(bool show)
 {
+    m_playerShown = show;
     ui->playerControl->setVisible(show);
     ui->playerSettings->setVisible(show);
 
     if(m_scene)
         m_scene->setDrawCurrentDtSlider(show);
+}
+
+bool GanttWidget::player() const
+{
+    return m_playerShown;
 }
 
 void GanttWidget::addItems(GanttInfoItem* item)

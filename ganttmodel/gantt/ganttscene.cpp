@@ -279,7 +279,6 @@ void GanttScene::mousePressEvent(QGraphicsSceneMouseEvent *event)
         QGraphicsObject *object = objectForPos(event->scenePos());
         if(object)
         {
-            qDebug()<<"object pos "<< object->scenePos();
             setCurrentItem(object);
         }
     }
@@ -354,7 +353,6 @@ QGraphicsItem *GanttScene::currentItem() const
 
 void GanttScene::setSceneRect(const QRectF &rect)
 {
-    qDebug() << rect;
     QGraphicsScene::setSceneRect(rect);
 }
 
@@ -387,6 +385,14 @@ QRectF GanttScene::elementsBoundingRect()
 void GanttScene::clear()
 {
     m_currentItem = NULL;
+}
+
+qreal GanttScene::headerBottom() const
+{
+    if(!m_header)
+        return 0;
+
+    return m_header->sceneBoundingRect().bottom();
 }
 
 void GanttScene::setCurrentItem(QGraphicsObject *currentItem)

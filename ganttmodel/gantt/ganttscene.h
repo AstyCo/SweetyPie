@@ -101,6 +101,7 @@ public:
     QRectF elementsBoundingRect();
 
     void clear();
+    qreal headerBottom() const;
 
 signals:
     void limitsChanged(const UtcDateTime &start, const UtcDateTime &finish);

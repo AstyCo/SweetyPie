@@ -42,8 +42,8 @@
         <file>images/Buttons 64x64/reg_step_on_64.png</file>
         <file>images/Buttons 64x64/stop_off_64.png</file>
         <file>images/Buttons 64x64/stop_on_64.png</file>
-        <file>images/Buttons 64x64/reverse-arrow.png</file>
-        <file>images/Buttons 64x64/save.png</file>
+        <file>images/Buttons 64x64/less_click_32.png</file>
+        <file>images/Buttons 64x64/more_click_32.png</file>
     </qresource>
     <qresource prefix="/icons">
         <file>icons/clear.png</file>

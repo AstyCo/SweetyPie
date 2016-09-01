@@ -162,7 +162,7 @@ void MainWindow::testGanttModel()
 {
 
 
-    ui->ganttWidget->addItems(generateTest());
+//    ui->ganttWidget->addItems(generateTest());
 }
 
 void MainWindow::testMemoryPlanningWidget()

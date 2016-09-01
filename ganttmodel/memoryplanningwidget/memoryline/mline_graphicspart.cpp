@@ -22,7 +22,6 @@ void MLineGraphicsPart::paint(QPainter *painter, const QStyleOptionGraphicsItem 
     else
         painter->setBrush(QBrush(statusColor()));
 
-//    qDebug()<<begin()<<"-"<<end()<<" "<<width();
     setX(xByVal(begin()));
 
     updateVisualElements();

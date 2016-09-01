@@ -60,9 +60,11 @@ void GanttHeaderView::paintEvent(QPaintEvent *e)
     painter.setPen(headerPen);
 
     painter.setFont(dtFont);
-    painter.drawText(dtRect,(p_parentWidget)?
-                         (p_parentWidget->slidersDt().toString("dd.MM.yyyy HH:mm:ss"))
-                       :(QString()),QTextOption(Qt::AlignCenter));
+    if(p_parentWidget && p_parentWidget->player())
+    {
+        painter.drawText(dtRect,p_parentWidget->slidersDt().toString("dd.MM.yyyy HH:mm:ss")
+                           ,QTextOption(Qt::AlignCenter));
+    }
 
 
     painter.drawRect(utcRect);  

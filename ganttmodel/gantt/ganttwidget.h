@@ -32,6 +32,7 @@ public:
     ~GanttWidget();
 
     void showPlayer(bool show);
+    bool player() const;
 
     void addItems(GanttInfoItem* item);
     void addItems(const QList<GanttInfoItem*>& items);
@@ -97,6 +98,7 @@ private:
     GanttTreeModel *m_model;
 
     qreal m_curSceneMax;
+    bool m_playerShown;
 
     UtcDateTime m_minDt, m_maxDt;
 
