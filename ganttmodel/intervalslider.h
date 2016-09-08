@@ -46,32 +46,39 @@ public:
         EndHandle
     };
 
-
     explicit IntervalSlider(QWidget *parent = 0);
     ~IntervalSlider(){}
-    long long endHandle() const;
-    virtual void setEndHandle(long long endHandle);
 
-    long long beginHandle() const;
+    void setHandleSize(int new_handle_value);///< Устанавливает размер бегунков
+
+    /** Устанавливают новые значения для бегунков */
+    virtual void setEndHandle(long long endHandle);
     virtual void setBeginHandle(long long beginHandle);
 
-    long long maxValue() const;
+    /** Устанавливают область значений */
     void setMaxValue(long long maxValue);
-
-    long long minValue() const;
     void setMinValue(long long minValue);
+
+    /** Устанавливают геометрию слайдера */
+    void setSliderV(int new_sliderV);
+    void setOffsetV(int new_offsetV);
+
+    /** Устанавливает смещение в пикселях левого слайдера и правого слайдера,
+     *  относительно начала/конца соответственно */
+    void setLeftOffset(qreal value);
+    void setRightOffset(qreal value);
+
+
+    long long endHandle() const;
+    long long beginHandle() const;
+    long long maxValue() const;
+    long long minValue() const;
 
     virtual void setLimits(long long minValue,long long maxValue);
     virtual void setHandles(long long beginHandle,long long endHandle);
 
     int handleSize() const;
-    void setHandleSize(int new_handle_value);
-
     int sliderV() const{return m_sliderV;}
-    void setSliderV(int new_sliderV);
-
-    void setOffsetV(int new_offsetV);
-
     int intervalSliderHeight() const;
 
     qreal begin() const;
@@ -124,6 +131,9 @@ protected:
         m_sliderV,
         m_offsetV,
         m_borderWidth;
+
+    qreal m_leftOffset,
+        m_rightOffset;
 
     bool m_shiftModifier;
 

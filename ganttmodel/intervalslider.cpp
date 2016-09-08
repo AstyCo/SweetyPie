@@ -14,6 +14,7 @@
 IntervalSlider::IntervalSlider(QWidget *parent) :
     QWidget(parent)
 {
+    m_leftOffset = m_rightOffset = 0;
     m_sliderV = 0;
     m_offsetV = 0;
     m_borderWidth = 1;
@@ -180,16 +181,16 @@ void IntervalSlider::setOffsetV(int new_offsetV)
 long long IntervalSlider::pointToValue(const QPoint &p,ClippedHandle handle) const
 {
     int x = p.x() - halfHandleSize();
-    int offset;
-    long long widthDiff = handleSize() +((handle==NoHandle)?(0):(handleSize())),
+    int offset = m_leftOffset;
+    long long widthDiff = handleSize() +((handle==NoHandle)?(0):(handleSize())) + m_rightOffset + m_leftOffset,
          relWidth= width() - widthDiff;
     switch(handle)
     {
     case EndHandle:
-        offset = handleSize();
+        offset += handleSize();
         break;
     default:
-        offset = 0;
+        offset += 0;
         break;
     }
     long long relValue =(m_maxValue-m_minValue)?
@@ -205,8 +206,8 @@ long long IntervalSlider::pointToValue(const QPoint &p,ClippedHandle handle) con
 int IntervalSlider::valueToPoint(long long value,ClippedHandle handle) const
 {
     long long relativeValue = value-m_minValue;
-    int offset= halfHandleSize();
-    long long widthDiff = 2*handleSize() /*+((handle==NoHandle)?(0):(handleSize()))*/,
+    int offset= halfHandleSize() + m_leftOffset;
+    long long widthDiff = 2*handleSize() + m_rightOffset + m_leftOffset /*+((handle==NoHandle)?(0):(handleSize()))*/,
          relWidth= width() - widthDiff;
 
     switch(handle)
@@ -380,6 +381,17 @@ bool IntervalSlider::posOverEndHandle(const QPoint& pos) const
          endSpliter2 = endSpliter1 + handleSize();
 
     return (pos.x()>endSpliter1 && pos.x()<endSpliter2);
+}
+
+
+void IntervalSlider::setRightOffset(qreal value)
+{
+    m_rightOffset = value;
+}
+
+void IntervalSlider::setLeftOffset(qreal value)
+{
+    m_leftOffset = value;
 }
 
 int IntervalSlider::intervalSliderHeight() const
