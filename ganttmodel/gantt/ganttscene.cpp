@@ -64,6 +64,9 @@ void GanttScene::updateWidth(int w)
 
 void GanttScene::updateHeight(int h)
 {
+//    h = qMax(h,m_view->treeViewHeight());
+//    qDebug()<<"treeView height: "<<QString::number(m_view->treeViewHeight());
+
     setSceneRect(0,0,sceneRect().width(),h);
 }
 
@@ -147,13 +150,19 @@ void GanttScene::onViewResize(const QSize&newSize)
 
 void GanttScene::updateSceneRect()
 {
+
     if(!sceneHaveItems())
     {
         if(m_header)
             setSceneRect(m_header->mapRectToScene(m_header->boundingRect()));
     }
     else
+    {
+//        QRectF rect = elementsBoundingRect();
+//        qDebug()<<"treeView height: "<<QString::number(m_view->treeViewHeight());
+//        rect.setBottom(qMax(rect.bottom(),(qreal) m_view->treeViewHeight()));
         setSceneRect(elementsBoundingRect());
+    }
 
     updateSliderRect();
 }
@@ -242,7 +251,7 @@ void GanttScene::setHeaderMode(GanttHeader::GanttHeaderMode mode)
 
 GanttHeader::GanttHeaderMode GanttScene::headerMode() const
 {
-    if(!m_header)
+    if(m_header.isNull())
     {
         Q_ASSERT(false);
         return GanttHeader::GanttHeaderMode_count;
@@ -264,7 +273,7 @@ void GanttScene::changeExpanding(const QModelIndex &index)
 
 UtcDateTime GanttScene::slidersDt() const
 {
-    if(!m_header || !m_slider)
+    if(m_header.isNull() || !m_slider)
         return UtcDateTime();
 
     return m_slider->dt();
@@ -395,7 +404,7 @@ void GanttScene::clear()
 
 qreal GanttScene::headerBottom() const
 {
-    if(!m_header)
+    if(m_header.isNull())
         return 0;
 
     return m_header->sceneBoundingRect().bottom();
@@ -527,20 +536,23 @@ void GanttScene::addItemsHelper(GanttInfoItem *item)
         GanttInfoNode *node = dynamic_cast<GanttInfoNode*>(item);
         if(node)
         {
-            GanttCalcGraphicsObject *p_item = new GanttCalcGraphicsObject(node);
+            if(node->hasCalcDt())
+            {
+                GanttCalcGraphicsObject *p_item = new GanttCalcGraphicsObject(node);
 
-            connect(p_item,SIGNAL(graphicsItemHoverEnter()),this,SLOT(onGraphicsItemHoverEnter()));
-            connect(p_item,SIGNAL(graphicsItemHoverLeave()),this,SLOT(onGraphicsItemHoverLeave()));
-            connect(p_item,SIGNAL(graphicsItemPressed()),this,SLOT(onGraphicsItemPress()));
+                connect(p_item,SIGNAL(graphicsItemHoverEnter()),this,SLOT(onGraphicsItemHoverEnter()));
+                connect(p_item,SIGNAL(graphicsItemHoverLeave()),this,SLOT(onGraphicsItemHoverLeave()));
+                connect(p_item,SIGNAL(graphicsItemPressed()),this,SLOT(onGraphicsItemPress()));
 
 
-            p_item->setScene(this);
-            p_item->setHeader(m_header);
+                p_item->setScene(this);
+                p_item->setHeader(m_header);
 
-            m_calcItems.append(p_item);
-            m_itemByInfo.insert(node,p_item);
+                m_calcItems.append(p_item);
+                m_itemByInfo.insert(node,p_item);
 
-            p_item->updateItemGeometry();
+                p_item->updateItemGeometry();
+            }
 
             foreach(GanttInfoItem* item, node->m_items)
                 addItemsHelper(item);
@@ -668,35 +680,35 @@ void GanttScene::setRange(UtcDateTime min, UtcDateTime max)
 
 UtcDateTime GanttScene::minDt() const
 {
-    if(!m_header)
+    if(m_header.isNull())
         return UtcDateTime();
     return m_header->minDt();
 }
 
 UtcDateTime GanttScene::maxDt() const
 {
-    if(!m_header)
+    if(m_header.isNull())
         return UtcDateTime();
     return m_header->maxDt();
 }
 
 UtcDateTime GanttScene::startDt() const
 {
-    if(!m_header)
+    if(m_header.isNull())
         return UtcDateTime();
     return m_header->startDt();
 }
 
 UtcDateTime GanttScene::finishDt() const
 {
-    if(!m_header)
+    if(m_header.isNull())
         return UtcDateTime();
     return m_header->finishDt();
 }
 
 UtcDateTime GanttScene::xToDt(qreal x) const
 {
-    if(!m_header)
+    if(m_header.isNull())
     {
         Q_ASSERT(false);
         return UtcDateTime();
@@ -707,7 +719,7 @@ UtcDateTime GanttScene::xToDt(qreal x) const
 
 qreal GanttScene::dtToX(const UtcDateTime &dt) const
 {
-    if(!m_header)
+    if(m_header.isNull())
     {
         Q_ASSERT(false);
         return 0;
@@ -718,7 +730,7 @@ qreal GanttScene::dtToX(const UtcDateTime &dt) const
 
 UtcDateTime GanttScene::startByDt(const UtcDateTime &dt,GanttHeader::GanttPrecisionMode mode) const
 {
-    if(!m_header)
+    if(m_header.isNull())
     {
         Q_ASSERT(false);
         return UtcDateTime();
@@ -729,7 +741,7 @@ UtcDateTime GanttScene::startByDt(const UtcDateTime &dt,GanttHeader::GanttPrecis
 
 UtcDateTime GanttScene::startByDt(const UtcDateTime &dt) const
 {
-    if(!m_header)
+    if(m_header.isNull())
     {
         Q_ASSERT(false);
         return UtcDateTime();
@@ -740,7 +752,7 @@ UtcDateTime GanttScene::startByDt(const UtcDateTime &dt) const
 
 UtcDateTime GanttScene::finishByDt(const UtcDateTime &dt,GanttHeader::GanttPrecisionMode mode) const
 {
-    if(!m_header)
+    if(m_header.isNull())
     {
         Q_ASSERT(false);
         return UtcDateTime();
@@ -751,7 +763,7 @@ UtcDateTime GanttScene::finishByDt(const UtcDateTime &dt,GanttHeader::GanttPreci
 
 UtcDateTime GanttScene::finishByDt(const UtcDateTime &dt) const
 {
-    if(!m_header)
+    if(m_header.isNull())
     {
         Q_ASSERT(false);
         return UtcDateTime();
@@ -762,7 +774,7 @@ UtcDateTime GanttScene::finishByDt(const UtcDateTime &dt) const
 
 UtcDateTime GanttScene::nextStart(const UtcDateTime &dt,GanttHeader::GanttPrecisionMode mode) const
 {
-    if(!m_header)
+    if(m_header.isNull())
     {
         Q_ASSERT(false);
         return UtcDateTime();
@@ -773,7 +785,7 @@ UtcDateTime GanttScene::nextStart(const UtcDateTime &dt,GanttHeader::GanttPrecis
 
 UtcDateTime GanttScene::nextStart(const UtcDateTime &dt) const
 {
-    if(!m_header)
+    if(m_header.isNull())
     {
         Q_ASSERT(false);
         return UtcDateTime();
@@ -784,7 +796,7 @@ UtcDateTime GanttScene::nextStart(const UtcDateTime &dt) const
 
 UtcDateTime GanttScene::prevFinish(const UtcDateTime &dt,GanttHeader::GanttPrecisionMode mode) const
 {
-    if(!m_header)
+    if(m_header.isNull())
     {
         Q_ASSERT(false);
         return UtcDateTime();
@@ -795,7 +807,7 @@ UtcDateTime GanttScene::prevFinish(const UtcDateTime &dt,GanttHeader::GanttPreci
 
 UtcDateTime GanttScene::prevFinish(const UtcDateTime &dt) const
 {
-    if(!m_header)
+    if(m_header.isNull())
     {
         Q_ASSERT(false);
         return UtcDateTime();
@@ -806,7 +818,7 @@ UtcDateTime GanttScene::prevFinish(const UtcDateTime &dt) const
 
 GanttHeader::GanttPrecisionMode GanttScene::headerPrecisionMode() const
 {
-    if(!m_header)
+    if(m_header.isNull())
     {
         qWarning("GanttScene::headerMode m_header is NULL");
         return (GanttHeader::GanttPrecisionMode)0;
@@ -816,7 +828,7 @@ GanttHeader::GanttPrecisionMode GanttScene::headerPrecisionMode() const
 
 GanttHeader::GanttPrecisionMode GanttScene::calculateTimeMode(const UtcDateTime &min, const UtcDateTime &max) const
 {
-    if(!m_header)
+    if(m_header.isNull())
     {
         qWarning("GanttScene::calculateTimeMode m_header is NULL");
         return (GanttHeader::GanttPrecisionMode)0;
@@ -831,7 +843,7 @@ void GanttScene::emitLimitsChanged(const UtcDateTime &start, const UtcDateTime &
 
 long long GanttScene::minTimeUnit() const
 {
-    if(!m_header)
+    if(m_header.isNull())
     {
         qWarning("GanttScene::minTimeUnit m_header is NULL");
         return 1;
@@ -925,7 +937,7 @@ void GanttScene::setEmpty(bool empty)
 
 void GanttScene::updateSliderRect()
 {
-    if(!m_slider || !m_header)
+    if(!m_slider || m_header.isNull())
         return;
 
     if(m_header->headerMode() == GanttHeader::TimelineMode)

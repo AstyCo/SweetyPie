@@ -109,6 +109,13 @@ void GanttGraphicsView::setHSliderHeight(int hSliderHeight)
                 QString("QScrollBar {height:%1px;}").arg(m_hSliderHeight));
 }
 
+int GanttGraphicsView::treeViewHeight() const
+{
+    if(!m_treeView)
+        return 0;
+    m_treeView->contentsRect().height();
+}
+
 void GanttGraphicsView::changeNodeExpanding()
 {
     GanttInfoNode *p_node = qobject_cast<GanttInfoNode*>(sender());

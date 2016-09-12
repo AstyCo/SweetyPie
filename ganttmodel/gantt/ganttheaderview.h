@@ -6,6 +6,7 @@
 #include <QHeaderView>
 
 class GanttTreeView;
+class GanttWidget;
 
 class GanttHeaderView : public QHeaderView
 {
@@ -19,6 +20,8 @@ public slots:
 
 protected:
     void paintEvent(QPaintEvent *e);
+
+    GanttWidget *m_widget;
 };
 
 #endif // GANTTHEADERVIEW_H

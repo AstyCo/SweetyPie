@@ -70,7 +70,9 @@ QVariant GanttTreeModel::data(const QModelIndex &index, int role) const
         case 0:
             return node->title();
         case 1:
-            return node->calcDt().dateTime();
+            if(node->hasCalcDt())
+                return node->calcDt().dateTime();
+            return QVariant();
         case finishField:
         case durationField:
             return QVariant();

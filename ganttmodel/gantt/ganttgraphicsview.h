@@ -27,6 +27,8 @@ public:
 
     void setHSliderHeight(int hSliderHeight);
 
+    int treeViewHeight() const;
+
 public slots:
     void changeNodeExpanding();
 

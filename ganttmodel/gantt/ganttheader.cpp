@@ -990,15 +990,17 @@ bool GanttHeader::onItemsAdditionHelper(GanttInfoItem *item)
         GanttInfoNode *node = dynamic_cast<GanttInfoNode*>(item);
         if(node)
         {
-
-            if(m_isEmpty)
+            if(node->hasCalcDt())
             {
-                m_isEmpty = false;
-                m_minDt = node->calcDt();
-                m_maxDt = node->calcDt();
-            }
+                if(m_isEmpty)
+                {
+                    m_isEmpty = false;
+                    m_minDt = node->calcDt();
+                    m_maxDt = node->calcDt();
+                }
 
-            newRange |= verifyBoundsByNode(node);
+                newRange |= verifyBoundsByNode(node);
+            }
 
             foreach(GanttInfoItem* item, node->m_items)
             {
@@ -1190,9 +1192,8 @@ bool GanttHeader::verifyBoundsByNode(const GanttInfoNode *node)
 {
     if(!node)
         return false;
-    if(!node->calcDt().isValid())
+    if(!node->hasCalcDt())
     {
-        qWarning("node\'s calc time not valid!");
         return false;
     }
 

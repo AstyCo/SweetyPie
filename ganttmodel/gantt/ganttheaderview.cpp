@@ -18,26 +18,20 @@
 GanttHeaderView::GanttHeaderView(Qt::Orientation orientation, QWidget * parent) :
     QHeaderView(orientation,parent)
 {
+    m_widget = NULL;
+    QWidget *p_parent = parentWidget();
+    while(!m_widget)
+    {
+        if(!p_parent)
+            break;
+
+        m_widget = dynamic_cast<GanttWidget*>(p_parent);
+        p_parent = p_parent->parentWidget();
+    }
 }
 
 void GanttHeaderView::paintEvent(QPaintEvent *e)
 {
-    static GanttWidget* p_parentWidget = NULL;
-
-    if(!p_parentWidget)
-    {
-        QWidget *p_parent = parentWidget();
-        while(!p_parentWidget)
-        {
-            if(!p_parent)
-                break;
-
-            p_parentWidget = dynamic_cast<GanttWidget*>(p_parent);
-            p_parent = p_parent->parentWidget();
-        }
-    }
-
-
     QPainter painter(viewport());
 
     QPen headerPen(QBrush(Qt::white)
@@ -60,9 +54,9 @@ void GanttHeaderView::paintEvent(QPaintEvent *e)
     painter.setPen(headerPen);
 
     painter.setFont(dtFont);
-    if(p_parentWidget && p_parentWidget->player())
+    if(m_widget && m_widget->player())
     {
-        painter.drawText(dtRect,p_parentWidget->slidersDt().toString("dd.MM.yyyy HH:mm:ss")
+        painter.drawText(dtRect,m_widget->slidersDt().toString("dd.MM.yyyy HH:mm:ss")
                            ,QTextOption(Qt::AlignCenter));
     }
 

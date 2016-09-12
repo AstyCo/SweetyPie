@@ -35,6 +35,7 @@ public:
     void setIsExpanded(bool isExpanded);
 
     UtcDateTime calcDt() const;
+    bool hasCalcDt() const;
     void setCalcDt(const UtcDateTime &calcDt);
     void callForEachItemRecursively(void (*func)(GanttInfoItem*));
     

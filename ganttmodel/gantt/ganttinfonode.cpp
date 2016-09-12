@@ -116,6 +116,11 @@ UtcDateTime GanttInfoNode::calcDt() const
     return m_calcDt;
 }
 
+bool GanttInfoNode::hasCalcDt() const
+{
+    return m_calcDt.isValid();
+}
+
 void GanttInfoNode::setCalcDt(const UtcDateTime &calcDt)
 {
     if(m_calcDt == calcDt)
