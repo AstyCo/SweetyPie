@@ -1,0 +1,19 @@
+Priority: optional
+Maintainer: unknown <unknown@debian.org>
+Source: ganttmodellib
+Build-Depends: debhelper (>= 5)
+Standards-Version: 3.8.2
+Homepage: 
+
+Package: ganttmodellib
+Section: utils
+Architecture: amd64
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Description: Библиотека для построения диаграммы Ганта
+
+Package: ganttmodellib-devel
+Section: utils
+Architecture: amd64
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Description: Библиотека для построения диаграммы Ганта для разработки
+
