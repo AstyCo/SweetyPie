@@ -4,6 +4,8 @@
 #include <QGraphicsObject>
 #include <QPainterPath>
 
+#include <QPointer>
+
 class GanttHeader;
 class GanttScene;
 class GanttInfoNode;
@@ -42,7 +44,7 @@ private:
     QPainterPath m_shapePath;
     GanttHeader* m_header;
     GanttInfoNode* m_info;
-    GanttScene *m_scene;
+    QPointer<GanttScene> m_scene;
 };
 
 #endif // GANTTCALCGRAPHICSITEM_H

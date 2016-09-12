@@ -35,11 +35,6 @@ GanttGraphicsObject::~GanttGraphicsObject()
         m_scene->removeItem(this);
         setParentItem(NULL);
         m_scene->update(sceneBoundingRect());
-        if(m_scene->dtItems().isEmpty())
-        {
-            m_scene->setEmpty(true);
-            m_scene->updateSceneRect();
-        }
     }
 
     if(m_info)

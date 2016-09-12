@@ -16,7 +16,7 @@
 #include <QDebug>
 
 GanttHeader::GanttHeader(QGraphicsItem *parent) :
-    QGraphicsItem(parent)
+    QGraphicsObject(parent)
 {
 
     m_scene = NULL;

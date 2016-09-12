@@ -102,6 +102,7 @@ public:
 
     void clear();
     qreal headerBottom() const;
+    bool sceneHaveItems() const;
 
 signals:
     void limitsChanged(const UtcDateTime &start, const UtcDateTime &finish);
@@ -136,11 +137,13 @@ protected:
 
 private:
 
+
     void updateSlider();
     void addItemsHelper(GanttInfoItem* item);
     void updateItems();
 
 private slots:
+    void onVisItemDestroyed(QObject *which);
     void onGraphicsItemPress();
     void onGraphicsItemHoverEnter();
     void onGraphicsItemHoverLeave();
@@ -158,7 +161,7 @@ private:
     QMap<const /*GanttInfoLeaf*/GanttInfoItem*, /*GanttGraphicsObject*/QGraphicsObject*> m_itemByInfo;
     QMap<UtcDateTime,const GanttInfoLeaf*> m_infoByStart,
                                             m_infoByFinish;
-    GanttHeader *m_header;
+    QPointer<GanttHeader> m_header;
     GanttCurrentDtSlider *m_slider;
     QPointer<QGraphicsObject> m_currentItem;
     QPointer<GanttGraphicsView> m_view;

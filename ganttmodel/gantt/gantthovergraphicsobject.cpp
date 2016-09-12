@@ -6,6 +6,7 @@
 #include <QPainter>
 
 GanttHoverGraphicsObject::GanttHoverGraphicsObject(QGraphicsItem* parent)
+    : QGraphicsObject(parent)
 {
 
 }

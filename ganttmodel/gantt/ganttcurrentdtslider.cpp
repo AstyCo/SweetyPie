@@ -42,6 +42,9 @@ QRectF GanttCurrentDtSlider::boundingRect() const
 
 void GanttCurrentDtSlider::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
 {
+    Q_UNUSED(option);
+    Q_UNUSED(widget);
+
     if(!m_draw)
         return;
 
@@ -110,6 +113,7 @@ void GanttCurrentDtSlider::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
 
 void GanttCurrentDtSlider::mousePressEvent(QGraphicsSceneMouseEvent *event)
 {
+    Q_UNUSED(event);
     setCursor(Qt::ClosedHandCursor);
 }
 
@@ -146,8 +150,6 @@ void GanttCurrentDtSlider::updateScenePos()
 
 void GanttCurrentDtSlider::updateRange(const UtcDateTime &minDt, const UtcDateTime &maxDt)
 {
-    GanttHeader::GanttPrecisionMode mode = m_scene->calculateTimeMode(minDt,maxDt);
-
     m_minDt = minDt;
     m_maxDt = maxDt;
 }

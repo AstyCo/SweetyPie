@@ -254,6 +254,7 @@ void IntervalSlider::checkItemRange(long long &itemVal)
 
 void IntervalSlider::paintEvent(QPaintEvent *event)
 {
+    Q_UNUSED(event);
     QPainter painter( this );
 //    painter.setClipRegion( event->region() );
 

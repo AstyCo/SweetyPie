@@ -48,8 +48,6 @@ void GanttTreeView::scrollContentsBy(int dx, int dy)
 
     if(!m_graphicsView)
         return;
-
-    int oldVal = verticalScrollBar()->value();
     int vs = verticalScrollBar()->value();
     m_graphicsView->verticalScrollBar()->setValue(vs);
     if(m_graphicsView->verticalScrollBar()->value() != vs)

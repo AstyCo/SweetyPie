@@ -290,6 +290,7 @@ void GanttIntervalSlider::setMinTimeSize(long long minTimeSize)
 
 void GanttIntervalSlider::updateMinTimeSize(const QSize &newViewSize)
 {
+    Q_UNUSED(newViewSize);
     if(!m_scene)
     {
         qWarning("GanttIntervalSlider::closestStartDt m_scene is NULL");

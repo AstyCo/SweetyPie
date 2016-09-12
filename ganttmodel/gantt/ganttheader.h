@@ -16,7 +16,7 @@ class GanttInfoLeaf;
 class GanttInfoNode;
 class GanttWidget;
 
-class GanttHeader : public QGraphicsItem
+class GanttHeader : public QGraphicsObject
 {
 public:
     enum GanttHeaderMode

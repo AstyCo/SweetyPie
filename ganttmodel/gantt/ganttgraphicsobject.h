@@ -5,6 +5,7 @@
 
 
 #include <QGraphicsObject>
+#include <QPointer>
 
 class GanttHeader;
 class GanttScene;
@@ -51,7 +52,7 @@ private:
 
     GanttHeader* m_header;
     GanttInfoLeaf* m_info;
-    GanttScene *m_scene;
+    QPointer<GanttScene> m_scene;
 
     QSizeF m_boundingRectSize;
 

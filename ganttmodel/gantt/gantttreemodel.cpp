@@ -92,6 +92,8 @@ Qt::ItemFlags GanttTreeModel::flags(const QModelIndex &index) const
 QVariant GanttTreeModel::headerData(int section, Qt::Orientation orientation,
                                int role) const
 {
+    Q_UNUSED(section);
+    Q_UNUSED(orientation);
 
     if (role == Qt::SizeHintRole)
     {

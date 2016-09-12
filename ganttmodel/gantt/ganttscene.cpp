@@ -147,7 +147,7 @@ void GanttScene::onViewResize(const QSize&newSize)
 
 void GanttScene::updateSceneRect()
 {
-    if(m_items.isEmpty() && m_calcItems.isEmpty())
+    if(!sceneHaveItems())
     {
         if(m_header)
             setSceneRect(m_header->mapRectToScene(m_header->boundingRect()));
@@ -323,6 +323,12 @@ void GanttScene::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
     QGraphicsScene::mouseReleaseEvent(event);
 }
 
+void GanttScene::onVisItemDestroyed(QObject *item)
+{
+    Q_UNUSED(item);
+    updateSceneRect();
+}
+
 void GanttScene::onLeafStartChanged(/*const UtcDateTime& lastStart*/)
 {
     GanttInfoLeaf* p_leaf = qobject_cast<GanttInfoLeaf*>(sender());
@@ -393,6 +399,11 @@ qreal GanttScene::headerBottom() const
         return 0;
 
     return m_header->sceneBoundingRect().bottom();
+}
+
+bool GanttScene::sceneHaveItems() const
+{
+    return !(m_items.isEmpty() && m_calcItems.isEmpty());
 }
 
 void GanttScene::setCurrentItem(QGraphicsObject *currentItem)
@@ -487,6 +498,11 @@ void GanttScene::updateSlider()
 
 void GanttScene::addItemsHelper(GanttInfoItem *item)
 {
+    if(!item)
+        return;
+
+    connect(item,SIGNAL(destroyed(QObject*)),this,SLOT(onVisItemDestroyed(QObject*)));
+
     GanttInfoLeaf *leaf = dynamic_cast<GanttInfoLeaf*>(item);
     if(leaf)
     {
@@ -495,7 +511,6 @@ void GanttScene::addItemsHelper(GanttInfoItem *item)
         connect(p_item,SIGNAL(graphicsItemHoverEnter()),this,SLOT(onGraphicsItemHoverEnter()));
         connect(p_item,SIGNAL(graphicsItemHoverLeave()),this,SLOT(onGraphicsItemHoverLeave()));
         connect(p_item,SIGNAL(graphicsItemPressed()),this,SLOT(onGraphicsItemPress()));
-
 
 
         p_item->setScene(this);
