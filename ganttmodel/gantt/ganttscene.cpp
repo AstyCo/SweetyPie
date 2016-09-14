@@ -64,8 +64,6 @@ void GanttScene::updateWidth(int w)
 
 void GanttScene::updateHeight(int h)
 {
-//    h = qMax(h,m_view->treeViewHeight());
-//    qDebug()<<"treeView height: "<<QString::number(m_view->treeViewHeight());
 
     setSceneRect(0,0,sceneRect().width(),h);
 }

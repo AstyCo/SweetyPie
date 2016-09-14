@@ -60,6 +60,7 @@ GanttWidget::GanttWidget(QWidget *parent) :
     connect(ui->ganttView, SIGNAL(viewResized(QSize)),m_scene,SLOT(onViewResize(QSize)));
     connect(ui->ganttView, SIGNAL(viewResized(QSize)),ui->intervalSlider,SLOT(updateRange()));
     connect(ui->ganttView, SIGNAL(viewResized(QSize)),ui->intervalSlider,SLOT(updateMinTimeSize(QSize)));
+    connect(ui->ganttView,SIGNAL(customContextMenuRequested(QPoint)),this,SLOT(onGanttViewCustomContextMenuRequested(QPoint)));
 
 
     connect(ui->treeView,SIGNAL(clicked(QModelIndex)), this, SLOT(onTreeViewEntered(QModelIndex)));
@@ -203,6 +204,16 @@ void GanttWidget::onSliderMoved()
     m_scene->setRange(ui->intervalSlider->beginDt(),ui->intervalSlider->endDt());
 }
 
+void GanttWidget::onGanttViewCustomContextMenuRequested(const QPoint &point)
+{
+    qDebug()<<"onGanttViewCustomContextMenuRequested";
+    QPoint widgetPoint =ui->ganttView->mapTo(this,point);
+
+    qDebug() << "itemAtWidgetPoint: "<< itemAtPos(widgetPoint);
+
+    emit customContextMenuRequested(point);
+}
+
 void GanttWidget::updatePos(GanttInfoNode *from)
 {
     m_curSceneMax = 0;
@@ -320,7 +331,24 @@ void GanttWidget::clear()
 //        m_scene->clear();
 
 
-//    ui->treeView->update();
+    //    ui->treeView->update();
+}
+
+GanttInfoItem *GanttWidget::itemAtPos(const QPoint &widgetPoint) const
+{
+    QPointF scenePos = ui->ganttView->mapToScene(ui->ganttView->mapFrom(
+                                        const_cast<QWidget*>(reinterpret_cast<const QWidget*>(this)),widgetPoint));
+
+    if(QGraphicsScene* scene = ui->ganttView->scene())
+        if(QGraphicsItem*item= scene->itemAt(scenePos))
+        {
+            if(GanttGraphicsObject *rectObject = dynamic_cast<GanttGraphicsObject*>(item))
+                return rectObject->info();
+            if(GanttCalcGraphicsObject *calcObject = dynamic_cast<GanttCalcGraphicsObject*>(item))
+                return calcObject->info();
+        }
+
+    return NULL;
 }
 
 

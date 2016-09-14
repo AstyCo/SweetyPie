@@ -42,6 +42,7 @@ protected:
 
     void mouseMoveEvent(QMouseEvent *event);
     void leaveEvent(QEvent *);
+private slots:
 
 private:
     void initialize();

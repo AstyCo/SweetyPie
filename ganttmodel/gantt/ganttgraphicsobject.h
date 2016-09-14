@@ -53,6 +53,7 @@ private:
     GanttHeader* m_header;
     GanttInfoLeaf* m_info;
     QPointer<GanttScene> m_scene;
+    bool m_isSmall;
 
     QSizeF m_boundingRectSize;
 

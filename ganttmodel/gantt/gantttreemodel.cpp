@@ -357,8 +357,26 @@ void GanttTreeModel::addItems(const QList<GanttInfoItem *> &items)
 
 void GanttTreeModel::addItems(GanttInfoItem *item)
 {
-    m_root->append(item);
-    initIndexes(item);
+    GanttInfoNode *insertToNode = qobject_cast<GanttInfoNode*>(itemForName(item->title()));
+    if(insertToNode)
+    {
+        GanttInfoNode *node = qobject_cast<GanttInfoNode*>(item);
+        if(node)
+        {
+            beginInsertRows(insertToNode->index(),insertToNode->size(),insertToNode->size()+node->size());
+            for(int i=0;i<node->size();++i)
+                insertToNode->append(node->child(i));
+            endInsertRows();
+        }
+        initIndexes(insertToNode);
+    }
+    else
+    {
+        beginInsertRows(QModelIndex(),m_root->size(),m_root->size()+1);
+        m_root->append(item);
+        endInsertRows();
+        initIndexes(item);
+    }
 
     // NON RECURSIVELY
     for(int i = 0; i<m_root->size() ; ++i)

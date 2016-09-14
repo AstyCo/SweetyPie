@@ -87,6 +87,7 @@ void GanttGraphicsView::leaveEvent(QEvent *e)
 
 
 
+
 void GanttGraphicsView::initialize()
 {
     m_scene = NULL;
@@ -97,6 +98,8 @@ void GanttGraphicsView::initialize()
     setFrameStyle(0);
     setAlignment(Qt::AlignLeft | Qt::AlignTop);
     setHSliderHeight(15);
+
+    setContextMenuPolicy(Qt::CustomContextMenu);
 }
 
 void GanttGraphicsView::setHSliderHeight(int hSliderHeight)

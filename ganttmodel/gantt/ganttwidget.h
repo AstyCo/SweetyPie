@@ -52,6 +52,7 @@ public:
 
     void clear();
 
+    GanttInfoItem *itemAtPos(const QPoint& widgetPoint) const;
 
 signals:
     void currentDtChanged(const UtcDateTime& dt);
@@ -67,6 +68,8 @@ private slots:
     void collapsed(const QModelIndex& index);
 
     void onSliderMoved();
+
+    void onGanttViewCustomContextMenuRequested(const QPoint&);
 
 public slots:
 //    void repaintDtHeader();
