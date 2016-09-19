@@ -100,11 +100,12 @@ SOURCES += \
     gantt/ganttheader.cpp \
     gantt/ganttgraphicsview.cpp \
     appeventfilter.cpp \
-    gantt/ganttcalcgraphicsobject.cpp \
-    gantt/ganttgraphicsobject.cpp \
     gantt/ganttcurrentdtslider.cpp \
     gantt/ganttdtcrossobject.cpp \
-    gantt/gantthovergraphicsobject.cpp
+    gantt/gantthovergraphicsobject.cpp \
+    gantt/ganttcalcgraphicsobject.cpp \
+    gantt/ganttgraphicsobject.cpp \
+    gantt/ganttintervalgraphicsobject.cpp
 
 
 HEADERS += \
@@ -150,11 +151,12 @@ HEADERS += \
     gantt/ganttglobalvalues.h \
     ganttproject_global.h \
     appeventfilter.h \
-    gantt/ganttgraphicsobject.h \
-    gantt/ganttcalcgraphicsobject.h \
     gantt/ganttcurrentdtslider.h \
     gantt/ganttdtcrossobject.h \
-    gantt/gantthovergraphicsobject.h
+    gantt/gantthovergraphicsobject.h \
+    gantt/ganttcalcgraphicsobject.h \
+    gantt/ganttgraphicsobject.h \
+    gantt/ganttintervalgraphicsobject.h
 
 
 RESOURCES += \

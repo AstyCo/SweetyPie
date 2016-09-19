@@ -81,24 +81,27 @@ void GanttHeader::paint(QPainter *painter, const QStyleOptionGraphicsItem *optio
 
         UtcDateTime dt = m_startDt;
 
-        do
+        if(!m_isEmpty)
         {
-            if(isDrawn(dt,m_mode))
+            do
             {
-                painter->drawLine(QPointF(curOffset,DEFAULT_ITEM_HEIGHT),QPointF(curOffset,DEFAULT_ITEM_HEIGHT*(3.0/2))); // big hatch
-                QFont dtFont("Goudy Old Style", 8);
-                painter->setFont(dtFont);
-                painter->drawText(QRectF(-MIN_WIDTH_FOR_TIME_VISUALIZING/2 + curOffset, DEFAULT_ITEM_HEIGHT*(3.0/2),
-                                         MIN_WIDTH_FOR_TIME_VISUALIZING,DEFAULT_ITEM_HEIGHT/2)
-                                  ,dt.toString(formatForMode(m_mode)),QTextOption(Qt::AlignCenter));
-            }
-            else
-                painter->drawLine(QPointF(curOffset,DEFAULT_ITEM_HEIGHT),QPointF(curOffset,DEFAULT_ITEM_HEIGHT*(5.0/4))); // little hatch
+                if(isDrawn(dt,m_mode))
+                {
+                    painter->drawLine(QPointF(curOffset,DEFAULT_ITEM_HEIGHT),QPointF(curOffset,DEFAULT_ITEM_HEIGHT*(3.0/2))); // big hatch
+                    QFont dtFont("Goudy Old Style", 8);
+                    painter->setFont(dtFont);
+                    painter->drawText(QRectF(-MIN_WIDTH_FOR_TIME_VISUALIZING/2 + curOffset, DEFAULT_ITEM_HEIGHT*(3.0/2),
+                                             MIN_WIDTH_FOR_TIME_VISUALIZING,DEFAULT_ITEM_HEIGHT/2)
+                                      ,dt.toString(formatForMode(m_mode)),QTextOption(Qt::AlignCenter));
+                }
+                else
+                    painter->drawLine(QPointF(curOffset,DEFAULT_ITEM_HEIGHT),QPointF(curOffset,DEFAULT_ITEM_HEIGHT*(5.0/4))); // little hatch
 
-            dt=dt.addMicroseconds(modeToMicrosecond(m_mode,dt.date()) / modeToSegmentCount(m_mode,dt.date()));
-            curOffset=dtToX(dt);
+                dt=dt.addMicroseconds(modeToMicrosecond(m_mode,dt.date()) / modeToSegmentCount(m_mode,dt.date()));
+                curOffset=dtToX(dt);
+            }
+            while(dt <= m_finishDt);
         }
-        while(dt <= m_finishDt);
     }
 
 }
@@ -165,9 +168,11 @@ void GanttHeader::updateHeader()
         GanttPrecisionMode newMode = calculateTimeMode(m_minDt,m_maxDt);
         if(setMode(newMode))
         {
+            initRange();
             updateStretchFactor();
         }
-        initRange();
+        else
+            initRange();
     }
 }
 
@@ -188,26 +193,26 @@ bool GanttHeader::setMode(const GanttPrecisionMode &mode)
 
 void GanttHeader::onItemsAddition(const QList<GanttInfoItem *> &items)
 {
-    bool newRange = false;
-    foreach(GanttInfoItem *item, items)
-    {
-        newRange|= onItemsAdditionHelper(item);
-    }
-    if(newRange)
+//    bool newRange = false;
+//    foreach(GanttInfoItem *item, items)
+//    {
+//        newRange|= onItemsAdditionHelper(item);
+//    }
+//    if(newRange)
     {
         updateHeader();
 
-        updateWidget();
+//        updateWidget();
     }
 }
 
 void GanttHeader::onItemsAddition(GanttInfoItem* items)
 {
-    if(onItemsAdditionHelper(items))
+//    if(onItemsAdditionHelper(items))
     {
         updateHeader();
 
-        updateWidget();
+//        updateWidget();
     }
 }
 
@@ -224,6 +229,9 @@ void GanttHeader::initRange()
 
 UtcDateTime GanttHeader::startByDt(const UtcDateTime &dt,GanttPrecisionMode mode) const
 {
+    if(m_isEmpty)
+        return UtcDateTime();
+
     if(m_headerMode == GanttDiagramMode)
     {
         switch(mode)
@@ -299,7 +307,7 @@ UtcDateTime GanttHeader::startByDt(const UtcDateTime &dt,GanttPrecisionMode mode
         case years1:
             return UtcDateTime(QDate(dt.year(),1,1));
         default:
-            qWarning("GanttHeader::initRange() out of range");
+            qWarning("GanttHeader::startByDt() out of range");
             return UtcDateTime();
         }
     }
@@ -313,6 +321,8 @@ UtcDateTime GanttHeader::startByDt(const UtcDateTime &dt) const
 
 UtcDateTime GanttHeader::finishByDt(const UtcDateTime &dt,GanttPrecisionMode mode) const
 {
+    if(m_isEmpty)
+        return UtcDateTime();
     if(m_headerMode == GanttDiagramMode)
     {
         switch(mode)
@@ -489,7 +499,7 @@ UtcDateTime GanttHeader::finishByDt(const UtcDateTime &dt,GanttPrecisionMode mod
             return res;
         }
         default:
-            qWarning("GanttHeader::initRange() out of range");
+            qWarning("GanttHeader::finishByDt() out of range");
             return UtcDateTime();
         }
     }
@@ -926,6 +936,9 @@ void GanttHeader::clear()
         m_items.removeOne(item);
         delete item;
     }
+    m_minDt = UtcDateTime();
+    m_maxDt = UtcDateTime();
+    m_isEmpty = true;
     m_scene->invalidate();
 }
 
@@ -1156,6 +1169,7 @@ void GanttHeader::setRange(UtcDateTime min, UtcDateTime max)
     if(min>max)
         return;
 
+    m_isEmpty = false;
     m_minDt = min;
     m_maxDt = max;
 
@@ -1215,7 +1229,6 @@ bool GanttHeader::verifyBoundsByNode(const GanttInfoNode *node)
 
 long long GanttHeader::modeToMicrosecond(GanttPrecisionMode mode, const QDate& date)
 {
-
     switch(mode)
     {
 //    case microseconds1:

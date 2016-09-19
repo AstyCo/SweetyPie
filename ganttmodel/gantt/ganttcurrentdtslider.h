@@ -2,9 +2,11 @@
 #define GANTTCURRENTTIMESLIDER_H
 
 #include "utcdatetime.h"
+#include "ganttinfonode.h"
 
 
 #include <QGraphicsObject>
+#include <QPair>
 
 class GanttHeader;
 class GanttScene;
@@ -53,10 +55,12 @@ signals:
     void drawChanged(bool);
 
 public slots:
+    void setToBegin();
     void makeStep(long long deltaVal);
     bool setDt(UtcDateTime dt);
     void updateScenePos();
     void updateRange(const UtcDateTime& minDt, const UtcDateTime& maxDt);
+    void updateRange(const GanttInfoNode *node);
 
     void moveToBegin();
     void moveToEnd();
@@ -66,6 +70,7 @@ public slots:
 
 private:
 
+//    QPair<UtcDateTime,UtcDateTime> getLimits(const GanttInfoItem *root) const;
     bool outOfRange() const;
     bool outOfBounds(const UtcDateTime &dt) const;
 

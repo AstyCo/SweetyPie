@@ -8,6 +8,7 @@
 #include <QMutex>
 
 class GanttInfoNode;
+class UtcDateTime;
 
 class GANTTMODELSHARED_EXPORT GanttInfoItem : public QObject
 {
@@ -33,6 +34,8 @@ public:
 
     void increaseLinkCnt();
     void reduceLinkCnt();
+
+    static QPair<UtcDateTime,UtcDateTime> getLimits(const GanttInfoItem *root);
 
 signals:
     void parentChanged();

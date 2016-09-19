@@ -11,7 +11,7 @@
 #include <QDebug>
 
 GanttCalcGraphicsObject::GanttCalcGraphicsObject(GanttInfoNode* node, QGraphicsItem *parent)
-    :QGraphicsObject(parent)
+    :GanttGraphicsObject(node,parent)
 {
     m_shapePath.moveTo(0,0);
     m_shapePath.lineTo(0,(DEFAULT_ITEM_HEIGHT-6)/2);
@@ -19,16 +19,14 @@ GanttCalcGraphicsObject::GanttCalcGraphicsObject(GanttInfoNode* node, QGraphicsI
     m_shapePath.moveTo(0,DEFAULT_ITEM_HEIGHT - (DEFAULT_ITEM_HEIGHT-6)/2);
     m_shapePath.lineTo(0,DEFAULT_ITEM_HEIGHT);
 
-    m_info = node;
-
-    if(m_info)
+    if(innerInfo())
     {
-        setToolTip( QString::fromUtf8("НУ-РЕШ-ВИТОК:") + '\t' + '\t' + m_info->title()
-                    + '\n' + QString::fromUtf8("Время рассчета:") + '\t' + m_info->calcDt().toString("dd.MM.yyyy HH:mm:ss"));
+        setToolTip( QString::fromUtf8("НУ-РЕШ-ВИТОК:") + '\t' + '\t' + innerInfo()->title()
+                    + '\n' + QString::fromUtf8("Время рассчета:") + '\t' + innerInfo()->calcDt().toString("dd.MM.yyyy HH:mm:ss"));
 
-        connect(m_info, SIGNAL(changed()),this,SLOT(updateItemGeometry()));
+        connect(innerInfo(), SIGNAL(changed()),this,SLOT(updateItemGeometry()));
 
-        m_info->increaseLinkCnt();
+        innerInfo()->increaseLinkCnt();
     }
 
     setAcceptHoverEvents(true);
@@ -44,8 +42,8 @@ GanttCalcGraphicsObject::~GanttCalcGraphicsObject()
         m_scene->update(sceneBoundingRect());
     }
 
-    if(m_info)
-        m_info->reduceLinkCnt();
+    if(innerInfo())
+        innerInfo()->reduceLinkCnt();
 }
 
 QRectF GanttCalcGraphicsObject::boundingRect() const
@@ -63,37 +61,31 @@ void GanttCalcGraphicsObject::paint(QPainter *painter, const QStyleOptionGraphic
     painter->fillPath(m_shapePath,QBrush(color.lighter(130)));
 }
 
-void GanttCalcGraphicsObject::setScene(GanttScene *scene)
+GanttInfoNode *GanttCalcGraphicsObject::innerInfo() const
 {
-    m_scene = scene;
-    m_scene->addItem(this);
-}
-
-void GanttCalcGraphicsObject::setHeader(GanttHeader *header)
-{
-    m_header = header;
+    return qobject_cast<GanttInfoNode*>(m_info);
 }
 
 void GanttCalcGraphicsObject::updateItemGeometry()
 {
-    if(!m_header || !m_info)
+    if(!m_header || !innerInfo())
         return;
 
-    qreal calcPos = m_header->dtToX(m_info->calcDt());
+    qreal calcPos = m_header->dtToX(innerInfo()->calcDt());
 
-    setPos(calcPos, 2*DEFAULT_ITEM_WIDTH + m_info->pos());
+    setPos(calcPos, 2*DEFAULT_ITEM_WIDTH + innerInfo()->pos());
 }
 
 void GanttCalcGraphicsObject::mousePressEvent(QGraphicsSceneMouseEvent *event)
 {
-//    if(!m_scene || !m_info)
+//    if(!m_scene || !innerInfo())
 //        return;
 
 //    if((this == m_scene->itemAt(event->scenePos())))
-//        if((!m_info->isExpanded() && (event->button() == Qt::LeftButton))
-//                /*|| (m_info->isExpanded() && (event->button() == Qt::RightButton))*/)
+//        if((!innerInfo()->isExpanded() && (event->button() == Qt::LeftButton))
+//                /*|| (innerInfo()->isExpanded() && (event->button() == Qt::RightButton))*/)
 //        {
-//            m_scene->changeExpanding(m_info->index());
+//            m_scene->changeExpanding(innerInfo()->index());
 //            emit graphicsItemPressed();
 //        }
 
@@ -114,8 +106,4 @@ void GanttCalcGraphicsObject::hoverLeaveEvent(QGraphicsSceneHoverEvent *event)
     QGraphicsItem::hoverLeaveEvent(event);
 }
 
-GanttInfoNode *GanttCalcGraphicsObject::info() const
-{
-    return m_info;
-}
 

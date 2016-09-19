@@ -8,7 +8,7 @@
 #include "ganttinfoleaf.h"
 #include "ganttinfonode.h"
 
-#include "ganttgraphicsobject.h"
+#include "ganttintervalgraphicsobject.h"
 #include "ganttcalcgraphicsobject.h"
 
 #include <QScrollBar>
@@ -39,6 +39,8 @@ GanttWidget::GanttWidget(QWidget *parent) :
 
     m_scene = new GanttScene(this);
     m_model = new GanttTreeModel(NULL,this);
+
+    m_scene->setModel(m_model);
 
     ui->ganttView->setScene(m_scene);
     ui->treeView->setModel(m_model);
@@ -116,6 +118,10 @@ void GanttWidget::addItems(GanttInfoItem* item)
     }
 
     m_model->addItems(item);
+
+    updateMinMax(m_model->root());
+    m_scene->m_header->setRange(m_minDt,m_maxDt);
+
     m_scene->addItems(item);
 
     callForEachItem(item,ui->treeView,m_scene,
@@ -127,6 +133,10 @@ void GanttWidget::addItems(GanttInfoItem* item)
 void GanttWidget::addItems(const QList<GanttInfoItem *> &items)
 {
     m_model->addItems(items);
+
+    updateMinMax(m_model->root());
+    m_scene->m_header->setRange(m_minDt,m_maxDt);
+
     m_scene->addItems(items);
 
     foreach(GanttInfoItem* item,items)
@@ -214,6 +224,16 @@ void GanttWidget::onGanttViewCustomContextMenuRequested(const QPoint &point)
     emit customContextMenuRequested(point);
 }
 
+void GanttWidget::updateMinMax(const GanttInfoItem *root)
+{
+    QPair<UtcDateTime,UtcDateTime> limits = GanttInfoItem::getLimits(root);
+
+    clearStack();
+    m_minDt = limits.first;
+    m_maxDt = limits.second;
+    updateSliderLimits();
+}
+
 void GanttWidget::updatePos(GanttInfoNode *from)
 {
     m_curSceneMax = 0;
@@ -238,7 +258,7 @@ void GanttWidget::updatePosHelper(GanttInfoItem *item)
     GanttInfoLeaf *leaf = qobject_cast<GanttInfoLeaf*>(item);
     if(leaf)
     {
-        GanttGraphicsObject *graphicsItem = qobject_cast<GanttGraphicsObject *>(m_scene->itemByInfo(leaf));
+        GanttIntervalGraphicsObject *graphicsItem = qobject_cast<GanttIntervalGraphicsObject *>(m_scene->itemByInfo(leaf));
         if(graphicsItem)
         {
             graphicsItem->setPos(graphicsItem->scenePos().x(),2*DEFAULT_ITEM_WIDTH + leaf->pos());
@@ -295,7 +315,7 @@ UtcDateTime GanttWidget::maxDt() const
     return m_maxDt;
 }
 
-const UtcDateTime &GanttWidget::outerMaxt() const
+const UtcDateTime &GanttWidget::outerMaxDt() const
 {
     if(m_stackLimits.isEmpty())
         return maxDt();
@@ -327,8 +347,8 @@ void GanttWidget::clear()
 {
     if(m_model)
         m_model->clear();
-//    if(m_scene)
-//        m_scene->clear();
+    if(m_scene)
+        m_scene->clear();
 
 
     //    ui->treeView->update();
@@ -342,7 +362,7 @@ GanttInfoItem *GanttWidget::itemAtPos(const QPoint &widgetPoint) const
     if(QGraphicsScene* scene = ui->ganttView->scene())
         if(QGraphicsItem*item= scene->itemAt(scenePos))
         {
-            if(GanttGraphicsObject *rectObject = dynamic_cast<GanttGraphicsObject*>(item))
+            if(GanttIntervalGraphicsObject *rectObject = dynamic_cast<GanttIntervalGraphicsObject*>(item))
                 return rectObject->info();
             if(GanttCalcGraphicsObject *calcObject = dynamic_cast<GanttCalcGraphicsObject*>(item))
                 return calcObject->info();
@@ -429,6 +449,23 @@ void GanttWidget::prevLimits()
     m_stackLimits.pop_back();
 
     updateRange(limits.first,limits.second);
+}
+
+void GanttWidget::clearStack()
+{
+    if(!m_stackLimits.isEmpty())
+    {
+        m_minDt = outerMinDt();
+        m_maxDt = outerMaxDt();
+        m_stackLimits.clear();
+    }
+}
+
+bool GanttWidget::setCurrentDt(const UtcDateTime &curDt)
+{
+    if(m_scene&&m_scene->slider())
+        return m_scene->slider()->setDt(curDt);
+    return false;
 }
 
 void GanttWidget::setCurrentItem(const GanttInfoItem *info)

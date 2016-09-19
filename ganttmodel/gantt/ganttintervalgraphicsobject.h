@@ -1,35 +1,37 @@
-#ifndef GANTTCALCGRAPHICSITEM_H
-#define GANTTCALCGRAPHICSITEM_H
+#ifndef GANTTGRAPHICSITEM_H
+#define GANTTGRAPHICSITEM_H
 
 #include "ganttgraphicsobject.h"
-#include <QPainterPath>
+#include "ganttinfoleaf.h"
 
 #include <QPointer>
 
-class GanttHeader;
-class GanttScene;
-class GanttInfoNode;
-
-class GanttCalcGraphicsObject : public GanttGraphicsObject
+class GanttIntervalGraphicsObject : public GanttGraphicsObject
 {
     Q_OBJECT
 
 public:
-    GanttCalcGraphicsObject(GanttInfoNode* node,QGraphicsItem *parent = NULL);
-    ~GanttCalcGraphicsObject();
+    GanttIntervalGraphicsObject(GanttInfoLeaf *info,QGraphicsItem *parent = 0);
+    virtual ~GanttIntervalGraphicsObject();
 
     QRectF boundingRect() const;
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
 
-    GanttInfoNode *innerInfo() const;
+    GanttInfoLeaf *innerInfo() const;
+
 
 signals:
     void graphicsItemPressed();
     void graphicsItemHoverEnter();
     void graphicsItemHoverLeave();
 
+
 public slots:
+    void setBoundingRectSize(const QSizeF &boundingRectSize);
+
     void updateItemGeometry();
+
+
 
 protected:
     void mousePressEvent(QGraphicsSceneMouseEvent *event);
@@ -38,7 +40,11 @@ protected:
     void hoverLeaveEvent(QGraphicsSceneHoverEvent *event);
 
 private:
-    QPainterPath m_shapePath;
+    bool m_isSmall;
+
+    QSizeF m_boundingRectSize;
+
+
 };
 
-#endif // GANTTCALCGRAPHICSITEM_H
+#endif // GANTTGRAPHICSITEM_H

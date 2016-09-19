@@ -63,6 +63,47 @@ void GanttInfoItem::reduceLinkCnt()
     tryDeleteHimself();
 }
 
+QPair<UtcDateTime,UtcDateTime> myMax(const QPair<UtcDateTime,UtcDateTime>&f,const QPair<UtcDateTime,UtcDateTime>&s)
+{
+    UtcDateTime resFirst,resSecond;
+
+    if(f.first.isValid() && s.first.isValid())
+        resFirst = qMin(f.first,s.first);
+    else if(f.first.isValid())
+        resFirst = f.first;
+    else
+        resFirst = s.first;
+
+    if(f.second.isValid() && s.second.isValid())
+        resSecond = qMax(f.second,s.second);
+    else if(f.second.isValid())
+        resSecond = f.second;
+    else
+        resSecond = s.second;
+
+    return QPair<UtcDateTime,UtcDateTime>(resFirst,resSecond);
+}
+
+QPair<UtcDateTime,UtcDateTime> GanttInfoItem::getLimits(const GanttInfoItem *root)
+{
+    QPair<UtcDateTime,UtcDateTime> res;
+    if(!root)
+        return res;
+    const GanttInfoLeaf*leaf = qobject_cast<const GanttInfoLeaf*>(root);
+    if(leaf)
+    {
+        return qMakePair(leaf->start(),leaf->finish());
+    }
+
+    const GanttInfoNode *rNode = qobject_cast<const GanttInfoNode*>(root);
+//    res = qMakePair(rNode->calcDt(),rNode->calcDt());
+    for(int i = 0; i<rNode->size(); ++i)
+    {
+        res = myMax(res,getLimits(rNode->child(i)));
+    }
+    return res;
+}
+
 void GanttInfoItem::setIndex(const QModelIndex &index)
 {
     if(index == m_index)

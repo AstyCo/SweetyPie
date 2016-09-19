@@ -1,63 +1,27 @@
-#ifndef GANTTGRAPHICSITEM_H
-#define GANTTGRAPHICSITEM_H
-
-#include "ganttinfoleaf.h"
-
+#ifndef GANTTGRAPHICSOBJECT_H
+#define GANTTGRAPHICSOBJECT_H
 
 #include <QGraphicsObject>
 #include <QPointer>
 
+class GanttInfoItem;
 class GanttHeader;
 class GanttScene;
 
 class GanttGraphicsObject : public QGraphicsObject
 {
-    Q_OBJECT
-
 public:
-    GanttGraphicsObject(GanttInfoLeaf *info,QGraphicsItem *parent = 0);
-    virtual ~GanttGraphicsObject();
+    GanttGraphicsObject(GanttInfoItem *item,QGraphicsItem *parent = NULL);
 
-    QRectF boundingRect() const;
-    void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
+    virtual GanttInfoItem *info() const;
 
-
-
-    GanttInfoLeaf *info() const;
-
-
-    void setHeader(GanttHeader *header);
-
-signals:
-    void graphicsItemPressed();
-    void graphicsItemHoverEnter();
-    void graphicsItemHoverLeave();
-
-
-public slots:
-    void setScene(GanttScene *scene);
-    void setBoundingRectSize(const QSizeF &boundingRectSize);
-
-    void updateItemGeometry();
-
-
+    virtual void setHeader(const QPointer<GanttHeader> &header);
+    virtual void setScene(const QPointer<GanttScene> &scene);
 
 protected:
-    void mousePressEvent(QGraphicsSceneMouseEvent *event);
-
-    void hoverEnterEvent(QGraphicsSceneHoverEvent *event);
-    void hoverLeaveEvent(QGraphicsSceneHoverEvent *event);
-
-private:
-
-    GanttHeader* m_header;
-    GanttInfoLeaf* m_info;
+    QPointer<GanttHeader> m_header;
     QPointer<GanttScene> m_scene;
-    bool m_isSmall;
-
-    QSizeF m_boundingRectSize;
-
-
+    QPointer<GanttInfoItem> m_info;
 };
 
-#endif // GANTTGRAPHICSITEM_H
+#endif // GANTTGRAPHICSOBJECT_H

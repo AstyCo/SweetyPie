@@ -4,13 +4,14 @@
 
 #include "ganttheader.h"
 #include "ganttcurrentdtslider.h"
+#include "gantttreemodel.h"
 
 #include <QGraphicsScene>
 #include <QMap>
 #include <QPointer>
 
 class GanttGraphicsView;
-class GanttGraphicsObject;
+class GanttIntervalGraphicsObject;
 class GanttCalcGraphicsObject;
 class GanttDtCrossObject;
 class GanttHoverGraphicsObject;
@@ -52,7 +53,7 @@ public:
     GanttCurrentDtSlider *slider() const;
 
     void setRange(UtcDateTime min, UtcDateTime max);
-
+    GanttInfoNode *root()const;
 
     UtcDateTime minDt() const;
     UtcDateTime maxDt() const;
@@ -87,7 +88,7 @@ public:
     void removeByInfoLeaf(const GanttInfoLeaf* leaf);
     void setEmpty(bool empty);
 
-    const QList<GanttGraphicsObject *>& dtItems() const;
+    const QList<GanttIntervalGraphicsObject *>& dtItems() const;
     void removeItem(QGraphicsItem *item);
 
     void setDrawCurrentDtSlider(bool enable);
@@ -103,6 +104,8 @@ public:
     void clear();
     qreal headerBottom() const;
     bool sceneHaveItems() const;
+
+    void setModel(const QPointer<GanttTreeModel> &model);
 
 signals:
     void limitsChanged(const UtcDateTime &start, const UtcDateTime &finish);
@@ -156,11 +159,12 @@ private slots:
 
 private:
 
-    QList<GanttGraphicsObject*> m_items;
+    QList<GanttIntervalGraphicsObject*> m_items;
     QList<GanttCalcGraphicsObject*> m_calcItems;
     QMap<const /*GanttInfoLeaf*/GanttInfoItem*, /*GanttGraphicsObject*/QGraphicsObject*> m_itemByInfo;
     QMap<UtcDateTime,const GanttInfoLeaf*> m_infoByStart,
                                             m_infoByFinish;
+    QPointer<GanttTreeModel> m_model;
     QPointer<GanttHeader> m_header;
     GanttCurrentDtSlider *m_slider;
     QPointer<QGraphicsObject> m_currentItem;

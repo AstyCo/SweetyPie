@@ -7,6 +7,7 @@
 #include <QGraphicsScene>
 #include <QCursor>
 #include <QGraphicsSceneMouseEvent>
+#include <QPair>
 
 #include <QDebug>
 
@@ -123,6 +124,11 @@ void GanttCurrentDtSlider::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
     QGraphicsItem::mouseReleaseEvent(event);
 }
 
+void GanttCurrentDtSlider::setToBegin()
+{
+    setDt(m_minDt);
+}
+
 void GanttCurrentDtSlider::makeStep(long long deltaVal)
 {
     setDt(m_dt.addMicroseconds(deltaVal));
@@ -154,6 +160,13 @@ void GanttCurrentDtSlider::updateRange(const UtcDateTime &minDt, const UtcDateTi
     m_maxDt = maxDt;
 }
 
+void GanttCurrentDtSlider::updateRange(const GanttInfoNode *node)
+{
+    QPair<UtcDateTime,UtcDateTime> limits = GanttInfoItem::getLimits(node);
+    updateRange(limits.first,limits.second);
+    setDt(limits.first);
+}
+
 bool GanttCurrentDtSlider::outOfRange() const
 {
     if(!m_scene)
@@ -179,6 +192,7 @@ void GanttCurrentDtSlider::setVisible(bool visible)
     if(m_draw)
         QGraphicsObject::setVisible(visible);
 }
+
 bool GanttCurrentDtSlider::draw() const
 {
     return m_draw;
@@ -239,6 +253,48 @@ void GanttCurrentDtSlider::moveToRangeFinish()
     setDt(m_scene->finishDt());
 }
 
+//QPair<UtcDateTime,UtcDateTime> myMax(const QPair<UtcDateTime,UtcDateTime>&f,const QPair<UtcDateTime,UtcDateTime>&s)
+//{
+//    UtcDateTime resFirst,resSecond;
+
+//    if(f.first.isValid() && s.first.isValid())
+//        resFirst = qMin(f.first,s.first);
+//    else if(f.first.isValid())
+//        resFirst = f.first;
+//    else
+//        resFirst = s.first;
+
+//    if(f.second.isValid() && s.second.isValid())
+//        resSecond = qMax(f.second,s.second);
+//    else if(f.second.isValid())
+//        resSecond = f.second;
+//    else
+//        resSecond = s.second;
+
+//    return QPair<UtcDateTime,UtcDateTime>(resFirst,resSecond);
+//}
+
+//QPair<UtcDateTime,UtcDateTime> GanttCurrentDtSlider::getLimits(const GanttInfoItem *root) const
+//{
+//    QPair<UtcDateTime,UtcDateTime> res;
+//    if(!root)
+//        return res;
+//    const GanttInfoLeaf*leaf = qobject_cast<const GanttInfoLeaf*>(root);
+//    if(leaf)
+//    {
+//        return qMakePair(leaf->start(),leaf->finish());
+//    }
+
+//    const GanttInfoNode *rNode = qobject_cast<const GanttInfoNode*>(root);
+//    res = qMakePair(rNode->calcDt(),rNode->calcDt());
+
+//    for(int i = 0; i<rNode->size(); ++i)
+//    {
+//        res = myMax(res,getLimits(rNode->child(i)));
+//    }
+//    return res;
+//}
+
 UtcDateTime GanttCurrentDtSlider::minDt() const
 {
     return m_minDt;
@@ -265,9 +321,6 @@ bool GanttCurrentDtSlider::setDt(UtcDateTime dt)
         dt = m_minDt;
     if(dt > m_maxDt)
         dt = m_maxDt;
-
-    if(dt == m_dt)
-        return false;
 
     m_dt = dt;
 

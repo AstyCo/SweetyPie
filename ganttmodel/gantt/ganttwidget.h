@@ -43,7 +43,7 @@ public:
     const UtcDateTime &outerMinDt() const;
 
     UtcDateTime maxDt() const;
-    const UtcDateTime &outerMaxt() const;
+    const UtcDateTime &outerMaxDt() const;
 
     GanttInfoNode *nodeByName(const QString&title) const;
 
@@ -73,14 +73,17 @@ private slots:
 
 public slots:
 //    void repaintDtHeader();
+    void updateMinMax(const GanttInfoItem* root);
     void updateRange(const UtcDateTime& min, const UtcDateTime& max);
     void updateSliderLimits();
     // ZOOM +
     void newLimits();
     void newLimits(const UtcDateTime& min, const UtcDateTime& max);
     void prevLimits();
+    void clearStack();
     // ZOOM -
 
+    bool setCurrentDt(const UtcDateTime& curDt);
     void setCurrentItem(const GanttInfoItem* item);
     void onTreeViewEntered(const QModelIndex& index);
 
