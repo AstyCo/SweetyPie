@@ -121,7 +121,7 @@ void MGridScene::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
 void MGridScene::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
 {
     // INTERACTIVE SELECTION
-    setInteractiveHighlight(false);
+//    setInteractiveHighlight(false);
 
     // ITEMS SELECT <disabled>
     clearLastSelected();

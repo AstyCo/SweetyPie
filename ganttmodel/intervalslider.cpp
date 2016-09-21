@@ -115,13 +115,38 @@ void IntervalSlider::setMinValue(long long minValue)
     update();
 }
 
+void IntervalSlider::setBeginAndEnd(long long begin, long long end)
+{
+    if(begin> end)
+        return;
+
+//    if(begin<m_minValue)
+//        begin = m_minValue;
+//    if(begin>m_maxValue)
+//        begin = m_maxValue;
+
+//    if(end<m_minValue)
+//        end = m_minValue;
+//    if(end>m_maxValue)
+//        end = m_maxValue;
+
+    setBeginHandle(m_minValue);
+    setEndHandle(m_maxValue);
+
+    setBeginHandle(begin);
+    setEndHandle(end);
+
+}
+
 void IntervalSlider::setLimits(long long minValue,long long maxValue)
 {
     setMinValue(minValue);
     setMaxValue(maxValue);
 
-    setBeginHandle(minValue);
-    setEndHandle(maxValue);
+    setBeginAndEnd(minValue,maxValue);
+
+//    setBeginHandle(minValue);
+//    setEndHandle(maxValue);
 }
 
 void IntervalSlider::setHandles(long long beginHandle, long long endHandle)

@@ -62,9 +62,7 @@ void MainWindow::testChartWidget()
   ui->widget->setData("11111111111111", data);
   ui->widget->setData("22222222222222", data2, QwtPlot::yRight);
 
-  ui->widgetIntervalSlider->setMinValue(0);
-  ui->widgetIntervalSlider->setMaxValue(TimeSpan(ui->widget->maximumDt() - ui->widget->minimumDt()).totalSeconds());
-  ui->widgetIntervalSlider->setEndHandle(ui->widgetIntervalSlider->maxValue());  
+  ui->widgetIntervalSlider->setLimits(0,TimeSpan(ui->widget->maximumDt() - ui->widget->minimumDt()).totalSeconds());
   ui->checkBox_showLegend->setChecked(true);
 
   connect(ui->widgetIntervalSlider, SIGNAL(valueChanged(IntervalSlider::ClippedHandle, long long)), this, SLOT(setInterval()));
@@ -210,6 +208,7 @@ void MainWindow::testMemoryPlanningWidget()
     ui->memoryPlanningWidget->setMemory(kaMemory);
     scene->setLimits(200,1750);
     ui->memoryPlanningWidget->setShowButtons(true);
+    scene->setSelectionMode(MGridScene::areaSelection);
 }
 
 void MainWindow::setInterval()

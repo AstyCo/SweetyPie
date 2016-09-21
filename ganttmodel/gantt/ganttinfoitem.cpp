@@ -96,7 +96,7 @@ QPair<UtcDateTime,UtcDateTime> GanttInfoItem::getLimits(const GanttInfoItem *roo
     }
 
     const GanttInfoNode *rNode = qobject_cast<const GanttInfoNode*>(root);
-//    res = qMakePair(rNode->calcDt(),rNode->calcDt());
+    res = qMakePair(rNode->calcDt(),rNode->calcDt());
     for(int i = 0; i<rNode->size(); ++i)
     {
         res = myMax(res,getLimits(rNode->child(i)));

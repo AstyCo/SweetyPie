@@ -55,9 +55,6 @@ public:
     virtual void setEndHandle(long long endHandle);
     virtual void setBeginHandle(long long beginHandle);
 
-    /** Устанавливают область значений */
-    void setMaxValue(long long maxValue);
-    void setMinValue(long long minValue);
 
     /** Устанавливают геометрию слайдера */
     void setSliderV(int new_sliderV);
@@ -118,6 +115,13 @@ protected:
 
     bool posOverBeginHandle(const QPoint& pos) const;
     bool posOverEndHandle(const QPoint& pos) const;
+
+private:
+    /** Устанавливают область значений */
+    void setMaxValue(long long maxValue);
+    void setMinValue(long long minValue);
+
+    void setBeginAndEnd(long long begin, long long end);
 
 protected:
     ClippedHandle m_clippedHandle;

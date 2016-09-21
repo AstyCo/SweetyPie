@@ -380,8 +380,7 @@ void GanttIntervalSlider::updateRange()
             max = m_widget->maxDt();
     GanttHeader::GanttPrecisionMode mode = m_scene->calculateTimeMode(min,max);
 
-    setMinValue(m_scene->startByDt(min,mode).toMicrosecondsSinceEpoch());
-    setMaxValue(m_scene->finishByDt(max,mode).toMicrosecondsSinceEpoch());
+    setLimits(m_scene->startByDt(min,mode).toMicrosecondsSinceEpoch(),m_scene->finishByDt(max,mode).toMicrosecondsSinceEpoch());
 }
 
 UtcDateTime GanttIntervalSlider::closestStartDtHelper(const UtcDateTime& valDt, GanttHeader::GanttPrecisionMode mode) const
