@@ -57,6 +57,7 @@ GanttWidget::GanttWidget(QWidget *parent) :
 
     connect(m_scene->slider(),SIGNAL(dtChanged(UtcDateTime)),ui->intervalSlider,SLOT(setCurrentTime(UtcDateTime)));
     connect(m_scene->slider(),SIGNAL(drawChanged(bool)),ui->intervalSlider,SLOT(setDrawCurrentDt(bool)));
+    connect(m_scene,SIGNAL(currentDtChanged(UtcDateTime)),this,SIGNAL(currentDtChanged(UtcDateTime)));
 
 
     connect(ui->ganttView, SIGNAL(viewResized(QSize)),m_scene,SLOT(onViewResize(QSize)));

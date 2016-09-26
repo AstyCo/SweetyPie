@@ -158,7 +158,7 @@ QList<GanttInfoItem*> generateTest()
 
 void MainWindow::testGanttModel()
 {
-
+    connect(ui->ganttWidget,SIGNAL(currentDtChanged(UtcDateTime)),this,SLOT(testSignal(UtcDateTime)));
 
 //    ui->ganttWidget->addItems(generateTest());
 }
@@ -255,4 +255,9 @@ void MainWindow::on_pushButton_ganttClear_clicked()
 void MainWindow::on_radioButton_ganttPlayer_toggled(bool checked)
 {
     ui->ganttWidget->showPlayer(checked);
+}
+
+void MainWindow::testSignal(const UtcDateTime &dt)
+{
+    qDebug() << dt;
 }

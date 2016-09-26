@@ -83,6 +83,7 @@ void GanttHeader::paint(QPainter *painter, const QStyleOptionGraphicsItem *optio
 
         if(!m_isEmpty)
         {
+            qDebug() <<"painting no empty";
             do
             {
                 if(isDrawn(dt,m_mode))
@@ -1169,7 +1170,6 @@ void GanttHeader::setRange(UtcDateTime min, UtcDateTime max)
     if(min>max)
         return;
 
-    m_isEmpty = false;
     m_minDt = min;
     m_maxDt = max;
 
