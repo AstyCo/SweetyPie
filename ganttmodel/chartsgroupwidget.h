@@ -3,7 +3,10 @@
 
 #include <QToolButton>
 
-#include "chartwidget.h"
+#include <utcdatetime.h>
+#include <timespan.h>
+
+#include "charttimexywidget.h"
 
 namespace Ui {
 class ChartsGroupWidget;
@@ -18,10 +21,10 @@ public:
   explicit ChartsGroupWidget(QWidget *parent = 0);
   ~ChartsGroupWidget();
 
-  void addChart(ChartWidget *chart);
-  void insertChart(int index, ChartWidget *chart);
-  ChartWidget *removeChartAt(int index);
-  ChartWidget *at(int index);
+  void addChart(ChartTimeXYWidget *chart);
+  void insertChart(int index, ChartTimeXYWidget *chart);
+  ChartTimeXYWidget *removeChartAt(int index);
+  ChartTimeXYWidget *at(int index);
   int chartsCount() const { return m_charts.size(); }
   void clearChartsData();
 
@@ -116,7 +119,7 @@ private:
 
   void zoomChart(int newZoom);
   void interconnectCharts();
-  void connectChart(ChartWidget *chart);
+  void connectChart(ChartTimeXYWidget *chart);
   void alignAxes(int axis);
   void alignScaleBorder(int axis);
   void createActionsToolBar();
@@ -132,7 +135,7 @@ private:
   Ui::ChartsGroupWidget *ui;
 
   ChartActionsToolBar *m_actionsToolBar;  
-  QList<ChartWidget *> m_charts;
+  QList<ChartTimeXYWidget *> m_charts;
   QList<QAction *> m_chartZoomActions;
   /// Текущие отображаемые графики имеют общую ось X
   bool m_syncChartsByAxisX;

@@ -60,11 +60,10 @@ INCLUDEPATH += "$$PWD/../ganttmodel/gantt"
 DEFINES += GANTTMODEL_LIBRARY
 
 SOURCES += \
-    chartwidget.cpp \
     curvedetailsgroupbox.cpp \
     intervalslider.cpp \
     plotinterval.cpp \
-    chartsgroupwidget.cpp \
+#    chartsgroupwidget.cpp \
     chartactionstoolbar.cpp \
     plotkeyeventhandler.cpp \
     chartsettingsdlg.cpp \
@@ -105,15 +104,17 @@ SOURCES += \
     gantt/gantthovergraphicsobject.cpp \
     gantt/ganttcalcgraphicsobject.cpp \
     gantt/ganttgraphicsobject.cpp \
-    gantt/ganttintervalgraphicsobject.cpp
+    gantt/ganttintervalgraphicsobject.cpp \
+    charttimexywidget.cpp \
+    chartxywidget.cpp \
+    chartintervalselectionmodel.cpp
 
 
 HEADERS += \
-    chartwidget.h \
     curvedetailsgroupbox.h \
     intervalslider.h \
     plotinterval.h \
-    chartsgroupwidget.h \
+#    chartsgroupwidget.h \
     chartactionstoolbar.h \
     plotkeyeventhandler.h \
     chartsettingsdlg.h \
@@ -156,20 +157,23 @@ HEADERS += \
     gantt/gantthovergraphicsobject.h \
     gantt/ganttcalcgraphicsobject.h \
     gantt/ganttgraphicsobject.h \
-    gantt/ganttintervalgraphicsobject.h
+    gantt/ganttintervalgraphicsobject.h \
+    charttimexywidget.h \
+    chartxywidget.h \
+    chartintervalselectionmodel.h
 
 
 RESOURCES += \
     images.qrc
 
 FORMS += \
-    chartwidget.ui \
     curvedetailsgroupbox.ui \
-    chartsgroupwidget.ui \
+#    chartsgroupwidget.ui \
     chartsettingsdlg.ui \
     memoryplanningwidget/memoryplanningwidget.ui \
     gantt/ganttwidget.ui \
-    gantt/mygantt_playercontrol.ui
+    gantt/mygantt_playercontrol.ui \
+    chartxywidget.ui
 
 include(build_config.pri)
 

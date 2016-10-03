@@ -87,7 +87,7 @@ void ChartsGroupWidget::setSettings(const ChartSettings &settings)
   m_settings = settings;
   for(int i = 0; i < m_charts.size(); i++)
   {
-    ChartWidget *chart = m_charts.at(i);
+    ChartTimeXYWidget *chart = m_charts.at(i);
     chart->updateChartSettings(m_settings);
   }
 
@@ -101,12 +101,12 @@ ChartActionsToolBar *ChartsGroupWidget::getActionsToolBar() const
 }
 
 
-void ChartsGroupWidget::addChart(ChartWidget *chart)
+void ChartsGroupWidget::addChart(ChartTimeXYWidget *chart)
 {
   insertChart(m_charts.size(), chart);
 }
 
-void ChartsGroupWidget::insertChart(int index, ChartWidget *chart)
+void ChartsGroupWidget::insertChart(int index, ChartTimeXYWidget *chart)
 {
   int chartNum = m_charts.size() + 1;
   QAction * zoomAct = new QAction(QString::number(chartNum), m_actionsToolBar);
@@ -154,9 +154,9 @@ void ChartsGroupWidget::setFrameStatsEnabled(bool frameStatsEnabled)
 
 void ChartsGroupWidget::onPointSelected(CurveIndex idx)
 {
-  ChartWidget * senderChart = static_cast<ChartWidget *>(QObject::sender());
+  ChartTimeXYWidget * senderChart = static_cast<ChartTimeXYWidget *>(QObject::sender());
 
-  foreach (ChartWidget *cc, m_charts)
+  foreach (ChartTimeXYWidget *cc, m_charts)
     if (cc != senderChart)
       cc->selectPointByIndex(idx);
 
@@ -164,15 +164,15 @@ void ChartsGroupWidget::onPointSelected(CurveIndex idx)
 
 void ChartsGroupWidget::onIntervalSelectionStart(QPointF pos)
 {
-  ChartWidget * senderChart = static_cast<ChartWidget *>(QObject::sender());
-  foreach (ChartWidget *cc, m_charts)
+  ChartTimeXYWidget * senderChart = static_cast<ChartTimeXYWidget *>(QObject::sender());
+  foreach (ChartTimeXYWidget *cc, m_charts)
     if (cc != senderChart)
       cc->setIntervalSelectionStart(pos);
 }
 
 void ChartsGroupWidget::onIntervalSelectionEnd(QPointF pos)
 {
-  ChartWidget * senderChart = static_cast<ChartWidget *>(QObject::sender());
+  ChartTimeXYWidget * senderChart = static_cast<ChartTimeXYWidget *>(QObject::sender());
   UtcDateTime beginDt = senderChart->getIntervalSelectionBeginDt();
   UtcDateTime endDt = senderChart->getIntervalSelectionEndDt();
   updateSelectIntervalPanelDates(beginDt, endDt);
@@ -182,7 +182,7 @@ void ChartsGroupWidget::onIntervalSelectionEnd(QPointF pos)
   bool b = selIntAct->blockSignals(true);
   selIntAct->setChecked(false);
   selIntAct->blockSignals(b);
-  foreach (ChartWidget *cc, m_charts)
+  foreach (ChartTimeXYWidget *cc, m_charts)
     if (cc != senderChart)
       cc->setIntervalSelectionEnd(pos);
 
@@ -191,8 +191,8 @@ void ChartsGroupWidget::onIntervalSelectionEnd(QPointF pos)
 
 void ChartsGroupWidget::onTargetingDtSet(UtcDateTime dt)
 {
-  ChartWidget * senderChart = static_cast<ChartWidget *>(QObject::sender());
-  foreach (ChartWidget *cc, m_charts)
+  ChartTimeXYWidget * senderChart = static_cast<ChartTimeXYWidget *>(QObject::sender());
+  foreach (ChartTimeXYWidget *cc, m_charts)
     if (cc != senderChart)
       cc->setTargetingPoint(dt);
 
@@ -206,8 +206,8 @@ void ChartsGroupWidget::onTargetingDtSet(UtcDateTime dt)
 
 void ChartsGroupWidget::onScaleChanged(qreal scaleFactor, QPoint anchorPoint)
 {
-  ChartWidget * senderChart = static_cast<ChartWidget *>(QObject::sender());
-  foreach (ChartWidget *cc, m_charts)
+  ChartTimeXYWidget * senderChart = static_cast<ChartTimeXYWidget *>(QObject::sender());
+  foreach (ChartTimeXYWidget *cc, m_charts)
     if (cc != senderChart)
       cc->rescale(scaleFactor, anchorPoint);
 
@@ -216,8 +216,8 @@ void ChartsGroupWidget::onScaleChanged(qreal scaleFactor, QPoint anchorPoint)
 
 void ChartsGroupWidget::onZoomed(const QRectF &rect)
 {
-  ChartWidget * senderChart = static_cast<ChartWidget *>(QObject::sender());
-  foreach (ChartWidget *cc, m_charts)
+  ChartTimeXYWidget * senderChart = static_cast<ChartTimeXYWidget *>(QObject::sender());
+  foreach (ChartTimeXYWidget *cc, m_charts)
     if (cc != senderChart)
     {
       cc->zoom(rect);
@@ -231,8 +231,8 @@ void ChartsGroupWidget::onChartPanned(int dx, int dy)
 {
   // при сдвиге графика учитываем только сдвиг по общей оси X
   Q_UNUSED(dy)
-  ChartWidget * senderChart = static_cast<ChartWidget *>(QObject::sender());
-  foreach (ChartWidget *cc, m_charts)
+  ChartTimeXYWidget * senderChart = static_cast<ChartTimeXYWidget *>(QObject::sender());
+  foreach (ChartTimeXYWidget *cc, m_charts)
     if (cc != senderChart)
       cc->moveCanvas(dx, 0);
 
@@ -253,13 +253,13 @@ void ChartsGroupWidget::alignPanelsDetails()
     return;
 
   int minWidth = 0;
-  foreach(ChartWidget *cc, m_charts)
+  foreach(ChartTimeXYWidget *cc, m_charts)
   {
     int panelWidth = cc->getPanelCurveDetails()->widget()->minimumSizeHint().width();
     if (panelWidth > minWidth)
       minWidth = panelWidth;
   }
-  foreach(ChartWidget *cc, m_charts)
+  foreach(ChartTimeXYWidget *cc, m_charts)
   {
     VerticalScrollArea *v = (VerticalScrollArea *)cc->getPanelCurveDetails();
     v->setUserMinWidth(minWidth);
@@ -273,14 +273,14 @@ void ChartsGroupWidget::resizeEvent(QResizeEvent *ev)
   alignPanelsDetails();
 }
 
-ChartWidget * ChartsGroupWidget::removeChartAt(int index)
+ChartTimeXYWidget * ChartsGroupWidget::removeChartAt(int index)
 {
   if ((index < 0) || (index >= m_charts.size()))
       return NULL;
 
   bool chartWithXAxisLabel = (index == (m_charts.size() - 1));
 
-  ChartWidget *chartCtrl = m_charts.takeAt(index);
+  ChartTimeXYWidget *chartCtrl = m_charts.takeAt(index);
   QAction * zoomAct = m_chartZoomActions.takeLast();
 
   if ((! m_charts.isEmpty()) && (m_syncChartsByAxisX))
@@ -296,7 +296,7 @@ ChartWidget * ChartsGroupWidget::removeChartAt(int index)
   return chartCtrl;
 }
 
-ChartWidget * ChartsGroupWidget::at(int index)
+ChartTimeXYWidget * ChartsGroupWidget::at(int index)
 {
   if ((index < 0) || (index >= m_charts.size()))
       return NULL;
@@ -306,7 +306,7 @@ ChartWidget * ChartsGroupWidget::at(int index)
 
 void ChartsGroupWidget::clearChartsData()
 {
-  foreach(ChartWidget *cc, m_charts)
+  foreach(ChartTimeXYWidget *cc, m_charts)
     cc->clearChart();
 }
 
@@ -331,7 +331,7 @@ void ChartsGroupWidget::zoomChart(int newZoom)
   QList<int> sizes;
 
   int idx = 0;
-  foreach(ChartWidget *cc, m_charts)
+  foreach(ChartTimeXYWidget *cc, m_charts)
   {
     bool visible;
     if (newZoom == 0)
@@ -380,11 +380,11 @@ void ChartsGroupWidget::zoomChart(int newZoom)
 
 void ChartsGroupWidget::interconnectCharts()
 {
-  foreach(ChartWidget *chart, m_charts)
+  foreach(ChartTimeXYWidget *chart, m_charts)
     connectChart(chart);
 }
 
-void ChartsGroupWidget::connectChart(ChartWidget *chart)
+void ChartsGroupWidget::connectChart(ChartTimeXYWidget *chart)
 {
   disconnect(chart, 0, this, 0);
 
@@ -425,7 +425,7 @@ void ChartsGroupWidget::setSyncChartsByAxisX(bool syncChartsByAxisX)
 
   for(int i = 0; i < m_charts.size() - 1; i++)
   {
-    ChartWidget *chart = m_charts.at(i);
+    ChartTimeXYWidget *chart = m_charts.at(i);
       chart->getPlot()->enableAxis(QwtPlot::xBottom, (! m_syncChartsByAxisX));
   }
 
@@ -434,7 +434,7 @@ void ChartsGroupWidget::setSyncChartsByAxisX(bool syncChartsByAxisX)
 
 void ChartsGroupWidget::selectIntervalByDates(UtcDateTime beginDt, UtcDateTime endDt)
 {
-  foreach(ChartWidget *cc, m_charts)
+  foreach(ChartTimeXYWidget *cc, m_charts)
       cc->setIntervalSelectionByDates(beginDt, endDt);
 
   updateSelectIntervalPanelDates(beginDt, endDt);
@@ -442,13 +442,13 @@ void ChartsGroupWidget::selectIntervalByDates(UtcDateTime beginDt, UtcDateTime e
 
 void ChartsGroupWidget::setTargetingPoint(UtcDateTime dt)
 {
-  foreach(ChartWidget *cc, m_charts)
+  foreach(ChartTimeXYWidget *cc, m_charts)
       cc->setTargetingPoint(dt);
 }
 
 void ChartsGroupWidget::clearTargetingPoint()
 {
-  foreach(ChartWidget *cc, m_charts)
+  foreach(ChartTimeXYWidget *cc, m_charts)
       cc->clearTargetingPoint();
 }
 
@@ -492,7 +492,7 @@ void ChartsGroupWidget::updateSelectionPanel()
     // с минимальным временным интервалом значений
     for(int i = 1; i < m_charts.size(); i++)
     {
-      ChartWidget *cc = m_charts.at(i);
+      ChartTimeXYWidget *cc = m_charts.at(i);
       if (cc->minimumDt() > beginDt)
         beginDt = cc->minimumDt();
 
@@ -581,7 +581,7 @@ void ChartsGroupWidget::on_toolButton_SetDtIntervalSelection_clicked()
   }
   for(int i = 0; i < m_charts.size(); i++)
   {
-    ChartWidget *cc = m_charts.at(i);
+    ChartTimeXYWidget *cc = m_charts.at(i);
     cc->setIntervalSelectionByDates(startDt, endDt);
   }
 
@@ -616,7 +616,7 @@ void ChartsGroupWidget::on_toolButton_SetSelectionInterval_clicked()
 
   for(int i = 0; i < m_charts.size(); i++)
   {
-    ChartWidget *cc = m_charts.at(i);
+    ChartTimeXYWidget *cc = m_charts.at(i);
     cc->setIntervalSelectionByDates(startDt, endDt);
   }
 
@@ -672,7 +672,7 @@ void ChartsGroupWidget::hideEditIntervalButtons()
 
 void ChartsGroupWidget::onAction_autoZoom_clicked()
 {
-  foreach(ChartWidget *chart, m_charts)
+  foreach(ChartTimeXYWidget *chart, m_charts)
     chart->autoZoom();
 
   scaleDivChanged();
@@ -681,13 +681,13 @@ void ChartsGroupWidget::onAction_autoZoom_clicked()
 void ChartsGroupWidget::onAction_grid_toggled(bool checked)
 {
   m_settings.grid = checked;
-  foreach(ChartWidget *chart, m_charts)
+  foreach(ChartTimeXYWidget *chart, m_charts)
     chart->setGrid(checked);
 }
 
 void ChartsGroupWidget::onAction_clearChart_clicked()
 {
-    foreach(ChartWidget *chart, m_charts)
+    foreach(ChartTimeXYWidget *chart, m_charts)
       chart->fullReplot();
 }
 
@@ -700,7 +700,7 @@ void ChartsGroupWidget::onAction_selectIntervalByMouse_toggled(bool checked)
       selTargetAct->setChecked(false);
   }
 
-  foreach(ChartWidget *cc, m_charts)
+  foreach(ChartTimeXYWidget *cc, m_charts)
       cc->setIntervalSelection(checked);
 }
 
@@ -794,7 +794,7 @@ void ChartsGroupWidget::onAction_selectTarget_toggled(bool checked)
       selIntervalAct->setChecked(false);
   }
 
-  foreach (ChartWidget *chart, m_charts)
+  foreach (ChartTimeXYWidget *chart, m_charts)
   {
     chart->setSelectionModeTargetingPoint(checked);
   }
@@ -803,7 +803,7 @@ void ChartsGroupWidget::onAction_selectTarget_toggled(bool checked)
 void ChartsGroupWidget::onAction_chartSettings_triggered()
 {
   QList<QwtPlotCurve *> curves;
-  foreach(ChartWidget *chart, m_charts)
+  foreach(ChartTimeXYWidget *chart, m_charts)
     curves << chart->curves();
 
   ChartSettingsDlg dlg(m_settings, curves, this);
@@ -817,7 +817,7 @@ void ChartsGroupWidget::onAction_panelCurveDetails_toggled(bool checked)
 {
   m_settings.detailsPanelVisible = checked;
 
-  foreach(ChartWidget *cc, m_charts)
+  foreach(ChartTimeXYWidget *cc, m_charts)
     cc->setPanelCurveDetailsVisible(m_settings.detailsPanelVisible);
 
   alignPanelsDetails();

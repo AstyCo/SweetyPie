@@ -18,7 +18,7 @@
     <item row="0" column="0">
      <widget class="QTabWidget" name="tabWidget">
       <property name="currentIndex">
-       <number>0</number>
+       <number>1</number>
       </property>
       <widget class="QWidget" name="tab">
        <attribute name="title">
@@ -49,7 +49,7 @@
          </widget>
         </item>
         <item>
-         <widget class="ChartWidget" name="widget" native="true"/>
+         <widget class="ChartXYWidget" name="widget" native="true"/>
         </item>
         <item>
          <layout class="QHBoxLayout" name="horizontalLayout_2">
@@ -77,7 +77,7 @@
        </attribute>
        <layout class="QVBoxLayout" name="verticalLayout_2" stretch="1,0">
         <item>
-         <widget class="ChartsGroupWidget" name="widget_chartGroup" native="true"/>
+         <widget class="QWidget" name="widget_chartGroup" native="true"/>
         </item>
         <item>
          <layout class="QHBoxLayout" name="horizontalLayout">
@@ -180,7 +180,7 @@
      <x>0</x>
      <y>0</y>
      <width>1032</width>
-     <height>21</height>
+     <height>26</height>
     </rect>
    </property>
   </widget>
@@ -194,21 +194,15 @@
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>ChartWidget</class>
+   <class>ChartXYWidget</class>
    <extends>QWidget</extends>
-   <header>chartwidget.h</header>
+   <header>chartxywidget.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>
    <class>IntervalSlider</class>
    <extends>QWidget</extends>
    <header>intervalslider.h</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
-   <class>ChartsGroupWidget</class>
-   <extends>QWidget</extends>
-   <header>chartsgroupwidget.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>

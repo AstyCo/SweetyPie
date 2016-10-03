@@ -1,5 +1,6 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
+
 #include <stdlib.h>
 #include <stdio.h>
 #include <time.h>
@@ -12,6 +13,8 @@
 #include "memoryplanningwidget.h"
 #include "mgrid_scene.h"
 #include "mline_scene.h"
+
+#include "charttimexywidget.h"
 
 MainWindow::MainWindow(QWidget *parent) :
   QMainWindow(parent),
@@ -39,12 +42,12 @@ void MainWindow::testChartWidget()
   UtcDateTime baseDt = QDateTime::currentDateTime();
   for(int i = 0; i < 60; i++)
   {    
-    data.append(ChartWidget::dtToPoint(baseDt.addSecs(i * 60), (rand() % 100)));    
+    data.append(ChartTimeXYWidget::dtToPoint(baseDt.addSecs(i * 60), (rand() % 100)));    
   }
 
   for(int i = 60; i < 100; i++)
   {
-    data2.append(ChartWidget::dtToPoint(baseDt.addSecs(i * 65), (rand() % 1000) + 100));
+    data2.append(ChartTimeXYWidget::dtToPoint(baseDt.addSecs(i * 65), (rand() % 1000) + 100));
   }
 
   ui->widget->getActionsToolBar()->setChartActions(QSet<ChartActions>()
@@ -61,8 +64,10 @@ void MainWindow::testChartWidget()
 
   ui->widget->setData("11111111111111", data);
   ui->widget->setData("22222222222222", data2, QwtPlot::yRight);
-
-  ui->widgetIntervalSlider->setLimits(0,TimeSpan(ui->widget->maximumDt() - ui->widget->minimumDt()).totalSeconds());
+/*
+  ui->widgetIntervalSlider->setLimits(0,TimeSpan(ui->widget->selectionModel()->maximumDt()
+                                                 - ui->widget->selectionModel()->minimumDt()).totalSeconds());
+                                                 */
   ui->checkBox_showLegend->setChecked(true);
 
   connect(ui->widgetIntervalSlider, SIGNAL(valueChanged(IntervalSlider::ClippedHandle, long long)), this, SLOT(setInterval()));
@@ -77,27 +82,28 @@ void MainWindow::testChartGroupWidget()
   for(int i = 0; i < 100; i++)
   {
     UtcDateTime time = baseDt.addSecs(i * 60);
-    data.append(ChartWidget::dtToPoint(time, (rand() % 100)));
-    data2.append(ChartWidget::dtToPoint(time, (rand() % 100) * 100));
-    data3.append(ChartWidget::dtToPoint(time, (rand() % 100) * 1000));
+    data.append(ChartTimeXYWidget::dtToPoint(time, (rand() % 100)));
+    data2.append(ChartTimeXYWidget::dtToPoint(time, (rand() % 100) * 100));
+    data3.append(ChartTimeXYWidget::dtToPoint(time, (rand() % 100) * 1000));
   }
-
-  ChartWidget *chart = new ChartWidget();
+/*
+  ChartTimeXYWidget *chart = new ChartTimeXYWidget();
   chart->setLeftAxis("Test Chart 1 big title");
   chart->setData("chart 1", data);
   ui->widget_chartGroup->addChart(chart);
 
-  chart = new ChartWidget();
+  chart = new ChartTimeXYWidget();
   chart->setLeftAxis("Test Chart 2");
   chart->setData("chart 2", data2);
   ui->widget_chartGroup->addChart(chart);
 
-  chart = new ChartWidget();
+  chart = new ChartTimeXYWidget();
   chart->setLeftAxis("Test Chart 3 norm");
   chart->setData("chart 3", data3);
   ui->widget_chartGroup->addChart(chart);
   ui->widget_chartGroup->setSyncChartsByAxisX(false);
   ui->widget_chartGroup->setPanelSelectIntervalVisible(true);
+  */
 }
 QList<GanttInfoItem*> generateTest()
 {
@@ -213,26 +219,28 @@ void MainWindow::testMemoryPlanningWidget()
 
 void MainWindow::setInterval()
 {
-  UtcDateTime baseDt = ui->widget->minimumDt();
+  /*
+  UtcDateTime baseDt = ui->widget->selectionModel()->minimumDt();
   UtcDateTime rez1 = baseDt.addSecs(ui->widgetIntervalSlider->beginHandle());
 
   UtcDateTime rez2 = baseDt.addSecs(ui->widgetIntervalSlider->endHandle());
-  ui->widget->setIntervalSelectionByDates(rez1, rez2);
+  ui->widget->selectionModel()->setIntervalSelectionByDates(rez1, rez2);
+  */
 }
 
 void MainWindow::on_checkBox_syncAxisX_toggled(bool checked)
 {
-   ui->widget_chartGroup->setSyncChartsByAxisX(checked);
+   //ui->widget_chartGroup->setSyncChartsByAxisX(checked);
 }
 
 void MainWindow::on_pushButton_clicked()
 {
    QwtScaleDiv *div = ui->widget->getPlot()->axisScaleDiv(QwtPlot::xBottom);
-   UtcDateTime begin(ChartWidget::pointToDt(QPointF(div->lowerBound(), 0)));
-   UtcDateTime end(ChartWidget::pointToDt(QPointF(div->upperBound(), 0)));
+   UtcDateTime begin(ChartTimeXYWidget::pointToDt(QPointF(div->lowerBound(), 0)));
+   UtcDateTime end(ChartTimeXYWidget::pointToDt(QPointF(div->upperBound(), 0)));
    ui->widget->getPlot()->setAxisAutoScale(QwtPlot::xBottom, false);
-   ui->widget->getPlot()->setAxisScale(QwtPlot::xBottom, ChartWidget::dtToPoint(begin.addSecs(20 * 60), 0).x(),
-                                       ChartWidget::dtToPoint(end.addSecs(-20 * 60), 0).x());
+   ui->widget->getPlot()->setAxisScale(QwtPlot::xBottom, ChartTimeXYWidget::dtToPoint(begin.addSecs(20 * 60), 0).x(),
+                                       ChartTimeXYWidget::dtToPoint(end.addSecs(-20 * 60), 0).x());
 
    ui->widget->getPlot()->replot();
 }
