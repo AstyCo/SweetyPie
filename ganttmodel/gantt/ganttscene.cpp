@@ -99,6 +99,12 @@ void GanttScene::setMode(GanttHeader::GanttPrecisionMode newMode)
 void GanttScene::addItems(GanttInfoItem* item)
 {
 //    m_header->onItemsAddition(item);
+    if(m_header)
+    {
+        setEmpty(false);
+        m_header->updateHeader();
+    }
+
     addItemsHelper(item);
     {
         m_slider->updateRange(root());
@@ -108,6 +114,7 @@ void GanttScene::addItems(GanttInfoItem* item)
 
     updateSceneRect();
 
+
 //    QRectF _sceneRect = sceneRect();
 //    setSceneRect(_sceneRect.x(),_sceneRect.y(),_sceneRect.width()
 //                 ,_sceneRect.height() + DEFAULT_ITEM_HEIGHT);
@@ -116,7 +123,11 @@ void GanttScene::addItems(GanttInfoItem* item)
 void GanttScene::addItems(const QList<GanttInfoItem *> &items)
 {
 //    m_header->onItemsAddition(items);
-
+    if(m_header)
+    {
+        setEmpty(false);
+        m_header->updateHeader();
+    }
 
     foreach(GanttInfoItem* item, items)
         addItemsHelper(item);
@@ -125,6 +136,8 @@ void GanttScene::addItems(const QList<GanttInfoItem *> &items)
         m_slider->setToBegin();
     }
     updateSceneRect();
+
+
 
 //    QRectF _sceneRect = sceneRect();
 //    setSceneRect(_sceneRect.x(),_sceneRect.y(),_sceneRect.width()
@@ -165,9 +178,6 @@ void GanttScene::updateSceneRect()
     }
     else
     {
-//        QRectF rect = elementsBoundingRect();
-//        qDebug()<<"treeView height: "<<QString::number(m_view->treeViewHeight());
-//        rect.setBottom(qMax(rect.bottom(),(qreal) m_view->treeViewHeight()));
         setSceneRect(elementsBoundingRect());
     }
 
@@ -953,7 +963,9 @@ void GanttScene::removeByInfoLeaf(const GanttInfoLeaf *leaf)
 void GanttScene::setEmpty(bool empty)
 {
     if(m_header)
+    {
         m_header->setEmpty(empty);
+    }
 }
 
 void GanttScene::updateSliderRect()

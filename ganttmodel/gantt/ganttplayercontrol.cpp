@@ -81,21 +81,11 @@ void GanttPlayerControl::makeStepBackward()
     emit makeStep(-m_step);
 }
 
-void GanttPlayerControl::setDefaultPlaySpeed()
+void GanttPlayerControl::onSpeedChanged(qreal mult)
 {
-    setSpeedModifier(1.0);
-
+    setSpeedModifier(mult);
 }
 
-void GanttPlayerControl::setX3PlaySpeed()
-{
-    setSpeedModifier(3.0);
-}
-
-void GanttPlayerControl::setX5PlaySpeed()
-{
-    setSpeedModifier(5.0);
-}
 
 void GanttPlayerControl::updateTimers()
 {
@@ -128,10 +118,9 @@ void GanttPlayerControl::setSettings(GanttPlayerSettings *settings)
     if(!settings)
         return;
     m_settings = settings;
+    setSpeedModifier(m_settings->currentSpeed());
 
-    connect(m_settings,SIGNAL(speedX1()),this,SLOT(setDefaultPlaySpeed()));
-    connect(m_settings,SIGNAL(speedX3()),this,SLOT(setX3PlaySpeed()));
-    connect(m_settings,SIGNAL(speedX5()),this,SLOT(setX5PlaySpeed()));
+    connect(m_settings,SIGNAL(speedChanged(qreal)),this,SLOT(onSpeedChanged(qreal)));
 }
 
 qreal GanttPlayerControl::playFrequency() const

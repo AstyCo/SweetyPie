@@ -34,7 +34,6 @@ private slots:
     void on_pushButton_ganttAddItems_clicked();
     void on_pushButton_ganttClear_clicked();
     void on_radioButton_ganttPlayer_toggled(bool checked);
-    void testSignal(const UtcDateTime& dt);
 };
 
 #endif // MAINWINDOW_H

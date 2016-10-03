@@ -40,9 +40,7 @@ private slots:
     void makeStepForward();
     void makeStepBackward();
 
-    void setDefaultPlaySpeed();
-    void setX3PlaySpeed();
-    void setX5PlaySpeed();
+    void onSpeedChanged(qreal mult);
 
     void updateTimers();
 
