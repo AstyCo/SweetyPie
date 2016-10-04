@@ -67,6 +67,7 @@ public:
   /// Отменяет выделенный интервал
   void clearIntervalSelection();
 
+  CurveIndex selectedPoint() const { return m_selectedPointIndex; }
   void selectPointByIndex(CurveIndex idx);
   void clearSelectedPoint();
   /// Отображает пояснительный текст к выбранной пользователем точке
