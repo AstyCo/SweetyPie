@@ -63,7 +63,7 @@ SOURCES += \
     curvedetailsgroupbox.cpp \
     intervalslider.cpp \
     plotinterval.cpp \
-#    chartsgroupwidget.cpp \
+    chartsgroupwidget.cpp \
     chartactionstoolbar.cpp \
     plotkeyeventhandler.cpp \
     chartsettingsdlg.cpp \
@@ -107,14 +107,15 @@ SOURCES += \
     gantt/ganttintervalgraphicsobject.cpp \
     charttimexywidget.cpp \
     chartxywidget.cpp \
-    chartintervalselectionmodel.cpp
+    chartintervalselectionwidget.cpp \
+    chartintervalselector.cpp
 
 
 HEADERS += \
     curvedetailsgroupbox.h \
     intervalslider.h \
     plotinterval.h \
-#    chartsgroupwidget.h \
+    chartsgroupwidget.h \
     chartactionstoolbar.h \
     plotkeyeventhandler.h \
     chartsettingsdlg.h \
@@ -160,7 +161,8 @@ HEADERS += \
     gantt/ganttintervalgraphicsobject.h \
     charttimexywidget.h \
     chartxywidget.h \
-    chartintervalselectionmodel.h
+    chartintervalselectionwidget.h \
+    chartintervalselector.h
 
 
 RESOURCES += \
@@ -168,12 +170,13 @@ RESOURCES += \
 
 FORMS += \
     curvedetailsgroupbox.ui \
-#    chartsgroupwidget.ui \
+    chartsgroupwidget.ui \
     chartsettingsdlg.ui \
     memoryplanningwidget/memoryplanningwidget.ui \
     gantt/ganttwidget.ui \
     gantt/mygantt_playercontrol.ui \
-    chartxywidget.ui
+    chartxywidget.ui \
+    chartintervalselectionwidget.ui
 
 include(build_config.pri)
 

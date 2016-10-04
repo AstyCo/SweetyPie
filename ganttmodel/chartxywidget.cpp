@@ -1,5 +1,5 @@
 #include "chartxywidget.h"
-#include "ui_chartwidget.h"
+#include "ui_chartxywidget.h"
 
 #include <cmath>
 
@@ -14,8 +14,6 @@
 #include <qwt/qwt_symbol.h>
 #include <qwt/qwt_legend.h>
 #include <qwt/qwt_plot_panner.h>
-#include <qwt/qwt_plot_picker.h>
-#include <qwt/qwt_picker_machine.h>
 #include <qwt/qwt_plot_marker.h>
 #include <qwt/qwt_series_data.h>
 
@@ -28,7 +26,7 @@
 
 ChartXYWidget::ChartXYWidget(QWidget * parent) :
   QWidget(parent),
-  ui(new Ui::ChartWidget)
+  ui(new Ui::ChartXYWidget)
 {
   Q_INIT_RESOURCE(images);
   ui->setupUi(this);
@@ -58,19 +56,13 @@ ChartXYWidget::ChartXYWidget(QWidget * parent) :
   m_pMinRightMarker = 0;
   m_pMaxRightMarker = 0;
 
-  // объект отслеживает перемещение и нажатие кнопки мыши
-  m_picker = new QwtPlotPicker(QwtPlot::xBottom, QwtPlot::yLeft,
-                               QwtPicker::CrossRubberBand, QwtPicker::AlwaysOff, ui->m_plot->canvas());
-  QwtPickerMachine* pickerMachine = new QwtPickerClickPointMachine();
-  m_picker->setStateMachine(pickerMachine);
-  // отключить перемещение курсора клавишами влево вправо
-  m_picker->setKeyPattern(QwtEventPattern::KeyLeft, Qt::Key_unknown);
-  m_picker->setKeyPattern(QwtEventPattern::KeyRight, Qt::Key_unknown);
-
-  //connect(m_panner, SIGNAL(panned(int, int)), SLOT(onPlotPanned()));
-
-  m_selectionModel = new ChartIntervalSelectionModel(this, m_navigator);
+  m_selectionModel = new ChartIntervalSelector(this, m_navigator);
   m_showLegend = false;
+
+  connect(m_actionsToolBar->getChartAction(caSelectInterval), SIGNAL(toggled(bool)),
+          m_selectionModel, SLOT(setIntervalSelection(bool)));
+  connect(m_actionsToolBar->getChartAction(caSelectTarget), SIGNAL(toggled(bool)),
+          m_selectionModel, SLOT(onAction_SelectTarget_toggled(bool)));
 
   setPanelCurveDetailsVisible(true);  
 
@@ -374,7 +366,7 @@ void ChartXYWidget::moveCanvas( int dx, int dy )
   plot->replot();  
 }
 
-ChartIntervalSelectionModel *ChartXYWidget::selectionModel() const
+ChartIntervalSelector *ChartXYWidget::selectionModel() const
 {
   return m_selectionModel;
 }
@@ -734,6 +726,8 @@ void ChartXYWidget::setData(const QString &title, const QVector<QPointF> &data, 
 
   calcDetailsPanel();
   fullReplot();
+
+  emit curveDataChanged();
 }
 
 void ChartXYWidget::setLeftAxisMargin(int value)
@@ -931,7 +925,7 @@ void ChartXYWidget::addZone(const QString &name, double beginX, double endX, con
   if(!isFind)
   {
     QVBoxLayout* lay = (QVBoxLayout*) ui->widgetDetail->layout();
-    QHBoxLayout *hlay = new QHBoxLayout(this);
+    QHBoxLayout *hlay = new QHBoxLayout();
 
     QLabel * intervalColor = new QLabel(this);
     intervalColor->setPalette(QPalette(c1));

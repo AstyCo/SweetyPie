@@ -25,6 +25,7 @@ CurveDetailsGroupBox::~CurveDetailsGroupBox()
 {
   delete ui;
 }
+
 QwtPlotCurve *CurveDetailsGroupBox::curve() const
 {
   return m_curve;

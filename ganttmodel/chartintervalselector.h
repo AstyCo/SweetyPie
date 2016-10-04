@@ -1,5 +1,5 @@
-#ifndef CHARTINTERVALSELECTIONMODEL_H
-#define CHARTINTERVALSELECTIONMODEL_H
+#ifndef CHARTINTERVALSELECTOR_H
+#define CHARTINTERVALSELECTOR_H
 
 #include <QObject>
 #include <QPointF>
@@ -12,23 +12,16 @@
 
 #include "ganttproject_global.h"
 
-enum ChartSelectionState
-{
-  ssNone,
-  ssTargetingPoint,
-  ssIntervalBegin,
-  ssIntervalEnd
-};
-
 /// Структура для индексации точки среди нескольких графиков
-struct GANTTMODELSHARED_EXPORT CurveIndex{
+struct GANTTMODELSHARED_EXPORT CurveIndex
+{
     CurveIndex(){
         indexCurve=-1;
         indexPoint=-1;
     }
 
     /// Действительный ли индекс
-    bool isValid(){
+    bool isValid() const {
         return  indexCurve!=-1 &&
                 indexPoint!=-1;
     }
@@ -41,27 +34,31 @@ class QwtPlot;
 class QwtPlotCurve;
 class QwtPlotMarker;
 class PlotNavigator;
+class QwtPlotPicker;
 class PlotKeyEventHandler;
 class ChartXYWidget;
 
-class GANTTMODELSHARED_EXPORT ChartIntervalSelectionModel : public QObject
+class GANTTMODELSHARED_EXPORT ChartIntervalSelector : public QObject
 {
   Q_OBJECT
 
-public:
-  ChartIntervalSelectionModel(ChartXYWidget *chart, PlotNavigator *nav);
+public:    
+  ChartIntervalSelector(ChartXYWidget *chart, PlotNavigator *nav);
 
-  /// Дата и время начала выделенного интервала
-  qreal getIntervalSelectionBegin() { return m_intervalBegin; }
-  /// Дата и время конца выделенного интервала
-  qreal getIntervalSelectionEnd() { return m_intervalEnd; }
+  /// Точка начала интервала данных
+  qreal begin() const;
+  /// Точка конца интервала данных
+  qreal end() const;
+
+  /// Точка начала выделенного интервала
+  qreal intervalSelectionBegin() const { return m_intervalBegin; }
+  /// Точка конца выделенного интервала
+  qreal intervalSelectionEnd() const { return m_intervalEnd; }
 
   /// Выделение первой точки интевала
   void setIntervalSelectionStart(QPointF pos);
-
   /// Выделение второй (последней) точки интервала
   void setIntervalSelectionEnd(QPointF pos);
-
 
   /// Выполняет выделение интервала
   void setIntervalSelection(qreal begin, ///< Начало интервала
@@ -71,10 +68,13 @@ public:
   void clearIntervalSelection();
 
   void selectPointByIndex(CurveIndex idx);
-  void setSelectionModeTargetingPoint(bool b);
-  void setTargetingPoint(UtcDateTime dt);
-  void clearTargetingPoint();
   void clearSelectedPoint();
+  /// Отображает пояснительный текст к выбранной пользователем точке
+  void setSelectedPointLabel(const QwtText &xLbl, const QwtText &yLbl);
+
+  void setSelectionModeTargetingPoint(bool b);
+  void setTargetingPoint(qreal value);
+  void clearTargetingPoint();
 
   void clearAllSelections();
 
@@ -87,14 +87,14 @@ public slots:
   void onCurveVisibilityChanged(int curveIdx, bool b);
 
 signals:
-  /// Когда выбрана точка
+  /// Точка выбрана пользователем
   void pointSelected(CurveIndex index);
   /// Выбрана первая точка при выделении интервала
   void intervalSelectionStarted(QPointF p);
   /// Выбрана вторая точка при выделении интервала
   void intervalSelectionEnded(QPointF p);
-
-  void targetingDtSet(UtcDateTime dt);
+  /// Выбрана целевая точка
+  void targetingPointSet(qreal val);
 
 protected:
   void setIntervalSelectionByState(QPointF pos);
@@ -111,18 +111,27 @@ protected slots:
   void onCurvePointSelected(const QPointF& pos);
   void onAction_SelectTarget_toggled(bool checked);
 
-  virtual void drawMarkerOnCurve(QwtPlot::Axis axis = QwtPlot::yLeft);
+  virtual void drawMarkerOnCurve();
 
-private:
+private:  
   void updateDetailsPanelsSelPoint();
 
   void updateCurvesIntervalStats();
 
 protected:
+  enum SelectionState
+  {
+    ssNone,
+    ssTargetingPoint,
+    ssIntervalBegin,
+    ssIntervalEnd
+  };
+
   ChartXYWidget *m_chart;
   QwtPlot *m_plot;
   PlotNavigator *m_navigator;
   QAction *m_selIntAct;
+  QwtPlotPicker *m_picker;
   PlotKeyEventHandler *m_keyEventHandler;
 
   /// Дата и время первой точки
@@ -136,9 +145,6 @@ protected:
   /// Дата и время окончания выделенного интервала
   qreal m_intervalEnd;
 
-  /// Текущий выделенный интервал
-  qreal m_selInterval;
-
   /// Номер текущей выделенной точки
   CurveIndex m_selectedPointIndex;
 
@@ -150,7 +156,7 @@ protected:
 
   /// Текущий выделенный интервал
   bool m_hasSelection;
-  ChartSelectionState m_selectionState;
+  SelectionState m_selectionState;
 
   /** Маркеры обозначения выделенной точки.
   * Один маркер для вертикальной, один для горизонтальной линии
@@ -166,10 +172,12 @@ protected:
 
 };
 
-class GANTTMODELSHARED_EXPORT ChartTimeIntervalSelectionModel : public ChartIntervalSelectionModel
+class GANTTMODELSHARED_EXPORT ChartTimeIntervalSelector : public ChartIntervalSelector
 {
+  Q_OBJECT
+
 public:
-   ChartTimeIntervalSelectionModel(ChartXYWidget *chart, PlotNavigator *nav);
+   ChartTimeIntervalSelector(ChartXYWidget *chart, PlotNavigator *nav);
 
    /// Дата и время начала выделенного интервала
    UtcDateTime getIntervalSelectionBeginDt();
@@ -185,6 +193,12 @@ public:
    void setIntervalSelectionByDates(UtcDateTime beginDt, ///< Начало интервала
                               UtcDateTime endDt ///< Конец интервала
                               );
+
+signals:
+   void targetingDtSet(UtcDateTime dt);
+
+private slots:
+   void onTargetingPointSet(qreal point);
 };
 
-#endif // CHARTINTERVALSELECTIONMODEL_H
+#endif // CHARTINTERVALSELECTOR_H

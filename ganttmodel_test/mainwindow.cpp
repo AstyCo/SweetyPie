@@ -86,8 +86,8 @@ void MainWindow::testChartGroupWidget()
     data2.append(ChartTimeXYWidget::dtToPoint(time, (rand() % 100) * 100));
     data3.append(ChartTimeXYWidget::dtToPoint(time, (rand() % 100) * 1000));
   }
-/*
-  ChartTimeXYWidget *chart = new ChartTimeXYWidget();
+
+  ChartXYWidget *chart = new ChartTimeXYWidget();
   chart->setLeftAxis("Test Chart 1 big title");
   chart->setData("chart 1", data);
   ui->widget_chartGroup->addChart(chart);
@@ -103,7 +103,6 @@ void MainWindow::testChartGroupWidget()
   ui->widget_chartGroup->addChart(chart);
   ui->widget_chartGroup->setSyncChartsByAxisX(false);
   ui->widget_chartGroup->setPanelSelectIntervalVisible(true);
-  */
 }
 QList<GanttInfoItem*> generateTest()
 {
@@ -230,7 +229,7 @@ void MainWindow::setInterval()
 
 void MainWindow::on_checkBox_syncAxisX_toggled(bool checked)
 {
-   //ui->widget_chartGroup->setSyncChartsByAxisX(checked);
+   ui->widget_chartGroup->setSyncChartsByAxisX(checked);
 }
 
 void MainWindow::on_pushButton_clicked()

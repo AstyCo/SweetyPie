@@ -6,7 +6,7 @@
 #include <utcdatetime.h>
 #include <timespan.h>
 
-#include "charttimexywidget.h"
+#include "chartxywidget.h"
 
 namespace Ui {
 class ChartsGroupWidget;
@@ -21,10 +21,10 @@ public:
   explicit ChartsGroupWidget(QWidget *parent = 0);
   ~ChartsGroupWidget();
 
-  void addChart(ChartTimeXYWidget *chart);
-  void insertChart(int index, ChartTimeXYWidget *chart);
-  ChartTimeXYWidget *removeChartAt(int index);
-  ChartTimeXYWidget *at(int index);
+  void addChart(ChartXYWidget *chart);
+  void insertChart(int index, ChartXYWidget *chart);
+  ChartXYWidget *removeChartAt(int index);
+  ChartXYWidget *at(int index);
   int chartsCount() const { return m_charts.size(); }
   void clearChartsData();
 
@@ -48,8 +48,7 @@ public:
   /// Дата и время конца выделенного интервала
   UtcDateTime getSelIntervalEndDt();
   bool panelSelectIntervalVisible() const;
-  void setPanelSelectIntervalVisible(bool vis);
-  void updateSelectionPanel();
+  void setPanelSelectIntervalVisible(bool vis);  
 
   ChartActionsToolBar *getActionsToolBar() const;
 
@@ -69,29 +68,17 @@ protected:
   void resizeEvent(QResizeEvent *ev);
 
 private slots:
-  void onToolButtonZoom_clicked();  
-
   void onAction_panelSelectionInterval_clicked();
 
-  void on_dateTimeEdit_StartSelection_dateTimeChanged(const QDateTime &dateTime);
+  void onToolButtonZoom_clicked();  
 
-  void on_dateTimeEdit_EndSelection_dateTimeChanged(const QDateTime &dateTime);
+  void updateSelectionPanel();
+  void onIntervalSelected();
 
-  void on_doubleSpinBox_SelInterval_valueChanged(double arg1);
-
-  void on_toolButton_SetDtIntervalSelection_clicked();
-
-  void on_toolButton_CancelDtIntervalSelection_clicked();
-
-  void on_toolButton_SetSelectionInterval_clicked();
-
-  void on_toolButton_CancelSelectionInterval_clicked();
-
-  void on_comboBox_IntervalTimeDim_currentIndexChanged(int index);
   void onPointSelected(CurveIndex idx);
   void onIntervalSelectionStart(QPointF pos);
   void onIntervalSelectionEnd(QPointF pos);
-  void onTargetingDtSet(UtcDateTime dt);
+  void onTargetingDtSet(qreal value);
   void onScaleChanged(qreal scaleFactor, QPoint anchorPoint);
   void onChartPanned(int dx, int dy);
 
@@ -110,32 +97,20 @@ private slots:
   void onAction_chartSettings_triggered();
   void onAction_panelCurveDetails_toggled(bool checked);
   void onZoomed(const QRectF &rect);
+
 private:
-
-  void setSelectionInterval(TimeSpan selInt);
-  void updateSelectIntervalPanelDates(UtcDateTime startDt, UtcDateTime endDt);
-
-  void hideEditIntervalButtons();
-
+  void connectChart(ChartXYWidget *chart);
   void zoomChart(int newZoom);
   void interconnectCharts();
-  void connectChart(ChartTimeXYWidget *chart);
   void alignAxes(int axis);
   void alignScaleBorder(int axis);
   void createActionsToolBar();
 
-private:
-  /// Режимы изменения выбранного интервала
-  enum IntervalEditState { iesNone,  ///< Интервал не изменялся
-                           iesBegin, ///< Изменилось начало интервала
-                           iesEnd,   ///< Изменилось окончание интервала
-                           iesInt    ///< Изменилась длина интервала
-                         };
-
+private:  
   Ui::ChartsGroupWidget *ui;
 
   ChartActionsToolBar *m_actionsToolBar;  
-  QList<ChartTimeXYWidget *> m_charts;
+  QList<ChartXYWidget *> m_charts;
   QList<QAction *> m_chartZoomActions;
   /// Текущие отображаемые графики имеют общую ось X
   bool m_syncChartsByAxisX;
@@ -143,16 +118,6 @@ private:
   /// Номер графика, развернутого на всю форму
   int m_zoomActive;
   bool m_panelSelectIntervalVisible;  
-
-  UtcDateTime m_curStartDt;
-  UtcDateTime m_curEndDt;
-
-  /// Текущее состояние интервала
-  IntervalEditState m_intState;
-  TimeSpan::TimeIntervalTypes m_curSelTimeIntType;
-
-  /// Текущий выделенный интервал
-  TimeSpan m_selInterval;
 
   ChartSettings m_settings;  
 };

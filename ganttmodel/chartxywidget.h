@@ -17,10 +17,10 @@
 #include "plotkeyeventhandler.h"
 #include "chartactionstoolbar.h"
 #include "chartsettingsdlg.h"
-#include "chartintervalselectionmodel.h"
+#include "chartintervalselector.h"
 
 namespace Ui {
-class ChartWidget;
+class ChartXYWidget;
 }
 
 enum SearchDirection
@@ -44,7 +44,6 @@ class QwtPlotCurve;
 class QwtPlotGrid;
 class QwtPlotPanner;
 class PlotNavigator;
-class QwtPlotPicker;
 class QwtPlotMarker;
 
 /// Основной класс для графиков
@@ -52,7 +51,7 @@ class GANTTMODELSHARED_EXPORT ChartXYWidget : public QWidget
 {
   Q_OBJECT
 
-  friend class ChartIntervalSelectionModel;
+  friend class ChartIntervalSelector;
 
 public:
   /// Конструктор класса
@@ -114,14 +113,14 @@ public:
 
   void setChartToolBarVisible(bool vis);
 
-  /// Указатель на график
-  QwtPlotCurve *curve(int index ///< Номер графика
+  /// Указатель на кривую графика
+  QwtPlotCurve *curve(int index ///< Индекс кривой
                       ) const;
 
   /// Список интервалов
   QList<PlotInterval *> intervals() const;
 
-  /// Список графиков
+  /// Список кривых
   QList<QwtPlotCurve *> curves() const;
 
   /// Запускает таймер для перерисовки графика
@@ -154,7 +153,7 @@ public:
 
   CurveIndex findClosestPointAllCurves(const QPointF &pos, SearchDirection direction=sdAny);
 
-  ChartIntervalSelectionModel *selectionModel() const;
+  ChartIntervalSelector *selectionModel() const;
 
 
 
@@ -169,6 +168,8 @@ public slots:
   void moveCanvas(int dx, int dy);
 
 signals: 
+  /// Данные для построения графика изменились
+  void curveDataChanged();
   /// Масштаб графика изменился (фактор масштабирования, точка привязки)
   void scaleChanged(qreal, QPoint);
   /// Видимая область графика была перемещена
@@ -177,7 +178,7 @@ signals:
   void zoomed(const QRectF &rect);
 
 protected:
-  Ui::ChartWidget *ui;
+  Ui::ChartXYWidget *ui;
 
   ChartActionsToolBar *m_actionsToolBar;
   QList<QwtPlotCurve *> m_curves;
@@ -186,11 +187,10 @@ protected:
   QList<PlotInterval *> m_zones;
   QList<QLabel *> m_zoneLegendWidgets;
   QList<CurveDetailsGroupBox *> m_panelCurveDetailsList;
-  ChartIntervalSelectionModel *m_selectionModel;
+  ChartIntervalSelector *m_selectionModel;
 
   QwtPlotGrid *m_pGrid;
   PlotNavigator *m_navigator;
-  QwtPlotPicker *m_picker;
 
   QwtPlotMarker *m_pMinLeftMarker;
   QwtPlotMarker *m_pMaxLeftMarker;
