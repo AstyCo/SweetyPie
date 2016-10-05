@@ -238,6 +238,7 @@ private:
     long m_min,m_max;
 private:
 
+    bool m_leftButtonPressed;
     MGridItem *m_mouseOverItem;
     MGridUnit *m_mouseOverUnit;
     MGridItem* m_lastSelected;

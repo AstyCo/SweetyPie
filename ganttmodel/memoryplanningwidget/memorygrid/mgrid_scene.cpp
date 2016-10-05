@@ -55,6 +55,7 @@ MGridScene::~MGridScene()
 
 void MGridScene::mousePressEvent(QGraphicsSceneMouseEvent *event)
 {
+    m_leftButtonPressed = true;
 
     if(m_interactiveHighlight)
     {
@@ -88,7 +89,7 @@ void MGridScene::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
     // INTERACTIVE SELECTION
     if(m_interactiveHighlight)
     {
-        if((m_selectionMode == positionSelection) && p_mem)
+        if(m_leftButtonPressed && (m_selectionMode == positionSelection) && p_mem)
         {
             setStartSelection(p_mem->index());
         }
@@ -120,11 +121,17 @@ void MGridScene::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
 
 void MGridScene::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
 {
+    m_leftButtonPressed = false;
     // INTERACTIVE SELECTION
 //    setInteractiveHighlight(false);
 
     // ITEMS SELECT <disabled>
-    clearLastSelected();
+    if(m_lastSelected)
+    {
+        clearLastSelected();
+        emit intervalHasSelected();
+    }
+
 
 
     return QGraphicsScene::mouseReleaseEvent(event);
@@ -141,16 +148,6 @@ void MGridScene::clear()
     m_lastSelected = NULL;
     clearMouseOver();
 }
-
-
-//void MemoryScene::drawForeground(QPainter *painter, const QRectF &rect)
-//{
-//    if(m_interactiveUnit)
-//        m_interactiveUnit->update();
-//    foreach(MemoryUnit* unit, m_units)
-//        unit->update();
-//    return QGraphicsScene::drawForeground(painter,rect);
-//}
 
 void MGridScene::clearShownUnits()
 {

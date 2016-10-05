@@ -105,22 +105,22 @@ QVariant GanttTreeModel::headerData(int section, Qt::Orientation orientation,
     }
 
 
-//    if (orientation == Qt::Horizontal && role == Qt::DisplayRole)
-//    {
-//        switch(section)
-//        {
-//        case nameField:
-//            return trUtf8("Название");
-//        case startField:
-//            return trUtf8("Начало");
-//        case finishField:
-//            return trUtf8("Конец");
-//        case durationField:
-//            return trUtf8("Длительность");
-//        default:
-//            return QVariant();
-//        }
-//    }
+    if (orientation == Qt::Horizontal && role == Qt::DisplayRole)
+    {
+        switch(section)
+        {
+        case titleField:
+            return trUtf8("Название");
+        case startField:
+            return trUtf8("Время расчета/начала");
+        case finishField:
+            return trUtf8("Время окончания");
+        case durationField:
+            return trUtf8("Длительность");
+        default:
+            return QVariant();
+        }
+    }
 
     return QVariant();
 }

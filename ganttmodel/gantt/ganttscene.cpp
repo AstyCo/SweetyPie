@@ -700,6 +700,7 @@ void GanttScene::setRange(UtcDateTime min, UtcDateTime max)
     m_header->setRange(min,max);
     updateItems();
     updateSlider();
+    emit limitsChanged(m_header->startDt(),m_header->finishDt());
 }
 
 GanttInfoNode *GanttScene::root() const
@@ -867,10 +868,6 @@ GanttHeader::GanttPrecisionMode GanttScene::calculateTimeMode(const UtcDateTime 
     return m_header->calculateTimeMode(min,max);
 }
 
-void GanttScene::emitLimitsChanged(const UtcDateTime &start, const UtcDateTime &finish)
-{
-    emit limitsChanged(start,finish);
-}
 
 long long GanttScene::minTimeUnit() const
 {

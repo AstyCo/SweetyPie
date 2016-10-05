@@ -208,7 +208,8 @@ void MainWindow::testMemoryPlanningWidget()
     ui->memoryPlanningWidget->setMemory(kaMemory);
     scene->setLimits(200,1750);
     ui->memoryPlanningWidget->setShowButtons(true);
-    scene->setSelectionMode(MGridScene::areaSelection);
+    scene->setSelectionMode(MGridScene::positionSelection);
+    scene->setLengthSelection(10);
 }
 
 void MainWindow::setInterval()

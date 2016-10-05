@@ -78,8 +78,6 @@ public:
     GanttHeader::GanttPrecisionMode headerPrecisionMode() const;
     GanttHeader::GanttPrecisionMode calculateTimeMode(const UtcDateTime &min, const UtcDateTime &max) const;
 
-    void emitLimitsChanged(const UtcDateTime &start, const UtcDateTime &finish);
-
     long long minTimeUnit() const;
 
     const GanttInfoLeaf *nextEvent(const UtcDateTime &curDt) const;

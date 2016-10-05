@@ -41,7 +41,7 @@ private:
 private:
 
     GanttGraphicsView* m_graphicsView;
-    GanttHeaderView* m_header;
+//    GanttHeaderView* m_header;
     GanttTreeModel *m_model;
 
     int m_hSliderHeight;

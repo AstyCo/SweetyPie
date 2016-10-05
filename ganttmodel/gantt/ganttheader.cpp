@@ -1173,6 +1173,7 @@ void GanttHeader::setRange(UtcDateTime min, UtcDateTime max)
     m_maxDt = max;
 
     updateHeader();
+
 }
 
 bool GanttHeader::verifyBoundsByLeaf(const GanttInfoLeaf *leaf)

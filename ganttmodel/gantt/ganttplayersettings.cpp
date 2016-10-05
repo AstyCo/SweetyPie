@@ -92,7 +92,7 @@ void GanttPlayerSettings::initActions()
                   "}");
 
     m_slider->setOrientation(Qt::Horizontal);
-    connect(m_slider,SIGNAL(sliderMoved(int)),this,SLOT(onSpeedChanged(int)));
+    connect(m_slider,SIGNAL(valueChanged(int)),this,SLOT(onSpeedChanged(int)));
     setMultiplies(0.5,10);
     if(m_cur)
         m_cur->setText(QString::number(m_slider->value()*1.0/m_precision,'f',1));

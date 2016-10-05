@@ -19,8 +19,8 @@ GanttTreeView::GanttTreeView(QWidget * parent )
     m_model = NULL;
     m_hSliderHeight = 15;
 
-    m_header = new GanttHeaderView(Qt::Horizontal,this);
-    setHeader(m_header);
+//    m_header = new GanttHeaderView(Qt::Horizontal,this);
+//    setHeader(m_header);
 
     setMinimumWidth(GANTTTREEVIEW_MIN_WIDTH);
     horizontalScrollBar()->setStyleSheet(
@@ -41,7 +41,6 @@ GanttTreeView::GanttTreeView(QWidget * parent )
 
 void GanttTreeView::scrollContentsBy(int dx, int dy)
 {
-
 
     if(dx)
         repaintHeader();

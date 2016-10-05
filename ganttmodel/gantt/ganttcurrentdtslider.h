@@ -25,6 +25,7 @@ public:
     QPainterPath shape() const;
 
     void updateShape();
+
     void setSlidersRect(const QRectF &slidersRect);
 
     void setPos(const QPointF &pos);
@@ -55,6 +56,7 @@ signals:
     void drawChanged(bool);
 
 public slots:
+    void updateTextRect();
     void setToBegin();
     void makeStep(long long deltaVal);
     bool setDt(UtcDateTime dt);
@@ -76,6 +78,7 @@ private:
 
 private:
     QRectF m_slidersRect; ///< The rectangle, where slider can actually move.
+    QRect m_textRect;
 
     QPainterPath m_sliderShape;
     QPainterPath m_rhombus;
