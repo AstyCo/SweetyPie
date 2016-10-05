@@ -7,6 +7,8 @@
 #include <timespan.h>
 
 #include "chartxywidget.h"
+#include "charttimexywidget.h"
+#include "chartintervalselectionwidget.h"
 
 namespace Ui {
 class ChartsGroupWidget;
@@ -34,21 +36,8 @@ public:
   bool syncChartsByAxisX() const;
   void setSyncChartsByAxisX(bool syncChartsByAxisX);
 
-
-  /// Выполняет выделение интервала
-  void selectIntervalByDates(UtcDateTime beginDt, ///< Начало интервала
-                             UtcDateTime endDt ///< Конец интервала
-                             );
-
   void setTargetingPoint(UtcDateTime dt);
   void clearTargetingPoint();
-  /// Дата и время начала выделенного интервала
-  UtcDateTime getSelIntervalBeginDt();
-
-  /// Дата и время конца выделенного интервала
-  UtcDateTime getSelIntervalEndDt();
-  bool panelSelectIntervalVisible() const;
-  void setPanelSelectIntervalVisible(bool vis);  
 
   ChartActionsToolBar *getActionsToolBar() const;
 
@@ -67,13 +56,8 @@ public slots:
 protected:
   void resizeEvent(QResizeEvent *ev);
 
-private slots:
-  void onAction_panelSelectionInterval_clicked();
-
+protected slots:
   void onToolButtonZoom_clicked();  
-
-  void updateSelectionPanel();
-  void onIntervalSelected();
 
   void onPointSelected(CurveIndex idx);
   void onIntervalSelectionStart(QPointF pos);
@@ -98,7 +82,7 @@ private slots:
   void onAction_panelCurveDetails_toggled(bool checked);
   void onZoomed(const QRectF &rect);
 
-private:
+protected:
   void connectChart(ChartXYWidget *chart);
   void zoomChart(int newZoom);
   void interconnectCharts();
@@ -106,7 +90,7 @@ private:
   void alignScaleBorder(int axis);
   void createActionsToolBar();
 
-private:  
+protected:
   Ui::ChartsGroupWidget *ui;
 
   ChartActionsToolBar *m_actionsToolBar;  
@@ -117,9 +101,43 @@ private:
   bool m_panelStatsVisible;
   /// Номер графика, развернутого на всю форму
   int m_zoomActive;
-  bool m_panelSelectIntervalVisible;  
 
   ChartSettings m_settings;  
+};
+
+class GANTTMODELSHARED_EXPORT ChartTimeXYGroupWidget : public ChartsGroupWidget
+{
+  Q_OBJECT
+
+public:
+  explicit ChartTimeXYGroupWidget(QWidget *parent = 0);
+
+  void addChart(ChartTimeXYWidget *chart);
+  void insertChart(int index, ChartTimeXYWidget *chart);
+
+  /// Выполняет выделение интервала
+  void selectIntervalByDates(UtcDateTime beginDt, ///< Начало интервала
+                             UtcDateTime endDt ///< Конец интервала
+                             );
+  /// Дата и время начала выделенного интервала
+  UtcDateTime getSelIntervalBeginDt();
+
+  /// Дата и время конца выделенного интервала
+  UtcDateTime getSelIntervalEndDt();
+  bool panelSelectIntervalVisible() const;
+  void setPanelSelectIntervalVisible(bool vis);
+
+private slots:
+  void onAction_panelSelectionInterval_clicked();
+
+  void updateSelectionPanel();
+  void onIntervalSelected();
+
+  void onChartIntervalSelectionEnd(QPointF p);
+
+protected:
+  ChartIntervalSelectionWidget *m_selectionPanel;
+  bool m_panelSelectIntervalVisible;
 };
 
 #endif // CHARTSGROUPWIDGET_H

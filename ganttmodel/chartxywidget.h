@@ -105,10 +105,12 @@ public:
   /// Обновляет данные графика. Если таймер запущен то график не перерисовывается.
   void updateData(int indexCurve, const QVector<QPointF> &data);
 
+  /// Возвращает пояснительный текст к точке графика
+  virtual void getCurvePointLabel(const CurveIndex &idx, QString &xLbl, QString &yLbl) const;
 
-  ChartCurveStats getCurveStats(int curveId) { return m_curvesStats.at(curveId); }
+  ChartCurveStats getCurveStats(int curveId) const { return m_curvesStats.at(curveId); }
 
-  bool panelCurveDetailsVisible();
+  bool panelCurveDetailsVisible() const;
   void setPanelCurveDetailsVisible(bool vis);
 
   void setChartToolBarVisible(bool vis);
@@ -132,7 +134,7 @@ public:
   int countLastPoints() const;
   void setCountLastPoints(int countLastPoints);
 
-  QwtPlot * getPlot();
+  QwtPlot *getPlot() const;
   void zoom(const QRectF &rect);
   void rescale(qreal scaleFactor, QPoint anchorPoint);
 
@@ -151,9 +153,9 @@ public:
   /// false - всегда скрывать
   void setShowLegend(bool show);
 
-  CurveIndex findClosestPointAllCurves(const QPointF &pos, SearchDirection direction=sdAny);
+  CurveIndex findClosestPointAllCurves(const QPointF &pos, SearchDirection direction=sdAny) const;
 
-  ChartIntervalSelector *selectionModel() const;
+  ChartIntervalSelector *selector() const;
 
 
 
@@ -211,7 +213,7 @@ protected:
   QPointF getTransformedPoint(const CurveIndex &index) const;
   QPointF getTransformedPoint(int indexCurve, int indexPoint) const;
 
-  double calcDistance(const QPointF &p1, const QPointF &p2);
+  double calcDistance(const QPointF &p1, const QPointF &p2) const;
 
   void createActionsToolBar();
   void createMenuIntervals();

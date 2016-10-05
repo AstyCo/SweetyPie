@@ -70,8 +70,6 @@ public:
   CurveIndex selectedPoint() const { return m_selectedPointIndex; }
   void selectPointByIndex(CurveIndex idx);
   void clearSelectedPoint();
-  /// Отображает пояснительный текст к выбранной пользователем точке
-  void setSelectedPointLabel(const QwtText &xLbl, const QwtText &yLbl);
 
   void setSelectionModeTargetingPoint(bool b);
   void setTargetingPoint(qreal value);

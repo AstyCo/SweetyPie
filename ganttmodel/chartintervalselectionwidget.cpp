@@ -136,6 +136,13 @@ void ChartIntervalSelectionWidget::hideEditIntervalButtons()
 
 void ChartIntervalSelectionWidget::setSelectedInterval(const UtcDateTimeInterval &selectedInterval)
 {
+  UtcDateTimeInterval roundedSelInt;
+  roundedSelInt.setBegin(selectedInterval.begin().dateTime());
+  if (selectedInterval.end().secPartMicroseconds() > 0)
+    roundedSelInt.setEnd(selectedInterval.end().dateTime().addSecs(1));
+  else
+    roundedSelInt.setEnd(selectedInterval.end());
+
   if (! m_availableInterval.contains(selectedInterval))
     m_selectedInterval = m_availableInterval.intersectionInterval(selectedInterval);
   else
@@ -157,6 +164,11 @@ UtcDateTimeInterval ChartIntervalSelectionWidget::availableInterval() const
 void ChartIntervalSelectionWidget::setAvailableInterval(const UtcDateTimeInterval &availableInterval)
 {
   m_availableInterval = availableInterval;
+  m_availableInterval.setBegin(availableInterval.begin().dateTime());
+  if (availableInterval.end().secPartMicroseconds() > 0)
+    m_availableInterval.setEnd(availableInterval.end().dateTime().addSecs(1));
+  else
+    m_availableInterval.setEnd(availableInterval.end());
 
   if (! m_selectedInterval.isValid())
     setSelectedInterval(m_availableInterval);

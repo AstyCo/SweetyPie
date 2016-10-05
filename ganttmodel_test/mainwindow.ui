@@ -77,7 +77,7 @@
        </attribute>
        <layout class="QVBoxLayout" name="verticalLayout_2" stretch="1,0">
         <item>
-         <widget class="ChartsGroupWidget" name="widget_chartGroup" native="true"/>
+         <widget class="ChartTimeXYGroupWidget" name="widget_chartGroup" native="true"/>
         </item>
         <item>
          <layout class="QHBoxLayout" name="horizontalLayout">
@@ -206,15 +206,15 @@
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>ChartsGroupWidget</class>
-   <extends>QWidget</extends>
-   <header>chartsgroupwidget.h</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
    <class>ChartTimeXYWidget</class>
    <extends>QWidget</extends>
    <header>charttimexywidget.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>ChartTimeXYGroupWidget</class>
+   <extends>QWidget</extends>
+   <header>chartsgroupwidget.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

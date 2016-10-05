@@ -393,14 +393,6 @@ void ChartIntervalSelector::clearSelectedPoint()
   m_pMarker[1]->hide();
 }
 
-void ChartIntervalSelector::setSelectedPointLabel(const QwtText &xLbl, const QwtText &yLbl)
-{
-  m_pMarker[0]->setLabel(xLbl);
-  m_pMarker[1]->setLabel(yLbl);
-
-  m_plot->replot();
-}
-
 void ChartIntervalSelector::clearAllSelections()
 {
   // скрыть маркеры
@@ -512,16 +504,19 @@ void ChartIntervalSelector::drawMarkerOnCurve()
   if (!m_selectedPointIndex.isValid())
     return;
 
-  QwtText txtX, txtY;
-
-  QwtPlotCurve *curve = m_chart->curves()[m_selectedPointIndex.indexCurve];
+  QwtPlotCurve *curve = m_chart->m_curves[m_selectedPointIndex.indexCurve];
   QPointF p = curve->sample(m_selectedPointIndex.indexPoint);
 
-  QString valY = QString::number(p.y(), 'f', 6);
+  QString xLbl, yLbl;
+  m_chart->getCurvePointLabel(m_selectedPointIndex, xLbl, yLbl);
+  QwtText txtX(xLbl), txtY(yLbl);
+  txtX.setFont(m_chart->m_settings.m_markerLabelFont);
+  txtY.setFont(m_chart->m_settings.m_markerLabelFont);
 
-  txtX = tr("[%1]").arg(m_chart->getPlot()->axisScaleDraw(curve->xAxis())->label(p.x()).text());
-
-  txtY = QString("[%1]").arg(valY);
+  txtX.setBackgroundBrush(QBrush(Qt::white));
+  txtY.setBackgroundBrush(QBrush(Qt::white));
+  txtX.setRenderFlags(Qt::AlignLeft);
+  txtY.setRenderFlags(Qt::AlignLeft);
 
   showSelectionPoint(txtX, txtY, p, (QwtPlot::Axis)curve->yAxis());
 }

@@ -17,6 +17,8 @@ CurveDetailsGroupBox::CurveDetailsGroupBox(QwtPlotCurve *curve, QWidget *parent)
 
   connect(ui->checkBox_title, SIGNAL(toggled(bool)), this, SLOT(setCurveVisible(bool)));
 
+  setIntervalLabelsVisible(false);
+
   updateCurveColor();
   updateData();
 }

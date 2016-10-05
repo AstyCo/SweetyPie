@@ -32,13 +32,9 @@ ChartsGroupWidget::ChartsGroupWidget(QWidget *parent) :
   m_zoomActive = 0;
   m_syncChartsByAxisX = true;
 
-  m_panelStatsVisible = false;
-  setPanelSelectIntervalVisible(false);
-  onAction_panelSelectionInterval_clicked();
   ui->frame_stats->hide();
 
-  connect(ui->splitter_charts, SIGNAL(splitterMoved(int,int)), SLOT(scaleDivChanged()));  
-  connect(ui->widget_SelectionPanel, SIGNAL(intervalChanged()), SLOT(onIntervalSelected()));
+  connect(ui->splitter_charts, SIGNAL(splitterMoved(int,int)), SLOT(scaleDivChanged()));    
 }
 
 ChartsGroupWidget::~ChartsGroupWidget()
@@ -73,7 +69,6 @@ void ChartsGroupWidget::createActionsToolBar()
   connect(m_actionsToolBar->getChartAction(caSettingsDlg), SIGNAL(triggered(bool)), SLOT(onAction_chartSettings_triggered()));
   m_actionsToolBar->insertSeparator(m_actionsToolBar->getChartAction(caClear));
 
-  connect(m_actionsToolBar->getChartAction(caSelectIntervalPanel), SIGNAL(toggled(bool)), SLOT(onAction_panelSelectionInterval_clicked()));
   connect(m_actionsToolBar->getChartAction(caDetailsPanel), SIGNAL(toggled(bool)), SLOT(onAction_panelCurveDetails_toggled(bool)));
 
   m_actionsToolBar->addSeparator();
@@ -134,8 +129,6 @@ void ChartsGroupWidget::insertChart(int index, ChartXYWidget *chart)
   chart->updateChartSettings(m_settings);
   chart->setPanelCurveDetailsVisible(m_settings.detailsPanelVisible);
   chart->setChartToolBarVisible(false);  
-
-  updateSelectionPanel();  
 }
 
 bool ChartsGroupWidget::frameStatsEnabled() const
@@ -155,20 +148,20 @@ void ChartsGroupWidget::setFrameStatsEnabled(bool frameStatsEnabled)
 
 void ChartsGroupWidget::onPointSelected(CurveIndex idx)
 {
-  ChartXYWidget * senderChart = static_cast<ChartXYWidget *>(QObject::sender());
+  ChartIntervalSelector *senderSelector = qobject_cast<ChartIntervalSelector *>(QObject::sender());
 
   foreach (ChartXYWidget *cc, m_charts)
-    if (cc != senderChart)
-      cc->selectionModel()->selectPointByIndex(idx);
+    if (cc->selector() != senderSelector)
+      cc->selector()->selectPointByIndex(idx);
 
 }
 
 void ChartsGroupWidget::onIntervalSelectionStart(QPointF pos)
 {
-  ChartXYWidget * senderChart = static_cast<ChartXYWidget *>(QObject::sender());
+  ChartIntervalSelector * senderSelector = qobject_cast<ChartIntervalSelector *>(QObject::sender());
   foreach (ChartXYWidget *cc, m_charts)
-    if (cc != senderChart)
-      cc->selectionModel()->setIntervalSelectionStart(pos);
+    if (cc->selector() != senderSelector)
+      cc->selector()->setIntervalSelectionStart(pos);
 }
 
 void ChartsGroupWidget::onIntervalSelectionEnd(QPointF pos)
@@ -176,30 +169,24 @@ void ChartsGroupWidget::onIntervalSelectionEnd(QPointF pos)
   ChartIntervalSelector *senderModel =
       qobject_cast<ChartIntervalSelector *>(QObject::sender());
 
-  qreal begin = senderModel->intervalSelectionBegin();
-  qreal end = senderModel->intervalSelectionEnd();
-  ui->widget_SelectionPanel->setSelectedInterval(UtcDateTimeInterval(
-                                                   pointToDt(begin),
-                                                   pointToDt(end)));
-
   QAction *selIntAct = m_actionsToolBar->getChartAction(caSelectInterval);
 
   bool b = selIntAct->blockSignals(true);
   selIntAct->setChecked(false);
   selIntAct->blockSignals(b);
   foreach (ChartXYWidget *cc, m_charts)
-    if (cc->selectionModel() != senderModel)
-      cc->selectionModel()->setIntervalSelectionEnd(pos);
+    if (cc->selector() != senderModel)
+      cc->selector()->setIntervalSelectionEnd(pos);
 
   emit intervalSelectionEnded(pos);
 }
 
 void ChartsGroupWidget::onTargetingDtSet(qreal value)
 {
-  ChartXYWidget * senderChart = static_cast<ChartXYWidget *>(QObject::sender());
+  ChartIntervalSelector * senderSelector = qobject_cast<ChartIntervalSelector *>(QObject::sender());
   foreach (ChartXYWidget *cc, m_charts)
-    if (cc != senderChart)
-      cc->selectionModel()->setTargetingPoint(value);
+    if (cc->selector() != senderSelector)
+      cc->selector()->setTargetingPoint(value);
 
   QAction *selTargetAct = m_actionsToolBar->getChartAction(caSelectTarget);
   bool b = selTargetAct->blockSignals(true);
@@ -323,17 +310,6 @@ void ChartsGroupWidget::onToolButtonZoom_clicked()
 }
 
 
-void ChartsGroupWidget::onIntervalSelected()
-{
-  UtcDateTimeInterval newInt = ui->widget_SelectionPanel->selectedInterval();
-  for(int i = 0; i < m_charts.size(); i++)
-  {
-    ChartXYWidget *cc = m_charts.at(i);
-    cc->selectionModel()->setIntervalSelection(dtToPoint(newInt.begin()),
-                                               dtToPoint(newInt.end()));
-  }
-}
-
 void ChartsGroupWidget::zoomChart(int newZoom)
 {
   if (newZoom > m_charts.size())
@@ -404,11 +380,11 @@ void ChartsGroupWidget::interconnectCharts()
 void ChartsGroupWidget::connectChart(ChartXYWidget *chart)
 {
   disconnect(chart, 0, this, 0);
-  disconnect(chart->selectionModel(), 0, this, 0);
+  disconnect(chart->selector(), 0, this, 0);
 
   if (m_syncChartsByAxisX)
   {
-    ChartIntervalSelector *selModel = chart->selectionModel();
+    ChartIntervalSelector *selModel = chart->selector();
     connect(selModel, SIGNAL(pointSelected(CurveIndex)), SLOT(onPointSelected(CurveIndex)));
     connect(selModel, SIGNAL(intervalSelectionStarted(QPointF)), SLOT(onIntervalSelectionStart(QPointF)));
     connect(selModel, SIGNAL(intervalSelectionEnded(QPointF)), SLOT(onIntervalSelectionEnd(QPointF)));
@@ -417,20 +393,8 @@ void ChartsGroupWidget::connectChart(ChartXYWidget *chart)
     connect(chart, SIGNAL(scaleChanged(qreal,QPoint)), SLOT(onScaleChanged(qreal,QPoint)));
     connect(chart, SIGNAL(zoomed(QRectF)), SLOT(onZoomed(QRectF)));
     connect(chart, SIGNAL(panned(int,int)), SLOT(onChartPanned(int,int)));
-  }
-  connect(chart, SIGNAL(curveDataChanged()), SLOT(updateSelectionPanel()));
+  }  
 }
-
-bool ChartsGroupWidget::panelSelectIntervalVisible() const
-{
-  return m_panelSelectIntervalVisible;
-}
-
-void ChartsGroupWidget::setPanelSelectIntervalVisible(bool vis)
-{  
-  m_actionsToolBar->getChartAction(caSelectIntervalPanel)->setChecked(vis);
-}
-
 
 bool ChartsGroupWidget::syncChartsByAxisX() const
 {
@@ -453,43 +417,18 @@ void ChartsGroupWidget::setSyncChartsByAxisX(bool syncChartsByAxisX)
   interconnectCharts();
 }
 
-void ChartsGroupWidget::selectIntervalByDates(UtcDateTime beginDt, UtcDateTime endDt)
-{
-  foreach(ChartXYWidget *cc, m_charts)
-      cc->selectionModel()->setIntervalSelection(dtToPoint(beginDt), dtToPoint(endDt));
-
-
-  ui->widget_SelectionPanel->setSelectedInterval(UtcDateTimeInterval(beginDt, endDt));
-}
-
 void ChartsGroupWidget::setTargetingPoint(UtcDateTime dt)
 {
   foreach(ChartXYWidget *cc, m_charts)
-      cc->selectionModel()->setTargetingPoint(dtToPoint(dt));
+      cc->selector()->setTargetingPoint(dtToPoint(dt));
 }
 
 void ChartsGroupWidget::clearTargetingPoint()
 {
   foreach(ChartXYWidget *cc, m_charts)
-      cc->selectionModel()->clearTargetingPoint();
+      cc->selector()->clearTargetingPoint();
 }
 
-UtcDateTime ChartsGroupWidget::getSelIntervalBeginDt()
-{
-  return ui->widget_SelectionPanel->selectedInterval().begin();
-}
-
-UtcDateTime ChartsGroupWidget::getSelIntervalEndDt()
-{
-  return ui->widget_SelectionPanel->selectedInterval().end();
-}
-
-
-void ChartsGroupWidget::onAction_panelSelectionInterval_clicked()
-{  
-  m_panelSelectIntervalVisible = m_actionsToolBar->getChartAction(caSelectIntervalPanel)->isChecked();
-  ui->widget_SelectionPanel->setVisible(m_panelSelectIntervalVisible);
-}
 /*
 void ChartsGroupWidget::on_toolButton_EndSelectionByMouse_clicked()
 {
@@ -499,44 +438,6 @@ void ChartsGroupWidget::on_toolButton_EndSelectionByMouse_clicked()
   updateSelectionPanel();
 }
 */
-void ChartsGroupWidget::updateSelectionPanel()
-{
-  if (m_charts.isEmpty())
-    return;
-
-  qreal startLimit = m_charts.first()->selectionModel()->begin();
-  qreal endLimit = m_charts.first()->selectionModel()->end();
-  NumericInterval newAvailInt(startLimit, endLimit);
-  if ((! m_syncChartsByAxisX) && (m_charts.size() != 1))
-  {
-    foreach(ChartXYWidget *cc, m_charts)
-    {
-      qreal chartBegin = cc->selectionModel()->begin();
-      qreal chartEnd = cc->selectionModel()->end();
-
-      NumericInterval chartInt(chartBegin, chartEnd);
-      newAvailInt += chartInt;
-    }
-  }
-  UtcDateTimeInterval newDateTimeAvailInt(pointToDt(newAvailInt.begin()),
-                                          pointToDt(newAvailInt.end()));
-  ui->widget_SelectionPanel->setAvailableInterval(newDateTimeAvailInt);
-
-  if (m_syncChartsByAxisX || (m_charts.size() == 1))
-  {
-    if (!m_charts.first()->curves().isEmpty())
-    {
-      ui->label_stat_points->setText(QString::number(m_charts.first()->curve(0)->dataSize()));
-
-      QString beginEnd("%1 - %2");
-      beginEnd = beginEnd.arg(newDateTimeAvailInt.begin().toStdString(0),
-                              newDateTimeAvailInt.end().toStdString(0));
-      ui->label_stat_beginDt_endDt->setText(beginEnd);
-
-      ui->label_stat_duration->setText(newDateTimeAvailInt.length().toString());
-    }
-  }
-}
 
 void ChartsGroupWidget::onAction_autoZoom_clicked()
 {
@@ -569,7 +470,7 @@ void ChartsGroupWidget::onAction_selectIntervalByMouse_toggled(bool checked)
   }
 
   foreach(ChartXYWidget *cc, m_charts)
-      cc->selectionModel()->setIntervalSelection(checked);
+      cc->selector()->setIntervalSelection(checked);
 }
 
 void ChartsGroupWidget::alignAxes(int axis)
@@ -664,7 +565,7 @@ void ChartsGroupWidget::onAction_selectTarget_toggled(bool checked)
 
   foreach (ChartXYWidget *chart, m_charts)
   {
-    chart->selectionModel()->setSelectionModeTargetingPoint(checked);
+    chart->selector()->setSelectionModeTargetingPoint(checked);
   }
 }
 
@@ -689,4 +590,131 @@ void ChartsGroupWidget::onAction_panelCurveDetails_toggled(bool checked)
     cc->setPanelCurveDetailsVisible(m_settings.detailsPanelVisible);
 
   alignPanelsDetails();
+}
+
+ChartTimeXYGroupWidget::ChartTimeXYGroupWidget(QWidget *parent)
+  : ChartsGroupWidget(parent)
+{
+  m_selectionPanel = ui->widget_SelectionPanel;
+  m_panelStatsVisible = false;
+  setPanelSelectIntervalVisible(false);
+  onAction_panelSelectionInterval_clicked();
+  connect(m_actionsToolBar->getChartAction(caSelectIntervalPanel), SIGNAL(toggled(bool)),
+          SLOT(onAction_panelSelectionInterval_clicked()));
+  connect(m_selectionPanel, SIGNAL(intervalChanged()), SLOT(onIntervalSelected()));
+}
+
+void ChartTimeXYGroupWidget::addChart(ChartTimeXYWidget *chart)
+{
+  insertChart(m_charts.size(), chart);
+}
+
+void ChartTimeXYGroupWidget::insertChart(int index, ChartTimeXYWidget *chart)
+{
+  ChartsGroupWidget::insertChart(index, chart);
+  connect(chart, SIGNAL(curveDataChanged()), SLOT(updateSelectionPanel()));
+  connect(chart->selector(), SIGNAL(intervalSelectionEnded(QPointF)),
+          SLOT(onChartIntervalSelectionEnd(QPointF)));
+
+  updateSelectionPanel();
+}
+
+void ChartTimeXYGroupWidget::selectIntervalByDates(UtcDateTime beginDt, UtcDateTime endDt)
+{
+  foreach(ChartXYWidget *cc, m_charts)
+      cc->selector()->setIntervalSelection(dtToPoint(beginDt), dtToPoint(endDt));
+
+
+  m_selectionPanel->setSelectedInterval(UtcDateTimeInterval(beginDt, endDt));
+}
+
+UtcDateTime ChartTimeXYGroupWidget::getSelIntervalBeginDt()
+{
+  return m_selectionPanel->selectedInterval().begin();
+}
+
+UtcDateTime ChartTimeXYGroupWidget::getSelIntervalEndDt()
+{
+  return m_selectionPanel->selectedInterval().end();
+}
+
+
+void ChartTimeXYGroupWidget::onAction_panelSelectionInterval_clicked()
+{
+  m_panelSelectIntervalVisible = m_actionsToolBar->getChartAction(caSelectIntervalPanel)->isChecked();
+  m_selectionPanel->setVisible(m_panelSelectIntervalVisible);
+}
+
+void ChartTimeXYGroupWidget::onIntervalSelected()
+{
+  UtcDateTimeInterval newInt = m_selectionPanel->selectedInterval();
+  for(int i = 0; i < m_charts.size(); i++)
+  {
+    ChartXYWidget *cc = m_charts.at(i);
+    cc->selector()->setIntervalSelection(dtToPoint(newInt.begin()),
+                                               dtToPoint(newInt.end()));
+  }
+}
+
+void ChartTimeXYGroupWidget::onChartIntervalSelectionEnd(QPointF p)
+{
+  Q_UNUSED(p)
+
+  ChartIntervalSelector *senderModel =
+      qobject_cast<ChartIntervalSelector *>(QObject::sender());
+
+  qreal begin = senderModel->intervalSelectionBegin();
+  qreal end = senderModel->intervalSelectionEnd();
+  m_selectionPanel->setSelectedInterval(UtcDateTimeInterval(
+                                                   pointToDt(begin),
+                                                   pointToDt(end)));
+}
+
+void ChartTimeXYGroupWidget::updateSelectionPanel()
+{
+  if (m_charts.isEmpty())
+    return;
+
+  qreal startLimit = m_charts.first()->selector()->begin();
+  qreal endLimit = m_charts.first()->selector()->end();
+  NumericInterval newAvailInt(startLimit, endLimit);
+  if ((! m_syncChartsByAxisX) && (m_charts.size() != 1))
+  {
+    foreach(ChartXYWidget *cc, m_charts)
+    {
+      qreal chartBegin = cc->selector()->begin();
+      qreal chartEnd = cc->selector()->end();
+
+      NumericInterval chartInt(chartBegin, chartEnd);
+      newAvailInt += chartInt;
+    }
+  }
+  UtcDateTimeInterval newDateTimeAvailInt(pointToDt(newAvailInt.begin()),
+                                          pointToDt(newAvailInt.end()));
+  m_selectionPanel->setAvailableInterval(newDateTimeAvailInt);
+
+  if (m_syncChartsByAxisX || (m_charts.size() == 1))
+  {
+    if (!m_charts.first()->curves().isEmpty())
+    {
+      ui->label_stat_points->setText(QString::number(m_charts.first()->curve(0)->dataSize()));
+
+      QString beginEnd("%1 - %2");
+      beginEnd = beginEnd.arg(newDateTimeAvailInt.begin().toStdString(0),
+                              newDateTimeAvailInt.end().toStdString(0));
+      ui->label_stat_beginDt_endDt->setText(beginEnd);
+
+      ui->label_stat_duration->setText(newDateTimeAvailInt.length().toString());
+    }
+  }
+}
+
+bool ChartTimeXYGroupWidget::panelSelectIntervalVisible() const
+{
+  return m_panelSelectIntervalVisible;
+}
+
+void ChartTimeXYGroupWidget::setPanelSelectIntervalVisible(bool vis)
+{
+  m_actionsToolBar->getChartAction(caSelectIntervalPanel)->setChecked(vis);
 }

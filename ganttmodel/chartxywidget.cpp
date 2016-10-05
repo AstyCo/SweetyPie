@@ -16,6 +16,7 @@
 #include <qwt/qwt_plot_panner.h>
 #include <qwt/qwt_plot_marker.h>
 #include <qwt/qwt_series_data.h>
+#include <qwt/qwt_scale_draw.h>
 
 #include <qwt/qwt_color_map.h>
 #include <qwt/qwt_raster_data.h>
@@ -162,7 +163,7 @@ long ChartXYWidget::findPointIndexByPos(const QPointF &pos, SearchDirection dire
   }
 }
 
-CurveIndex ChartXYWidget::findClosestPointAllCurves(const QPointF &pos, SearchDirection direction)
+CurveIndex ChartXYWidget::findClosestPointAllCurves(const QPointF &pos, SearchDirection direction) const
 {
 
   if(m_curves.isEmpty())
@@ -313,7 +314,7 @@ QVector<QPointF> ChartXYWidget::trimData(const QVector<QPointF> data) const
   }
 }
 
-QwtPlot *ChartXYWidget::getPlot()
+QwtPlot *ChartXYWidget::getPlot() const
 {
   return ui->m_plot;
 }
@@ -366,7 +367,7 @@ void ChartXYWidget::moveCanvas( int dx, int dy )
   plot->replot();  
 }
 
-ChartIntervalSelector *ChartXYWidget::selectionModel() const
+ChartIntervalSelector *ChartXYWidget::selector() const
 {
   return m_selectionModel;
 }
@@ -485,7 +486,7 @@ QPointF ChartXYWidget::getTransformedPoint(const CurveIndex &index) const
   return getTransformedPoint(index.indexCurve, index.indexPoint);
 }
 
-double ChartXYWidget::calcDistance(const QPointF &p1, const QPointF &p2)
+double ChartXYWidget::calcDistance(const QPointF &p1, const QPointF &p2) const
 {
   double x2 = (p2.x() - p1.x()) * (p2.x() - p1.x());
   double y2 = (p2.y() - p1.y()) * (p2.y() - p1.y());
@@ -752,12 +753,24 @@ void ChartXYWidget::updateData(int indexCurve, const QVector<QPointF> &data)
   }
 }
 
+void ChartXYWidget::getCurvePointLabel(const CurveIndex &idx, QString &xLbl, QString &yLbl) const
+{
+  QwtPlotCurve *curve = m_curves[idx.indexCurve];
+  QPointF p = curve->sample(idx.indexPoint);
+
+  QString valY = QString::number(p.y(), 'f', 6);
+
+  xLbl = tr("[%1]").arg(ui->m_plot->axisScaleDraw(curve->xAxis())->label(p.x()).text());
+
+  yLbl = QString("[%1]").arg(valY);
+}
+
 void ChartXYWidget::setPanelCurveDetailsVisible(bool vis)
 {  
   m_actionsToolBar->getChartAction(caDetailsPanel)->setChecked(vis);
 }
 
-bool ChartXYWidget::panelCurveDetailsVisible()
+bool ChartXYWidget::panelCurveDetailsVisible() const
 {
   return ui->m_detailsPanel->isVisible();
 }

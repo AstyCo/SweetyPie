@@ -41,22 +41,6 @@
    <property name="bottomMargin">
     <number>5</number>
    </property>
-   <item row="1" column="0">
-    <widget class="QSplitter" name="splitter_charts">
-     <property name="orientation">
-      <enum>Qt::Vertical</enum>
-     </property>
-     <property name="opaqueResize">
-      <bool>false</bool>
-     </property>
-     <property name="handleWidth">
-      <number>1</number>
-     </property>
-     <property name="childrenCollapsible">
-      <bool>false</bool>
-     </property>
-    </widget>
-   </item>
    <item row="2" column="0">
     <widget class="QFrame" name="frame_stats">
      <property name="frameShape">
@@ -155,6 +139,22 @@
        </spacer>
       </item>
      </layout>
+    </widget>
+   </item>
+   <item row="1" column="0">
+    <widget class="QSplitter" name="splitter_charts">
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
+     </property>
+     <property name="opaqueResize">
+      <bool>false</bool>
+     </property>
+     <property name="handleWidth">
+      <number>1</number>
+     </property>
+     <property name="childrenCollapsible">
+      <bool>false</bool>
+     </property>
     </widget>
    </item>
    <item row="0" column="0" colspan="2">

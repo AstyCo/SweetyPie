@@ -87,7 +87,7 @@ void MainWindow::testChartGroupWidget()
     data3.append(ChartTimeXYWidget::dtToPoint(time, (rand() % 100) * 1000));
   }
 
-  ChartXYWidget *chart = new ChartTimeXYWidget();
+  ChartTimeXYWidget *chart = new ChartTimeXYWidget();
   chart->setLeftAxis("Test Chart 1 big title");
   chart->setData("chart 1", data);
   ui->widget_chartGroup->addChart(chart);
