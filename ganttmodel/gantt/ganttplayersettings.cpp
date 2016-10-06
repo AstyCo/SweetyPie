@@ -47,7 +47,7 @@ void GanttPlayerSettings::initActions()
     p_action = new QAction(QIcon(":/images/Buttons 64x64/reg_speed_on_64.png"),QString::fromUtf8("Выбор скорости воспроизведения"),this);
 
     QMenu *menu = new QMenu(this);
-    QGroupBox* speedSelectionWidget = new QGroupBox(QString::fromUtf8("Скорость воспроизведения"),menu);
+    QGroupBox* speedSelectionWidget = new QGroupBox(QString::fromUtf8("Скорость воспроизведения"));
 
     QWidgetAction *wa = new QWidgetAction(this);
 
@@ -64,12 +64,13 @@ void GanttPlayerSettings::initActions()
     m_right = new QLabel;
     m_cur = new QLabel;
     m_cur->setStyleSheet("border: 1px solid;");
-    QSpacerItem *spacer = new QSpacerItem(0,0,QSizePolicy::Expanding,QSizePolicy::Minimum);
+    QSpacerItem *spacer1 = new QSpacerItem(0,0,QSizePolicy::Expanding,QSizePolicy::Minimum),
+            *spacer2 = new QSpacerItem(0,0,QSizePolicy::Expanding,QSizePolicy::Minimum);
 
     h_lay->addWidget(m_left);
-    h_lay->addSpacerItem(spacer);
+    h_lay->addSpacerItem(spacer1);
     h_lay->addWidget(m_cur);
-    h_lay->addSpacerItem(spacer);
+    h_lay->addSpacerItem(spacer2);
     h_lay->addWidget(m_right);
 
     v_layout->addLayout(h_lay);
