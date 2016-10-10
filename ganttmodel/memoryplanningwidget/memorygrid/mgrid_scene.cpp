@@ -47,6 +47,7 @@ MGridScene::MGridScene( QObject * parent)
     setLengthSelection(100);
 
     m_interactiveUnit = new MGridInteractiveUnit(this);
+
 }
 
 MGridScene::~MGridScene()
@@ -107,6 +108,8 @@ void MGridScene::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
                 }
                 else
                 {
+                    setStartSelection(m_lastSelected->index());
+//                    qDebug() << p_mem->index()<<' '<<m_lastSelected->index();
                     long length = p_mem->index() - m_lastSelected->index() + 1;
                     setLengthSelection(length);
                 }
@@ -137,14 +140,27 @@ void MGridScene::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
     return QGraphicsScene::mouseReleaseEvent(event);
 }
 
+bool MGridScene::event(QEvent *event)
+{
+    qDebug() << event;
+    return QGraphicsScene::event(event);
+}
+
 void MGridScene::clear()
 {
-    clearItems();
-    clearUnits();
-
-
+//    return;
     m_items.clear();
     m_units.clear();
+    if(m_interactiveUnit)
+        removeItem(m_interactiveUnit);
+    QGraphicsScene::clear();
+    if(m_interactiveUnit)
+        addItem(m_interactiveUnit);
+    clearItems();
+//    clearUnits();
+
+
+
     m_lastSelected = NULL;
     clearMouseOver();
 }
@@ -157,6 +173,7 @@ void MGridScene::clearShownUnits()
 
 void MGridScene::updateShownUnits()
 {
+    qDebug() << "updateShownUnits";
     for(int i = m_startSelection; i<m_startSelection+m_lengthSelection; ++i)
     {
         MGridUnit* pmem_unit = m_items[i]->unit();
@@ -433,6 +450,7 @@ Memory MGridScene::memory()
 
 void MGridScene::updateMemory()
 {
+    qDebug() << "updateMemory";
     QList<MemoryPart> parts;
 
     foreach(MGridUnit* unit,m_units)
@@ -576,6 +594,7 @@ QList<MGridUnit *> MGridScene::crossingParts(long from, long to) const
 
 void MGridScene::setupMatrix(const QVector<MGridItem *> &items)
 {
+    qDebug() << "setupMatrix+";
     if(!m_itemPerRow)
         return;
     int row = 0, col = 0;
@@ -588,6 +607,7 @@ void MGridScene::setupMatrix(const QVector<MGridItem *> &items)
             row++;
         }
     }
+    qDebug() << "setupMatrix-";
 }
 
 void MGridScene::clearMouseOver()
@@ -877,8 +897,19 @@ MGridItem *MGridScene::itemAtPos(const QPointF &pos) const
 
     long index = row*itemPerRow()+col;
 
-    if(index>=memorySize())
-        return NULL;
+    if(index<0)
+    {
+        if(m_items.isEmpty())
+            return NULL;
+        return m_items[0];
+    }
+
+    if(index>=m_items.size())
+    {
+        if(m_items.isEmpty())
+            return NULL;
+        return m_items[m_items.size()-1];
+    }
 
     return m_items[index];
 }
@@ -914,6 +945,7 @@ long MGridScene::memorySize() const
 
 void MGridScene::viewResized(QSizeF viewSize)
 {
+    qDebug() << "viewResized";
     qreal viewWidth = viewSize.width();
 
     int newItemPerRow = (viewWidth)
@@ -929,6 +961,7 @@ void MGridScene::viewResized(QSizeF viewSize)
         if(m_interactiveUnit)
             m_interactiveUnit->rebuildShape();
     }
+    qDebug() << "viewResized finished";
 }
 
 void MGridScene::updateInteractiveRange(long start, long finish)

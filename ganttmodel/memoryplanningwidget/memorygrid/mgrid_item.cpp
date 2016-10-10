@@ -69,23 +69,13 @@ void MGridItem::paint(QPainter *painter,
 {
     Q_UNUSED(widget);
 
-//    painter->setCompositionMode(QPainter::CompositionMode_SourceOver);
     painter->setPen(Qt::NoPen);
 
     if(borderWidth())
     {
         QRectF extSquareItem( 0, 0, edgeLength()+2*borderWidth(), edgeLength()+2*borderWidth());
         QColor extSquareColor = GLOBAL_BORDER_COLOR;
-//        QPainterPath externalFigure;
-//        externalFigure.addRect(extSquareItem);
-
         painter->fillRect(extSquareItem,QBrush(extSquareColor));
-
-
-//        painter->setOpacity(0.2);
-//        painter->fillPath(externalFigure, extSquareColor);
-//        painter->drawPath(externalFigure);
-//        painter->setOpacity(1);
     }
 
     if(isHighlighted())

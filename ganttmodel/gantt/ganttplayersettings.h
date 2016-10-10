@@ -18,6 +18,7 @@ public:
     void setMultiplies(qreal min,qreal max);
 
     int precision() const;
+    void setCurrentSpeed(qreal speed) const;
     qreal currentSpeed() const;
 
 signals:

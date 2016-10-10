@@ -17,6 +17,7 @@ MemoryPlanningWidget::MemoryPlanningWidget(QWidget *parent) :
     ui(new Ui::MemoryPlanningWidget)
 {
     ui->setupUi(this);
+    setShowViews(false); // disabled by default
 
     ui->pushButtonEmpty->setStyleSheet(QString("background-color: %1").arg(MemoryState_to_QColor(MemoryPart::Empty).name()));
     ui->pushButtonFree->setStyleSheet(QString("background-color: %1").arg(MemoryState_to_QColor(MemoryPart::Free).name()));
@@ -84,6 +85,11 @@ void MemoryPlanningWidget::changeScene()
     }
 }
 
+void MemoryPlanningWidget::clear()
+{
+    m_gridScene->clear();
+}
+
 void MemoryPlanningWidget::setGridView()
 {
 //    clear();
@@ -98,8 +104,6 @@ void MemoryPlanningWidget::setGridView()
         connect(m_gridScene,SIGNAL(unitInfoChanged(const QString&)),this,SLOT(setUnitInfo(const QString&)));
         connect(m_gridScene,SIGNAL(startHighlightChanged(long)),this,SLOT(updateParts()));
         connect(m_gridScene,SIGNAL(lengthHighlightChanged(long)),this,SLOT(updateParts()));
-
-//        m_gridScene->setBackgroundBrush(QBrush(QColor(Qt::gray).lighter(130)));
     }
 
     ui->memoryView->setScene(m_gridScene);
@@ -126,6 +130,7 @@ void MemoryPlanningWidget::setItemInfo(const QString &text)
 
 void MemoryPlanningWidget::updateParts()
 {
+    return;
     static QString base = tr("Пересекаемые области памяти:\n\n");
     if(m_mode != MemoryView::MemoryGrid)
         return;
@@ -180,6 +185,12 @@ void MemoryPlanningWidget::setShowButtons(bool flag)
         ui->pushButtonPendingRead->hide();
         ui->pushButtonPendingWrite->hide();
     }
+}
+
+void MemoryPlanningWidget::setShowViews(bool flag)
+{
+    ui->radioButtonGridView->setShown(flag);
+    ui->radioButtonLineView->setShown(flag);
 }
 
 

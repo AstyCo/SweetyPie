@@ -30,7 +30,7 @@ MGridInteractiveUnit::MGridInteractiveUnit(MGridScene* scene,QGraphicsItem *pare
 
     m_items = &(m_scene->m_items);
 
-    m_borderPen=QPen(QBrush(Qt::darkRed), m_scene->itemBorder() ,Qt::SolidLine ,Qt::SquareCap,Qt::MiterJoin);
+    m_borderPen=QPen(QBrush(Qt::red), 1 ,Qt::SolidLine ,Qt::SquareCap,Qt::MiterJoin);
 
     setZValue(1000);
 }
@@ -57,6 +57,7 @@ void MGridInteractiveUnit::paint(QPainter *painter, const QStyleOptionGraphicsIt
 
     if(!m_enabled)
         return;
+    painter->setOpacity(1);
     painter->setPen(m_borderPen);
     painter->drawPath(m_shapeBorder);
 }
@@ -115,6 +116,8 @@ void MGridInteractiveUnit::rebuildShape()
         qDebug() << "MemoryInteractiveUnit::rebuildShape() out of range";
         return;
     }
+
+//    qDebug() <<"rebuild shape "<< m_start<<' '<<m_finish;
 
     QRectF itemsRect;
 
