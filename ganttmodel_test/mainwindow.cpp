@@ -10,6 +10,9 @@
 #include "ganttglobalvalues.h"
 
 #include <qwt/qwt_scale_div.h>
+#include <qwt/qwt_scale_widget.h>
+#include <qwt/qwt_plot_canvas.h>
+
 #include "memoryplanningwidget.h"
 #include "mgrid_scene.h"
 #include "mline_scene.h"
@@ -274,4 +277,10 @@ void MainWindow::on_radioButton_ganttPlayer_toggled(bool checked)
 void MainWindow::on_pushButton_2_clicked()
 {
     ui->memoryPlanningWidget->clear();
+}
+
+void MainWindow::on_pushButton_3_clicked()
+{
+    foreach(ChartXYWidget *cxy, ui->widget_chartGroup->charts())
+      qDebug() << cxy->getPlot()->canvas()->sizeHint();
 }

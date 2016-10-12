@@ -73,6 +73,11 @@ void ChartsGroupWidget::createActionsToolBar()
 
   m_actionsToolBar->addSeparator();
 }
+
+QList<ChartXYWidget *> ChartsGroupWidget::charts() const
+{
+  return m_charts;
+}
 ChartSettings ChartsGroupWidget::getSettings() const
 {
   return m_settings;

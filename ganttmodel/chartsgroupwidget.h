@@ -44,6 +44,8 @@ public:
   ChartSettings getSettings() const;
   void setSettings(const ChartSettings &settings);
 
+  QList<ChartXYWidget *> charts() const;
+
 signals:
   /// Выбрана вторая точка при выделении интервала
   void intervalSelectionEnded(QPointF p);

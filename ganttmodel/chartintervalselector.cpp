@@ -107,6 +107,9 @@ void ChartIntervalSelector::onAction_SelectTarget_toggled(bool checked)
 
 void ChartIntervalSelector::setIntervalSelection(qreal begin, qreal end)
 {
+  if (! m_beginLimit.isValid() || ! m_endLimit.isValid())
+    return;
+
   QPointF startP(begin, 0);
   QPointF endP(end, 0);
   QPointF startLimitP = m_chart->curves()[m_beginLimit.indexCurve]->sample(m_beginLimit.indexPoint);
