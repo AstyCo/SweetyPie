@@ -28,6 +28,7 @@ MainWindow::MainWindow(QWidget *parent) :
   testChartGroupWidget();
   testGanttModel();
   testMemoryPlanningWidget();
+//  qDebug() << "test finished";
 }
 
 MainWindow::~MainWindow()
@@ -163,7 +164,7 @@ QList<GanttInfoItem*> generateTest()
 
 void MainWindow::testGanttModel()
 {
-    connect(ui->ganttWidget,SIGNAL(currentDtChanged(UtcDateTime)),this,SLOT(testSignal(UtcDateTime)));
+//    connect(ui->ganttWidget,SIGNAL(currentDtChanged(UtcDateTime)),this,SLOT(testSignal(UtcDateTime)));
 
 //    ui->ganttWidget->addItems(generateTest());
 }
@@ -189,7 +190,7 @@ void MainWindow::testMemoryPlanningWidget()
         newPeace.setStart(vacantPos);
         vacantPos+=memoryPeaceLength;
 
-        if(vacantPos>2000)
+        if(vacantPos>5000)
             break;
 
         newPeace.setFinish(vacantPos);
@@ -205,15 +206,20 @@ void MainWindow::testMemoryPlanningWidget()
         }
     }
     // end init values
+//    qDebug() << "end random";
 
     Memory kaMemory;
-    kaMemory.init(records,2000);
+    kaMemory.init(records,5000);
 
     MGridScene * scene = ui->memoryPlanningWidget->gridScene();
+
     ui->memoryPlanningWidget->setMemory(kaMemory);
-    scene->setLimits(200,1750);
+
+//    scene->setLimits(200,1750);
     ui->memoryPlanningWidget->setShowButtons(true);
     scene->setSelectionMode(MGridScene::areaSelection);
+//    scene->setLengthSelection(10);
+//    qDebug() << "end test";
 }
 
 void MainWindow::setInterval()
@@ -264,7 +270,8 @@ void MainWindow::on_radioButton_ganttPlayer_toggled(bool checked)
     ui->ganttWidget->showPlayer(checked);
 }
 
-void MainWindow::testSignal(const UtcDateTime &dt)
+
+void MainWindow::on_pushButton_2_clicked()
 {
-    qDebug() << dt;
+    ui->memoryPlanningWidget->clear();
 }

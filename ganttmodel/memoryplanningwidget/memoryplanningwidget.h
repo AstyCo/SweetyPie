@@ -34,10 +34,12 @@ public:
     MGridScene* gridScene() const;
     MLineScene* lineScene() const;
 
-    void setShowButtons(bool flag);
+    void setShowButtons(bool flag); ///< отображение кнопок взаимодействия с выбранной областью
+    void setShowViews(bool flag); ///< отображение режимов (сеткой/линейная ...)
 
 public slots:
     void changeScene();
+    void clear();
 
     void setGridView();
     void setLineView();

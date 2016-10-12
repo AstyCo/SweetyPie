@@ -137,6 +137,7 @@ int MLineAbstractPart::valByX(qreal x) const
 MLineAbstractPart::MLineAbstractPart(QGraphicsItem *parent):
     QGraphicsObject(parent)
 {
+    qDebug() << "MLineAbstractPart";
     _begin=0;
     _end=0;
     y_pos=10;

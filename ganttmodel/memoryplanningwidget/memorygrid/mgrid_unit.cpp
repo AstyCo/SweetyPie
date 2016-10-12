@@ -174,6 +174,7 @@ void MGridUnit::rebuildShape()
         return;
     }
 
+    qDebug() << "MGridUnit::rebuildShape";
     QRectF itemsRect;
 
     for(int i = m_start; i <= m_finish; ++i)

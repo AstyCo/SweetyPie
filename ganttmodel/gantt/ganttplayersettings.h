@@ -2,6 +2,10 @@
 #define GANTTPLAYERSETTINGS_H
 
 #include <QToolBar>
+#include <QPointer>
+
+class QLabel;
+class QSlider;
 
 class GanttPlayerSettings : public QToolBar
 {
@@ -11,15 +15,24 @@ public:
     explicit GanttPlayerSettings(QWidget *parent = 0);
     ~GanttPlayerSettings();
 
+    void setMultiplies(qreal min,qreal max);
+
+    int precision() const;
+    void setCurrentSpeed(qreal speed) const;
+    qreal currentSpeed() const;
+
 signals:
-    void speedX1();
-    void speedX3();
-    void speedX5();
+    void speedChanged(qreal multiply);
+private slots:
+    void onSpeedChanged(int m);
 
 private:
     void initActions();
 
 private:
+    QPointer<QSlider> m_slider;
+    QPointer<QLabel> m_left,m_right,m_cur;
+    int m_precision;
 
 };
 

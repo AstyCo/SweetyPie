@@ -27,7 +27,6 @@ MemoryView::MemoryView(QGraphicsScene * scene, QWidget * parent) :
 
 void MemoryView::resizeEvent(QResizeEvent *event)
 {
-
     if(m_mode == MemoryGrid)
     {
         m_gridScene->viewResized(event->size());

@@ -95,6 +95,11 @@ GanttWidget::~GanttWidget()
     delete ui;
 }
 
+void GanttWidget::setPlayerSpeeds(qreal minMultiply, qreal maxMultiply)
+{
+    ui->playerSettings->setMultiplies(minMultiply,maxMultiply);
+}
+
 void GanttWidget::showPlayer(bool show)
 {
     m_playerShown = show;
@@ -217,10 +222,7 @@ void GanttWidget::onSliderMoved()
 
 void GanttWidget::onGanttViewCustomContextMenuRequested(const QPoint &point)
 {
-    qDebug()<<"onGanttViewCustomContextMenuRequested";
     QPoint widgetPoint =ui->ganttView->mapTo(this,point);
-
-    qDebug() << "itemAtWidgetPoint: "<< itemAtPos(widgetPoint);
 
     emit customContextMenuRequested(point);
 }

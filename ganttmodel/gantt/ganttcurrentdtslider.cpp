@@ -20,6 +20,7 @@ GanttCurrentDtSlider::GanttCurrentDtSlider(QGraphicsItem* parent) :
     m_penWidth = 2;
     setCursor(Qt::OpenHandCursor);
     setZValue(20);
+
 }
 
 void GanttCurrentDtSlider::setScene(GanttScene *scene)
@@ -29,6 +30,7 @@ void GanttCurrentDtSlider::setScene(GanttScene *scene)
 
     m_scene = scene;
     scene->addItem(this);
+    connect(m_scene,SIGNAL(limitsChanged(UtcDateTime,UtcDateTime)),this,SLOT(updateTextRect()));
 
 
     setSlidersRect(scene->sceneRect());
@@ -60,6 +62,12 @@ void GanttCurrentDtSlider::paint(QPainter *painter, const QStyleOptionGraphicsIt
     painter->fillPath(m_sliderShape,borderBrush);
     painter->fillPath(m_rhombus,fillBrush);
     painter->drawPath(m_rhombus);
+    painter->save();
+    painter->setBrush(QBrush(Qt::white));
+    painter->drawRect(m_textRect);
+    painter->setFont(m_scene->font());
+    painter->drawText(m_textRect,m_dt.toString("HH:mm:ss dd.MM.yyyy"),QTextOption(Qt::AlignCenter));
+    painter->restore();
 
 }
 
@@ -95,7 +103,30 @@ void GanttCurrentDtSlider::updateShape()
 
     prepareGeometryChange();
     m_rhombus = rhombus;
+
+    updateTextRect();
+    m_sliderShape.addRect(m_textRect);
     m_sliderShape = path;
+}
+
+void GanttCurrentDtSlider::updateTextRect()
+{
+    if(!m_scene)
+        return;
+    QFontMetrics fontMetrics(m_scene->font());
+    QRect textRect;
+    {
+        textRect =  fontMetrics.tightBoundingRect(m_dt.toString("dd.MM.yyyy HH:mm:ss"));
+        int adjust = 4;
+        textRect.adjust(-adjust,-adjust,adjust,adjust);
+        textRect.moveTo(10,1);
+    }
+
+    if(mapFromScene(m_scene->sceneRect().topRight()).x() < textRect.right())
+    {
+        textRect.moveTo(-textRect.width()-10,0);
+    }
+    m_textRect = textRect;
 }
 
 
@@ -336,6 +367,7 @@ bool GanttCurrentDtSlider::setDt(UtcDateTime dt)
     updateScenePos();
 
     emit dtChanged(dt);
+    updateTextRect();
     return true;
 }
 

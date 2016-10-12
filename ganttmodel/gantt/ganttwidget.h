@@ -31,6 +31,8 @@ public:
     explicit GanttWidget(QWidget *parent = 0);
     ~GanttWidget();
 
+
+    void setPlayerSpeeds(qreal minMultiply, qreal maxMultiply);///< Устанавливает минимальную и максимальную скорости воспроизведения (прим. x0.5 - x3)
     void showPlayer(bool show);
     bool player() const;
 

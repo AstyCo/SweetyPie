@@ -18,7 +18,7 @@
 GanttHeader::GanttHeader(QGraphicsItem *parent) :
     QGraphicsObject(parent)
 {
-
+    m_mode = GanttPrecisionMode_count;
     m_scene = NULL;
     m_widget = NULL;
     m_mode = GanttPrecisionMode_count;
@@ -83,7 +83,6 @@ void GanttHeader::paint(QPainter *painter, const QStyleOptionGraphicsItem *optio
 
         if(!m_isEmpty)
         {
-            qDebug() <<"painting no empty";
             do
             {
                 if(isDrawn(dt,m_mode))
@@ -1174,6 +1173,7 @@ void GanttHeader::setRange(UtcDateTime min, UtcDateTime max)
     m_maxDt = max;
 
     updateHeader();
+
 }
 
 bool GanttHeader::verifyBoundsByLeaf(const GanttInfoLeaf *leaf)

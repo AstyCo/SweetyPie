@@ -126,6 +126,7 @@ public slots:
     MemoryPart setFree();
     MemoryPart setPendingRead();
     MemoryPart setPendingWrite();
+    void clear();
 
     // -ACTIONS
 
@@ -145,10 +146,10 @@ protected:
     void mousePressEvent(QGraphicsSceneMouseEvent *event);
     void mouseMoveEvent(QGraphicsSceneMouseEvent *event);
     void mouseReleaseEvent(QGraphicsSceneMouseEvent *event);
+    bool event(QEvent *event);
 
 
 private:
-    void clear();
     MemoryPart setState(long from, long count, MemoryPart::MemoryState state);
     void clearShownUnits();
     void updateShownUnits();
@@ -238,6 +239,7 @@ private:
     long m_min,m_max;
 private:
 
+    bool m_leftButtonPressed;
     MGridItem *m_mouseOverItem;
     MGridUnit *m_mouseOverUnit;
     MGridItem* m_lastSelected;
