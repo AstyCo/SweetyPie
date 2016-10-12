@@ -140,10 +140,11 @@ void ChartIntervalSelector::setIntervalSelection(qreal begin, qreal end)
 
 void ChartIntervalSelector::setSelectionModeTargetingPoint(bool b)
 {  
-  clearTargetingPoint();
 
   if (b)
   {
+    clearTargetingPoint();
+
     if (m_selectionState != ssNone)
       clearIntervalSelection();
 

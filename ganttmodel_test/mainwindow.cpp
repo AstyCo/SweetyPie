@@ -52,7 +52,7 @@ void MainWindow::testChartWidget()
   }
 
   ui->widget->getActionsToolBar()->setChartActions(QSet<ChartActions>()
-        << caScale << caGrid << caMaxMinLines << caTimer << caSelectInterval
+        << caScale << caGrid << caMaxMinLines << caTimer << caSelectInterval << caSelectTarget
                                                    << caDetailsPanel << caSettingsDlg);
   ui->widget->setLeftAxis("111111", 0, 0);
   ui->widget->setRightAxis("222222", 0, 800);
