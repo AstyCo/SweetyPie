@@ -126,6 +126,7 @@ void GanttIntervalSlider::drawCurrentTime(QPainter *painter, const QRect &slider
 {
     if(!m_drawCurrentDt)
         return;
+
     QRect currentTimeRect(valueToPoint(dtToVal(m_currentTime),NoHandle)
                           - (m_currentTimeRectWidth)/2,
                           sliderRect.y(),
@@ -409,6 +410,7 @@ UtcDateTime GanttIntervalSlider::closestFinishDtHelper(const UtcDateTime &valDt,
 {
     UtcDateTime finish = m_scene->finishByDt(valDt,mode),
                 prevFinish = m_scene->prevFinish(finish,mode);
+
     UtcDateTime closestInCurrentMode;
 
     if(valDt.toMicrosecondsSinceEpoch() - prevFinish.toMicrosecondsSinceEpoch()

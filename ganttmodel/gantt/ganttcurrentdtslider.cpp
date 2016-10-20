@@ -239,9 +239,10 @@ void GanttCurrentDtSlider::setDraw(bool draw)
         QGraphicsObject::setVisible(true);
     if(!m_draw)
         QGraphicsObject::setVisible(false);
+    emit drawChanged(draw);
 
     update();
-    emit drawChanged(draw);
+
 }
 
 

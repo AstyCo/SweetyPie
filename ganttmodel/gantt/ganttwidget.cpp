@@ -108,6 +108,8 @@ void GanttWidget::showPlayer(bool show)
 
     if(m_scene)
         m_scene->setDrawCurrentDtSlider(show);
+
+    update();
 }
 
 bool GanttWidget::player() const
@@ -129,11 +131,10 @@ void GanttWidget::addItems(GanttInfoItem* item)
     m_scene->m_header->setRange(m_minDt,m_maxDt);
 
     m_scene->addItems(item);
+    ui->intervalSlider->updateRange();
 
     callForEachItem(item,ui->treeView,m_scene,
                     &connectSignalsToNewItems);
-
-//    ui->treeView->resizeColumnsToContents();
 }
 
 void GanttWidget::addItems(const QList<GanttInfoItem *> &items)
@@ -144,12 +145,11 @@ void GanttWidget::addItems(const QList<GanttInfoItem *> &items)
     m_scene->m_header->setRange(m_minDt,m_maxDt);
 
     m_scene->addItems(items);
+    ui->intervalSlider->updateRange();
 
     foreach(GanttInfoItem* item,items)
         callForEachItem(item,ui->treeView,m_scene,
                         &connectSignalsToNewItems);
-
-//        ui->treeView->resizeColumnsToContents();
 }
 
 
