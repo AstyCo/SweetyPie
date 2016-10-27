@@ -27,6 +27,7 @@ MGridScene::MGridScene( QObject * parent)
 
     setSelectionMode(noSelection);
     setHighlightStyle( bordersAround | highlightedArea | highlightedItems);
+    setItemIndexMethod(QGraphicsScene::NoIndex);
 
     m_lastSelected = NULL;
     m_mouseOverItem = NULL;
@@ -138,12 +139,6 @@ void MGridScene::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
 
 
     return QGraphicsScene::mouseReleaseEvent(event);
-}
-
-bool MGridScene::event(QEvent *event)
-{
-    qDebug() << event;
-    return QGraphicsScene::event(event);
 }
 
 void MGridScene::clear()

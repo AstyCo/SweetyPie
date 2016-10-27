@@ -57,7 +57,6 @@ void MGridInteractiveUnit::paint(QPainter *painter, const QStyleOptionGraphicsIt
 
     if(!m_enabled)
         return;
-    painter->setOpacity(1);
     painter->setPen(m_borderPen);
     painter->drawPath(m_shapeBorder);
 }

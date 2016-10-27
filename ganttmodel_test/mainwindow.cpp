@@ -30,8 +30,8 @@ MainWindow::MainWindow(QWidget *parent) :
   testChartWidget();
   testChartGroupWidget();
   testGanttModel();
-//  testMemoryPlanningWidget();
-//  qDebug() << "test finished";
+  testMemoryPlanningWidget();
+  qDebug() << "test finished";
 }
 
 MainWindow::~MainWindow()
@@ -182,6 +182,7 @@ void MainWindow::testMemoryPlanningWidget()
     int memoryPeaceLength,spaceBetweenUnits;
     int vacantPos = 0;
     int id = 1;
+    int memLen = 128000;
 
     for(;;)
     {
@@ -193,7 +194,7 @@ void MainWindow::testMemoryPlanningWidget()
         newPeace.setStart(vacantPos);
         vacantPos+=memoryPeaceLength;
 
-        if(vacantPos>5000)
+        if(vacantPos>memLen)
             break;
 
         newPeace.setFinish(vacantPos);
@@ -209,20 +210,18 @@ void MainWindow::testMemoryPlanningWidget()
         }
     }
     // end init values
-//    qDebug() << "end random";
+
+    qDebug()<<"end init";
 
     Memory kaMemory;
-    kaMemory.init(records,5000);
+    kaMemory.init(records,memLen);
 
     MGridScene * scene = ui->memoryPlanningWidget->gridScene();
 
     ui->memoryPlanningWidget->setMemory(kaMemory);
 
-//    scene->setLimits(200,1750);
     ui->memoryPlanningWidget->setShowButtons(true);
     scene->setSelectionMode(MGridScene::areaSelection);
-//    scene->setLengthSelection(10);
-//    qDebug() << "end test";
 }
 
 void MainWindow::setInterval()
