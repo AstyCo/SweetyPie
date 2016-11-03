@@ -29,7 +29,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
 //  testChartWidget();
 //  testChartGroupWidget();
-//  testGanttModel();
+  testGanttModel();
 //  testMemoryPlanningWidget();
   testDtIntervalWidget();
   qDebug() << "test finished";

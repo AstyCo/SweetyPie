@@ -15,6 +15,7 @@ IntervalSlider::IntervalSlider(QWidget *parent) :
     QWidget(parent)
 {
     hide();
+    m_isHidden = false;
     m_limitsSet = false;
     m_leftOffset = m_rightOffset = 0;
     m_sliderV = 0;
