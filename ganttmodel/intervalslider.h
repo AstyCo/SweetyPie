@@ -88,6 +88,7 @@ public:
 
     QSize sizeHint() const;
     QSize minimumSizeHint() const;
+    void setVisible(bool visible);
 
 signals:
 
@@ -123,6 +124,7 @@ private:
 
     void setBeginAndEnd(long long begin, long long end);
 
+
 protected:
     ClippedHandle m_clippedHandle;
 
@@ -139,7 +141,9 @@ protected:
     qreal m_leftOffset,
         m_rightOffset;
 
-    bool m_shiftModifier;
+    bool m_shiftModifier,
+        m_limitsSet,
+        m_isHidden;
 
 protected:
     virtual bool moveHandles(long long deltaVal);

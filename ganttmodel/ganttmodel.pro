@@ -106,7 +106,8 @@ SOURCES += \
     charttimexywidget.cpp \
     chartxywidget.cpp \
     chartintervalselectionwidget.cpp \
-    chartintervalselector.cpp
+    chartintervalselector.cpp \
+    dtintervalwidget/dtintervalwidget.cpp
 
 
 HEADERS += \
@@ -160,7 +161,8 @@ HEADERS += \
     charttimexywidget.h \
     chartxywidget.h \
     chartintervalselectionwidget.h \
-    chartintervalselector.h
+    chartintervalselector.h \
+    dtintervalwidget/dtintervalwidget.h
 
 
 RESOURCES += \
@@ -174,7 +176,8 @@ FORMS += \
     gantt/ganttwidget.ui \
     gantt/mygantt_playercontrol.ui \
     chartxywidget.ui \
-    chartintervalselectionwidget.ui
+    chartintervalselectionwidget.ui \
+    dtintervalwidget/dtintervalwidget.ui
 
 include(build_config.pri)
 
@@ -182,3 +185,6 @@ CODECFORTR = UTF-8
 
 TRANSLATIONS += \
     locale/file_codec_locale_ru.ts
+
+DISTFILES += \
+    icons/request_wait.png

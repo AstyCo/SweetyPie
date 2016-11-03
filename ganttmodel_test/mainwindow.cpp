@@ -27,10 +27,11 @@ MainWindow::MainWindow(QWidget *parent) :
 
   installEventFilter(ui->widgetIntervalSlider);
 
-  testChartWidget();
-  testChartGroupWidget();
-  testGanttModel();
-  testMemoryPlanningWidget();
+//  testChartWidget();
+//  testChartGroupWidget();
+//  testGanttModel();
+//  testMemoryPlanningWidget();
+  testDtIntervalWidget();
   qDebug() << "test finished";
 }
 
@@ -219,9 +220,23 @@ void MainWindow::testMemoryPlanningWidget()
     MGridScene * scene = ui->memoryPlanningWidget->gridScene();
 
     ui->memoryPlanningWidget->setMemory(kaMemory);
+    ui->memoryPlanningWidget->gridScene()->setStartSelection(10);
+    ui->memoryPlanningWidget->gridScene()->setLengthSelection(100);
+
 
     ui->memoryPlanningWidget->setShowButtons(true);
     scene->setSelectionMode(MGridScene::areaSelection);
+}
+
+
+void MainWindow::testDtIntervalWidget()
+{
+
+    ui->dtIntervalWidget->setFlags(DtIntervalWidget::DateTime|
+                                   DtIntervalWidget::IntervalSlider|
+                                   DtIntervalWidget::ToolButtonToDt);
+    ui->dtIntervalWidget->setLimits(QDateTime::currentDateTime(),QDateTime::currentDateTime().addDays(3));
+
 }
 
 void MainWindow::setInterval()

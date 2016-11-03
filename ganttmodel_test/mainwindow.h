@@ -24,6 +24,7 @@ private:
     void testChartGroupWidget();
     void testGanttModel();
     void testMemoryPlanningWidget();
+    void testDtIntervalWidget();
 
 private slots:
     void setInterval();

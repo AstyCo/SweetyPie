@@ -18,7 +18,7 @@
     <item row="0" column="0">
      <widget class="QTabWidget" name="tabWidget">
       <property name="currentIndex">
-       <number>3</number>
+       <number>4</number>
       </property>
       <widget class="QWidget" name="tab">
        <attribute name="title">
@@ -184,6 +184,21 @@
         </item>
        </layout>
       </widget>
+      <widget class="QWidget" name="tab_5">
+       <attribute name="title">
+        <string>DtIntervalWidget</string>
+       </attribute>
+       <widget class="DtIntervalWidget" name="dtIntervalWidget" native="true">
+        <property name="geometry">
+         <rect>
+          <x>130</x>
+          <y>60</y>
+          <width>601</width>
+          <height>331</height>
+         </rect>
+        </property>
+       </widget>
+      </widget>
      </widget>
     </item>
    </layout>
@@ -202,15 +217,15 @@
  <layoutdefault spacing="6" margin="11"/>
  <customwidgets>
   <customwidget>
-   <class>GanttWidget</class>
-   <extends>QWidget</extends>
-   <header>ganttwidget.h</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
    <class>IntervalSlider</class>
    <extends>QWidget</extends>
    <header>intervalslider.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>GanttWidget</class>
+   <extends>QWidget</extends>
+   <header>ganttwidget.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>
@@ -229,6 +244,12 @@
    <class>ChartTimeXYGroupWidget</class>
    <extends>QWidget</extends>
    <header>chartsgroupwidget.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>DtIntervalWidget</class>
+   <extends>QWidget</extends>
+   <header>dtintervalwidget/dtintervalwidget.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

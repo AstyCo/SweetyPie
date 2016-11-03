@@ -110,7 +110,6 @@ void MGridScene::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
                 else
                 {
                     setStartSelection(m_lastSelected->index());
-//                    qDebug() << p_mem->index()<<' '<<m_lastSelected->index();
                     long length = p_mem->index() - m_lastSelected->index() + 1;
                     setLengthSelection(length);
                 }
@@ -168,7 +167,6 @@ void MGridScene::clearShownUnits()
 
 void MGridScene::updateShownUnits()
 {
-    qDebug() << "updateShownUnits";
     for(int i = m_startSelection; i<m_startSelection+m_lengthSelection; ++i)
     {
         MGridUnit* pmem_unit = m_items[i]->unit();
@@ -445,7 +443,6 @@ Memory MGridScene::memory()
 
 void MGridScene::updateMemory()
 {
-    qDebug() << "updateMemory";
     QList<MemoryPart> parts;
 
     foreach(MGridUnit* unit,m_units)
@@ -589,7 +586,6 @@ QList<MGridUnit *> MGridScene::crossingParts(long from, long to) const
 
 void MGridScene::setupMatrix(const QVector<MGridItem *> &items)
 {
-    qDebug() << "setupMatrix+";
     if(!m_itemPerRow)
         return;
     int row = 0, col = 0;
@@ -602,7 +598,6 @@ void MGridScene::setupMatrix(const QVector<MGridItem *> &items)
             row++;
         }
     }
-    qDebug() << "setupMatrix-";
 }
 
 void MGridScene::clearMouseOver()
@@ -684,6 +679,9 @@ long MGridScene::finishSelection() const
 
 bool MGridScene::setStartSelection(long startHighlight)
 {
+    if(m_highlightStyle&highlightedItems)
+        setHighlightMode(true);
+
     if(startHighlight==m_startSelection)
         return false;
     if(startHighlight+m_lengthSelection-1>m_max || m_min > startHighlight)
@@ -697,6 +695,9 @@ bool MGridScene::setStartSelection(long startHighlight)
 
 bool MGridScene::setLengthSelection(long lengthHighlight)
 {
+    if(m_highlightStyle&highlightedItems)
+        setHighlightMode(true);
+
     if(!lengthHighlight)
     {
         setHighlightMode(false);
@@ -940,7 +941,6 @@ long MGridScene::memorySize() const
 
 void MGridScene::viewResized(QSizeF viewSize)
 {
-    qDebug() << "viewResized";
     qreal viewWidth = viewSize.width();
 
     int newItemPerRow = (viewWidth)
@@ -956,7 +956,6 @@ void MGridScene::viewResized(QSizeF viewSize)
         if(m_interactiveUnit)
             m_interactiveUnit->rebuildShape();
     }
-    qDebug() << "viewResized finished";
 }
 
 void MGridScene::updateInteractiveRange(long start, long finish)

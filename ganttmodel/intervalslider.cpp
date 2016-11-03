@@ -14,6 +14,8 @@
 IntervalSlider::IntervalSlider(QWidget *parent) :
     QWidget(parent)
 {
+    hide();
+    m_limitsSet = false;
     m_leftOffset = m_rightOffset = 0;
     m_sliderV = 0;
     m_offsetV = 0;
@@ -140,13 +142,19 @@ void IntervalSlider::setBeginAndEnd(long long begin, long long end)
 
 void IntervalSlider::setLimits(long long minValue,long long maxValue)
 {
+    if(!m_limitsSet)
+    {
+        m_limitsSet=true;
+        if(!m_isHidden)
+            show();
+
+        qDebug() <<"setLimits";
+    }
+
     setMinValue(minValue);
     setMaxValue(maxValue);
 
     setBeginAndEnd(minValue,maxValue);
-
-//    setBeginHandle(minValue);
-//    setEndHandle(maxValue);
 }
 
 void IntervalSlider::setHandles(long long beginHandle, long long endHandle)
@@ -455,6 +463,15 @@ QSize IntervalSlider::sizeHint() const
 QSize IntervalSlider::minimumSizeHint() const
 {
     return QSize(200, intervalSliderHeight());
+}
+
+void IntervalSlider::setVisible(bool visible)
+{
+    m_isHidden=!visible;
+    if(!m_limitsSet&&visible)
+        return;
+    QWidget::setVisible(visible);
+    qDebug() <<"setVisible "<<visible;
 }
 
 
