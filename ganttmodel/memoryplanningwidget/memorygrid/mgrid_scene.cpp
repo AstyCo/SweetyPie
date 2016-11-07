@@ -43,7 +43,6 @@ MGridScene::MGridScene( QObject * parent)
 
     m_highlightMode = false;
     m_interactiveHighlight = false;
-    m_lengthSelection = 0;
 
     setLengthSelection(100);
 
@@ -167,7 +166,7 @@ void MGridScene::clearShownUnits()
 
 void MGridScene::updateShownUnits()
 {
-    for(int i = m_startSelection; i<m_startSelection+m_lengthSelection; ++i)
+    for(int i = startSelection(); i<=finishSelection(); ++i)
     {
         MGridUnit* pmem_unit = m_items[i]->unit();
         if(!pmem_unit)
@@ -176,10 +175,12 @@ void MGridScene::updateShownUnits()
     }
 }
 
-void MGridScene::setMemory(const Memory& kaMemory)
+void MGridScene::setMemory(QSharedPointer<KaMemory> &kaMemory)
 {
     clear();
     m_memory = kaMemory;
+    if(m_memory.isNull())
+        return;
 
     for(int i = 0; i<memorySize(); ++i)
     {
@@ -191,7 +192,7 @@ void MGridScene::setMemory(const Memory& kaMemory)
 
     setupMatrix(m_items);
 
-    const QList<MemoryPart>& units = kaMemory.memoryParts();
+    const QList<QSharedPointer<MemoryPart> >& units = kaMemory->memoryParts();
 
     for(int i = 0; i < units.size(); ++i)
         addUnit(units[i]);
@@ -200,7 +201,7 @@ void MGridScene::setMemory(const Memory& kaMemory)
 
 MGridUnit* MGridScene::newUnit()
 {
-    MGridUnit* p_memUnit = new MGridUnit(this);
+    MGridUnit* p_memUnit = new MGridUnit(QSharedPointer<MemoryPart>(new MemoryPart()),this);
     p_memUnit->setState(MemoryPart::Empty);
 
     addUnit(p_memUnit);
@@ -276,7 +277,7 @@ bool MGridScene::inHighlightRange(long index) const
 
     if(!m_highlightMode)
         return true;
-    return m_startSelection <= index && index < m_startSelection+m_lengthSelection;
+    return startSelection() <= index && index <=finishSelection();
 }
 
 bool MGridScene::errorHandler(QList<ActionErrors> &errors) const
@@ -435,34 +436,41 @@ void MGridScene::setHighlightStyle(int highlightStyle)
 
 }
 
-Memory MGridScene::memory()
+QSharedPointer<KaMemory> &MGridScene::memory()
 {
-    updateMemory();
+//    updateMemory();
     return m_memory;
 }
 
-void MGridScene::updateMemory()
-{
-    QList<MemoryPart> parts;
+//void MGridScene::updateMemory()
+//{
+//    QList<MemoryPart> parts;
 
-    foreach(MGridUnit* unit,m_units)
-    {
-        MemoryPart part;
-        part.setStart(unit->start());
-        part.setFinish(unit->finish());
-        part.setId(unit->id());
-        part.setState(unit->state());
-        parts.append(part);
-    }
+//    foreach(MGridUnit* unit,m_units)
+//    {
+//        MemoryPart part;
+//        part.setStart(unit->start());
+//        part.setFinish(unit->finish());
+//        part.setId(unit->id());
+//        part.setState(unit->state());
+//        parts.append(part);
+//    }
 
-    m_memory.init(parts,m_memory.memorySize());
-    emit memoryChanged();
-}
+//    m_memory.init(parts,m_memory.memorySize());
+//    emit memoryChanged();
+//}
 
 bool MGridScene::interactiveHighlight() const
 {
     return m_interactiveHighlight;
 }
+
+//void MGridScene::updateInteractiveRange()
+//{
+//    if(m_interactiveUnit==NULL)
+//        return;
+//    m_interactiveUnit->rebuildShape();
+//}
 
 void MGridScene::setInteractiveHighlight(bool interactiveHighlight)
 {
@@ -526,17 +534,16 @@ QString MGridScene::warning(ActionErrors id)
 
 long MGridScene::lengthSelection() const
 {
-    return m_lengthSelection;
+    if(!m_interactiveUnit)
+        return 0;
+    return 1+m_interactiveUnit->finish()-m_interactiveUnit->start();
 }
 
-void MGridScene::addUnit(const MemoryPart &part)
+void MGridScene::addUnit(QSharedPointer<MemoryPart> part)
 {
-    MGridUnit* p_memUnit = new MGridUnit(this);
-    p_memUnit->setState(part.state());
-    p_memUnit->setId(part.id());
-    p_memUnit->addItems(part.start(),part.finish());
-
+    MGridUnit* p_memUnit = new MGridUnit(part,this);
     addUnit(p_memUnit);
+
 }
 
 void MGridScene::setItemInfo(const QString &text)
@@ -606,17 +613,16 @@ void MGridScene::clearMouseOver()
     setMouseOverUnit(NULL);
 }
 
-QList<MemoryPart> MGridScene::crossingParts() const
+QList<QSharedPointer<MemoryPart> > MGridScene::crossingParts() const
 {
-
+    QList<QSharedPointer<MemoryPart> > result;
     QList<MGridUnit*> units;
 
     if(lengthSelection())
         units = crossingParts(startSelection(),finishSelection());
-    QList<MemoryPart> result;
     foreach(MGridUnit* unit, units)
     {
-        result.append(unit->toKaMemoryPart());
+        result.append(unit->kaMemoryPart());
     }
     return result;
 }
@@ -668,12 +674,16 @@ long MGridScene::freedCount(long from, long to) const
 
 long MGridScene::startSelection() const
 {
-    return m_startSelection;
+    if(m_interactiveUnit == NULL)
+        return 0;
+    return m_interactiveUnit->start();
 }
 
 long MGridScene::finishSelection() const
 {
-    return m_startSelection + m_lengthSelection - 1;
+    if(!m_interactiveUnit)
+        return 0;
+    return startSelection() + lengthSelection() - 1;
 }
 
 
@@ -682,13 +692,15 @@ bool MGridScene::setStartSelection(long startHighlight)
     if(m_highlightStyle&highlightedItems)
         setHighlightMode(true);
 
-    if(startHighlight==m_startSelection)
+    if(startHighlight==startSelection())
+        return true;
+    if(startHighlight+lengthSelection()-1>m_max || m_min > startHighlight)
         return false;
-    if(startHighlight+m_lengthSelection-1>m_max || m_min > startHighlight)
+    if(m_interactiveUnit==NULL)
         return false;
-    m_startSelection = startHighlight;
-    update();
-    emit startHighlightChanged(m_startSelection);
+
+    m_interactiveUnit->setRange(startHighlight,lengthSelection());
+    emit startHighlightChanged(startHighlight);
     return true;
 }
 
@@ -703,11 +715,13 @@ bool MGridScene::setLengthSelection(long lengthHighlight)
         setHighlightMode(false);
     }
 
-    if(!(m_selectionMode == positionSelection) && m_startSelection + lengthHighlight - 1 > m_max)
+    if(!(m_selectionMode == positionSelection) && startSelection() + lengthHighlight - 1 > m_max)
+        return false;
+    if(m_interactiveUnit==NULL)
         return false;
 
-    m_lengthSelection = lengthHighlight;
-    emit lengthHighlightChanged(m_lengthSelection);
+    m_interactiveUnit->setRange(startSelection(),startSelection()+lengthHighlight);
+    emit lengthHighlightChanged(lengthSelection());
     return true;
 }
 
@@ -725,7 +739,7 @@ void MGridScene::setHighlightMode(bool highlightMode)
 }
 
 
-MemoryPart MGridScene::setEmpty(long from, long count)
+QSharedPointer<MemoryPart>  MGridScene::setEmpty(long from, long count)
 {
     QList<ActionErrors> errors;
     // ANALYSIS
@@ -747,10 +761,10 @@ MemoryPart MGridScene::setEmpty(long from, long count)
         return setState(from,count,MemoryPart::Empty);
     }
 
-    return MemoryPart();
+    return QSharedPointer<MemoryPart>();
 }
 
-MemoryPart MGridScene::setPendingRead(long from, long count)
+QSharedPointer<MemoryPart>  MGridScene::setPendingRead(long from, long count)
 {
 
     QList<ActionErrors> errors;
@@ -773,10 +787,10 @@ MemoryPart MGridScene::setPendingRead(long from, long count)
         return setState(from,count,MemoryPart::PendingRead);
     }
 
-    return MemoryPart();
+    return QSharedPointer<MemoryPart>();
 }
 
-MemoryPart MGridScene::setFree(long from, long count)
+QSharedPointer<MemoryPart>  MGridScene::setFree(long from, long count)
 {
 
     QList<ActionErrors> errors;
@@ -791,10 +805,10 @@ MemoryPart MGridScene::setFree(long from, long count)
         return setState(from,count,MemoryPart::Free);
     }
 
-    return MemoryPart();
+    return QSharedPointer<MemoryPart>();
 }
 
-MemoryPart MGridScene::setPendingWrite(long from, long count)
+QSharedPointer<MemoryPart>  MGridScene::setPendingWrite(long from, long count)
 {
 
     QList<ActionErrors> errors;
@@ -823,38 +837,38 @@ MemoryPart MGridScene::setPendingWrite(long from, long count)
         return setState(from,count,MemoryPart::PendingWrite);
     }
 
-    return MemoryPart();
+    return QSharedPointer<MemoryPart>();
 }
 
-MemoryPart MGridScene::setEmpty()
+QSharedPointer<MemoryPart>  MGridScene::setEmpty()
 {
     if(!lengthSelection())
-        return MemoryPart();
+        return QSharedPointer<MemoryPart>();
     return setEmpty(startSelection(),lengthSelection());
 }
 
-MemoryPart MGridScene::setFree()
+QSharedPointer<MemoryPart>  MGridScene::setFree()
 {
     if(!lengthSelection())
-        return MemoryPart();
+        return QSharedPointer<MemoryPart>();
     return setFree(startSelection(),lengthSelection());
 }
 
-MemoryPart MGridScene::setPendingRead()
+QSharedPointer<MemoryPart>  MGridScene::setPendingRead()
 {
     if(!lengthSelection())
-        return MemoryPart();
+        return QSharedPointer<MemoryPart>();
     return setPendingRead(startSelection(),lengthSelection());
 }
 
-MemoryPart MGridScene::setPendingWrite()
+QSharedPointer<MemoryPart>  MGridScene::setPendingWrite()
 {
     if(!lengthSelection())
-        return MemoryPart();
+        return QSharedPointer<MemoryPart>();
     return setPendingWrite(startSelection(),lengthSelection());
 }
 
-MemoryPart MGridScene::setState(long from, long count, MemoryPart::MemoryState state)
+QSharedPointer<MemoryPart> MGridScene::setState(long from, long count, MemoryPart::MemoryState state)
 {
     MGridUnit* p_mu = NULL;
     clearMemory(from,count);
@@ -868,7 +882,7 @@ MemoryPart MGridScene::setState(long from, long count, MemoryPart::MemoryState s
 
     update();
     emit memoryChanged();
-    return (p_mu)?(p_mu->toKaMemoryPart()):(MemoryPart());
+    return (p_mu)?(p_mu->kaMemoryPart()):(QSharedPointer<MemoryPart>());
 }
 
 void MGridScene::clearMemory(long from, long count)
@@ -936,7 +950,7 @@ bool MGridScene::isMouseOverItem(MGridItem* p_item) const
 }
 long MGridScene::memorySize() const
 {
-    return m_memory.memorySize();
+    return m_memory->memorySize();
 }
 
 void MGridScene::viewResized(QSizeF viewSize)
@@ -995,6 +1009,21 @@ void MGridScene::setItemBorder(qreal itemBorder)
 
     foreach(MGridUnit* unit, m_units)
         unit->rebuildShape();
+}
+
+bool MGridScene::setSelected(long start, long length)
+{
+    long lastStart = startSelection();
+    if(!setStartSelection(start))
+        return false;
+    if(!setLengthSelection(length))
+    {
+        setStartSelection(lastStart);
+        return false;
+    }
+
+    qDebug()<<"setSelected update";
+    return true;
 }
 
 

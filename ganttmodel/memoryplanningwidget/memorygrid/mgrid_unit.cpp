@@ -12,17 +12,28 @@
 
 extern MGridScene* mem_scene;
 
-MGridUnit::MGridUnit(QGraphicsScene *scene,QGraphicsItem *parent /*= 0*/)
-    : QGraphicsItem(parent,scene)
+//MGridUnit::MGridUnit(QGraphicsScene *scene, QGraphicsItem *parent)
+//    :QGraphicsItem(parent,scene)
+//{
+//    initialize();
+//    setScene(dynamic_cast<MGridScene*>(scene));
+//}
+
+MGridUnit::MGridUnit(QSharedPointer<MemoryPart> memoryPart,QGraphicsScene *scene,QGraphicsItem *parent /*= 0*/)
+    :QGraphicsItem(parent,scene)
+{
+    initialize();
+
+    setScene(dynamic_cast<MGridScene*>(scene));
+    setKaMemoryPart(memoryPart);
+}
+
+void MGridUnit::initialize()
 {
     isEmpty = true;
 
-
-    setScene(dynamic_cast<MGridScene*>(scene));
-
     setShowBorder(false);
     setAcceptsHoverEvents(true);
-
     setZValue(1);
 }
 
@@ -60,7 +71,7 @@ void MGridUnit::paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
 
 //    qDebug() << "paint" << QString::number(zValue()) << m_shapeBorder;
 //    qDebug() << "size  items "<< QString::number(size()) +" " + QString::number(m_scene->itemPerRow());
-//    qDebug() << "size  items "<<QString::number(m_items->at(m_start)->left())+' '+QString::number(m_items->at(m_finish)->right());
+//    qDebug() << "size  items "<<QString::number(m_items->at(start())->left())+' '+QString::number(m_items->at(finish())->right());
 
     painter->setPen(m_borderPen);
     painter->drawPath(m_shapeBorder);
@@ -69,67 +80,74 @@ void MGridUnit::paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
 
 int MGridUnit::id() const
 {
-    return m_unitId;
+    Q_ASSERT(!m_kaMemoryPart.isNull());
+    return m_kaMemoryPart->id();
 }
 
 void MGridUnit::setId(int unitId)
 {
-    m_unitId = unitId;
+    Q_ASSERT(!m_kaMemoryPart.isNull());
+    m_kaMemoryPart->setId(unitId);
 }
 
 MemoryPart::MemoryState MGridUnit::state() const
 {
-    return m_state;
+    Q_ASSERT(!m_kaMemoryPart.isNull());
+    return m_kaMemoryPart->state();
 }
 
 void MGridUnit::setState(const MemoryPart::MemoryState &status)
 {
-    m_state = status;
+    Q_ASSERT(!m_kaMemoryPart.isNull());
+    m_kaMemoryPart->setState(status);
 }
 
 long MGridUnit::start() const
 {
-    return m_start;
+    Q_ASSERT(!m_kaMemoryPart.isNull());
+    return m_kaMemoryPart->start();
 }
 
 void MGridUnit::setStart(long start)
 {
+    Q_ASSERT(!m_kaMemoryPart.isNull());
     if(isEmpty)
         return;
     if(start<0)
     {
-        m_start = 0;
-        return;
+        start=0;
     }
-    m_start = start;
+    m_kaMemoryPart->setStart(start);
 }
 
 long MGridUnit::finish() const
 {
-    return m_finish;
+    Q_ASSERT(!m_kaMemoryPart.isNull());
+    return m_kaMemoryPart->finish();
 }
 
 void MGridUnit::setFinish(long finish)
 {
+    Q_ASSERT(!m_kaMemoryPart.isNull());
     if(isEmpty)
         return;
     if(finish >= m_scene->memorySize())
     {
-        m_finish = m_scene->memorySize()-1;
-        return;
+        finish = m_scene->memorySize()-1;
     }
-
-    m_finish = finish;
+    m_kaMemoryPart->setFinish(finish);
 }
 
 long MGridUnit::size() const
 {
-    return m_finish-m_start + 1;
+    Q_ASSERT(!m_kaMemoryPart.isNull());
+    return m_kaMemoryPart->size();
 }
 
 void MGridUnit::setSize(long newSize)
 {
-    setFinish(start()+newSize-1);
+    Q_ASSERT(!m_kaMemoryPart.isNull());
+    m_kaMemoryPart->setSize(newSize);
 }
 
 //qreal MGridUnit::spacing() const
@@ -168,7 +186,7 @@ void MGridUnit::rebuildShape()
         return;
 
 
-    if(m_finish>m_items->size())
+    if(finish()>m_items->size())
     {
         qDebug() << "MemoryInteractiveUnit::rebuildShape() out of range";
         return;
@@ -176,13 +194,13 @@ void MGridUnit::rebuildShape()
 
     QRectF itemsRect;
 
-    for(int i = m_start; i <= m_finish; ++i)
+    for(int i = start(); i <= finish(); ++i)
     {
         itemsRect|=m_items->at(i)->geometry();
     }
 
-    MGridItem  *utterLeftItem = m_items->at(m_start),
-                *utterRightItem = m_items->at(m_finish);
+    MGridItem  *utterLeftItem = m_items->at(start()),
+                *utterRightItem = m_items->at(finish());
     qreal   utterLeft = utterLeftItem->left(),
             utterRight = utterRightItem->right();
 
@@ -245,6 +263,19 @@ void MGridUnit::setShapeBorder(const QPainterPath &shapeBorder)
     m_shapeBorder = shapeBorder;
 }
 
+QSharedPointer<MemoryPart> MGridUnit::kaMemoryPart() const
+{
+    return m_kaMemoryPart;
+}
+
+void MGridUnit::setKaMemoryPart(const QSharedPointer<MemoryPart> &kaMemoryPart)
+{
+    m_kaMemoryPart = kaMemoryPart;
+    if(m_kaMemoryPart.isNull() || m_scene == NULL)
+        return;
+    addItems(m_kaMemoryPart->start(),m_kaMemoryPart->finish());
+}
+
 bool MGridUnit::showBorder() const
 {
     return m_unitSelected;
@@ -257,7 +288,7 @@ void MGridUnit::setShowBorder(bool unitSelected)
 
 QColor MGridUnit::color()
 {
-    return MemoryState_to_QColor(m_state,true);
+    return MemoryState_to_QColor(state(),true);
 }
 
 void MGridUnit::addItems(long start, long finish)
@@ -278,21 +309,21 @@ long MGridUnit::removeItems(long from, long count)
 {
     if(!m_scene)
         return 0;
-    if(from+count<=m_start)
+    if(from+count<=start())
         return 0;
-    if(from+count-1>m_finish)
-        count = m_finish - from + 1;
+    if(from+count-1>finish())
+        count = finish() - from + 1;
 
 
-    if(from>m_start && from+count-1<m_finish)
+    if(from>start() && from+count-1<finish())
     {
         MGridUnit* p_memUnit1 = m_scene->newUnit(); // first -to- from-1
-        p_memUnit1->setState(m_state);
-        p_memUnit1->addItems(m_start,from-1);
+        p_memUnit1->setState(state());
+        p_memUnit1->addItems(start(),from-1);
 
         MGridUnit* p_memUnit2 = m_scene->newUnit(); // from+count-1   -to- last
-        p_memUnit2->setState(m_state);
-        p_memUnit2->addItems(from+count,m_finish);
+        p_memUnit2->setState(state());
+        p_memUnit2->addItems(from+count,finish());
 
         m_scene->addUnit(p_memUnit1);
         m_scene->addUnit(p_memUnit2);
@@ -306,7 +337,7 @@ long MGridUnit::removeItems(long from, long count)
         return count;
     }
 
-    while(from<m_start)
+    while(from<start())
     {
         from++;
         if(count--<=0)
@@ -320,9 +351,9 @@ long MGridUnit::removeItems(long from, long count)
         m_items->at(j)->setUnit(NULL);
     }
 
-    if(from!=m_start)
+    if(from!=start())
         setFinish(from-1);
-    else if(from+count<=m_finish)
+    else if(from+count<=finish())
         setStart(from+count);
     else
     {
@@ -337,7 +368,7 @@ void MGridUnit::updateParenthesis()
 {
     if(isEmpty)
         return;
-    for(int i = m_start; i <= m_finish; ++i)
+    for(int i = start(); i <= finish(); ++i)
     {
         m_items->at(i)->setUnit(this);
     }
@@ -349,11 +380,6 @@ qreal MGridUnit::extraSize() const
     if(!m_scene)
         return 0;
     return m_scene->itemBorder();
-}
-
-MemoryPart MGridUnit::toKaMemoryPart() const
-{
-    return MemoryPart(start(),finish(),state(),id());
 }
 
 

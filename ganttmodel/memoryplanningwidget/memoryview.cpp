@@ -114,15 +114,13 @@ void MemoryView::init()
 
 void MemoryView::changeScene()
 {
-    Memory kaMemory;
     if(m_mode == MemoryGrid)
     {
         m_mode = MemoryLine;
         if(!m_lineScene)
         {
             setScene(new MLineScene(parent()));
-            kaMemory = m_gridScene->memory();
-            setMemory(kaMemory);
+            setMemory(m_gridScene->memory());
         }
         else
             setScene(m_lineScene);
@@ -133,15 +131,14 @@ void MemoryView::changeScene()
         if(!m_gridScene)
         {
             setScene(new MGridScene(parent()));
-            kaMemory = m_lineScene->memory();
-            setMemory(kaMemory);
+            setMemory(m_lineScene->memory());
         }
         else
             setScene(m_gridScene);
     }
 }
 
-void MemoryView::setMemory(const Memory &kaMemory)
+void MemoryView::setMemory(QSharedPointer<KaMemory> &kaMemory)
 {
     if(m_mode == MemoryGrid)
         m_gridScene->setMemory(kaMemory);

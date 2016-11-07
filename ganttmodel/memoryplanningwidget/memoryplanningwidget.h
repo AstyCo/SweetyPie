@@ -13,7 +13,7 @@ namespace Ui {
 class MemoryPlanningWidget;
 }
 
-class Memory;
+class KaMemory;
 class MGridScene;
 class MLineScene;
 
@@ -29,10 +29,11 @@ public:
     ~MemoryPlanningWidget();
 
 
-    void setMemory(const Memory& kaMemory);
+    void setMemory(QSharedPointer<KaMemory> kaMemory);
 
     MGridScene* gridScene() const;
     MLineScene* lineScene() const;
+    bool setSelected(long start,long length);
 
     void setShowButtons(bool flag); ///< отображение кнопок взаимодействия с выбранной областью
     void setShowViews(bool flag); ///< отображение режимов (сеткой/линейная ...)
@@ -49,6 +50,7 @@ public slots:
     void updateParts();
 
 private slots:
+    void onSelectionChanged();
     void on_pushButtonEmpty_clicked();
 
     void on_pushButtonFree_clicked();
@@ -59,6 +61,9 @@ private slots:
 
     void hideGridWidgets();
     void showGridWidgets();
+
+signals:
+    void selectionChanged(const QList<MemoryPart *>);
 
 
 private:
