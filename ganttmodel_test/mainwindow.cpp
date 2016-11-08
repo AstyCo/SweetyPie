@@ -27,10 +27,10 @@ MainWindow::MainWindow(QWidget *parent) :
 
   installEventFilter(ui->widgetIntervalSlider);
 
-  testChartWidget();
-  testChartGroupWidget();
+//  testChartWidget();
+//  testChartGroupWidget();
   testGanttModel();
-  testMemoryPlanningWidget();
+//  testMemoryPlanningWidget();
   testDtIntervalWidget();
   qDebug() << "test finished";
 }
@@ -179,7 +179,7 @@ void MainWindow::testMemoryPlanningWidget()
     ui->memoryPlanningWidget->setGridView();
 
     // Begin init values
-    QList<QSharedPointer<MemoryPart> > records;
+    QList<MemoryPart> records;
     int memoryPeaceLength,spaceBetweenUnits;
     int vacantPos = 0;
     int id = 1;
@@ -190,23 +190,23 @@ void MainWindow::testMemoryPlanningWidget()
         memoryPeaceLength = qrand()%100;
         spaceBetweenUnits = qrand()%15;
 
-        QSharedPointer<MemoryPart> newPeace(new MemoryPart());
+        MemoryPart newPeace;
         vacantPos+=spaceBetweenUnits;
-        newPeace->setStart(vacantPos);
+        newPeace.setStart(vacantPos);
         vacantPos+=memoryPeaceLength;
 
         if(vacantPos>memLen)
             break;
 
-        newPeace->setFinish(vacantPos);
+        newPeace.setFinish(vacantPos);
         vacantPos+=1;
 
-        newPeace->setState(static_cast<MemoryPart::MemoryState>(qrand()%MemoryPart::MemoryState_count));
-        if(newPeace->state()==MemoryPart::Empty)
-            newPeace->setId(0);
+        newPeace.setState(static_cast<MemoryPart::MemoryState>(qrand()%MemoryPart::MemoryState_count));
+        if(newPeace.state()==MemoryPart::Empty)
+            newPeace.setId(0);
         else
         {
-            newPeace->setId(id++);
+            newPeace.setId(id++);
             records.push_back(newPeace);
         }
     }
@@ -214,14 +214,14 @@ void MainWindow::testMemoryPlanningWidget()
 
     qDebug()<<"end init";
 
-    QSharedPointer<KaMemory> kaMemory(new KaMemory());
-    kaMemory->init(records,memLen);
+    Memory kaMemory;
+    kaMemory.init(records,memLen);
 
     MGridScene * scene = ui->memoryPlanningWidget->gridScene();
 
     ui->memoryPlanningWidget->setMemory(kaMemory);
-
-    ui->memoryPlanningWidget->setSelected(10,100);
+    ui->memoryPlanningWidget->gridScene()->setStartSelection(10);
+    ui->memoryPlanningWidget->gridScene()->setLengthSelection(100);
 
 
     ui->memoryPlanningWidget->setShowButtons(true);

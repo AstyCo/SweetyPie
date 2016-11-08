@@ -20,7 +20,6 @@ extern MGridScene* mem_scene;
 MGridInteractiveUnit::MGridInteractiveUnit(MGridScene* scene,QGraphicsItem *parent /*= 0*/)
     : QGraphicsItem(parent,scene)
 {
-    m_startSet=m_finishSet = false;
     m_scene=dynamic_cast<MGridScene*>(scene);
     if(!m_scene)
     {
@@ -75,9 +74,6 @@ long MGridInteractiveUnit::start() const
 
 void MGridInteractiveUnit::setStart(long start)
 {
-    if(!m_startSet)
-        m_startSet=true;
-
     m_start = start;
 }
 
@@ -88,9 +84,6 @@ long MGridInteractiveUnit::finish() const
 
 void MGridInteractiveUnit::setFinish(long finish)
 {
-    if(!m_finishSet)
-        m_finishSet=true;
-
     m_finish = finish;
 }
 
@@ -115,7 +108,7 @@ void MGridInteractiveUnit::setSize(long newSize)
 
 void MGridInteractiveUnit::rebuildShape()
 {
-    if(!m_enabled || !m_startSet || !m_finishSet)
+    if(!m_enabled)
         return;
     if(m_finish>m_items->size())
     {

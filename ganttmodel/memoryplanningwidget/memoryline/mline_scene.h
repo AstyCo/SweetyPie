@@ -26,7 +26,7 @@ class GANTTMODELSHARED_EXPORT MLineScene: public QGraphicsScene
 {
     Q_OBJECT
 private:
-    QSharedPointer<KaMemory> _memory;
+    Memory _memory;
     bool m_isPickerEnabled;
 
     MLinePicker * m_picker;
@@ -47,11 +47,11 @@ public:
 
     MLineGraphicsPart * selectedKaMemoryPart();
 
-    QSharedPointer<KaMemory> &memory();
+    Memory memory() const;
 
-//    void init(const QList<MemoryPart>& list, long memorySize);
+    void init(const QList<MemoryPart>& list, long memorySize);
 
-    void setMemory(QSharedPointer<KaMemory> &memory);
+    void setMemory(const Memory &memory);
 };
 
 #endif // MLINE_SCENE_H

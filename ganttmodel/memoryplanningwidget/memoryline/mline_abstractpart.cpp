@@ -107,7 +107,8 @@ int MLineAbstractPart::memorySize() const
         return 0;
     }
 
-     return sc->memory()->memorySize();
+
+     return sc->memory().memorySize();
 
 }
 

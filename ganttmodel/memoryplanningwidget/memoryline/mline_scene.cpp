@@ -6,30 +6,30 @@
 #include <QCursor>
 #include "QGraphicsTextItem"
 
-QSharedPointer<KaMemory> &MLineScene::memory()
+Memory MLineScene::memory() const
 {
     return _memory;
 }
 
-//void MLineScene::init(const QList<MemoryPart> &records, long memorySize)
-//{
-//    Memory kaMemory;
-//    kaMemory.init(records,memorySize);
-//    setMemory(kaMemory);
-//}
+void MLineScene::init(const QList<MemoryPart> &records, long memorySize)
+{
+    Memory kaMemory;
+    kaMemory.init(records,memorySize);
+    setMemory(kaMemory);
+}
 
-void MLineScene::setMemory(QSharedPointer<KaMemory> &memory)
+void MLineScene::setMemory(const Memory &memory)
 {
     _memory = memory;
 
-    for(int i=0; i<_memory->memoryParts().count(); i++)
+    for(int i=0; i<_memory.memoryParts().count(); i++)
     {
         MLineGraphicsPart * part = new MLineGraphicsPart();
         addItem(part);
         part->setVisible(true);
         _memoryParts.append(part);
 
-        part->setKaMemoryPart(*_memory->memoryParts()[i]);
+        part->setKaMemoryPart(_memory.memoryParts()[i]);
 
         QGraphicsItemGroup * group = new QGraphicsItemGroup();
         _memoryGroups.append(group);
@@ -37,9 +37,9 @@ void MLineScene::setMemory(QSharedPointer<KaMemory> &memory)
         {
             MLineGraphicsPart * part = new MLineGraphicsPart(group);
             group->addToGroup(part);
-            part->setStatus(_memory->memoryParts()[i]->state());
-            part->setBegin(_memory->memoryParts()[i]->start());
-            part->setEnd(_memory->memoryParts()[i]->finish());
+            part->setStatus(_memory.memoryParts()[i].state());
+            part->setBegin(_memory.memoryParts()[i].start());
+            part->setEnd(_memory.memoryParts()[i].finish());
 
         }
         group->setVisible(true);
@@ -180,7 +180,7 @@ void MLineScene::createStatistic(qreal posX, qreal posY)
 //        _inputChanelsText->setPlainText(tr("один канал из %1").arg(
 //                                      QString::number(_memory.inputChannelCount())));
         _memSizeText->setPlainText(tr("объем памяти %1 Мб").arg(
-                                      QString::number(_memory->memorySize())));
+                                      QString::number(_memory.memorySize())));
     }
     _memSizeText->setPos(posX, posY+20);
 }

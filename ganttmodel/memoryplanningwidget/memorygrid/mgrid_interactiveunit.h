@@ -38,14 +38,14 @@ public:
     void disable();
 
     void setRange(long start, long finish);
-    void setStart(long start);
-    void setFinish(long finish);
 
     long memorySize() const;
 
     void rebuildShape();
 
 private:
+    void setStart(long start);
+    void setFinish(long finish);
     void setSize(long newSize);
 
     QPainterPath shapeBorder() const;
@@ -63,8 +63,6 @@ private:
     long m_start, m_finish;
 
     bool m_enabled;
-
-    bool m_startSet, m_finishSet;
 
 };
 

@@ -6,7 +6,7 @@
 #include "memory.h"
 #include "ganttproject_global.h"
 
-class KaMemory;
+class Memory;
 
 class MGridScene;
 class MLineScene;
@@ -28,7 +28,7 @@ public:
     void setScene(QGraphicsScene *scene);
     void init();
     void changeScene();
-    void setMemory(QSharedPointer<KaMemory> &kaMemory);
+    void setMemory(const Memory& kaMemory);
 
     MemoryView::MemoryViewMode mode() const;
     void setMode(const MemoryView::MemoryViewMode &mode);

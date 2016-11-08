@@ -30,8 +30,8 @@ public:
     ~MGridScene();
 
     /// Инициализирует память
-    void setMemory(QSharedPointer<KaMemory>& kaMemory);
-    QSharedPointer<KaMemory> &memory();
+    void setMemory(const Memory& kaMemory);
+    Memory memory();
     /// Возвращает размер памяти
     long memorySize() const;
 
@@ -55,10 +55,10 @@ public:
         highlightedArea = 0x4
     };
 
-    /// Устанавливает выделенный участок с началом start и длиной length
-    bool setSelected(long start, long length);
     /// Устанавливает длину выделяемого участка
     bool setLengthSelection(long lengthSelection);
+    /// Устанавливает начало выделяемого участка
+    bool setStartSelection(long startSelection);
 
     /// Начало выделяемого участка
     long startSelection() const;
@@ -71,7 +71,7 @@ public:
     void setHighlightStyle(int highlightStyle);
 
     /// Возвращает список блоков, пересекающих выбранный интервал
-    QList<QSharedPointer<MemoryPart> > crossingParts() const;
+    QList<MemoryPart> crossingParts() const;
 
     /// Возвращает строку, представляющую блока памяти в унифицированном виде (ex. 0x0000-0xFFFF ...)
     QString toAdress(long start,long finish);
@@ -115,17 +115,17 @@ public slots:
     void setKaMemoryPart(const MemoryPart& part);
 
     /// Устанавливает статус по адресам
-    QSharedPointer<MemoryPart>  setEmpty(long from, long count);
-    QSharedPointer<MemoryPart>  setFree(long from, long count);
-    QSharedPointer<MemoryPart>  setPendingRead(long from, long count);
-    QSharedPointer<MemoryPart>  setPendingWrite(long from, long count);
+    MemoryPart setEmpty(long from, long count);
+    MemoryPart setFree(long from, long count);
+    MemoryPart setPendingRead(long from, long count);
+    MemoryPart setPendingWrite(long from, long count);
 
 
     /// Устанавливает статус по текущему выделению
-    QSharedPointer<MemoryPart>  setEmpty();
-    QSharedPointer<MemoryPart>  setFree();
-    QSharedPointer<MemoryPart>  setPendingRead();
-    QSharedPointer<MemoryPart>  setPendingWrite();
+    MemoryPart setEmpty();
+    MemoryPart setFree();
+    MemoryPart setPendingRead();
+    MemoryPart setPendingWrite();
     void clear();
 
     // -ACTIONS
@@ -149,9 +149,7 @@ protected:
 
 
 private:
-    /// Устанавливает начало выделяемого участка
-    bool setStartSelection(long startSelection);
-    QSharedPointer<MemoryPart> setState(long from, long count, MemoryPart::MemoryState state);
+    MemoryPart setState(long from, long count, MemoryPart::MemoryState state);
     void clearShownUnits();
     void updateShownUnits();
     void clearLastSelected();
@@ -160,19 +158,18 @@ private:
     void memoryStatusUpdate(const QRectF& rect = QRectF());
     bool inHighlightRange(long index) const;
     long freedCount(long from, long to) const;
-//    void updateMemory();
+    void updateMemory();
     void updateParenthesis();
     void addUnit(MGridUnit* p_memUnit);
     MGridUnit* newUnit();
     void removeUnit(MGridUnit* p_memUnit);
-    void addUnit(QSharedPointer<MemoryPart> part);
+    void addUnit(const MemoryPart &part);
 
     void setItemInfo(const QString& text);
     void setUnitInfo(const QString& text);
     void viewResized(QSizeF viewSize);
     bool interactiveHighlight() const;
 
-//    void updateInteractiveRange();
     void updateInteractiveRange(long start, long finish);
     qreal itemSize() const;
     bool highlightMode() const;
@@ -229,7 +226,10 @@ private:
     bool m_highlightMode;
     bool m_interactiveHighlight;
 
-    QSharedPointer<KaMemory> m_memory;
+    long m_startSelection;
+    long m_lengthSelection;
+
+    Memory m_memory;
 
     qreal m_itemEdge;
     qreal m_itemBorder;

@@ -148,7 +148,7 @@
         </size>
        </property>
        <property name="text">
-        <string/>
+        <string>Пересекаемые области памяти:</string>
        </property>
       </widget>
      </item>

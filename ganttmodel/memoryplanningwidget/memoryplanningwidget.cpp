@@ -102,12 +102,8 @@ void MemoryPlanningWidget::setGridView()
 
         connect(m_gridScene,SIGNAL(itemInfoChanged(const QString&)),this,SLOT(setItemInfo(const QString&)));
         connect(m_gridScene,SIGNAL(unitInfoChanged(const QString&)),this,SLOT(setUnitInfo(const QString&)));
-
-        connect(m_gridScene,SIGNAL(startHighlightChanged(long)),this,SLOT(onSelectionChanged()));
-        connect(m_gridScene,SIGNAL(lengthHighlightChanged(long)),this,SLOT(onSelectionChanged()));
-
-//        connect(this,SIGNAL(onSelectionChanged()),this,SLOT(updateParts()));
-//        connect(this,SIGNAL(onSelectionChanged()),this,SLOT(updateParts()));
+        connect(m_gridScene,SIGNAL(startHighlightChanged(long)),this,SLOT(updateParts()));
+        connect(m_gridScene,SIGNAL(lengthHighlightChanged(long)),this,SLOT(updateParts()));
     }
 
     ui->memoryView->setScene(m_gridScene);
@@ -138,28 +134,19 @@ void MemoryPlanningWidget::updateParts()
     static QString base = tr("Пересекаемые области памяти:\n\n");
     if(m_mode != MemoryView::MemoryGrid)
         return;
-    QList<QSharedPointer<MemoryPart> > parts = m_gridScene->crossingParts();
+    QList<MemoryPart> parts = m_gridScene->crossingParts();
 
     QString text;
 
-    foreach(QSharedPointer<MemoryPart> part, parts)
+    foreach(MemoryPart part, parts)
     {
-        text += '['+MemoryState_to_QString(part->state())+"] ";
-        text += m_gridScene->toAdress(part->start(),part->finish())+'\n';
+        text += '['+MemoryState_to_QString(part.state())+"] ";
+        text += m_gridScene->toAdress(part.start(),part.finish())+'\n';
     }
     ui->crossingParts->setText(base+text);
 }
 
-void MemoryPlanningWidget::onSelectionChanged()
-{
-    QList<MemoryPart *> res;
-    foreach(QSharedPointer<MemoryPart> part, m_gridScene->crossingParts())
-        res.append(part.data());
-    qDebug() <<"onSelectionChanged";
-    emit selectionChanged( res );
-}
-
-void MemoryPlanningWidget::setMemory(QSharedPointer<KaMemory> kaMemory)
+void MemoryPlanningWidget::setMemory(const Memory &kaMemory)
 {
     ui->memoryView->setMemory(kaMemory);
 }
@@ -176,16 +163,6 @@ MLineScene *MemoryPlanningWidget::lineScene() const
     if(m_mode == MemoryView::MemoryLine)
         return m_lineScene;
     return NULL;
-}
-
-bool MemoryPlanningWidget::setSelected(long start, long length)
-{
-    MGridScene *scene=gridScene();
-    if(scene==NULL)
-        return false;
-    else
-        return scene->setSelected(start,length);
-
 }
 
 void MemoryPlanningWidget::setShowButtons(bool flag)
@@ -222,22 +199,22 @@ void MemoryPlanningWidget::setShowViews(bool flag)
 
 void MemoryPlanningWidget::on_pushButtonEmpty_clicked()
 {
-    m_gridScene->setEmpty();
+    MemoryPart part = m_gridScene->setEmpty();
 }
 
 void MemoryPlanningWidget::on_pushButtonFree_clicked()
 {
-    m_gridScene->setFree();
+    MemoryPart part = m_gridScene->setFree();
 }
 
 void MemoryPlanningWidget::on_pushButtonPendingWrite_clicked()
 {
-    m_gridScene->setPendingWrite();
+    MemoryPart part = m_gridScene->setPendingWrite();
 }
 
 void MemoryPlanningWidget::on_pushButtonPendingRead_clicked()
 {
-    m_gridScene->setPendingRead();
+    MemoryPart part = m_gridScene->setPendingRead();
 }
 
 void MemoryPlanningWidget::hideGridWidgets()
