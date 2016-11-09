@@ -114,8 +114,8 @@ void MGridScene::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
                 }
             }
         }
-        if(lengthSelection())
-            updateInteractiveRange(startSelection(),lengthSelection());
+//        if(lengthSelection())
+//            updateInteractiveRange(startSelection(),lengthSelection());
     }
 
     return QGraphicsScene::mouseMoveEvent(event);
@@ -698,7 +698,7 @@ bool MGridScene::setStartSelection(long startHighlight)
     if(m_interactiveUnit==NULL)
         return false;
 
-    m_interactiveUnit->setRange(startHighlight,lengthSelection());
+    m_interactiveUnit->setStart(startHighlight);
     emit startHighlightChanged(startHighlight);
     return true;
 }
@@ -971,15 +971,6 @@ void MGridScene::viewResized(QSizeF viewSize)
         if(m_interactiveUnit)
             m_interactiveUnit->rebuildShape();
     }
-}
-
-void MGridScene::updateInteractiveRange(long start, long length)
-{
-    if(!highlightMode())
-        return;
-    if(!m_interactiveUnit)
-        return;
-    m_interactiveUnit->setRange(start,length);
 }
 
 qreal MGridScene::itemSize() const

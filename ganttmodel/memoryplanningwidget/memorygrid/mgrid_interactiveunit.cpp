@@ -76,6 +76,7 @@ long MGridInteractiveUnit::start() const
 void MGridInteractiveUnit::setStart(long start)
 {
     m_start = start;
+    rebuildShape();
 }
 
 //qreal MGridInteractiveUnit::spacing() const
@@ -89,7 +90,7 @@ void MGridInteractiveUnit::setStart(long start)
 
 void MGridInteractiveUnit::rebuildShape()
 {
-    if(!m_enabled)
+    if(!m_enabled || !m_items)
         return;
     if(m_length==0)
     {
@@ -191,6 +192,7 @@ long MGridInteractiveUnit::length() const
 void MGridInteractiveUnit::setLength(long length)
 {
     m_length = length;
+    rebuildShape();
 }
 
 long MGridInteractiveUnit::memorySize() const
@@ -219,8 +221,6 @@ void MGridInteractiveUnit::setRange(long start, long length)
 
     setStart(start);
     setLength(length);
-
-    rebuildShape();
 }
 
 #endif // MEMORYINTERACTIVEUNIT_CPP

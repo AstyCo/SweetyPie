@@ -170,8 +170,6 @@ private:
     void viewResized(QSizeF viewSize);
     bool interactiveHighlight() const;
 
-//    void updateInteractiveRange();
-    void updateInteractiveRange(long start, long length);
     qreal itemSize() const;
     bool highlightMode() const;
 
