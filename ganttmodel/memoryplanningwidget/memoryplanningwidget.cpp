@@ -106,8 +106,8 @@ void MemoryPlanningWidget::setGridView()
         connect(m_gridScene,SIGNAL(startHighlightChanged(long)),this,SLOT(onSelectionChanged()));
         connect(m_gridScene,SIGNAL(lengthHighlightChanged(long)),this,SLOT(onSelectionChanged()));
 
-        connect(this,SIGNAL(selectionChanged(QList<KaMemoryPart*>)),this,SLOT(updateParts()));
-        connect(this,SIGNAL(selectionChanged(QList<KaMemoryPart*>)),this,SLOT(updateParts()));
+//        connect(this,SIGNAL(selectionChanged(QList<KaMemoryPart*>)),this,SLOT(updateParts()));
+//        connect(this,SIGNAL(selectionChanged(QList<KaMemoryPart*>)),this,SLOT(updateParts()));
     }
 
     ui->memoryView->setScene(m_gridScene);
