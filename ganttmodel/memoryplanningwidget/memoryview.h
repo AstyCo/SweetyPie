@@ -44,6 +44,6 @@ private:
 
 };
 
-QColor GANTTMODELSHARED_EXPORT MemoryState_to_QColor(MemoryPart::MemoryState state, bool isActive = true);
+QColor GANTTMODELSHARED_EXPORT MemoryState_to_QColor(KaMemoryPart::KaMemoryState state, bool isActive = true);
 
 #endif // MEMORYVIEW_HPP

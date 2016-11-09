@@ -21,7 +21,7 @@ class MGridScene;
 class MGridUnit : public QGraphicsItem
 {
 public:
-    MGridUnit(QSharedPointer<MemoryPart> memoryPart,QGraphicsScene *scene,QGraphicsItem *parent = 0);
+    MGridUnit(QSharedPointer<KaMemoryPart> memoryPart,QGraphicsScene *scene,QGraphicsItem *parent = 0);
     void initialize();
 
     QRectF boundingRect() const;
@@ -32,8 +32,8 @@ public:
     int id() const;
     void setId(int id);
 
-    MemoryPart::MemoryState state() const;
-    void setState(const MemoryPart::MemoryState &state);
+    KaMemoryPart::KaMemoryState state() const;
+    void setState(const KaMemoryPart::KaMemoryState &state);
 
     long start() const;
     void setStart(long start);
@@ -57,8 +57,8 @@ public:
 
     qreal extraSize() const;
 
-    QSharedPointer<MemoryPart> kaMemoryPart() const;
-    void setKaMemoryPart(const QSharedPointer<MemoryPart> &kaMemoryPart);
+    QSharedPointer<KaMemoryPart> kaMemoryPart() const;
+    void setKaMemoryPart(const QSharedPointer<KaMemoryPart> &kaMemoryPart);
 
 private:
     void rebuildShape();
@@ -71,7 +71,7 @@ private:
     friend class MGridScene;
 
 private:
-    QSharedPointer<MemoryPart> m_kaMemoryPart;
+    QSharedPointer<KaMemoryPart> m_kaMemoryPart;
     bool m_unitSelected;
 
     MGridScene* m_scene;

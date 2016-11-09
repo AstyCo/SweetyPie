@@ -63,7 +63,7 @@ private slots:
     void showGridWidgets();
 
 signals:
-    void selectionChanged(const QList<MemoryPart *>);
+    void selectionChanged(const QList<KaMemoryPart *>);
 
 
 private:

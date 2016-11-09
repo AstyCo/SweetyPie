@@ -46,7 +46,7 @@ public:
 
     void setUnitSelected(bool selected);
 
-    MemoryPart::MemoryState state() const;
+    KaMemoryPart::KaMemoryState state() const;
     QColor color() const;
 
     long index() const;

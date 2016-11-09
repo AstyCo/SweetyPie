@@ -162,14 +162,14 @@ void MGridItem::setUnitSelected(bool selected)
     m_unit->update();
 }
 
-MemoryPart::MemoryState MGridItem::state() const
+KaMemoryPart::KaMemoryState MGridItem::state() const
 {
     if(m_unit)
     {
         return m_unit->state();
     }
 
-    return MemoryPart::Empty;
+    return KaMemoryPart::Empty;
 }
 
 QColor MGridItem::color() const
@@ -179,7 +179,7 @@ QColor MGridItem::color() const
     if(m_unit)
         return MemoryState_to_QColor(m_unit->state(),highlightedItem);
 
-    return MemoryState_to_QColor(MemoryPart::Empty,highlightedItem);
+    return MemoryState_to_QColor(KaMemoryPart::Empty,highlightedItem);
 }
 
 //int MemoryItem::parentUnitId() const

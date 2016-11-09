@@ -173,30 +173,30 @@ void MemoryView::leaveEvent(QEvent *)
 
 
 
-QColor MemoryState_to_QColor(MemoryPart::MemoryState state, bool isActive)
+QColor MemoryState_to_QColor(KaMemoryPart::KaMemoryState state, bool isActive)
 {
     QColor result;
     //    if(isActive)
     switch (state) {
-    case MemoryPart::Empty:
+    case KaMemoryPart::Empty:
         result = QColor(Qt::white);
         break;
-    case MemoryPart::Free:
+    case KaMemoryPart::Free:
         result = QColor::fromRgb(0xCCD2D4);
         break;
-    case MemoryPart::Recorded:
+    case KaMemoryPart::Recorded:
         result = QColor::fromRgb(0xE3E187);
         break;
-    case MemoryPart::PendingWrite:
+    case KaMemoryPart::PendingWrite:
         result = QColor::fromRgb(0x73E884);
         break;
-    case MemoryPart::PendingRead:
+    case KaMemoryPart::PendingRead:
         result = QColor::fromRgb(0x99DDE3);
         break;
-    case MemoryPart::ErrorWrite:
+    case KaMemoryPart::ErrorWrite:
         result = QColor::fromRgb(0xE39753);
         break;
-    case MemoryPart::ErrorRead:
+    case KaMemoryPart::ErrorRead:
         result = QColor::fromRgb(0x308C9E);
         break;
     default:
@@ -204,7 +204,7 @@ QColor MemoryState_to_QColor(MemoryPart::MemoryState state, bool isActive)
         break;
     }
 
-    if(!isActive && state != MemoryPart::Free)
+    if(!isActive && state != KaMemoryPart::Free)
         return result.lighter(130);
     return result;
 }

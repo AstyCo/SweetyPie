@@ -69,7 +69,7 @@ public:
     void setHighlightStyle(int highlightStyle);
 
     /// Возвращает список блоков, пересекающих выбранный интервал
-    QList<QSharedPointer<MemoryPart> > crossingParts() const;
+    QList<QSharedPointer<KaMemoryPart> > crossingParts() const;
 
     /// Возвращает строку, представляющую блока памяти в унифицированном виде (ex. 0x0000-0xFFFF ...)
     QString toAdress(long start,long finish);
@@ -110,20 +110,20 @@ public slots:
      *  ErrorRead,      ///< Ошибка сброса - красный
     */
 
-    void setKaMemoryPart(const MemoryPart& part);
+    void setKaMemoryPart(const KaMemoryPart& part);
 
     /// Устанавливает статус по адресам
-    QSharedPointer<MemoryPart>  setEmpty(long from, long count);
-    QSharedPointer<MemoryPart>  setFree(long from, long count);
-    QSharedPointer<MemoryPart>  setPendingRead(long from, long count);
-    QSharedPointer<MemoryPart>  setPendingWrite(long from, long count);
+    QSharedPointer<KaMemoryPart>  setEmpty(long from, long count);
+    QSharedPointer<KaMemoryPart>  setFree(long from, long count);
+    QSharedPointer<KaMemoryPart>  setPendingRead(long from, long count);
+    QSharedPointer<KaMemoryPart>  setPendingWrite(long from, long count);
 
 
     /// Устанавливает статус по текущему выделению
-    QSharedPointer<MemoryPart>  setEmpty();
-    QSharedPointer<MemoryPart>  setFree();
-    QSharedPointer<MemoryPart>  setPendingRead();
-    QSharedPointer<MemoryPart>  setPendingWrite();
+    QSharedPointer<KaMemoryPart>  setEmpty();
+    QSharedPointer<KaMemoryPart>  setFree();
+    QSharedPointer<KaMemoryPart>  setPendingRead();
+    QSharedPointer<KaMemoryPart>  setPendingWrite();
     void clear();
 
     // -ACTIONS
@@ -149,7 +149,7 @@ protected:
 private:
     /// Устанавливает начало выделяемого участка
     bool setStartSelection(long startSelection);
-    QSharedPointer<MemoryPart> setState(long from, long count, MemoryPart::MemoryState state);
+    QSharedPointer<KaMemoryPart> setState(long from, long count, KaMemoryPart::KaMemoryState state);
     void clearShownUnits();
     void updateShownUnits();
     void clearLastSelected();
@@ -163,7 +163,7 @@ private:
     void addUnit(MGridUnit* p_memUnit);
     MGridUnit* newUnit();
     void removeUnit(MGridUnit* p_memUnit);
-    void addUnit(QSharedPointer<MemoryPart> part);
+    void addUnit(QSharedPointer<KaMemoryPart> part);
 
     void setItemInfo(const QString& text);
     void setUnitInfo(const QString& text);
@@ -206,7 +206,7 @@ private:
         ActionErrors_count
     };
 
-    static QList<MemoryPart::MemoryState> m_notReadStates,
+    static QList<KaMemoryPart::KaMemoryState> m_notReadStates,
                               m_writeStates,
                               m_errorStates;
     struct Initializer

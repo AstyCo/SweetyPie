@@ -192,7 +192,7 @@ void MGridScene::setMemory(QSharedPointer<KaMemory> &kaMemory)
 
     setupMatrix(m_items);
 
-    const QList<QSharedPointer<MemoryPart> >& units = kaMemory->memoryParts();
+    const QList<QSharedPointer<KaMemoryPart> >& units = kaMemory->memoryParts();
 
     for(int i = 0; i < units.size(); ++i)
         addUnit(units[i]);
@@ -201,8 +201,8 @@ void MGridScene::setMemory(QSharedPointer<KaMemory> &kaMemory)
 
 MGridUnit* MGridScene::newUnit()
 {
-    MGridUnit* p_memUnit = new MGridUnit(QSharedPointer<MemoryPart>(new MemoryPart()),this);
-    p_memUnit->setState(MemoryPart::Empty);
+    MGridUnit* p_memUnit = new MGridUnit(QSharedPointer<KaMemoryPart>(new KaMemoryPart()),this);
+    p_memUnit->setState(KaMemoryPart::Empty);
 
     if(!memory().isNull())
         memory()->memoryParts().append(p_memUnit->kaMemoryPart());
@@ -542,7 +542,7 @@ long MGridScene::lengthSelection() const
     return m_interactiveUnit->length();
 }
 
-void MGridScene::addUnit(QSharedPointer<MemoryPart> part)
+void MGridScene::addUnit(QSharedPointer<KaMemoryPart> part)
 {
     MGridUnit* p_memUnit = new MGridUnit(part,this);
     addUnit(p_memUnit);
@@ -616,9 +616,9 @@ void MGridScene::clearMouseOver()
     setMouseOverUnit(NULL);
 }
 
-QList<QSharedPointer<MemoryPart> > MGridScene::crossingParts() const
+QList<QSharedPointer<KaMemoryPart> > MGridScene::crossingParts() const
 {
-    QList<QSharedPointer<MemoryPart> > result;
+    QList<QSharedPointer<KaMemoryPart> > result;
     QList<MGridUnit*> units;
 
     if(lengthSelection())
@@ -636,23 +636,23 @@ QString MGridScene::toAdress(long start, long finish)
             +" - 0x"+fixedNumPresentation(finish,16,memorySize()-1);
 }
 
-void MGridScene::setKaMemoryPart(const MemoryPart &part)
+void MGridScene::setKaMemoryPart(const KaMemoryPart &part)
 {
     long start = part.start(),
             length = part.length();
 
     switch(part.state())
     {
-    case MemoryPart::Empty:
+    case KaMemoryPart::Empty:
         setEmpty(start,length);
         break;
-    case MemoryPart::Free:
+    case KaMemoryPart::Free:
         setFree(start,length);
         break;
-    case MemoryPart::PendingRead:
+    case KaMemoryPart::PendingRead:
         setPendingRead(start,length);
         break;
-    case MemoryPart::PendingWrite:
+    case KaMemoryPart::PendingWrite:
         setPendingWrite(start,length);
         break;
     default:
@@ -738,18 +738,18 @@ void MGridScene::setHighlightMode(bool highlightMode)
 }
 
 
-QSharedPointer<MemoryPart>  MGridScene::setEmpty(long from, long count)
+QSharedPointer<KaMemoryPart>  MGridScene::setEmpty(long from, long count)
 {
     QList<ActionErrors> errors;
     // ANALYSIS
     for(int i = 0, j = from; i<count; ++i,++j)
     {
-        MemoryPart::MemoryState itemState = m_items[j]->state();
+        KaMemoryPart::KaMemoryState itemState = m_items[j]->state();
         if(m_notReadStates.contains(itemState))
         {
             errors.append(EmptyOfNotRead);
         }
-        if (itemState == MemoryPart::PendingRead)
+        if (itemState == KaMemoryPart::PendingRead)
         {
             errors.append(EmptyOfPendingRead);
         }
@@ -757,25 +757,25 @@ QSharedPointer<MemoryPart>  MGridScene::setEmpty(long from, long count)
 
     if(errorHandler(errors))
     {
-        return setState(from,count,MemoryPart::Empty);
+        return setState(from,count,KaMemoryPart::Empty);
     }
 
-    return QSharedPointer<MemoryPart>();
+    return QSharedPointer<KaMemoryPart>();
 }
 
-QSharedPointer<MemoryPart>  MGridScene::setPendingRead(long from, long count)
+QSharedPointer<KaMemoryPart>  MGridScene::setPendingRead(long from, long count)
 {
 
     QList<ActionErrors> errors;
     // ANALYSIS
     for(int i = 0, j = from; i<count; ++i,++j)
     {
-        MemoryPart::MemoryState itemState = m_items[j]->state();
-        if(itemState == MemoryPart::PendingRead)
+        KaMemoryPart::KaMemoryState itemState = m_items[j]->state();
+        if(itemState == KaMemoryPart::PendingRead)
         {
             errors.append(ReadOfReaded);
         }
-        else if (itemState == MemoryPart::Empty)
+        else if (itemState == KaMemoryPart::Empty)
         {
             errors.append(ReadOfEmpty);
         }
@@ -783,13 +783,13 @@ QSharedPointer<MemoryPart>  MGridScene::setPendingRead(long from, long count)
 
     if(errorHandler(errors))
     {
-        return setState(from,count,MemoryPart::PendingRead);
+        return setState(from,count,KaMemoryPart::PendingRead);
     }
 
-    return QSharedPointer<MemoryPart>();
+    return QSharedPointer<KaMemoryPart>();
 }
 
-QSharedPointer<MemoryPart>  MGridScene::setFree(long from, long count)
+QSharedPointer<KaMemoryPart>  MGridScene::setFree(long from, long count)
 {
 
     QList<ActionErrors> errors;
@@ -801,31 +801,31 @@ QSharedPointer<MemoryPart>  MGridScene::setFree(long from, long count)
 
     if(errorHandler(errors))
     {
-        return setState(from,count,MemoryPart::Free);
+        return setState(from,count,KaMemoryPart::Free);
     }
 
-    return QSharedPointer<MemoryPart>();
+    return QSharedPointer<KaMemoryPart>();
 }
 
-QSharedPointer<MemoryPart>  MGridScene::setPendingWrite(long from, long count)
+QSharedPointer<KaMemoryPart>  MGridScene::setPendingWrite(long from, long count)
 {
 
     QList<ActionErrors> errors;
     // ANALYSIS
     for(int i = 0, j = from; i<count; ++i,++j)
     {
-        MemoryPart::MemoryState itemState = m_items[j]->state();
+        KaMemoryPart::KaMemoryState itemState = m_items[j]->state();
         if(m_writeStates.contains(itemState))
         {
             errors.append(WriteToNotRead);
             errors.append(WriteToNotEmpty);
         }
-        else if (itemState == MemoryPart::PendingRead)
+        else if (itemState == KaMemoryPart::PendingRead)
         {
             errors.append(WriteToPendingRead);
             errors.append(WriteToNotEmpty);
         }
-        else if (itemState == MemoryPart::Free)
+        else if (itemState == KaMemoryPart::Free)
         {
             errors.append(WriteToNotEmpty);
         }
@@ -833,48 +833,48 @@ QSharedPointer<MemoryPart>  MGridScene::setPendingWrite(long from, long count)
 
     if(errorHandler(errors))
     {
-        return setState(from,count,MemoryPart::PendingWrite);
+        return setState(from,count,KaMemoryPart::PendingWrite);
     }
 
-    return QSharedPointer<MemoryPart>();
+    return QSharedPointer<KaMemoryPart>();
 }
 
-QSharedPointer<MemoryPart>  MGridScene::setEmpty()
+QSharedPointer<KaMemoryPart>  MGridScene::setEmpty()
 {
     if(!lengthSelection())
-        return QSharedPointer<MemoryPart>();
+        return QSharedPointer<KaMemoryPart>();
     return setEmpty(startSelection(),lengthSelection());
 }
 
-QSharedPointer<MemoryPart>  MGridScene::setFree()
+QSharedPointer<KaMemoryPart>  MGridScene::setFree()
 {
     if(!lengthSelection())
-        return QSharedPointer<MemoryPart>();
+        return QSharedPointer<KaMemoryPart>();
     return setFree(startSelection(),lengthSelection());
 }
 
-QSharedPointer<MemoryPart>  MGridScene::setPendingRead()
+QSharedPointer<KaMemoryPart>  MGridScene::setPendingRead()
 {
     if(!lengthSelection())
-        return QSharedPointer<MemoryPart>();
+        return QSharedPointer<KaMemoryPart>();
     return setPendingRead(startSelection(),lengthSelection());
 }
 
-QSharedPointer<MemoryPart>  MGridScene::setPendingWrite()
+QSharedPointer<KaMemoryPart>  MGridScene::setPendingWrite()
 {
     if(!lengthSelection())
-        return QSharedPointer<MemoryPart>();
+        return QSharedPointer<KaMemoryPart>();
     return setPendingWrite(startSelection(),lengthSelection());
 }
 
-QSharedPointer<MemoryPart> MGridScene::setState(long from, long count, MemoryPart::MemoryState state)
+QSharedPointer<KaMemoryPart> MGridScene::setState(long from, long count, KaMemoryPart::KaMemoryState state)
 {
     qDebug() <<"setState "<<state;
     qDebug() <<"from "<<from <<" length "<<count;
     MGridUnit* p_mu = NULL;
     clearMemory(from,count);
 
-    if(state != MemoryPart::Empty)
+    if(state != KaMemoryPart::Empty)
     {
         p_mu = newUnit();
         p_mu->setState(state);
@@ -883,7 +883,7 @@ QSharedPointer<MemoryPart> MGridScene::setState(long from, long count, MemoryPar
 
     update();
     emit memoryChanged();
-    return (p_mu)?(p_mu->kaMemoryPart()):(QSharedPointer<MemoryPart>());
+    return (p_mu)?(p_mu->kaMemoryPart()):(QSharedPointer<KaMemoryPart>());
 }
 
 void MGridScene::clearMemory(long from, long count)
@@ -1030,7 +1030,7 @@ bool MGridScene::setSelected(long start, long length)
 
 
 
-QList<MemoryPart::MemoryState> MGridScene::m_notReadStates,
+QList<KaMemoryPart::KaMemoryState> MGridScene::m_notReadStates,
                     MGridScene::m_writeStates,
                     MGridScene::m_errorStates;
 
@@ -1039,13 +1039,13 @@ MGridScene::Initializer MGridScene::initializerGuard;
 
 MGridScene::Initializer::Initializer()
 {
-    m_notReadStates.append(MemoryPart::Recorded);
-    m_notReadStates.append(MemoryPart::PendingRead);
-    m_notReadStates.append(MemoryPart::PendingWrite);
+    m_notReadStates.append(KaMemoryPart::Recorded);
+    m_notReadStates.append(KaMemoryPart::PendingRead);
+    m_notReadStates.append(KaMemoryPart::PendingWrite);
 
-    m_writeStates.append(MemoryPart::Recorded);
-    m_writeStates.append(MemoryPart::PendingWrite);
+    m_writeStates.append(KaMemoryPart::Recorded);
+    m_writeStates.append(KaMemoryPart::PendingWrite);
 
-    m_errorStates.append(MemoryPart::ErrorRead);
-    m_errorStates.append(MemoryPart::ErrorWrite);
+    m_errorStates.append(KaMemoryPart::ErrorRead);
+    m_errorStates.append(KaMemoryPart::ErrorWrite);
 }

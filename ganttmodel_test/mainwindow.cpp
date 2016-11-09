@@ -179,7 +179,7 @@ void MainWindow::testMemoryPlanningWidget()
     ui->memoryPlanningWidget->setGridView();
 
     // Begin init values
-    QList<QSharedPointer<MemoryPart> > records;
+    QList<QSharedPointer<KaMemoryPart> > records;
     int memoryPeaceLength,spaceBetweenUnits;
     int vacantPos = 0;
     int id = 1;
@@ -190,7 +190,7 @@ void MainWindow::testMemoryPlanningWidget()
         memoryPeaceLength = qrand()%100;
         spaceBetweenUnits = qrand()%15;
 
-        QSharedPointer<MemoryPart> newPeace(new MemoryPart());
+        QSharedPointer<KaMemoryPart> newPeace(new KaMemoryPart());
         vacantPos+=spaceBetweenUnits;
         newPeace->setStart(vacantPos);
         vacantPos+=memoryPeaceLength;
@@ -201,8 +201,8 @@ void MainWindow::testMemoryPlanningWidget()
         newPeace->setLength(memoryPeaceLength);
         vacantPos+=1;
 
-        newPeace->setState(static_cast<MemoryPart::MemoryState>(qrand()%MemoryPart::MemoryState_count));
-        if(newPeace->state()==MemoryPart::Empty)
+        newPeace->setState(static_cast<KaMemoryPart::KaMemoryState>(qrand()%KaMemoryPart::KaMemoryState_count));
+        if(newPeace->state()==KaMemoryPart::Empty)
             newPeace->setId(0);
         else
         {

@@ -19,7 +19,7 @@ extern MGridScene* mem_scene;
 //    setScene(dynamic_cast<MGridScene*>(scene));
 //}
 
-MGridUnit::MGridUnit(QSharedPointer<MemoryPart> memoryPart,QGraphicsScene *scene,QGraphicsItem *parent /*= 0*/)
+MGridUnit::MGridUnit(QSharedPointer<KaMemoryPart> memoryPart,QGraphicsScene *scene,QGraphicsItem *parent /*= 0*/)
     :QGraphicsItem(parent,scene)
 {
     initialize();
@@ -88,13 +88,13 @@ void MGridUnit::setId(int unitId)
     m_kaMemoryPart->setId(unitId);
 }
 
-MemoryPart::MemoryState MGridUnit::state() const
+KaMemoryPart::KaMemoryState MGridUnit::state() const
 {
     Q_ASSERT(!m_kaMemoryPart.isNull());
     return m_kaMemoryPart->state();
 }
 
-void MGridUnit::setState(const MemoryPart::MemoryState &status)
+void MGridUnit::setState(const KaMemoryPart::KaMemoryState &status)
 {
     Q_ASSERT(!m_kaMemoryPart.isNull());
     m_kaMemoryPart->setState(status);
@@ -242,12 +242,12 @@ void MGridUnit::setShapeBorder(const QPainterPath &shapeBorder)
     m_shapeBorder = shapeBorder;
 }
 
-QSharedPointer<MemoryPart> MGridUnit::kaMemoryPart() const
+QSharedPointer<KaMemoryPart> MGridUnit::kaMemoryPart() const
 {
     return m_kaMemoryPart;
 }
 
-void MGridUnit::setKaMemoryPart(const QSharedPointer<MemoryPart> &kaMemoryPart)
+void MGridUnit::setKaMemoryPart(const QSharedPointer<KaMemoryPart> &kaMemoryPart)
 {
     m_kaMemoryPart = kaMemoryPart;
     if(m_kaMemoryPart.isNull() || m_scene == NULL)

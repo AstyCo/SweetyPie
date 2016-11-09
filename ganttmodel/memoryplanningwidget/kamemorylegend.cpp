@@ -16,9 +16,9 @@ KaMemoryLegend::KaMemoryLegend(QWidget *parent) : QWidget(parent)
 
     this->setSizePolicy(sizePolicy);
 
-    for(int i = 0; i<MemoryPart::MemoryState_count; ++i)
+    for(int i = 0; i<KaMemoryPart::KaMemoryState_count; ++i)
     {
-        MemoryPart::MemoryState state = static_cast<MemoryPart::MemoryState>(i);
+        KaMemoryPart::KaMemoryState state = static_cast<KaMemoryPart::KaMemoryState>(i);
         QHBoxLayout *horizontalLayout = new QHBoxLayout;
 
         QLabel *labelColor = new QLabel(this);
@@ -48,6 +48,6 @@ KaMemoryLegend::KaMemoryLegend(QWidget *parent) : QWidget(parent)
         verticalLayout->addLayout(horizontalLayout);
     }
 
-    setMaximumHeight(MemoryPart::MemoryState_count*(16+8)); //ps itemHeight+space
+    setMaximumHeight(KaMemoryPart::KaMemoryState_count*(16+8)); //ps itemHeight+space
 }
 

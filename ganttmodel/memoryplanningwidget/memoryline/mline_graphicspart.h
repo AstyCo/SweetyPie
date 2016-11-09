@@ -12,7 +12,7 @@ class MLineGraphicsPart : public MLineAbstractPart
 {
     Q_OBJECT
 private:
-    MemoryPart::MemoryState _status;
+    KaMemoryPart::KaMemoryState _status;
     QColor statusColor() const;
 
 public:
@@ -24,10 +24,10 @@ public:
     QRectF boundingRect() const;  ///< used for update-on-fly
     QVariant itemChange(GraphicsItemChange change, const QVariant &value);
 
-    void setKaMemoryPart(const MemoryPart &part);
+    void setKaMemoryPart(const KaMemoryPart &part);
 
-    MemoryPart::MemoryState status() const;
-    void setStatus(const MemoryPart::MemoryState &status);
+    KaMemoryPart::KaMemoryState status() const;
+    void setStatus(const KaMemoryPart::KaMemoryState &status);
 private:
     // VISUAL ELEMENTS
     void updateVisualElements();

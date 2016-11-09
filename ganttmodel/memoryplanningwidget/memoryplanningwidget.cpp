@@ -19,10 +19,10 @@ MemoryPlanningWidget::MemoryPlanningWidget(QWidget *parent) :
     ui->setupUi(this);
     setShowViews(false); // disabled by default
 
-    ui->pushButtonEmpty->setStyleSheet(QString("background-color: %1").arg(MemoryState_to_QColor(MemoryPart::Empty).name()));
-    ui->pushButtonFree->setStyleSheet(QString("background-color: %1").arg(MemoryState_to_QColor(MemoryPart::Free).name()));
-    ui->pushButtonPendingRead->setStyleSheet(QString("background-color: %1").arg(MemoryState_to_QColor(MemoryPart::PendingRead).name()));
-    ui->pushButtonPendingWrite->setStyleSheet(QString("background-color: %1").arg(MemoryState_to_QColor(MemoryPart::PendingWrite).name()));
+    ui->pushButtonEmpty->setStyleSheet(QString("background-color: %1").arg(MemoryState_to_QColor(KaMemoryPart::Empty).name()));
+    ui->pushButtonFree->setStyleSheet(QString("background-color: %1").arg(MemoryState_to_QColor(KaMemoryPart::Free).name()));
+    ui->pushButtonPendingRead->setStyleSheet(QString("background-color: %1").arg(MemoryState_to_QColor(KaMemoryPart::PendingRead).name()));
+    ui->pushButtonPendingWrite->setStyleSheet(QString("background-color: %1").arg(MemoryState_to_QColor(KaMemoryPart::PendingWrite).name()));
 
 
     QPixmap pixmap(":/icons/icons/plus.png");
@@ -106,8 +106,8 @@ void MemoryPlanningWidget::setGridView()
         connect(m_gridScene,SIGNAL(startHighlightChanged(long)),this,SLOT(onSelectionChanged()));
         connect(m_gridScene,SIGNAL(lengthHighlightChanged(long)),this,SLOT(onSelectionChanged()));
 
-        connect(this,SIGNAL(selectionChanged(QList<MemoryPart*>)),this,SLOT(updateParts()));
-        connect(this,SIGNAL(selectionChanged(QList<MemoryPart*>)),this,SLOT(updateParts()));
+        connect(this,SIGNAL(selectionChanged(QList<KaMemoryPart*>)),this,SLOT(updateParts()));
+        connect(this,SIGNAL(selectionChanged(QList<KaMemoryPart*>)),this,SLOT(updateParts()));
     }
 
     ui->memoryView->setScene(m_gridScene);
@@ -138,11 +138,11 @@ void MemoryPlanningWidget::updateParts()
     static QString base = tr("Пересекаемые области памяти:\n\n");
     if(m_mode != MemoryView::MemoryGrid)
         return;
-    QList<QSharedPointer<MemoryPart> > parts = m_gridScene->crossingParts();
+    QList<QSharedPointer<KaMemoryPart> > parts = m_gridScene->crossingParts();
 
     QString text;
 
-    foreach(QSharedPointer<MemoryPart> part, parts)
+    foreach(QSharedPointer<KaMemoryPart> part, parts)
     {
         text += '['+MemoryState_to_QString(part->state())+"] ";
         if(part->length()!=0)
@@ -153,8 +153,8 @@ void MemoryPlanningWidget::updateParts()
 
 void MemoryPlanningWidget::onSelectionChanged()
 {
-    QList<MemoryPart *> res;
-    foreach(QSharedPointer<MemoryPart> part, m_gridScene->crossingParts())
+    QList<KaMemoryPart *> res;
+    foreach(QSharedPointer<KaMemoryPart> part, m_gridScene->crossingParts())
         res.append(part.data());
     emit selectionChanged( res );
 }
