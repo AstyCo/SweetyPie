@@ -1,7 +1,7 @@
 #ifndef MGRID_UNIT_H
 #define MGRID_UNIT_H
 
-#include "memorypart.h"
+#include "kamemorypart.h"
 
 #include <QGraphicsItem>
 #include <QVariant>

@@ -3,7 +3,7 @@
 
 #include "mline_abstractpart.h"
 //#include "QSqlRecord"
-#include "memorypart.h"
+#include "kamemorypart.h"
 
 #include <ganttproject_global.h>
 

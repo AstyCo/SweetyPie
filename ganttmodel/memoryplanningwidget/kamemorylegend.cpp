@@ -1,5 +1,5 @@
 #include "kamemorylegend.h"
-#include "memorypart.h"
+#include "kamemorypart.h"
 #include "memoryview.h"
 
 #include <QLabel>

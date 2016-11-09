@@ -3,7 +3,7 @@
 
 #include <ganttproject_global.h>
 
-#include "memory.h"
+#include "kamemory.h"
 
 #include <QGraphicsScene>
 

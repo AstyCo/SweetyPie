@@ -714,7 +714,7 @@ bool MGridScene::setLengthSelection(long lengthHighlight)
         setHighlightMode(false);
     }
 
-    if(!(m_selectionMode == positionSelection) && startSelection() + lengthHighlight - 1 > m_max)
+    if(lengthHighlight!=0 &&!(m_selectionMode == positionSelection) && startSelection() + lengthHighlight - 1 > m_max)
         return false;
     if(m_interactiveUnit==NULL)
         return false;

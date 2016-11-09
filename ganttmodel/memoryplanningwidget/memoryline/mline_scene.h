@@ -5,7 +5,7 @@
 #include <ganttproject_global.h>
 
 
-#include "memory.h"
+#include "kamemory.h"
 #include "QList"
 #include <QGraphicsScene>
 #include <QPainter>

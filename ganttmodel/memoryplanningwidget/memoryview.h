@@ -3,7 +3,7 @@
 
 #include <QGraphicsView>
 #include <QtCore>
-#include "memory.h"
+#include "kamemory.h"
 #include "ganttproject_global.h"
 
 class KaMemory;

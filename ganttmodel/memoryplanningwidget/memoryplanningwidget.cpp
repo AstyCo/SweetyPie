@@ -5,8 +5,8 @@
 #include "mgrid_scene.h"
 #include "mline_scene.h"
 
-#include "memorypart.h"
-#include "memory.h"
+#include "kamemorypart.h"
+#include "kamemory.h"
 #include <QDebug>
 #include <QBitmap>
 #include <QScrollBar>

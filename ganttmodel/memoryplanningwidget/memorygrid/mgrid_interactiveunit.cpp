@@ -6,7 +6,7 @@
 #include "mgrid_item.h"
 
 
-#include "memorypart.h"
+#include "kamemorypart.h"
 
 #include "memory_globalvalues.h"
 
@@ -56,7 +56,7 @@ void MGridInteractiveUnit::paint(QPainter *painter, const QStyleOptionGraphicsIt
     Q_UNUSED(option);
     Q_UNUSED(widget);
 
-    if(!m_enabled)
+    if(!m_enabled || m_length==0)
         return;
     painter->setPen(m_borderPen);
     painter->drawPath(m_shapeBorder);
@@ -75,6 +75,8 @@ long MGridInteractiveUnit::start() const
 
 void MGridInteractiveUnit::setStart(long start)
 {
+    if(!m_enabled)
+        m_enabled=true;
     m_start = start;
     rebuildShape();
 }
@@ -215,10 +217,6 @@ void MGridInteractiveUnit::setRange(long start, long length)
     {
         return;
     }
-
-    if(!m_enabled)
-        m_enabled = true;
-
     setStart(start);
     setLength(length);
 }
