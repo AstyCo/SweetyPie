@@ -30,8 +30,6 @@ MGridUnit::MGridUnit(QSharedPointer<MemoryPart> memoryPart,QGraphicsScene *scene
 
 void MGridUnit::initialize()
 {
-    isEmpty = true;
-
     setShowBorder(false);
     setAcceptsHoverEvents(true);
     setZValue(1);
@@ -111,8 +109,6 @@ long MGridUnit::start() const
 void MGridUnit::setStart(long start)
 {
     Q_ASSERT(!m_kaMemoryPart.isNull());
-    if(isEmpty)
-        return;
     if(start<0)
     {
         start=0;
@@ -120,34 +116,16 @@ void MGridUnit::setStart(long start)
     m_kaMemoryPart->setStart(start);
 }
 
-long MGridUnit::finish() const
+long MGridUnit::length() const
 {
     Q_ASSERT(!m_kaMemoryPart.isNull());
-    return m_kaMemoryPart->finish();
+    return m_kaMemoryPart->length();
 }
 
-void MGridUnit::setFinish(long finish)
+void MGridUnit::setLength(long newSize)
 {
     Q_ASSERT(!m_kaMemoryPart.isNull());
-    if(isEmpty)
-        return;
-    if(finish >= m_scene->memorySize())
-    {
-        finish = m_scene->memorySize()-1;
-    }
-    m_kaMemoryPart->setFinish(finish);
-}
-
-long MGridUnit::size() const
-{
-    Q_ASSERT(!m_kaMemoryPart.isNull());
-    return m_kaMemoryPart->size();
-}
-
-void MGridUnit::setSize(long newSize)
-{
-    Q_ASSERT(!m_kaMemoryPart.isNull());
-    m_kaMemoryPart->setSize(newSize);
+    m_kaMemoryPart->setLength(newSize);
 }
 
 //qreal MGridUnit::spacing() const
@@ -181,12 +159,13 @@ void MGridUnit::hoverLeaveEvent(QGraphicsSceneHoverEvent *event)
 
 void MGridUnit::rebuildShape()
 {
-
-    if(isEmpty)
+    if(length()==0)
+    {
+        setShapeBorder(QPainterPath());
         return;
+    }
 
-
-    if(finish()>m_items->size())
+    if(start()+length()>m_items->size())
     {
         qDebug() << "MemoryInteractiveUnit::rebuildShape() out of range";
         return;
@@ -194,13 +173,13 @@ void MGridUnit::rebuildShape()
 
     QRectF itemsRect;
 
-    for(int i = start(); i <= finish(); ++i)
+    for(int i = start(); i <start()+length(); ++i)
     {
         itemsRect|=m_items->at(i)->geometry();
     }
 
     MGridItem  *utterLeftItem = m_items->at(start()),
-                *utterRightItem = m_items->at(finish());
+                *utterRightItem = m_items->at(start()+length()-1);
     qreal   utterLeft = utterLeftItem->left(),
             utterRight = utterRightItem->right();
 
@@ -213,7 +192,7 @@ void MGridUnit::rebuildShape()
         shapingTop = true;
     if(utterRightItem->right()!=itemsRect.right())
         shapingBottom = true;
-    if(size()<m_scene->itemPerRow()
+    if(length()<m_scene->itemPerRow()
             && utterLeft>utterRight)
         shapingSeparate = true;
 
@@ -273,7 +252,7 @@ void MGridUnit::setKaMemoryPart(const QSharedPointer<MemoryPart> &kaMemoryPart)
     m_kaMemoryPart = kaMemoryPart;
     if(m_kaMemoryPart.isNull() || m_scene == NULL)
         return;
-    addItems(m_kaMemoryPart->start(),m_kaMemoryPart->finish());
+    addItems(m_kaMemoryPart->start(),m_kaMemoryPart->length());
 }
 
 bool MGridUnit::showBorder() const
@@ -291,16 +270,15 @@ QColor MGridUnit::color()
     return MemoryState_to_QColor(state(),true);
 }
 
-void MGridUnit::addItems(long start, long finish)
+void MGridUnit::addItems(long start, long length)
 {
     if(!m_items)
         return;
-    if(start<0 || finish>=m_scene->memorySize() || start>finish)
+    if(start<0 || length==0 ||  start+length>m_scene->memorySize())
         return;
-    isEmpty = false;
 
     setStart(start);
-    setFinish(finish);
+    setLength(length);
 
     updateParenthesis();
 }
@@ -311,19 +289,19 @@ long MGridUnit::removeItems(long from, long count)
         return 0;
     if(from+count<=start())
         return 0;
-    if(from+count-1>finish())
-        count = finish() - from + 1;
+    if(count>length())
+        count = length();
 
 
-    if(from>start() && from+count-1<finish())
+    if(from>start() && count<length())
     {
         MGridUnit* p_memUnit1 = m_scene->newUnit(); // first -to- from-1
         p_memUnit1->setState(state());
-        p_memUnit1->addItems(start(),from-1);
+        p_memUnit1->addItems(start(),from-start());
 
         MGridUnit* p_memUnit2 = m_scene->newUnit(); // from+count-1   -to- last
         p_memUnit2->setState(state());
-        p_memUnit2->addItems(from+count,finish());
+        p_memUnit2->addItems(from+count,start()+length()-from-count);
 
         m_scene->addUnit(p_memUnit1);
         m_scene->addUnit(p_memUnit2);
@@ -352,9 +330,12 @@ long MGridUnit::removeItems(long from, long count)
     }
 
     if(from!=start())
-        setFinish(from-1);
-    else if(from+count<=finish())
+        setLength(from-start());
+    else if(from+count<start()+length())
+    {
+        setLength(length()-count);
         setStart(from+count);
+    }
     else
     {
         m_scene->removeUnit(this);
@@ -366,9 +347,7 @@ long MGridUnit::removeItems(long from, long count)
 
 void MGridUnit::updateParenthesis()
 {
-    if(isEmpty)
-        return;
-    for(int i = start(); i <= finish(); ++i)
+    for(int i = start(); i < start()+length(); ++i)
     {
         m_items->at(i)->setUnit(this);
     }

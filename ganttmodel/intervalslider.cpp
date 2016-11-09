@@ -148,8 +148,6 @@ void IntervalSlider::setLimits(long long minValue,long long maxValue)
         m_limitsSet=true;
         if(!m_isHidden)
             show();
-
-        qDebug() <<"setLimits";
     }
 
     setMinValue(minValue);
@@ -472,7 +470,6 @@ void IntervalSlider::setVisible(bool visible)
     if(!m_limitsSet&&visible)
         return;
     QWidget::setVisible(visible);
-    qDebug() <<"setVisible "<<visible;
 }
 
 

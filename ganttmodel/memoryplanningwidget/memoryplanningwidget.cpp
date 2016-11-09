@@ -106,8 +106,8 @@ void MemoryPlanningWidget::setGridView()
         connect(m_gridScene,SIGNAL(startHighlightChanged(long)),this,SLOT(onSelectionChanged()));
         connect(m_gridScene,SIGNAL(lengthHighlightChanged(long)),this,SLOT(onSelectionChanged()));
 
-//        connect(this,SIGNAL(onSelectionChanged()),this,SLOT(updateParts()));
-//        connect(this,SIGNAL(onSelectionChanged()),this,SLOT(updateParts()));
+        connect(this,SIGNAL(selectionChanged(QList<MemoryPart*>)),this,SLOT(updateParts()));
+        connect(this,SIGNAL(selectionChanged(QList<MemoryPart*>)),this,SLOT(updateParts()));
     }
 
     ui->memoryView->setScene(m_gridScene);
@@ -134,7 +134,7 @@ void MemoryPlanningWidget::setItemInfo(const QString &text)
 
 void MemoryPlanningWidget::updateParts()
 {
-    return;
+//    return;
     static QString base = tr("Пересекаемые области памяти:\n\n");
     if(m_mode != MemoryView::MemoryGrid)
         return;
@@ -145,7 +145,8 @@ void MemoryPlanningWidget::updateParts()
     foreach(QSharedPointer<MemoryPart> part, parts)
     {
         text += '['+MemoryState_to_QString(part->state())+"] ";
-        text += m_gridScene->toAdress(part->start(),part->finish())+'\n';
+        if(part->length()!=0)
+            text += m_gridScene->toAdress(part->start(),part->start()+part->length()-1)+'\n';
     }
     ui->crossingParts->setText(base+text);
 }
@@ -155,13 +156,13 @@ void MemoryPlanningWidget::onSelectionChanged()
     QList<MemoryPart *> res;
     foreach(QSharedPointer<MemoryPart> part, m_gridScene->crossingParts())
         res.append(part.data());
-    qDebug() <<"onSelectionChanged";
     emit selectionChanged( res );
 }
 
 void MemoryPlanningWidget::setMemory(QSharedPointer<KaMemory> kaMemory)
 {
     ui->memoryView->setMemory(kaMemory);
+
 }
 
 MGridScene *MemoryPlanningWidget::gridScene() const

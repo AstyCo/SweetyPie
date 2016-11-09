@@ -32,7 +32,7 @@ MainWindow::MainWindow(QWidget *parent) :
   testGanttModel();
   testMemoryPlanningWidget();
   testDtIntervalWidget();
-  qDebug() << "test finished";
+  qDebug() << "test data initialized";
 }
 
 MainWindow::~MainWindow()
@@ -183,7 +183,7 @@ void MainWindow::testMemoryPlanningWidget()
     int memoryPeaceLength,spaceBetweenUnits;
     int vacantPos = 0;
     int id = 1;
-    int memLen = 128000;
+    int memLen = 1280;
 
     for(;;)
     {
@@ -198,7 +198,7 @@ void MainWindow::testMemoryPlanningWidget()
         if(vacantPos>memLen)
             break;
 
-        newPeace->setFinish(vacantPos);
+        newPeace->setLength(memoryPeaceLength);
         vacantPos+=1;
 
         newPeace->setState(static_cast<MemoryPart::MemoryState>(qrand()%MemoryPart::MemoryState_count));
@@ -212,7 +212,6 @@ void MainWindow::testMemoryPlanningWidget()
     }
     // end init values
 
-    qDebug()<<"end init";
 
     QSharedPointer<KaMemory> kaMemory(new KaMemory());
     kaMemory->init(records,memLen);

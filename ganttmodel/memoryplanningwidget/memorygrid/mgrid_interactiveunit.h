@@ -32,18 +32,18 @@ public:
 
 
     long start() const;
-    long finish() const;
-    long size() const;
 
     void disable();
 
-    void setRange(long start, long finish);
+    void setRange(long start, long length);
     void setStart(long start);
-    void setFinish(long finish);
 
     long memorySize() const;
 
     void rebuildShape();
+
+    long length() const;
+    void setLength(long length);
 
 private:
     void setSize(long newSize);
@@ -60,11 +60,10 @@ private:
     MGridScene *m_scene;
 
     QVector<MGridItem*>* m_items;
-    long m_start, m_finish;
+    long m_start, m_length;
 
     bool m_enabled;
 
-    bool m_startSet, m_finishSet;
 
 };
 

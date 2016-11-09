@@ -36,10 +36,11 @@ void MLineScene::setMemory(QSharedPointer<KaMemory> &memory)
         addItem(group);
         {
             MLineGraphicsPart * part = new MLineGraphicsPart(group);
+            long start = _memory->memoryParts()[i]->start();
             group->addToGroup(part);
             part->setStatus(_memory->memoryParts()[i]->state());
-            part->setBegin(_memory->memoryParts()[i]->start());
-            part->setEnd(_memory->memoryParts()[i]->finish());
+            part->setBegin(start);
+            part->setEnd(_memory->memoryParts()[i]->length()-1+start);
 
         }
         group->setVisible(true);

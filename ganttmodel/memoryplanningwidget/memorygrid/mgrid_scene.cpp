@@ -115,7 +115,7 @@ void MGridScene::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
             }
         }
         if(lengthSelection())
-            updateInteractiveRange(startSelection(),finishSelection());
+            updateInteractiveRange(startSelection(),lengthSelection());
     }
 
     return QGraphicsScene::mouseMoveEvent(event);
@@ -166,7 +166,7 @@ void MGridScene::clearShownUnits()
 
 void MGridScene::updateShownUnits()
 {
-    for(int i = startSelection(); i<=finishSelection(); ++i)
+    for(int i = startSelection(); i<startSelection()+lengthSelection(); ++i)
     {
         MGridUnit* pmem_unit = m_items[i]->unit();
         if(!pmem_unit)
@@ -204,6 +204,8 @@ MGridUnit* MGridScene::newUnit()
     MGridUnit* p_memUnit = new MGridUnit(QSharedPointer<MemoryPart>(new MemoryPart()),this);
     p_memUnit->setState(MemoryPart::Empty);
 
+    if(!memory().isNull())
+        memory()->memoryParts().append(p_memUnit->kaMemoryPart());
     addUnit(p_memUnit);
     return p_memUnit;
 }
@@ -277,7 +279,7 @@ bool MGridScene::inHighlightRange(long index) const
 
     if(!m_highlightMode)
         return true;
-    return startSelection() <= index && index <=finishSelection();
+    return startSelection() <= index && index <startSelection()+lengthSelection();
 }
 
 bool MGridScene::errorHandler(QList<ActionErrors> &errors) const
@@ -361,13 +363,14 @@ void MGridScene::setMouseOverUnit(MGridUnit *mouseOverUnit)
     else
     {
         m_mouseOverUnit->update();
-        emit setUnitInfo(QString(   /*QObject::tr("id: ")
-                                        +QString::number(m_mouseOverUnit->id())
-                                        +*/QString(QObject::tr(" Состояние: "))
-                                        +m_mouseOverUnit->state()
-                                        +QObject::tr(" Адрес: ")
-                                        +toAdress(m_mouseOverUnit->start(),m_mouseOverUnit->finish())
-                             ));
+        if(!m_mouseOverUnit->length()==0)
+            emit setUnitInfo(QString(   /*QObject::tr("id: ")
+                                            +QString::number(m_mouseOverUnit->id())
+                                            +*/QString(QObject::tr(" Состояние: "))
+                                            +m_mouseOverUnit->state()
+                                            +QObject::tr(" Адрес: ")
+                                            +toAdress(m_mouseOverUnit->start(),m_mouseOverUnit->start()+m_mouseOverUnit->length()-1)
+                                 ));
     }
 }
 
@@ -536,7 +539,7 @@ long MGridScene::lengthSelection() const
 {
     if(!m_interactiveUnit)
         return 0;
-    return 1+m_interactiveUnit->finish()-m_interactiveUnit->start();
+    return m_interactiveUnit->length();
 }
 
 void MGridScene::addUnit(QSharedPointer<MemoryPart> part)
@@ -573,14 +576,14 @@ void MGridScene::removeUnit(MGridUnit *p_memUnit)
     removeItem(p_memUnit);
 }
 
-QList<MGridUnit *> MGridScene::crossingParts(long from, long to) const
+QList<MGridUnit *> MGridScene::crossingParts(long start, long length) const
 {
     QList<MGridUnit*> result;
 
     if(!highlightMode())
         return result;
 
-    for(int i = from; i <= to; ++i)
+    for(int i = start; i < start+length; ++i)
     {
         MGridUnit* parUnit = m_items[i]->unit();
         if(!parUnit)
@@ -619,7 +622,7 @@ QList<QSharedPointer<MemoryPart> > MGridScene::crossingParts() const
     QList<MGridUnit*> units;
 
     if(lengthSelection())
-        units = crossingParts(startSelection(),finishSelection());
+        units = crossingParts(startSelection(),lengthSelection());
     foreach(MGridUnit* unit, units)
     {
         result.append(unit->kaMemoryPart());
@@ -679,13 +682,6 @@ long MGridScene::startSelection() const
     return m_interactiveUnit->start();
 }
 
-long MGridScene::finishSelection() const
-{
-    if(!m_interactiveUnit)
-        return 0;
-    return startSelection() + lengthSelection() - 1;
-}
-
 
 bool MGridScene::setStartSelection(long startHighlight)
 {
@@ -694,8 +690,11 @@ bool MGridScene::setStartSelection(long startHighlight)
 
     if(startHighlight==startSelection())
         return true;
-    if(startHighlight+lengthSelection()-1>m_max || m_min > startHighlight)
-        return false;
+    if(startHighlight+lengthSelection()-1>m_max)
+        startHighlight=m_max-lengthSelection();
+    if(startHighlight<m_min)
+        startHighlight=m_min;
+
     if(m_interactiveUnit==NULL)
         return false;
 
@@ -720,7 +719,7 @@ bool MGridScene::setLengthSelection(long lengthHighlight)
     if(m_interactiveUnit==NULL)
         return false;
 
-    m_interactiveUnit->setRange(startSelection(),startSelection()+lengthHighlight);
+    m_interactiveUnit->setLength(lengthHighlight);
     emit lengthHighlightChanged(lengthSelection());
     return true;
 }
@@ -870,6 +869,8 @@ QSharedPointer<MemoryPart>  MGridScene::setPendingWrite()
 
 QSharedPointer<MemoryPart> MGridScene::setState(long from, long count, MemoryPart::MemoryState state)
 {
+    qDebug() <<"setState "<<state;
+    qDebug() <<"from "<<from <<" length "<<count;
     MGridUnit* p_mu = NULL;
     clearMemory(from,count);
 
@@ -877,7 +878,7 @@ QSharedPointer<MemoryPart> MGridScene::setState(long from, long count, MemoryPar
     {
         p_mu = newUnit();
         p_mu->setState(state);
-        p_mu->addItems(from,from+count-1);
+        p_mu->addItems(from,count);
     }
 
     update();
@@ -887,11 +888,11 @@ QSharedPointer<MemoryPart> MGridScene::setState(long from, long count, MemoryPar
 
 void MGridScene::clearMemory(long from, long count)
 {
-    if(from+count>=memorySize())
+    if(from+count>memorySize())
     {
         count = memorySize()-from-1;
     }
-    QList<MGridUnit*> memoryUnits = crossingParts(from,from+count-1);
+    QList<MGridUnit*> memoryUnits = crossingParts(from,count);
     count-= freedCount(from,from+count-1);
 
     foreach(MGridUnit* unit, memoryUnits)
@@ -972,13 +973,13 @@ void MGridScene::viewResized(QSizeF viewSize)
     }
 }
 
-void MGridScene::updateInteractiveRange(long start, long finish)
+void MGridScene::updateInteractiveRange(long start, long length)
 {
     if(!highlightMode())
         return;
     if(!m_interactiveUnit)
         return;
-    m_interactiveUnit->setRange(start,finish);
+    m_interactiveUnit->setRange(start,length);
 }
 
 qreal MGridScene::itemSize() const
@@ -1021,8 +1022,6 @@ bool MGridScene::setSelected(long start, long length)
         setStartSelection(lastStart);
         return false;
     }
-
-    qDebug()<<"setSelected update";
     return true;
 }
 

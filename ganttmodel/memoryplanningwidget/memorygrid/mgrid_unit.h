@@ -38,11 +38,8 @@ public:
     long start() const;
     void setStart(long start);
 
-    long finish() const;
-    void setFinish(long finish);
-
-    long size() const;
-    void setSize(long newSize);
+    long length() const;
+    void setLength(long newSize);
 
     qreal spacing() const;
 
@@ -54,7 +51,7 @@ public:
 
     QColor color();
 
-    void addItems(long start, long finish);
+    void addItems(long start, long length);
     long removeItems(long from, long count); ///< returns count of actually removed items
     void updateParenthesis();
 
@@ -82,9 +79,6 @@ private:
 
     QPainterPath m_shapeBorder;
     QPen m_borderPen;
-
-    bool isEmpty;
-
 };
 
 #endif // MGRID_UNIT_H

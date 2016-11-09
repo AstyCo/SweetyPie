@@ -20,7 +20,7 @@ extern MGridScene* mem_scene;
 MGridInteractiveUnit::MGridInteractiveUnit(MGridScene* scene,QGraphicsItem *parent /*= 0*/)
     : QGraphicsItem(parent,scene)
 {
-    m_startSet=m_finishSet = false;
+    m_start=m_length=0;
     m_scene=dynamic_cast<MGridScene*>(scene);
     if(!m_scene)
     {
@@ -64,7 +64,7 @@ void MGridInteractiveUnit::paint(QPainter *painter, const QStyleOptionGraphicsIt
 
 bool MGridInteractiveUnit::inRange(long index) const
 {
-    return m_enabled&&(index>=m_start && index <=m_finish);
+    return m_enabled&&(index>=m_start && index <m_start+m_length);
 }
 
 
@@ -75,33 +75,7 @@ long MGridInteractiveUnit::start() const
 
 void MGridInteractiveUnit::setStart(long start)
 {
-    if(!m_startSet)
-        m_startSet=true;
-
     m_start = start;
-}
-
-long MGridInteractiveUnit::finish() const
-{
-    return m_finish;
-}
-
-void MGridInteractiveUnit::setFinish(long finish)
-{
-    if(!m_finishSet)
-        m_finishSet=true;
-
-    m_finish = finish;
-}
-
-long MGridInteractiveUnit::size() const
-{
-    return m_finish-m_start + 1;
-}
-
-void MGridInteractiveUnit::setSize(long newSize)
-{
-    setFinish(start()+newSize-1);
 }
 
 //qreal MGridInteractiveUnit::spacing() const
@@ -115,9 +89,14 @@ void MGridInteractiveUnit::setSize(long newSize)
 
 void MGridInteractiveUnit::rebuildShape()
 {
-    if(!m_enabled || !m_startSet || !m_finishSet)
+    if(!m_enabled)
         return;
-    if(m_finish>m_items->size())
+    if(m_length==0)
+    {
+        setShapeBorder(QPainterPath());
+        return;
+    }
+    if(m_start+m_length>m_items->size())
     {
         qDebug() << "MemoryInteractiveUnit::rebuildShape() out of range";
         return;
@@ -127,15 +106,15 @@ void MGridInteractiveUnit::rebuildShape()
 
     QRectF itemsRect;
 
-    for(int i = m_start; i <= m_finish; ++i)
+    for(int i = m_start; i < m_start+m_length; ++i)
     {
         itemsRect|=m_items->at(i)->geometry();
     }
 
     MGridItem  *utterLeftItem = m_items->at(m_start),
-                *utterRightItem = m_items->at(m_finish);
+                *utterRightItem = m_items->at(m_start+m_length-1);
     qreal   utterLeft = utterLeftItem->left(),
-            utterRight = utterLeftItem->right();
+            utterRight = utterRightItem->right();
 
     QPainterPath path;
 
@@ -147,7 +126,7 @@ void MGridInteractiveUnit::rebuildShape()
         shapingTop = true;
     if(utterRightItem->right()!=itemsRect.right())
         shapingBottom = true;
-    if(size()<m_scene->itemPerRow()
+    if(length()<m_scene->itemPerRow()
             && utterLeft>utterRight)
         shapingSeparate = true;
 
@@ -204,6 +183,16 @@ qreal MGridInteractiveUnit::extraSize() const
     return m_scene->itemBorder();
 }
 
+long MGridInteractiveUnit::length() const
+{
+    return m_length;
+}
+
+void MGridInteractiveUnit::setLength(long length)
+{
+    m_length = length;
+}
+
 long MGridInteractiveUnit::memorySize() const
 {
     if(!m_items)
@@ -213,22 +202,23 @@ long MGridInteractiveUnit::memorySize() const
 
 
 
-void MGridInteractiveUnit::setRange(long start, long finish)
+void MGridInteractiveUnit::setRange(long start, long length)
 {
     if(!m_items)
     {
         qDebug() << "MemoryInteractiveUnit:m_items NULL";
         return;
     }
-    if(start<0||finish>=memorySize())
+    if(start<0||start+length>memorySize())
     {
         return;
     }
 
     if(!m_enabled)
         m_enabled = true;
+
     setStart(start);
-    setFinish(finish);
+    setLength(length);
 
     rebuildShape();
 }

@@ -65,7 +65,7 @@ void MLineGraphicsPart::setKaMemoryPart(const MemoryPart &part)
 {
     _status = part.state();
     setBegin(part.start());
-    setEnd(part.finish());
+    setEnd(part.length()+part.start()-1);
 
     updateVisualElements();
 }

@@ -62,8 +62,6 @@ public:
 
     /// Начало выделяемого участка
     long startSelection() const;
-    /// Конец выделяемого участка
-    long finishSelection() const;
     /// Длина выделяемого участка
     long lengthSelection() const;
 
@@ -173,7 +171,7 @@ private:
     bool interactiveHighlight() const;
 
 //    void updateInteractiveRange();
-    void updateInteractiveRange(long start, long finish);
+    void updateInteractiveRange(long start, long length);
     qreal itemSize() const;
     bool highlightMode() const;
 
@@ -190,7 +188,7 @@ private:
     void clearItems();
     void clearUnits();
     HighlightStyle highlightStyle() const;
-    QList<MGridUnit*> crossingParts(long from, long to) const;
+    QList<MGridUnit*> crossingParts(long start, long length) const;
     void setupMatrix(const QVector<MGridItem*>& items);
     void clearMouseOver();
 
