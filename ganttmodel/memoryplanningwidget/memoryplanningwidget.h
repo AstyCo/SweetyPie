@@ -3,6 +3,7 @@
 
 #include "ganttproject_global.h"
 #include "memoryview.h"
+#include "mgrid_scene.h"
 
 #include <QGraphicsScene>
 #include <QWidget>
@@ -14,7 +15,6 @@ class MemoryPlanningWidget;
 }
 
 class KaMemory;
-class MGridScene;
 class MLineScene;
 
 
@@ -37,6 +37,7 @@ public:
 
     void setShowButtons(bool flag); ///< отображение кнопок взаимодействия с выбранной областью
     void setShowViews(bool flag); ///< отображение режимов (сеткой/линейная ...)
+    void setSelectionMode(MGridScene::SelectionMode mode);
 
 public slots:
     void changeScene();

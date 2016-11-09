@@ -20,11 +20,12 @@ extern MGridScene* mem_scene;
 MGridInteractiveUnit::MGridInteractiveUnit(MGridScene* scene,QGraphicsItem *parent /*= 0*/)
     : QGraphicsItem(parent,scene)
 {
-    m_start=m_length=0;
-    m_scene=dynamic_cast<MGridScene*>(scene);
+    m_start=0;
+    m_length=0;
+    m_scene=scene;
     if(!m_scene)
     {
-        qDebug() << "MemoryInteractiveUnit no scene";
+        Q_ASSERT(false);
     }
 
     m_enabled = false;
@@ -193,6 +194,7 @@ long MGridInteractiveUnit::length() const
 
 void MGridInteractiveUnit::setLength(long length)
 {
+
     m_length = length;
     rebuildShape();
 }

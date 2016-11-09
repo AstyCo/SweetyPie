@@ -183,7 +183,7 @@ void MainWindow::testMemoryPlanningWidget()
     int memoryPeaceLength,spaceBetweenUnits;
     int vacantPos = 0;
     int id = 1;
-    int memLen = 1280;
+    int memLen = 4080;
 
     for(;;)
     {
@@ -216,7 +216,6 @@ void MainWindow::testMemoryPlanningWidget()
     QSharedPointer<KaMemory> kaMemory(new KaMemory());
     kaMemory->init(records,memLen);
 
-    MGridScene * scene = ui->memoryPlanningWidget->gridScene();
 
     ui->memoryPlanningWidget->setMemory(kaMemory);
 
@@ -224,7 +223,7 @@ void MainWindow::testMemoryPlanningWidget()
 
 
     ui->memoryPlanningWidget->setShowButtons(true);
-    scene->setSelectionMode(MGridScene::areaSelection);
+    ui->memoryPlanningWidget->setSelectionMode(MGridScene::areaSelection);
 }
 
 

@@ -64,7 +64,7 @@ void MGridUnit::paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
     Q_UNUSED(option);
     Q_UNUSED(widget);
 
-    if(!m_scene->isMouseOverUnit(this))
+    if(!m_scene || !m_scene->isMouseOverUnit(this))
         return;
 
 //    qDebug() << "paint" << QString::number(zValue()) << m_shapeBorder;
@@ -159,6 +159,8 @@ void MGridUnit::hoverLeaveEvent(QGraphicsSceneHoverEvent *event)
 
 void MGridUnit::rebuildShape()
 {
+    if(!m_items)
+        return;
     if(length()==0)
     {
         setShapeBorder(QPainterPath());
@@ -285,7 +287,7 @@ void MGridUnit::addItems(long start, long length)
 
 long MGridUnit::removeItems(long from, long count)
 {
-    if(!m_scene)
+    if(!m_scene||!m_items)
         return 0;
     if(from+count<=start())
         return 0;
@@ -347,6 +349,8 @@ long MGridUnit::removeItems(long from, long count)
 
 void MGridUnit::updateParenthesis()
 {
+    if(!m_items)
+        return;
     for(int i = start(); i < start()+length(); ++i)
     {
         m_items->at(i)->setUnit(this);

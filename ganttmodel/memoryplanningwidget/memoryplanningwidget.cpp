@@ -217,6 +217,12 @@ void MemoryPlanningWidget::setShowViews(bool flag)
     ui->radioButtonLineView->setShown(flag);
 }
 
+void MemoryPlanningWidget::setSelectionMode(MGridScene::SelectionMode mode)
+{
+    if(m_mode==MemoryView::MemoryGrid && m_gridScene!=NULL)
+        m_gridScene->setSelectionMode(mode);
+}
+
 
 
 

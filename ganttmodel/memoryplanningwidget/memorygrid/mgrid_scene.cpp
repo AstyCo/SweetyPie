@@ -4,7 +4,7 @@
 #include "mgrid_item.h"
 #include "mgrid_unit.h"
 
-#include "memory.h"
+#include "kamemory.h"
 #include "mgrid_interactiveunit.h"
 
 #include <QGraphicsSceneMouseEvent>
@@ -24,15 +24,14 @@ MGridScene::MGridScene( QObject * parent)
 {
     m_highlightStyle = noHighlightStyle;
     m_selectionMode = SelectionMode_count;
+    m_lastSelected = NULL;
+    m_mouseOverItem = NULL;
+    m_mouseOverUnit = NULL;
+    m_interactiveUnit = new MGridInteractiveUnit(this);
 
     setSelectionMode(noSelection);
     setHighlightStyle( bordersAround | highlightedArea | highlightedItems);
     setItemIndexMethod(QGraphicsScene::NoIndex);
-
-    m_lastSelected = NULL;
-    m_mouseOverItem = NULL;
-    m_mouseOverUnit = NULL;
-    m_interactiveUnit = NULL;
 
 
     m_itemEdge = DEFAULT_EDGELENGTH;
@@ -45,8 +44,6 @@ MGridScene::MGridScene( QObject * parent)
     m_interactiveHighlight = false;
 
     setLengthSelection(100);
-
-    m_interactiveUnit = new MGridInteractiveUnit(this);
 
 }
 
@@ -151,8 +148,6 @@ void MGridScene::clear()
         addItem(m_interactiveUnit);
     clearItems();
 //    clearUnits();
-
-
 
     m_lastSelected = NULL;
     clearMouseOver();
@@ -580,7 +575,7 @@ QList<MGridUnit *> MGridScene::crossingParts(long start, long length) const
 {
     QList<MGridUnit*> result;
 
-    if(!highlightMode())
+    if(!highlightMode() || m_items.size()<start+length)
         return result;
 
     for(int i = start; i < start+length; ++i)
@@ -664,6 +659,11 @@ void MGridScene::setKaMemoryPart(const KaMemoryPart &part)
 long MGridScene::freedCount(long from, long to) const
 {
     long result = 0;
+    if(m_items.size()<=to)
+    {
+        Q_ASSERT(false);
+        return 0;
+    }
     for(int i = from; i <= to; ++i)
     {
         if(!m_items[i]->unit())
@@ -690,7 +690,7 @@ bool MGridScene::setStartSelection(long startHighlight)
 
     if(startHighlight==startSelection())
         return true;
-    if(startHighlight+lengthSelection()-1>m_max)
+    if(startHighlight+(lengthSelection()?(lengthSelection()-1):0)>m_max)
         startHighlight=m_max-lengthSelection();
     if(startHighlight<m_min)
         startHighlight=m_min;
@@ -742,6 +742,12 @@ QSharedPointer<KaMemoryPart>  MGridScene::setEmpty(long from, long count)
 {
     QList<ActionErrors> errors;
     // ANALYSIS
+    if(from+count>m_items.size())
+        if(from>=m_items.size())
+            return QSharedPointer<KaMemoryPart>();
+        else
+            count = m_items.size()-from;
+
     for(int i = 0, j = from; i<count; ++i,++j)
     {
         KaMemoryPart::KaMemoryState itemState = m_items[j]->state();
@@ -768,6 +774,9 @@ QSharedPointer<KaMemoryPart>  MGridScene::setPendingRead(long from, long count)
 
     QList<ActionErrors> errors;
     // ANALYSIS
+    if(from+count>m_items.size())
+        return QSharedPointer<KaMemoryPart>();
+
     for(int i = 0, j = from; i<count; ++i,++j)
     {
         KaMemoryPart::KaMemoryState itemState = m_items[j]->state();
@@ -794,6 +803,9 @@ QSharedPointer<KaMemoryPart>  MGridScene::setFree(long from, long count)
 
     QList<ActionErrors> errors;
     // ANALYSIS
+    if(from+count>m_items.size())
+        return QSharedPointer<KaMemoryPart>();
+
     for(int i = 0, j = from; i<count; ++i,++j)
     {
         // currently no possible error for change state to -> Available
@@ -812,6 +824,9 @@ QSharedPointer<KaMemoryPart>  MGridScene::setPendingWrite(long from, long count)
 
     QList<ActionErrors> errors;
     // ANALYSIS
+    if(from+count>m_items.size())
+        return QSharedPointer<KaMemoryPart>();
+
     for(int i = 0, j = from; i<count; ++i,++j)
     {
         KaMemoryPart::KaMemoryState itemState = m_items[j]->state();
@@ -951,6 +966,8 @@ bool MGridScene::isMouseOverItem(MGridItem* p_item) const
 }
 long MGridScene::memorySize() const
 {
+    if(m_memory.isNull())
+        return 0;
     return m_memory->memorySize();
 }
 

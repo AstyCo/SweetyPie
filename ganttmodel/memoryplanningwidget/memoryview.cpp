@@ -2,7 +2,7 @@
 #include "mgrid_scene.h"
 #include "mline_scene.h"
 
-#include "memory.h"
+#include "kamemory.h"
 
 #include <QDebug>
 #include <QResizeEvent>
