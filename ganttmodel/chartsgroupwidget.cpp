@@ -617,9 +617,6 @@ void ChartTimeXYGroupWidget::addChart(ChartTimeXYWidget *chart)
 void ChartTimeXYGroupWidget::insertChart(int index, ChartTimeXYWidget *chart)
 {
   ChartsGroupWidget::insertChart(index, chart);
-  connect(chart, SIGNAL(curveDataChanged()), SLOT(updateSelectionPanel()));
-  connect(chart->selector(), SIGNAL(intervalSelectionEnded(QPointF)),
-          SLOT(onChartIntervalSelectionEnd(QPointF)));
 
   updateSelectionPanel();
 }
@@ -672,7 +669,16 @@ void ChartTimeXYGroupWidget::onChartIntervalSelectionEnd(QPointF p)
   qreal end = senderModel->intervalSelectionEnd();
   m_selectionPanel->setSelectedInterval(UtcDateTimeInterval(
                                                    pointToDt(begin),
-                                                   pointToDt(end)));
+                                          pointToDt(end)));
+}
+
+void ChartTimeXYGroupWidget::connectChart(ChartXYWidget *chart)
+{
+  ChartsGroupWidget::connectChart(chart);
+
+  connect(chart, SIGNAL(curveDataChanged()), SLOT(updateSelectionPanel()));
+  connect(chart->selector(), SIGNAL(intervalSelectionEnded(QPointF)),
+          SLOT(onChartIntervalSelectionEnd(QPointF)));
 }
 
 void ChartTimeXYGroupWidget::updateSelectionPanel()
