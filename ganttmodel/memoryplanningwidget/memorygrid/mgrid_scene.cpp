@@ -598,7 +598,10 @@ QList<MGridUnit *> MGridScene::crossingParts(long start, long length) const
 {
     QList<MGridUnit*> result;
 
-    if(!highlightMode() || m_items.size()<start+length)
+    if(!highlightMode()
+            || m_items.size()<start+length
+            || m_items.isEmpty()
+            || start<0)
         return result;
 
     for(int i = start; i < start+length; ++i)

@@ -85,7 +85,7 @@ protected slots:
   void onZoomed(const QRectF &rect);
 
 protected:
-  void connectChart(ChartXYWidget *chart);
+  virtual void connectChart(ChartXYWidget *chart);
   void zoomChart(int newZoom);
   void interconnectCharts();
   void alignAxes(int axis);
@@ -136,6 +136,8 @@ private slots:
   void onIntervalSelected();
 
   void onChartIntervalSelectionEnd(QPointF p);
+protected:
+    virtual void connectChart(ChartXYWidget *chart);
 
 protected:
   ChartIntervalSelectionWidget *m_selectionPanel;
