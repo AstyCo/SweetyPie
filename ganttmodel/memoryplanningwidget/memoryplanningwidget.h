@@ -3,7 +3,7 @@
 
 #include "ganttproject_global.h"
 #include "memoryview.h"
-#include "mgrid_scene.h"
+#include "memorygrid/mgrid_scene.h"
 
 #include <QGraphicsScene>
 #include <QWidget>
