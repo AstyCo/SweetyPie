@@ -3,7 +3,7 @@
 
 #include "kamemorypart.h"
 
-#include <QGraphicsItem>
+#include <QGraphicsObject>
 #include <QVariant>
 #include <QPen>
 
@@ -18,8 +18,10 @@ class MGridScene;
 
 */
 
-class MGridUnit : public QGraphicsItem
+class MGridUnit : public QGraphicsObject
 {
+    Q_OBJECT
+
 public:
     MGridUnit(QSharedPointer<KaMemoryPart> memoryPart,QGraphicsScene *scene,QGraphicsItem *parent = 0);
     void initialize();
@@ -59,6 +61,10 @@ public:
 
     QSharedPointer<KaMemoryPart> kaMemoryPart() const;
     void setKaMemoryPart(const QSharedPointer<KaMemoryPart> &kaMemoryPart);
+
+signals:
+    void hoverEnter();
+    void hoverLeave();
 
 private:
     void rebuildShape();

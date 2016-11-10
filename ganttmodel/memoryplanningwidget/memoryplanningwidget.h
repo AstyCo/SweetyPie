@@ -42,6 +42,7 @@ public:
 public slots:
     void changeScene();
     void clear();
+    void hoverPart(const KaMemoryPart &part);
 
     void setGridView();
     void setLineView();
@@ -65,6 +66,9 @@ private slots:
 
 signals:
     void selectionChanged(const QList<KaMemoryPart *>);
+
+    void kaMemoryPartHoverEnter(const KaMemoryPart& part);
+    void kaMemoryPartHoverLeave(const KaMemoryPart& part);
 
 
 private:

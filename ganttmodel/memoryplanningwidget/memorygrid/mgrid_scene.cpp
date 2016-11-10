@@ -323,6 +323,24 @@ MGridScene::SelectionMode MGridScene::selectionMode() const
     return m_selectionMode;
 }
 
+void MGridScene::hoverParts(const QList<KaMemoryPart> &parts)
+{
+    foreach(KaMemoryPart part, parts)
+        hoverPart(part);
+}
+
+void MGridScene::hoverPart(const KaMemoryPart &part)
+{
+
+    foreach(MGridUnit* unit, m_units)
+    {
+        if((*unit->kaMemoryPart())==part)
+        {
+            unit->setShowBorder(true);
+        }
+    }
+}
+
 void MGridScene::setSelectionMode(const SelectionMode &selectionMode)
 {
     if(m_selectionMode == selectionMode)
@@ -559,6 +577,11 @@ void MGridScene::addUnit(MGridUnit *p_memUnit)
 {
     if(!p_memUnit)
         return;
+
+
+    connect(p_memUnit,SIGNAL(hoverEnter()),this,SLOT(onUnitHoverEnter()));
+    connect(p_memUnit,SIGNAL(hoverLeave()),this,SLOT(onUnitHoverLeave()));
+
     m_units.append(p_memUnit);
 }
 
@@ -609,6 +632,25 @@ void MGridScene::clearMouseOver()
 {
     setMouseOverItem(NULL);
     setMouseOverUnit(NULL);
+}
+
+void MGridScene::onUnitHoverEnter()
+{
+    MGridUnit *p_unit = dynamic_cast<MGridUnit*>(sender());
+    if(!p_unit)
+        return;
+
+    emit kaMemoryPartHoverEnter(*p_unit->kaMemoryPart());
+}
+
+void MGridScene::onUnitHoverLeave()
+{
+    MGridUnit *p_unit = dynamic_cast<MGridUnit*>(sender());
+    if(!p_unit)
+        return;
+
+
+    emit kaMemoryPartHoverLeave(*p_unit->kaMemoryPart());
 }
 
 QList<QSharedPointer<KaMemoryPart> > MGridScene::crossingParts() const

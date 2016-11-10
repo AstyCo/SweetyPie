@@ -99,6 +99,9 @@ public:
 
 public slots:
 
+    void hoverParts(const QList<KaMemoryPart> &parts);
+    void hoverPart(const KaMemoryPart &part);
+
     // +ACTIONS
     /*
      *  Empty,          ///< Пустая память - белый
@@ -130,6 +133,9 @@ public slots:
 
 
 signals:
+    void kaMemoryPartHoverEnter(const KaMemoryPart& part);
+    void kaMemoryPartHoverLeave(const KaMemoryPart& part);
+
     void startHighlightChanged(long val);
     void lengthHighlightChanged(long val);
     void interactiveHighlightChanged(bool val);
@@ -189,6 +195,11 @@ private:
     QList<MGridUnit*> crossingParts(long start, long length) const;
     void setupMatrix(const QVector<MGridItem*>& items);
     void clearMouseOver();
+
+private slots:
+    void onUnitHoverEnter();
+    void onUnitHoverLeave();
+
 
     // +WARNINGS
 private:

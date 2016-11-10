@@ -90,6 +90,12 @@ void MemoryPlanningWidget::clear()
     m_gridScene->clear();
 }
 
+void MemoryPlanningWidget::hoverPart(const KaMemoryPart &part)
+{
+    if(m_mode==MemoryView::MemoryGrid && m_gridScene)
+        m_gridScene->hoverPart(part);
+}
+
 void MemoryPlanningWidget::setGridView()
 {
 //    clear();
@@ -99,6 +105,9 @@ void MemoryPlanningWidget::setGridView()
     if(!m_gridScene)
     {
         m_gridScene = new MGridScene(this);
+
+        connect(m_gridScene,SIGNAL(kaMemoryPartHoverEnter(KaMemoryPart)),this,SIGNAL(kaMemoryPartHoverEnter(KaMemoryPart)));
+        connect(m_gridScene,SIGNAL(kaMemoryPartHoverLeave(KaMemoryPart)),this,SIGNAL(kaMemoryPartHoverLeave(KaMemoryPart)));
 
         connect(m_gridScene,SIGNAL(itemInfoChanged(const QString&)),this,SLOT(setItemInfo(const QString&)));
         connect(m_gridScene,SIGNAL(unitInfoChanged(const QString&)),this,SLOT(setUnitInfo(const QString&)));

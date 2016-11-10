@@ -20,7 +20,7 @@ extern MGridScene* mem_scene;
 //}
 
 MGridUnit::MGridUnit(QSharedPointer<KaMemoryPart> memoryPart,QGraphicsScene *scene,QGraphicsItem *parent /*= 0*/)
-    :QGraphicsItem(parent,scene)
+    :QGraphicsObject(parent)
 {
     initialize();
 
@@ -43,6 +43,7 @@ void MGridUnit::setScene(MGridScene* scene)
         qCritical("not MGridScene :: setScene");
         return;
     }
+    m_scene->addItem(this);
     m_items = &(m_scene->m_items);
 
     m_borderPen=QPen(QBrush(QColor(80,80,80)), extraSize() ,Qt::SolidLine,Qt::SquareCap,Qt::MiterJoin);
@@ -64,7 +65,7 @@ void MGridUnit::paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
     Q_UNUSED(option);
     Q_UNUSED(widget);
 
-    if(!m_scene || !m_scene->isMouseOverUnit(this))
+    if(!m_scene || !m_unitSelected)
         return;
 
 //    qDebug() << "paint" << QString::number(zValue()) << m_shapeBorder;
@@ -143,9 +144,9 @@ void MGridUnit::hoverEnterEvent(QGraphicsSceneHoverEvent *event)
     setShowBorder(true);
 
     setZValue(100);
-
     update();
 
+    emit hoverEnter();
     return QGraphicsItem::hoverEnterEvent(event);
 }
 
@@ -153,6 +154,8 @@ void MGridUnit::hoverLeaveEvent(QGraphicsSceneHoverEvent *event)
 {
     setZValue(0);
     setShowBorder(false);
+
+    emit hoverLeave();
     return QGraphicsItem::hoverLeaveEvent(event);
 }
 

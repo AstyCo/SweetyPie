@@ -184,6 +184,7 @@ void MainWindow::testMemoryPlanningWidget()
     int vacantPos = 0;
     int id = 1;
     int memLen = 4080;
+    QSharedPointer<KaMemoryPart> last_part;
 
     for(;;)
     {
@@ -191,12 +192,15 @@ void MainWindow::testMemoryPlanningWidget()
         spaceBetweenUnits = qrand()%15;
 
         QSharedPointer<KaMemoryPart> newPeace(new KaMemoryPart());
+
         vacantPos+=spaceBetweenUnits;
         newPeace->setStart(vacantPos);
         vacantPos+=memoryPeaceLength;
 
         if(vacantPos>memLen)
             break;
+
+        last_part=newPeace;
 
         newPeace->setLength(memoryPeaceLength);
         vacantPos+=1;
@@ -222,8 +226,11 @@ void MainWindow::testMemoryPlanningWidget()
     ui->memoryPlanningWidget->setSelected(10,100);
 
 
+
     ui->memoryPlanningWidget->setShowButtons(true);
     ui->memoryPlanningWidget->setSelectionMode(MGridScene::areaSelection);
+    if(!last_part.isNull())
+        ui->memoryPlanningWidget->hoverPart(*last_part);
 }
 
 
