@@ -62,12 +62,12 @@ public:
     QSharedPointer<KaMemoryPart> kaMemoryPart() const;
     void setKaMemoryPart(const QSharedPointer<KaMemoryPart> &kaMemoryPart);
 
+    void rebuildShape();
 signals:
     void hoverEnter();
     void hoverLeave();
 
 private:
-    void rebuildShape();
 
     void setScene(MGridScene* scene);
 

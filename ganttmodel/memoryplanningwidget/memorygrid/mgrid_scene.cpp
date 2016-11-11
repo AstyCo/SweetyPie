@@ -337,6 +337,12 @@ void MGridScene::hoverPart(const KaMemoryPart &part)
         if((*unit->kaMemoryPart())==part)
         {
             unit->setShowBorder(true);
+            unit->rebuildShape();
+        }
+        else
+        {
+            unit->setShowBorder(false);
+            unit->rebuildShape();
         }
     }
 }
