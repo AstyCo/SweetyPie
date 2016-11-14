@@ -26,3 +26,16 @@ UtcDateTime ChartTimeXYWidget::pointToDt(const QPointF &p)
 {
   return UtcDateTime::fromMicrosecondsSinceEpoch((long long)p.x() * 1000);
 }
+
+void ChartTimeXYWidget::getCurvePointLabel(const CurveIndex &idx, QString &xLbl, QString &yLbl) const
+{
+  QwtPlotCurve *curve = m_curves[idx.indexCurve];
+  QPointF p = curve->sample(idx.indexPoint);
+
+  QString valY = QString::number(p.y(), 'f', 6);
+
+  xLbl = tr("[%1]").arg(pointToDt(p).toStdString(3));
+
+  yLbl = QString("[%1]").arg(valY);
+}
+
