@@ -17,7 +17,7 @@
 GanttPlayerSettings::GanttPlayerSettings(QWidget *parent) :
     QToolBar(parent)
 {
-    m_precision = 10;
+    m_precision = 1000;
     setToolButtonStyle(Qt::ToolButtonIconOnly);
     setStyleSheet("QToolBar { border: 0px }");
 
@@ -37,6 +37,10 @@ void GanttPlayerSettings::setMultiplies(qreal min, qreal max)
             m_left->setText("x"+QString::number(min));
         if(m_right)
             m_right->setText("x"+QString::number(max));
+        if(m_cur!=NULL)
+        {
+            m_cur->setRange(min,max);
+        }
     }
 }
 
@@ -60,10 +64,12 @@ void GanttPlayerSettings::initActions()
     v_layout->addWidget(m_slider);
 
     QHBoxLayout *h_lay = new QHBoxLayout;
-    m_left = new QLabel;
-    m_right = new QLabel;
-    m_cur = new QLabel;
-    m_cur->setStyleSheet("border: 1px solid;");
+    m_left = new QLabel();
+    m_right = new QLabel();
+    m_cur = new QDoubleSpinBox();
+    m_cur->setButtonSymbols(QAbstractSpinBox::NoButtons);
+//    m_cur->setStyleSheet("border: 1px solid;");
+    connect(m_cur,SIGNAL(valueChanged(double)),this,SLOT(onCurTextChanged()));
     QSpacerItem *spacer1 = new QSpacerItem(0,0,QSizePolicy::Expanding,QSizePolicy::Minimum),
             *spacer2 = new QSpacerItem(0,0,QSizePolicy::Expanding,QSizePolicy::Minimum);
 
@@ -97,7 +103,7 @@ void GanttPlayerSettings::initActions()
     setMultiplies(0.5,300);
     setCurrentSpeed(1.0);
     if(m_cur)
-        m_cur->setText(QString::number(m_slider->value()*1.0/m_precision,'f',1));
+        m_cur->setValue(m_slider->value()*1.0/m_precision);
 
 
     wa->setDefaultWidget(speedSelectionWidget);
@@ -135,9 +141,22 @@ void GanttPlayerSettings::onSpeedChanged(int m)
     qreal val = m*1.0/m_precision;
 
     if(m_cur)
-        m_cur->setText(QString::number(val,'f',1));
+    {
+        m_cur->blockSignals(true);
+        m_cur->setValue(val);
+        m_cur->blockSignals(false);
+    }
 
     emit speedChanged(val);
+}
+
+void GanttPlayerSettings::onCurTextChanged()
+{
+    if(!m_cur)
+        return;
+    m_cur->blockSignals(true);
+    setCurrentSpeed(m_cur->value());
+    m_cur->blockSignals(false);
 }
 
 

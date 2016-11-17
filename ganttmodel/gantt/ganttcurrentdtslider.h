@@ -58,7 +58,7 @@ signals:
 public slots:
     void updateTextRect();
     void setToBegin();
-    void makeStep(long long deltaVal);
+    void makeStep(int deltaVal);
     bool setDt(UtcDateTime dt);
     void updateScenePos();
     void updateRange(const UtcDateTime& minDt, const UtcDateTime& maxDt);

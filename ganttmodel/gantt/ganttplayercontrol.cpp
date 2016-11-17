@@ -18,7 +18,6 @@ GanttPlayerControl::GanttPlayerControl(QWidget *parent) :
     m_settings = NULL;
     m_timer = std::make_pair<QTimer*,PlayMode>(NULL,PlayMode_count);
     m_speedModifier = 1.0;
-    setStep(GANTTPLAYER_DEFAULT_STEP);
     setPlayFrequency(GANTTPLAYER_DEFAULT_FREQUENCY);
 
 
@@ -62,23 +61,15 @@ GanttPlayerControl::~GanttPlayerControl()
 {
     delete ui;
 }
-long long GanttPlayerControl::step() const
-{
-    return m_step;
-}
-void GanttPlayerControl::setStep(long long step)
-{
-    m_step = step;
-}
 
 void GanttPlayerControl::makeStepForward()
 {
-    emit makeStep(m_step);
+    emit makeStep(_MICROSECONDS_IN_SECOND * m_speedModifier / m_playFrequency);
 }
 
 void GanttPlayerControl::makeStepBackward()
 {
-    emit makeStep(-m_step);
+    emit makeStep(-_MICROSECONDS_IN_SECOND * m_speedModifier / m_playFrequency);
 }
 
 void GanttPlayerControl::onSpeedChanged(qreal mult)
@@ -103,7 +94,7 @@ void GanttPlayerControl::updateTimers()
 
 int GanttPlayerControl::msec()
 {
-    return _MILISECONDS_IN_SECOND / m_playFrequency / m_speedModifier;
+    return _MILISECONDS_IN_SECOND * 1.0 / m_playFrequency;
 }
 
 void GanttPlayerControl::setSpeedModifier(const qreal &speedModifier)
