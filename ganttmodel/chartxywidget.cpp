@@ -170,7 +170,7 @@ CurveIndex ChartXYWidget::findClosestPointAllCurves(const QPointF &pos, SearchDi
     return CurveIndex();
 
   double minLenth = 2147483647;
-  CurveIndex rez, rez2;
+  CurveIndex rez;
   if (direction == sdLeft)
   {
     for(int j = 0; j < m_curves.count(); j++)
@@ -293,23 +293,19 @@ CurveIndex ChartXYWidget::findClosestPointAllCurves(const QPointF &pos, SearchDi
               if (!isFind) //Кликнули в той половине, где нет точек
               {
                   QPointF prev;
-                  minLenth = 2147483647;
                   for(long i = 0; i < m_curves[j]->dataSize(); i++)
                   {
                       p = getTransformedPoint(j, i);
                       double length = calcDistanceOnX(p, prev); //Ближайшая к точке с координатами (0;0)
                       if (length < minLenth)
                       {
-                          rez2.indexCurve = j;
-                          rez2.indexPoint = i;
+                          rez.indexCurve = j;
+                          rez.indexPoint = i;
                           minLenth = length;
                       }
                   }
-                  return rez2;
               }
-
           }
-
       }
     return rez;
   }
