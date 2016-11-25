@@ -170,7 +170,7 @@ CurveIndex ChartXYWidget::findClosestPointAllCurves(const QPointF &pos, SearchDi
     return CurveIndex();
 
   double minLenth = 2147483647;
-  CurveIndex rez;
+  CurveIndex rez, rez2;
   if (direction == sdLeft)
   {
     for(int j = 0; j < m_curves.count(); j++)
@@ -250,53 +250,67 @@ CurveIndex ChartXYWidget::findClosestPointAllCurves(const QPointF &pos, SearchDi
   }
   else
   {
-    for(int j = 0; j < m_curves.count(); j++)
-    {
-      if (m_curves[j]->isVisible() && m_curves[j]->dataSize() > 0)
+      for(int j = 0; j < m_curves.count(); j++)
       {
-        bool isFind = false;
-        QPointF p, prev;
-        for(long i = 0; i < m_curves[j]->dataSize(); i++)
-        {
-          p = getTransformedPoint(j, i);
-          if (pos.x() <= p.x())
+          if (m_curves[j]->isVisible() && m_curves[j]->dataSize() > 0)
           {
-            if (i > 0)
-            {
-              double lenth = calcDistance(prev, pos);
-              if(lenth < minLenth)
+              bool isFind = false;
+              QPointF p;
+              for(long i = 0; i < m_curves[j]->dataSize(); i++)
               {
-                isFind = true;
-                minLenth = lenth;
-                rez.indexCurve = j;
-                rez.indexPoint = i - 1;
+                  p = getTransformedPoint(j, i);
+                  if (pos.x() < 0)  //Кликнули слева от 0 по Х
+                  {
+                      if (p.x() >= 0) continue;  //Если точка в списке по Х справа от 0, продолжаем со сл. точкой
+                      else                   //Иначе, смотрим насколько она близко
+                      {
+                          double length = calcDistanceOnX(p, pos);
+                          if (length < minLenth)
+                          {
+                              rez.indexCurve = j;
+                              rez.indexPoint = i;
+                              minLenth = length;
+                              isFind = true;  //Запоминаем, что в левой половине плоскости была точка
+                          }
+                      }
+                  }
+                  else if (pos.x() >=0) //Кликнули справа от 0 по Х
+                  {
+                      if (p.x() < 0) continue; //Если точка в списке по Х слева от 0, продолжаем со сл. точкой
+                      else  //Иначе, смотрим насколько она близко
+                      {
+                          double length = calcDistanceOnX(p, pos);
+                          if (length < minLenth)
+                          {
+                              rez.indexCurve = j;
+                              rez.indexPoint = i;
+                              minLenth = length;
+                              isFind = true;  //Запоминаем, что в левой половине плоскости была точка
+                          }
+                      }
+                  }
               }
-            }
-            double lenth = calcDistance(p, pos);
-            if(lenth < minLenth)
-            {
-              isFind = true;
-              minLenth = lenth;
-              rez.indexCurve = j;
-              rez.indexPoint = i;
-            }
-            break;
+              if (!isFind) //Кликнули в той половине, где нет точек
+              {
+                  QPointF prev;
+                  minLenth = 2147483647;
+                  for(long i = 0; i < m_curves[j]->dataSize(); i++)
+                  {
+                      p = getTransformedPoint(j, i);
+                      double length = calcDistanceOnX(p, prev); //Ближайшая к точке с координатами (0;0)
+                      if (length < minLenth)
+                      {
+                          rez2.indexCurve = j;
+                          rez2.indexPoint = i;
+                          minLenth = length;
+                      }
+                  }
+                  return rez2;
+              }
+
           }
-          prev = p;
-        }
-        if(!isFind)
-        {
-          QPointF transP = getTransformedPoint(j, m_curves[j]->dataSize() - 1);
-          double lenth = calcDistance(transP, pos);
-          if(lenth < minLenth)
-          {
-            minLenth = lenth;
-            rez.indexCurve = j;
-            rez.indexPoint =  m_curves[j]->dataSize() - 1;
-          }
-        }
+
       }
-    }
     return rez;
   }
 }
@@ -492,7 +506,11 @@ double ChartXYWidget::calcDistance(const QPointF &p1, const QPointF &p2) const
   double y2 = (p2.y() - p1.y()) * (p2.y() - p1.y());
   return sqrt(x2 + y2);
 }
-
+double ChartXYWidget::calcDistanceOnX(const QPointF &p1, const QPointF &p2) const
+{
+    double x = fabs(p2.x()) - fabs(p1.x());
+    return fabs(x);
+}
 void ChartXYWidget::createActionsToolBar()
 {
   m_actionsToolBar = new ChartActionsToolBar();
@@ -994,4 +1012,7 @@ void ChartXYWidget::updateChartSettings(const ChartSettings &newSettings)
   foreach(CurveDetailsGroupBox *panel, m_panelCurveDetailsList)
     panel->updateCurveColor();
 }
-
+void ChartXYWidget::setAxisTitle(const QString &title, QwtPlot::Axis axis)
+{
+   ui->m_plot->setAxisTitle(axis, title);
+}

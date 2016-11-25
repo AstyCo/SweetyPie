@@ -102,6 +102,8 @@ public:
   void setLeftAxisMargin(int value);
   void setRightAxisMargin(int value);
 
+  void setAxisTitle(const QString &title, QwtPlot::Axis axis = QwtPlot::xBottom);
+
   /// Обновляет данные графика. Если таймер запущен то график не перерисовывается.
   void updateData(int indexCurve, const QVector<QPointF> &data);
 
@@ -214,7 +216,7 @@ protected:
   QPointF getTransformedPoint(int indexCurve, int indexPoint) const;
 
   double calcDistance(const QPointF &p1, const QPointF &p2) const;
-
+  double calcDistanceOnX(const QPointF &p1, const QPointF &p2) const;
   void createActionsToolBar();
   void createMenuIntervals();
 
