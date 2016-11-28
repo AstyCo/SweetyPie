@@ -21,7 +21,9 @@ public:
 private:
     Ui::MainWindow *ui;
     void testChartWidget();
-    void testChartGroupWidget();
+    void testChartTimeXYWidget();
+    void testChartsGroupWidget();
+    void testChartXYGroupWidget();
     void testGanttModel();
     void testMemoryPlanningWidget();
     void testDtIntervalWidget();

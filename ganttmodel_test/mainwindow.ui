@@ -16,13 +16,23 @@
   <widget class="QWidget" name="centralWidget">
    <layout class="QGridLayout" name="gridLayout">
     <item row="0" column="0">
-     <widget class="QTabWidget" name="tabWidget">
+     <widget class="QTabWidget" name="tabWidget_chartTimeXYWidget">
       <property name="currentIndex">
-       <number>3</number>
+       <number>1</number>
       </property>
+      <widget class="QWidget" name="tab_7">
+       <attribute name="title">
+        <string>ChartXYWidget</string>
+       </attribute>
+       <layout class="QVBoxLayout" name="verticalLayout_4">
+        <item>
+         <widget class="ChartXYWidget" name="widget_chartXYWidget" native="true"/>
+        </item>
+       </layout>
+      </widget>
       <widget class="QWidget" name="tab">
        <attribute name="title">
-        <string>ChartWidget</string>
+        <string>ChartTimeXYWidget</string>
        </attribute>
        <layout class="QVBoxLayout" name="verticalLayout">
         <item>
@@ -49,7 +59,7 @@
          </widget>
         </item>
         <item>
-         <widget class="ChartTimeXYWidget" name="widget" native="true"/>
+         <widget class="ChartTimeXYWidget" name="widget_chartTimeXYWidget" native="true"/>
         </item>
         <item>
          <layout class="QHBoxLayout" name="horizontalLayout_2">
@@ -71,13 +81,23 @@
         </item>
        </layout>
       </widget>
+      <widget class="QWidget" name="tab_6">
+       <attribute name="title">
+        <string>ChartsGroupWidget</string>
+       </attribute>
+       <layout class="QVBoxLayout" name="verticalLayout_3">
+        <item>
+         <widget class="ChartsGroupWidget" name="widget_chartsGroupWidget" native="true"/>
+        </item>
+       </layout>
+      </widget>
       <widget class="QWidget" name="tab_2">
        <attribute name="title">
-        <string>ChartGroupWidget</string>
+        <string>ChartTimeXYGroupWidget</string>
        </attribute>
        <layout class="QVBoxLayout" name="verticalLayout_2" stretch="1,0">
         <item>
-         <widget class="ChartTimeXYGroupWidget" name="widget_chartGroup" native="true"/>
+         <widget class="ChartTimeXYGroupWidget" name="widget_chartXYGroupWidget" native="true"/>
         </item>
         <item>
          <layout class="QHBoxLayout" name="horizontalLayout">
@@ -209,7 +229,7 @@
      <x>0</x>
      <y>0</y>
      <width>1032</width>
-     <height>21</height>
+     <height>26</height>
     </rect>
    </property>
   </widget>
@@ -250,6 +270,18 @@
    <class>DtIntervalWidget</class>
    <extends>QWidget</extends>
    <header>dtintervalwidget/dtintervalwidget.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>ChartsGroupWidget</class>
+   <extends>QWidget</extends>
+   <header location="global">chartsgroupwidget.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>ChartXYWidget</class>
+   <extends>QWidget</extends>
+   <header location="global">chartxywidget.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

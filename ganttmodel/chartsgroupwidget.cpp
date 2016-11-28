@@ -28,6 +28,7 @@ ChartsGroupWidget::ChartsGroupWidget(QWidget *parent) :
   ui->setupUi(this);  
 
   createActionsToolBar();
+  ui->widget_SelectionPanel->hide();
 
   m_zoomActive = 0;
   m_syncChartsByAxisX = true;
@@ -56,8 +57,7 @@ void ChartsGroupWidget::createActionsToolBar()
                   << caSelectTarget
                   << caClear
                   << caDetailsPanel
-                  << caSettingsDlg
-                  << caSelectIntervalPanel);
+                  << caSettingsDlg);
 
   connect(m_actionsToolBar->getChartAction(caScale), SIGNAL(triggered(bool)), SLOT(onAction_autoZoom_clicked()));
   connect(m_actionsToolBar->getChartAction(caGrid), SIGNAL(toggled(bool)), SLOT(onAction_grid_toggled(bool)));
@@ -600,6 +600,8 @@ void ChartsGroupWidget::onAction_panelCurveDetails_toggled(bool checked)
 ChartTimeXYGroupWidget::ChartTimeXYGroupWidget(QWidget *parent)
   : ChartsGroupWidget(parent)
 {
+  m_actionsToolBar->setChartActions(m_actionsToolBar->chartActions() << caSelectIntervalPanel);
+
   m_selectionPanel = ui->widget_SelectionPanel;
   m_panelStatsVisible = false;
   setPanelSelectIntervalVisible(false);
