@@ -160,7 +160,7 @@ void GanttCurrentDtSlider::setToBegin()
     setDt(m_minDt);
 }
 
-void GanttCurrentDtSlider::makeStep(long long deltaVal)
+void GanttCurrentDtSlider::makeStep(int deltaVal)
 {
     setDt(m_dt.addMicroseconds(deltaVal));
 }

@@ -121,7 +121,7 @@ public slots:
     void onViewResize(const QSize& newSize);
     void updateSceneRect();
 
-    void makeStep(long long step);
+    void makeStep(int step);
     void moveSliderToNextEventStart();
     void moveSliderToPrevEventFinish();
     void moveSliderToViewStart();

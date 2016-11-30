@@ -184,7 +184,7 @@ void GanttScene::updateSceneRect()
     updateSliderRect();
 }
 
-void GanttScene::makeStep(long long step)
+void GanttScene::makeStep(int step)
 {
     if(m_slider)
         m_slider->makeStep(step);

@@ -77,7 +77,7 @@ GanttWidget::GanttWidget(QWidget *parent) :
     connect(ui->intervalSlizedZoom,SIGNAL(increaseButtonClicked(bool)),this,SLOT(newLimits()));
     connect(ui->intervalSlizedZoom,SIGNAL(restoreButtonClicked(bool)),this,SLOT(prevLimits()));
 
-    connect(ui->playerControl,SIGNAL(makeStep(long long)),m_scene,SLOT(makeStep(long long)));
+    connect(ui->playerControl,SIGNAL(makeStep(int)),m_scene,SLOT(makeStep(int)));
     connect(ui->playerControl,SIGNAL(goToNextEventStart()),m_scene,SLOT(moveSliderToNextEventStart()));
     connect(ui->playerControl,SIGNAL(goToPrevEventFinish()),m_scene,SLOT(moveSliderToPrevEventFinish()));
     connect(ui->playerControl,SIGNAL(goToViewStart()),m_scene,SLOT(moveSliderToViewStart()));

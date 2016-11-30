@@ -18,9 +18,6 @@ public:
     explicit GanttPlayerControl(QWidget *parent = 0);
     ~GanttPlayerControl();
 
-    long long step() const;
-    void setStep(long long step);
-
     qreal playFrequency() const;
     void setPlayFrequency(const qreal &playFrequency);
 
@@ -29,7 +26,7 @@ public:
     void setSpeedModifier(const qreal &speedModifier);
 
 signals:
-    void makeStep(long long stepLengthInMicrosec);
+    void makeStep(int stepLengthInMicrosec);
     void goToPrevEventFinish();
     void goToNextEventStart();
     void stop();
@@ -84,7 +81,6 @@ private:
 
     Ui::GanttPlayerControl *ui;
 
-    long long m_step; ///< Шаг текущего времени в микросекундах
     qreal m_playFrequency; ///< Число шагов в секунду
     qreal m_speedModifier;
 

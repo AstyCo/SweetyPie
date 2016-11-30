@@ -40,6 +40,9 @@ public:
   static QPointF dtToPoint(const UtcDateTime &dt, double y = 0);
   static UtcDateTime pointToDt(const QPointF &p);
 
+protected:
+  void getCurvePointLabel(const CurveIndex &idx, QString &xLbl, QString &yLbl) const;
+
 private:
 
 };
