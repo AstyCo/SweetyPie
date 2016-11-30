@@ -26,6 +26,13 @@
        </attribute>
        <layout class="QVBoxLayout" name="verticalLayout">
         <item>
+         <widget class="QLabel" name="label">
+          <property name="text">
+           <string>TextLabel</string>
+          </property>
+         </widget>
+        </item>
+        <item>
          <widget class="QSlider" name="horizontalSlider">
           <property name="orientation">
            <enum>Qt::Horizontal</enum>
@@ -172,15 +179,22 @@
         <string>Memory</string>
        </attribute>
        <layout class="QGridLayout" name="gridLayout_2">
-        <item row="0" column="0">
-         <widget class="MemoryPlanningWidget" name="memoryPlanningWidget" native="true"/>
-        </item>
         <item row="1" column="0">
          <widget class="QPushButton" name="pushButton_2">
           <property name="text">
            <string>PushButton</string>
           </property>
          </widget>
+        </item>
+        <item row="1" column="1">
+         <widget class="QPushButton" name="pushButton_4">
+          <property name="text">
+           <string>ClearSelection</string>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="0" colspan="2">
+         <widget class="MemoryPlanningWidget" name="memoryPlanningWidget" native="true"/>
         </item>
        </layout>
       </widget>
@@ -217,6 +231,12 @@
  <layoutdefault spacing="6" margin="11"/>
  <customwidgets>
   <customwidget>
+   <class>MemoryPlanningWidget</class>
+   <extends>QWidget</extends>
+   <header>memoryplanningwidget.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
    <class>IntervalSlider</class>
    <extends>QWidget</extends>
    <header>intervalslider.h</header>
@@ -226,12 +246,6 @@
    <class>GanttWidget</class>
    <extends>QWidget</extends>
    <header>ganttwidget.h</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
-   <class>MemoryPlanningWidget</class>
-   <extends>QWidget</extends>
-   <header>memoryplanningwidget.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>

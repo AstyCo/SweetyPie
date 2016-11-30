@@ -105,12 +105,12 @@ public slots:
     // +ACTIONS
     /*
      *  Empty,          ///< Пустая память - белый
-     *  Free,           ///< Свободно - серый
+     *  Free,           ///< Считано - серый
      *  Recorded,       ///< Записано - зелёный
-     *  PendingWrite,   ///< Ожидание съёмки - оранжевый
-     *  PendingRead,    ///< Ожидание сброса - жёлтый
+     *  PendingWrite,   ///< Ожидание записи - оранжевый
+     *  PendingRead,    ///< Ожидание считано - жёлтый
      *  ErrorWrite,     ///< Ошибка записи - сиреневый
-     *  ErrorRead,      ///< Ошибка сброса - красный
+     *  ErrorRead,      ///< Ошибка считывания - красный
     */
 
     void setKaMemoryPart(const KaMemoryPart& part);
@@ -128,6 +128,8 @@ public slots:
     QSharedPointer<KaMemoryPart>  setPendingRead();
     QSharedPointer<KaMemoryPart>  setPendingWrite();
     void clear();
+    void clearInteractiveUnit();
+    bool isInteractiveUnit();
 
     // -ACTIONS
 

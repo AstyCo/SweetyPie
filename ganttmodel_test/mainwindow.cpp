@@ -24,7 +24,6 @@ MainWindow::MainWindow(QWidget *parent) :
   ui(new Ui::MainWindow)
 {
   ui->setupUi(this);
-
   installEventFilter(ui->widgetIntervalSlider);
 
   testChartWidget();
@@ -229,6 +228,7 @@ void MainWindow::testMemoryPlanningWidget()
 
     ui->memoryPlanningWidget->setShowButtons(true);
     ui->memoryPlanningWidget->setSelectionMode(MGridScene::areaSelection);
+
     if(!last_part.isNull())
         ui->memoryPlanningWidget->hoverPart(*last_part);
 }
@@ -302,4 +302,12 @@ void MainWindow::on_pushButton_3_clicked()
 {
     foreach(ChartXYWidget *cxy, ui->widget_chartGroup->charts())
       qDebug() << cxy->getPlot()->canvas()->sizeHint();
+}
+
+void MainWindow::on_pushButton_4_clicked()
+{
+    MGridScene * grisScene = ui->memoryPlanningWidget->gridScene();
+    grisScene->clearInteractiveUnit();
+    qDebug()<<grisScene->startSelection();
+    qDebug()<<grisScene->lengthSelection();
 }
