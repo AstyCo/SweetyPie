@@ -28,6 +28,7 @@ MGridScene::MGridScene( QObject * parent)
     m_mouseOverItem = NULL;
     m_mouseOverUnit = NULL;
     m_interactiveUnit = NULL;
+    m_tmpInteractiveLength = 0;
 
     setSelectionMode(noSelection);
     setHighlightStyle( bordersAround | highlightedArea | highlightedItems);
@@ -141,9 +142,9 @@ void MGridScene::clear()
 //    return;
     m_items.clear();
     m_units.clear();
-    QGraphicsScene::clear();
     clearInteractiveUnit();
     clearItems();
+    QGraphicsScene::clear();
 //    clearUnits();
 
     m_lastSelected = NULL;
@@ -154,6 +155,10 @@ void MGridScene::clearInteractiveUnit()
 {
     if(m_interactiveUnit)
     {
+        if(m_selectionMode == positionSelection)
+        {
+            m_tmpInteractiveLength = m_interactiveUnit->length();
+        }
         removeItem(m_interactiveUnit);
         m_interactiveUnit = NULL;
     }
@@ -761,6 +766,10 @@ bool MGridScene::setStartSelection(long startHighlight)
     {
         m_interactiveUnit = new MGridInteractiveUnit(this);
         addItem(m_interactiveUnit);
+        if(m_selectionMode == positionSelection)
+        {
+            m_interactiveUnit->setLength(m_tmpInteractiveLength);
+        }
     }
 
     if(m_interactiveUnit==NULL)
@@ -791,6 +800,7 @@ bool MGridScene::setLengthSelection(long lengthHighlight)
         addItem(m_interactiveUnit);
     }
 
+    m_tmpInteractiveLength = lengthHighlight;
     m_interactiveUnit->setLength(lengthHighlight);
     emit lengthHighlightChanged(lengthSelection());
     return true;

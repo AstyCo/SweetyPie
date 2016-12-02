@@ -252,6 +252,7 @@ private:
     MGridUnit *m_mouseOverUnit;
     MGridItem* m_lastSelected;
     MGridInteractiveUnit* m_interactiveUnit;
+    long m_tmpInteractiveLength;
 
 
     QList<MGridUnit*> m_units;

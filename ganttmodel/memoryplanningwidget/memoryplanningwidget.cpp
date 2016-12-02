@@ -42,7 +42,7 @@ MemoryPlanningWidget::MemoryPlanningWidget(QWidget *parent) :
     m_gridScene = NULL;
     m_lineScene = NULL;
 
-    m_gridWidgets << ui->crossingParts
+    m_gridWidgets
                   << ui->pushButtonEmpty
                   << ui->pushButtonFree
                   << ui->pushButtonPendingRead
@@ -157,7 +157,7 @@ void MemoryPlanningWidget::updateParts()
         if(part->length()!=0)
             text += m_gridScene->toAdress(part->start(),part->start()+part->length()-1)+'\n';
     }
-    ui->crossingParts->setText(base+text);
+//    ui->crossingParts->setText(base+text);
 }
 
 void MemoryPlanningWidget::onSelectionChanged()

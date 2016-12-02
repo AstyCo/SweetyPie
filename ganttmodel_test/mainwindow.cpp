@@ -293,7 +293,9 @@ void MainWindow::testMemoryPlanningWidget()
 
 
     ui->memoryPlanningWidget->setShowButtons(true);
-    ui->memoryPlanningWidget->setSelectionMode(MGridScene::areaSelection);
+//    MGridScene * grisScene = ui->memoryPlanningWidget->gridScene();
+//    grisScene->setLengthSelection(100);
+    ui->memoryPlanningWidget->setSelectionMode(MGridScene::positionSelection);
 
     if(!last_part.isNull())
         ui->memoryPlanningWidget->hoverPart(*last_part);
