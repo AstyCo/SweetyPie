@@ -30,9 +30,9 @@ unix {
 LIBS += -L$${DEP_PATH_LIBS}
 
 CONFIG(release, debug|release) {
-  LIBS += -lextensions -lqwt
+  LIBS += -lextensions -lextensions-gui -lqwt
 } else:CONFIG(debug, debug|release) {
-  LIBS += -lextensionsd
+  LIBS += -lextensionsd -lextensions-guid
   unix {
     LIBS += -lqwt
   } else:win32 {
@@ -43,7 +43,8 @@ CONFIG(release, debug|release) {
 
 INCLUDEPATH += $${DEP_PATH_HEADERS}/extensions
 DEPENDPATH += $${DEP_PATH_HEADERS}/extensions
-
+INCLUDEPATH += $${DEP_PATH_HEADERS}/extensions-gui
+DEPENDPATH += $${DEP_PATH_HEADERS}/extensions-gui
 # qwt
 INCLUDEPATH += $${DEP_PATH_HEADERS}
 INCLUDEPATH += $${DEP_PATH_HEADERS}/qwt
