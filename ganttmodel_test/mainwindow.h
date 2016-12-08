@@ -21,7 +21,9 @@ public:
 private:
     Ui::MainWindow *ui;
     void testChartWidget();
-    void testChartGroupWidget();
+    void testChartTimeXYWidget();
+    void testChartsGroupWidget();
+    void testChartXYGroupWidget();
     void testGanttModel();
     void testMemoryPlanningWidget();
     void testDtIntervalWidget();
@@ -37,6 +39,7 @@ private slots:
     void on_radioButton_ganttPlayer_toggled(bool checked);
     void on_pushButton_2_clicked();
     void on_pushButton_3_clicked();
+    void on_pushButton_4_clicked();
 };
 
 #endif // MAINWINDOW_H

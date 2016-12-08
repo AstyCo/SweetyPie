@@ -5,6 +5,7 @@
 #include <QDebug>
 #include <QCursor>
 #include "QGraphicsTextItem"
+#include "memoryview.h"
 
 QSharedPointer<KaMemory> &MLineScene::memory()
 {
@@ -106,13 +107,13 @@ void MLineScene::createLegend(qreal posX, qreal posY)
     qreal col7 = col6 + 20;
 
 
-    QGraphicsTextItem * empText = new QGraphicsTextItem(tr("Пусто"));
-    QGraphicsTextItem * freText = new QGraphicsTextItem(tr("Свободно"));
-    QGraphicsTextItem * recText = new QGraphicsTextItem(tr("Записано"));
-    QGraphicsTextItem * penWrText = new QGraphicsTextItem(tr("Ожидание съёмки"));
-    QGraphicsTextItem * penReText = new QGraphicsTextItem(tr("Ожидание сброса"));
-    QGraphicsTextItem * errWrText = new QGraphicsTextItem(tr("Ошибка записи"));
-    QGraphicsTextItem * errReText = new QGraphicsTextItem(tr("Ошибка сброса"));
+    QGraphicsTextItem * empText = new QGraphicsTextItem(MemoryState_to_QString(KaMemoryPart::Empty));
+    QGraphicsTextItem * freText = new QGraphicsTextItem(MemoryState_to_QString(KaMemoryPart::Free));
+    QGraphicsTextItem * recText = new QGraphicsTextItem(MemoryState_to_QString(KaMemoryPart::Recorded));
+    QGraphicsTextItem * penWrText = new QGraphicsTextItem(MemoryState_to_QString(KaMemoryPart::PendingWrite));
+    QGraphicsTextItem * penReText = new QGraphicsTextItem(MemoryState_to_QString(KaMemoryPart::PendingRead));
+    QGraphicsTextItem * errWrText = new QGraphicsTextItem(MemoryState_to_QString(KaMemoryPart::ErrorWrite));
+    QGraphicsTextItem * errReText = new QGraphicsTextItem(MemoryState_to_QString(KaMemoryPart::ErrorRead));
     QGraphicsTextItem * inputChanelsText = new QGraphicsTextItem();
     QGraphicsTextItem * memSizeText = new QGraphicsTextItem();
 
@@ -140,13 +141,13 @@ void MLineScene::createLegend(qreal posX, qreal posY)
 
     QGraphicsRectItem * recRect = new QGraphicsRectItem(col6,row0,15,15);
 
-    empRect->setBrush(QBrush(QColor(Qt::white)));
-    freRect->setBrush(QBrush(QColor(Qt::gray)));
-    recRect->setBrush(QBrush(QColor(Qt::green)));
-    penWrRect->setBrush(QBrush(QColor(255, 165, 0)));
-    penReRect->setBrush(QBrush(QColor(Qt::yellow)));
-    errWrRect->setBrush(QBrush(QColor(Qt::magenta)));
-    errReRect->setBrush(QBrush(QColor(Qt::red)));
+    empRect->setBrush(MemoryState_to_QColor(KaMemoryPart::Empty));
+    freRect->setBrush(MemoryState_to_QColor(KaMemoryPart::Free));
+    recRect->setBrush(MemoryState_to_QColor(KaMemoryPart::Recorded));
+    penWrRect->setBrush(MemoryState_to_QColor(KaMemoryPart::PendingWrite));
+    penReRect->setBrush(MemoryState_to_QColor(KaMemoryPart::PendingRead));
+    errWrRect->setBrush(MemoryState_to_QColor(KaMemoryPart::ErrorWrite));
+    errReRect->setBrush(MemoryState_to_QColor(KaMemoryPart::ErrorRead));
 
     addItem(empRect);
     addItem(freRect);
