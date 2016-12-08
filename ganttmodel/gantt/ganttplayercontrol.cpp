@@ -105,7 +105,6 @@ void GanttPlayerControl::setSpeedModifier(const qreal &speedModifier)
 
 void GanttPlayerControl::setSettings(GanttPlayerSettings *settings)
 {
-
     if(!settings)
         return;
     m_settings = settings;

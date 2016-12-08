@@ -68,7 +68,6 @@ void GanttPlayerSettings::initActions()
     m_right = new QLabel();
     m_cur = new QDoubleSpinBox();
     m_cur->setButtonSymbols(QAbstractSpinBox::NoButtons);
-//    m_cur->setStyleSheet("border: 1px solid;");
     connect(m_cur,SIGNAL(valueChanged(double)),this,SLOT(onCurTextChanged()));
     QSpacerItem *spacer1 = new QSpacerItem(0,0,QSizePolicy::Expanding,QSizePolicy::Minimum),
             *spacer2 = new QSpacerItem(0,0,QSizePolicy::Expanding,QSizePolicy::Minimum);
@@ -115,8 +114,8 @@ void GanttPlayerSettings::initActions()
     if(p_button)
         p_button->setPopupMode(QToolButton::InstantPopup);
 
-    p_action = new QAction(QIcon(":/images/Buttons 64x64/reg_step_on_64.png"),QString::fromUtf8("выбор шага воспроизведения"),this);
-    addAction(p_action);
+//    p_action = new QAction(QIcon(":/images/Buttons 64x64/reg_step_on_64.png"),QString::fromUtf8("выбор шага воспроизведения"),this);
+//    addAction(p_action);
 }
 
 int GanttPlayerSettings::precision() const
