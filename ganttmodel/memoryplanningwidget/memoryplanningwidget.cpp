@@ -10,6 +10,7 @@
 #include <QDebug>
 #include <QBitmap>
 #include <QScrollBar>
+#include <QResizeEvent>
 
 
 MemoryPlanningWidget::MemoryPlanningWidget(QWidget *parent) :
@@ -34,10 +35,10 @@ MemoryPlanningWidget::MemoryPlanningWidget(QWidget *parent) :
     ui->pushButtonPendingWrite->setIcon(buttonIcon);
 
 
-    ui->labelInfo->setMinimumSize(QSize(50,16));
-    ui->labelInfo->setMaximumSize(QSize(530,16));
-    ui->labelItemInfo->setMinimumSize(QSize(100,16));
-    ui->labelItemInfo->setMaximumSize(QSize(100,16));
+//    ui->labelInfo->setMinimumSize(QSize(50,16));
+//    ui->labelInfo->setMaximumSize(QSize(530,16));
+//    ui->labelItemInfo->setMinimumSize(QSize(100,16));
+//    ui->labelItemInfo->setMaximumSize(QSize(100,16));
 
     m_gridScene = NULL;
     m_lineScene = NULL;
@@ -47,7 +48,7 @@ MemoryPlanningWidget::MemoryPlanningWidget(QWidget *parent) :
                   << ui->pushButtonFree
                   << ui->pushButtonPendingRead
                   << ui->pushButtonPendingWrite
-                  << ui->labelInfo
+//                  << ui->labelInfo
                   << ui->labelItemInfo
                   << ui->labelUnitInfo;
 
@@ -230,6 +231,13 @@ void MemoryPlanningWidget::setSelectionMode(MGridScene::SelectionMode mode)
 {
     if(m_mode==MemoryView::MemoryGrid && m_gridScene!=NULL)
         m_gridScene->setSelectionMode(mode);
+}
+
+void MemoryPlanningWidget::resizeEvent(QResizeEvent *e)
+{
+    QWidget::resizeEvent(e);
+    ui->labelUnitInfo->setMaximumWidth(qMax(width() - 50 - ui->labelItemInfo->width(),20));
+
 }
 
 

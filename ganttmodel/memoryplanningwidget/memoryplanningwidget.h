@@ -39,6 +39,9 @@ public:
     void setShowViews(bool flag); ///< отображение режимов (сеткой/линейная ...)
     void setSelectionMode(MGridScene::SelectionMode mode);
 
+protected:
+    void resizeEvent(QResizeEvent *);
+
 public slots:
     void changeScene();
     void clear();
