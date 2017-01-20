@@ -136,6 +136,8 @@ private slots:
   void onIntervalSelected();
 
   void onChartIntervalSelectionEnd(QPointF p);
+signals:
+  void intervalSelectionEnded();
 protected:
     virtual void connectChart(ChartXYWidget *chart);
 

@@ -672,6 +672,8 @@ void ChartTimeXYGroupWidget::onChartIntervalSelectionEnd(QPointF p)
   m_selectionPanel->setSelectedInterval(UtcDateTimeInterval(
                                                    pointToDt(begin),
                                           pointToDt(end)));
+
+   emit intervalSelectionEnded();
 }
 
 void ChartTimeXYGroupWidget::connectChart(ChartXYWidget *chart)
