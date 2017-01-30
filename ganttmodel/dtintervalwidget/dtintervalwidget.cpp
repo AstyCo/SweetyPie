@@ -2,14 +2,15 @@
 #include "ui_dtintervalwidget.h"
 
 #include "timespan.h"
+#include "utcdatetime.h"
 #include <QMenu>
 
-DtIntervalWidget::DtIntervalWidget(QWidget *parent) :
-    QWidget(parent),
-    ui(new Ui::DtIntervalWidget)
+void DtIntervalWidget::init()
 {
     ui->setupUi(this);
+
     setFlags(0x0);
+    _negative = true;   // negative allowed by default
 
     _dtMenu = new QMenu(this);
     ui->toolButtonToDt->setMenu(_dtMenu);
@@ -29,9 +30,14 @@ DtIntervalWidget::DtIntervalWidget(QWidget *parent) :
     connect(this,SIGNAL(beginDtChanged(QDateTime)),this,SLOT(matchBegins(QDateTime)));
     connect(this,SIGNAL(endDtChanged(QDateTime)),this,SLOT(matchEnds(QDateTime)));
 
-
-
     createMenuSetDt();
+}
+
+DtIntervalWidget::DtIntervalWidget(QWidget *parent) :
+    QWidget(parent),
+    ui(new Ui::DtIntervalWidget)
+{
+    init();
 }
 
 void DtIntervalWidget::testDateTimeBegin()
@@ -114,6 +120,17 @@ void DtIntervalWidget::set3DaysIntervalFuture()
 DtIntervalWidget::~DtIntervalWidget()
 {
     delete ui;
+}
+
+void DtIntervalWidget::setMode(DtIntervalWidget::DtIntervalWidgetMode mode, bool value)
+{
+    switch(mode){
+    case NegativeEnabled:
+        if(!value && ui->dateTimeEditBegin->dateTime() > ui->dateTimeEditEnd->dateTime()){
+            setBeginDt(ui->dateTimeEditEnd->dateTime());
+        }
+        _negative = value;
+    }
 }
 
 void DtIntervalWidget::hideAll()
@@ -242,6 +259,7 @@ void DtIntervalWidget::setBeginDt(const QDateTime &dt)
 {
     if(dt == ui->dateTimeEditBegin->dateTime())
         return;    
+
     ui->dateTimeEditBegin->setDateTime(dt);
     emit beginDtChanged(beginDt());
 }
@@ -250,6 +268,7 @@ void DtIntervalWidget::setEndDt(const QDateTime &dt)
 {
     if(dt == ui->dateTimeEditEnd->dateTime())
         return;
+
     ui->dateTimeEditEnd->setDateTime(dt);
     emit endDtChanged(endDt());
 }
@@ -292,6 +311,19 @@ void DtIntervalWidget::matchBegins(const QDateTime &dt)
 {
     if(!dt.isValid())
         return;
+    QDateTime newBeg = dt;
+
+    if(!_negative && newBeg > ui->dateTimeEditEnd->dateTime()){
+        TimeSpan dur = ui->dateTimeEditEnd->dateTime() - _lastBegin;
+        QDateTime newEnd = UtcDateTime(newBeg + dur).dateTime();
+        if(newEnd > ui->dateTimeEditEnd->maximumDateTime()){
+            newEnd = ui->dateTimeEditEnd->maximumDateTime();
+            newBeg = UtcDateTime(newEnd - dur).dateTime();
+        }
+        ui->dateTimeEditBegin->setDateTime(newBeg);
+        setEndDt(newEnd);
+    }
+
     blockAllSignals(true);
 
     setBeginDt(dt);
@@ -299,12 +331,27 @@ void DtIntervalWidget::matchBegins(const QDateTime &dt)
     updateTimespanLabel();
 
     blockAllSignals(false);
+
+    _lastBegin = dt;
 }
 
 void DtIntervalWidget::matchEnds(const QDateTime &dt)
 {
     if(!dt.isValid())
         return;
+    QDateTime newEnd = dt;
+
+    if(!_negative && newEnd < ui->dateTimeEditBegin->dateTime() && _lastEnd.isValid()){
+        TimeSpan dur = _lastEnd - ui->dateTimeEditBegin->dateTime();
+        QDateTime newBeg = UtcDateTime(newEnd - dur).dateTime();
+        if(newBeg < ui->dateTimeEditBegin->minimumDateTime()){
+            newBeg = ui->dateTimeEditBegin->minimumDateTime();
+            newEnd = UtcDateTime(newBeg + dur).dateTime();
+        }
+        ui->dateTimeEditEnd->setDateTime(newEnd);
+        setBeginDt(newBeg);
+    }
+
     blockAllSignals(true);
 
     setEndDt(dt);
@@ -312,4 +359,6 @@ void DtIntervalWidget::matchEnds(const QDateTime &dt)
     updateTimespanLabel();
 
     blockAllSignals(false);
+
+    _lastEnd = dt;
 }

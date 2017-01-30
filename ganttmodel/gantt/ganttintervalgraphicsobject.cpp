@@ -74,7 +74,7 @@ void GanttIntervalGraphicsObject::paint(QPainter *painter, const QStyleOptionGra
         QPainterPath path;
 
         path.moveTo(-MIN_VIS_WIDTH/2,   drawRect.top());
-        path.lineTo(-1,                  drawRect.top() + drawRect.height()/2);
+        path.lineTo(-1,                 drawRect.top() + drawRect.height()/2);
         path.lineTo(-MIN_VIS_WIDTH/2,   drawRect.bottom());
         path.lineTo(-MIN_VIS_WIDTH/2,   drawRect.top());
 

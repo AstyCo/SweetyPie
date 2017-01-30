@@ -304,11 +304,11 @@ void MainWindow::testMemoryPlanningWidget()
 
 void MainWindow::testDtIntervalWidget()
 {
-
+    ui->dtIntervalWidget->setMode(DtIntervalWidget::NegativeEnabled, false);
     ui->dtIntervalWidget->setFlags(DtIntervalWidget::DateTime|
                                    DtIntervalWidget::IntervalSlider|
                                    DtIntervalWidget::ToolButtonToDt);
-    ui->dtIntervalWidget->setLimits(QDateTime::currentDateTime(),QDateTime::currentDateTime().addDays(3));
+    ui->dtIntervalWidget->setLimits(QDateTime::currentDateTime(),QDateTime::currentDateTime().addDays(300));
 
 }
 

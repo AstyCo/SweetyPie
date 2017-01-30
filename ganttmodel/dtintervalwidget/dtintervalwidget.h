@@ -18,7 +18,7 @@ class DtIntervalWidget;
 class GANTTMODELSHARED_EXPORT DtIntervalWidget : public QWidget
 {
     Q_OBJECT
-
+    void init();
 public:
     enum DtIntervalWidgetEnum
     {
@@ -32,10 +32,15 @@ public:
         DtIntervalWidgetEnumCount = 3       // Число элементов enum DateRoundFlags
     };
 
+    enum DtIntervalWidgetMode {
+        NegativeEnabled = 1
+    };
+
     explicit DtIntervalWidget(QWidget *parent = 0);
     ~DtIntervalWidget();
 
 
+    void setMode(DtIntervalWidgetMode mode, bool value);    // Установить режим ( вкл/выкл отриц. значения ...)
     virtual void hideAll();
     virtual void setFlags(int);
 
@@ -106,7 +111,12 @@ signals:
 protected:
     QMenu * _dtMenu;
     int m_flags;
+
+    bool _negative;
+    QDateTime _lastBegin, _lastEnd;
+
 private:
+
     Ui::DtIntervalWidget *ui;
 
 };

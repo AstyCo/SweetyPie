@@ -159,7 +159,7 @@ private:
 
     QList<GanttIntervalGraphicsObject*> m_items;
     QList<GanttCalcGraphicsObject*> m_calcItems;
-    QMap<const /*GanttInfoLeaf*/GanttInfoItem*, /*GanttGraphicsObject*/QGraphicsObject*> m_itemByInfo;
+    QMap<const GanttInfoItem*, QGraphicsObject*> m_itemByInfo;
     QMap<UtcDateTime,const GanttInfoLeaf*> m_infoByStart,
                                             m_infoByFinish;
     QPointer<GanttTreeModel> m_model;
