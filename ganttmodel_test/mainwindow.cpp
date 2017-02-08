@@ -6,8 +6,8 @@
 #include <time.h>
 #include "utcdatetime.h"
 
-#include "ganttinfonode.h"
-#include "ganttglobalvalues.h"
+#include "gantt/info/ganttinfonode.h"
+#include "gantt/private_extensions/gantt-lib_global_values.h"
 
 #include <qwt/qwt_scale_div.h>
 #include <qwt/qwt_scale_widget.h>
@@ -190,7 +190,7 @@ QList<GanttInfoItem*> generateTest()
                 sec = qrand()%60,
                 microsec = qrand()%1000000;
 
-        node->setCalcDt(UtcDateTime(year,month,day,hour,minute,sec,microsec));
+        node->setStart(UtcDateTime(year,month,day,hour,minute,sec,microsec));
 
         QColor color = QColor::fromRgb(qrand()%255,qrand()%255,qrand()%255);
         int max = qrand()%4;
@@ -217,7 +217,7 @@ QList<GanttInfoItem*> generateTest()
                         .addMonths(month - 1);
 
             leaf->setStart(start);
-            leaf->setFinish(finish);
+            leaf->setTimeSpan(finish - start);
             leaf->setColor(color);
             leaf->setTitle("leaf"+QString::number(1 + i) + ':' + QString::number(1 + j));
 
@@ -233,6 +233,9 @@ QList<GanttInfoItem*> generateTest()
 
 void MainWindow::testGanttModel()
 {
+    _model = new GanttTreeModel(0, this);
+    ui->ganttWidget->setModel(_model);
+    ui->ganttWidget->setView(ui->treeViewGantt);
 //    connect(ui->ganttWidget,SIGNAL(currentDtChanged(UtcDateTime)),this,SLOT(testSignal(UtcDateTime)));
 
 //    ui->ganttWidget->addItems(generateTest());
@@ -347,12 +350,12 @@ void MainWindow::on_checkBox_showLegend_toggled(bool checked)
 
 void MainWindow::on_pushButton_ganttAddItems_clicked()
 {
-    ui->ganttWidget->addItems(generateTest());
+    _model->addItems(generateTest());
 }
 
 void MainWindow::on_pushButton_ganttClear_clicked()
 {
-    ui->ganttWidget->clear();
+    _model->clear();
 }
 
 void MainWindow::on_radioButton_ganttPlayer_toggled(bool checked)

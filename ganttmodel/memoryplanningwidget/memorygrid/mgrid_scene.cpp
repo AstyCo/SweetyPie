@@ -824,11 +824,12 @@ QSharedPointer<KaMemoryPart>  MGridScene::setEmpty(long from, long count)
 {
     QList<ActionErrors> errors;
     // ANALYSIS
-    if(from+count>m_items.size())
+    if(from+count>m_items.size()){
         if(from>=m_items.size())
             return QSharedPointer<KaMemoryPart>();
         else
             count = m_items.size()-from;
+    }
 
     for(int i = 0, j = from; i<count; ++i,++j)
     {

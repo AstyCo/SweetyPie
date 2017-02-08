@@ -6,61 +6,18 @@
 
 QT       += core gui
 
-VERSION = 0.5.9
-
 TEMPLATE = lib
 
 DEFINES += QWT_DLL
+DEFINES += GANTTMODEL_LIBRARY
 
 TARGET = ganttmodel
 
-DESTDIR = $$OUT_PWD/../bin
+include(../gantt-lib-include.pri)
 
-#DLLDESTDIR = $$DESTDIR
-
-# пути к зависимым библиотекам
-unix {
-  DEP_PATH_LIBS = /usr/lib64
-  DEP_PATH_HEADERS = /usr/include
-} else:win32 {
-  DEP_PATH_LIBS = C:/lib64
-  DEP_PATH_HEADERS = C:/include
-}
-
-LIBS += -L$${DEP_PATH_LIBS}
-
-CONFIG(release, debug|release) {
-  LIBS += -lextensions -lextensions-gui -lqwt
-} else:CONFIG(debug, debug|release) {
-  LIBS += -lextensionsd -lextensions-guid
-  unix {
-    LIBS += -lqwt
-  } else:win32 {
-    LIBS += -lqwtd
-  }
-}
-
-
-INCLUDEPATH += $${DEP_PATH_HEADERS}/extensions
-DEPENDPATH += $${DEP_PATH_HEADERS}/extensions
-INCLUDEPATH += $${DEP_PATH_HEADERS}/extensions-gui
-DEPENDPATH += $${DEP_PATH_HEADERS}/extensions-gui
-# qwt
-INCLUDEPATH += $${DEP_PATH_HEADERS}
-INCLUDEPATH += $${DEP_PATH_HEADERS}/qwt
-
-INCLUDEPATH += "$$PWD/../ganttmodel"
-INCLUDEPATH += "$$PWD/../ganttmodel/memoryplanningwidget"
-INCLUDEPATH += "$$PWD/../ganttmodel/memoryplanningwidget/memoryline"
-INCLUDEPATH += "$$PWD/../ganttmodel/memoryplanningwidget/memorygrid"
-INCLUDEPATH += "$$PWD/../ganttmodel/gantt"
-
-
-DEFINES += GANTTMODEL_LIBRARY
 
 SOURCES += \
     curvedetailsgroupbox.cpp \
-    intervalslider.cpp \
     plotinterval.cpp \
     chartsgroupwidget.cpp \
     chartactionstoolbar.cpp \
@@ -79,41 +36,41 @@ SOURCES += \
     memoryplanningwidget/memoryline/mline_picker.cpp \
     memoryplanningwidget/memoryline/mline_scene.cpp \
     memoryplanningwidget/kamemorylegend.cpp \
-    gantt/ganttintervalsliderzoom.cpp \
-    gantt/ganttplayersettings.cpp \
-    gantt/main.cpp \
-    gantt/playercontrolbutton.cpp \
-    gantt/qgraphicsrectitemwithtext.cpp \
-    gantt/ganttwidget.cpp \
-    gantt/gantttreeview.cpp \
-    gantt/gantttreemodel.cpp \
-    gantt/gantttreedelegate.cpp \
-    gantt/ganttscene.cpp \
-    gantt/ganttplayercontrol.cpp \
-    gantt/ganttintervalslider.cpp \
-    gantt/ganttinfonode.cpp \
-    gantt/ganttinfoleaf.cpp \
-    gantt/ganttinfoitem.cpp \
-    gantt/ganttheaderview.cpp \
-    gantt/ganttheader.cpp \
-    gantt/ganttgraphicsview.cpp \
-    appeventfilter.cpp \
-    gantt/ganttcurrentdtslider.cpp \
-    gantt/ganttdtcrossobject.cpp \
-    gantt/gantthovergraphicsobject.cpp \
-    gantt/ganttcalcgraphicsobject.cpp \
-    gantt/ganttgraphicsobject.cpp \
-    gantt/ganttintervalgraphicsobject.cpp \
     charttimexywidget.cpp \
     chartxywidget.cpp \
     chartintervalselectionwidget.cpp \
     chartintervalselector.cpp \
-    dtintervalwidget/dtintervalwidget.cpp
+    extensions/dtline.cpp \
+    extensions/intervalslider.cpp \
+    extensions/timespan_extension.cpp \
+    gantt/info/ganttinfoitem.cpp \
+    gantt/info/ganttinfoleaf.cpp \
+    gantt/info/ganttinfonode.cpp \
+    gantt/info/ganttinfotree.cpp \
+    gantt/player/ganttplayercontrol.cpp \
+    gantt/player/ganttplayersettings.cpp \
+    gantt/player/playercontrolbutton.cpp \
+    gantt/plot/scene_objects/ganttcalcgraphicsobject.cpp \
+    gantt/plot/scene_objects/ganttcurrentdtslider.cpp \
+    gantt/plot/scene_objects/ganttdtcrossobject.cpp \
+    gantt/plot/scene_objects/ganttgraphicsobject.cpp \
+    gantt/plot/scene_objects/gantthovergraphicsobject.cpp \
+    gantt/plot/scene_objects/ganttintervalgraphicsobject.cpp \
+    gantt/plot/ganttdtline.cpp \
+    gantt/plot/ganttgraphicsview.cpp \
+    gantt/plot/ganttscene.cpp \
+    gantt/plot/hfitscene.cpp \
+    gantt/ganttintervalslider.cpp \
+    ganttwidget.cpp \
+    dtintervalwidget/dtintervalwidget.cpp \
+    extensions/qrectunion.cpp \
+    gantt/private_extensions/mousepresshelper.cpp \
+    extensions/intervalunion.cpp \
+    extensions/myutcdatetimeinterval.cpp
 
 
 HEADERS += \
     curvedetailsgroupbox.h \
-    intervalslider.h \
     plotinterval.h \
     chartsgroupwidget.h \
     chartactionstoolbar.h \
@@ -133,37 +90,40 @@ HEADERS += \
     memoryplanningwidget/memoryline/mline_scene.h \
     memoryplanningwidget/memory_globalvalues.h \
     memoryplanningwidget/kamemorylegend.h \
-    gantt/ganttintervalsliderzoom.h \
-    gantt/ganttplayersettings.h \
-    gantt/playercontrolbutton.h \
-    gantt/qgraphicsrectitemwithtext.h \
-    gantt/ganttwidget.h \
-    gantt/gantttreeview.h \
-    gantt/gantttreemodel.h \
-    gantt/gantttreedelegate.h \
-    gantt/ganttscene.h \
-    gantt/ganttplayercontrol.h \
-    gantt/ganttintervalslider.h \
-    gantt/ganttinfonode.h \
-    gantt/ganttinfoleaf.h \
-    gantt/ganttinfoitem.h \
-    gantt/ganttheaderview.h \
-    gantt/ganttheader.h \
-    gantt/ganttgraphicsview.h \
-    gantt/ganttglobalvalues.h \
     ganttproject_global.h \
-    appeventfilter.h \
-    gantt/ganttcurrentdtslider.h \
-    gantt/ganttdtcrossobject.h \
-    gantt/gantthovergraphicsobject.h \
-    gantt/ganttcalcgraphicsobject.h \
-    gantt/ganttgraphicsobject.h \
-    gantt/ganttintervalgraphicsobject.h \
     charttimexywidget.h \
     chartxywidget.h \
     chartintervalselectionwidget.h \
     chartintervalselector.h \
-    dtintervalwidget/dtintervalwidget.h
+    extensions/dtline.h \
+    extensions/timespan_extension.h \
+    gantt/info/ganttinfoitem.h \
+    gantt/info/ganttinfoleaf.h \
+    gantt/info/ganttinfonode.h \
+    gantt/info/ganttinfotree.h \
+    gantt/player/ganttplayercontrol.h \
+    gantt/player/ganttplayersettings.h \
+    gantt/player/playercontrolbutton.h \
+    gantt/plot/scene_objects/ganttcalcgraphicsobject.h \
+    gantt/plot/scene_objects/ganttcurrentdtslider.h \
+    gantt/plot/scene_objects/ganttdtcrossobject.h \
+    gantt/plot/scene_objects/ganttgraphicsobject.h \
+    gantt/plot/scene_objects/gantthovergraphicsobject.h \
+    gantt/plot/scene_objects/ganttintervalgraphicsobject.h \
+    gantt/plot/ganttdtline.h \
+    gantt/plot/ganttgraphicsview.h \
+    gantt/plot/ganttscene.h \
+    gantt/plot/hfitscene.h \
+    gantt/ganttintervalslider.h \
+    extensions/intervalslider.h \
+    ganttwidget.h \
+    dtintervalwidget/dtintervalwidget.h \
+    extensions/qrectunion.h \
+    gantt/private_extensions/idtinterval.h \
+    gantt/private_extensions/gantt-lib_global_values.h \
+    gantt/private_extensions/mousepresshelper.h \
+    extensions/intervalunion.h \
+    extensions/myutcdatetimeinterval.h
 
 
 RESOURCES += \
@@ -174,18 +134,15 @@ FORMS += \
     chartsgroupwidget.ui \
     chartsettingsdlg.ui \
     memoryplanningwidget/memoryplanningwidget.ui \
-    gantt/ganttwidget.ui \
-    gantt/mygantt_playercontrol.ui \
     chartxywidget.ui \
     chartintervalselectionwidget.ui \
+    gantt/player/ganttplayercontrol.ui \
+    ganttwidget.ui \
     dtintervalwidget/dtintervalwidget.ui
 
-include(build_config.pri)
-
-CODECFORTR = UTF-8
-
-TRANSLATIONS += \
-    locale/file_codec_locale_ru.ts
-
 DISTFILES += \
-    icons/request_wait.png
+    ../gantt-lib-include.pri \
+    gantt_uml.qmodel \
+    build_config.pri
+
+include(../build_config.pri)

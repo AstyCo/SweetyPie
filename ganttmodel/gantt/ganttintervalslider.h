@@ -1,18 +1,17 @@
 #ifndef GANTTINTERVALSLIDER_H
 #define GANTTINTERVALSLIDER_H
 
-#include "intervalslider.h"
+#include "gantt/private_extensions/idtinterval.h"
+#include "extensions/intervalslider.h"
 #include "utcdatetime.h"
 
-#include "ganttheader.h"
-
-class GanttScene;
 class GanttWidget;
 
-class GanttIntervalSlider : public IntervalSlider
+class GanttIntervalSlider : public IntervalSlider, public IDtInterval
 {
     Q_OBJECT
 
+    void init();
 public:
     explicit GanttIntervalSlider(QWidget *parent = 0);
 
@@ -20,41 +19,44 @@ public:
     void setCurrentTimeRectWidth(const qreal &currentTimeRectWidth);
     void setCurrentTimeRectColor(const QColor &currentTimeRectColor);
 
-    void setScene(GanttScene *scene);
-
-    UtcDateTime posToDt(qreal pos) const;
     UtcDateTime valToDt(long long val) const;
     long long dtToVal(const UtcDateTime& dt) const;
-    UtcDateTime closestStartDt(long long val) const;
-    UtcDateTime closestFinishDt(long long val) const;
 
     UtcDateTime beginDt() const;
     UtcDateTime endDt() const;
 
-    void setLimits(long long minValue, long long maxValue);
-
-
     long long minTimeSize() const;
 
-    void setBeginHandle(long long beginHandle);
-    void setEndHandle(long long endHandle);
+    void setBeginHandle(long long beginHandle, bool manually = false);
+    void setEndHandle(long long endHandle, bool manually = false);
     void reset();
 
+    //--- IDtInterval impl
+    virtual UtcDateTime left() const;
+    virtual UtcDateTime right() const;
+    virtual TimeSpan timeSpan() const;
+    virtual UtcDateTime min() const;
+    virtual UtcDateTime max() const;
 
-private:
-    UtcDateTime closestStartDtHelper(const UtcDateTime& val, GanttHeader::GanttPrecisionMode mode) const;
-    UtcDateTime closestFinishDtHelper(const UtcDateTime& val, GanttHeader::GanttPrecisionMode mode) const;
+    virtual void setLeft(const UtcDateTime &dt);
+    virtual void setRight(const UtcDateTime &dt);
+    virtual void setMin(const UtcDateTime &dt);
+    virtual void setTimeSpan(const TimeSpan &ts);
 
-    bool outOfLimits(const UtcDateTime& dt) const;
 
+    //---
+signals:
+    void rangeChanged(const UtcDateTime &min, const TimeSpan &ts);
+    void rangeChangedManually(const UtcDateTime &min, const TimeSpan &ts);
 
 public slots:
+    void setRange(const UtcDateTime &min, const TimeSpan &ts);
+    void setLimits(long long min, long long max);
+    void setLimits(const UtcDateTime &min, const TimeSpan &ts);
+    void setLimitsWithOffset(const UtcDateTime &min, const TimeSpan &ts);
     void setCurrentTime(const UtcDateTime &dt);
     void setDrawCurrentDt(bool draw);
-    void checkLimits(const UtcDateTime &start, const UtcDateTime &finish);
-    void updateRange();
     void setMinTimeSize(long long minTimeSize);
-    void updateMinTimeSize(const QSize& newViewSize);
 
 protected:
     void drawHandle(QPainter *painter, const QRect &handleRect, bool is_selected) const;
@@ -62,12 +64,12 @@ protected:
 
     void drawCurrentTime(QPainter *painter, const QRect &sliderRect) const;
 
-    void mouseMoveEvent(QMouseEvent *e);
-    bool moveHandles(long long deltaVal);
-    void mousePressEvent(QMouseEvent *e);
 
-    void keyPressEvent(QKeyEvent *e);
-    void keyReleaseEvent(QKeyEvent *e);
+private:
+    bool outOfLimits(const UtcDateTime& dt) const;
+private slots:
+    void emitRangeChanged();
+    void emitRangeChangedManually();
 
 private:
     UtcDateTime m_currentTime;
@@ -75,8 +77,6 @@ private:
     qreal m_currentTimeRectWidth;
     QColor m_currentTimeRectColor;
 
-    GanttScene* m_scene;
-    GanttWidget* m_widget;
     long long m_shiftRange;
     long long m_minTimeSize;
     QPoint m_lastPos;

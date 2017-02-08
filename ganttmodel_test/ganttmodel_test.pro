@@ -34,7 +34,6 @@ INCLUDEPATH += "$$PWD/../ganttmodel"
 INCLUDEPATH += "$$PWD/../ganttmodel/memoryplanningwidget"
 INCLUDEPATH += "$$PWD/../ganttmodel/memoryplanningwidget/memoryline"
 INCLUDEPATH += "$$PWD/../ganttmodel/memoryplanningwidget/memorygrid"
-INCLUDEPATH += "$$PWD/../ganttmodel/gantt"
 
 
 message(DESTDIR: $$DESTDIR)
@@ -71,10 +70,12 @@ INCLUDEPATH += $${DEP_PATH_HEADERS}
 
 
 SOURCES += main.cpp\
-        mainwindow.cpp
+        mainwindow.cpp \
+    gantttreemodel.cpp
 
 
-HEADERS  += mainwindow.h
+HEADERS  += mainwindow.h \
+    gantttreemodel.h
 
 FORMS    += mainwindow.ui
 

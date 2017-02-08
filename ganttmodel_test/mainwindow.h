@@ -3,6 +3,7 @@
 
 #include <QMainWindow>
 #include "utcdatetime.h"
+#include "gantttreemodel.h"
 
 namespace Ui {
 class MainWindow;
@@ -40,6 +41,9 @@ private slots:
     void on_pushButton_2_clicked();
     void on_pushButton_3_clicked();
     void on_pushButton_4_clicked();
+
+private:
+    GanttTreeModel *_model;
 };
 
 #endif // MAINWINDOW_H

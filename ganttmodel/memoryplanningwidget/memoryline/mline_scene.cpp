@@ -68,7 +68,7 @@ MLineScene::~MLineScene()
 
 }
 
-void MLineScene::drawBackground(QPainter *painter, const QRectF &rect)
+void MLineScene::drawBackground(QPainter */*painter*/, const QRectF &/*rect*/)
 {
 //    painter->setPen(QColor(Qt::black));
 //    qreal metrY = 40;
@@ -114,8 +114,6 @@ void MLineScene::createLegend(qreal posX, qreal posY)
     QGraphicsTextItem * penReText = new QGraphicsTextItem(MemoryState_to_QString(KaMemoryPart::PendingRead));
     QGraphicsTextItem * errWrText = new QGraphicsTextItem(MemoryState_to_QString(KaMemoryPart::ErrorWrite));
     QGraphicsTextItem * errReText = new QGraphicsTextItem(MemoryState_to_QString(KaMemoryPart::ErrorRead));
-    QGraphicsTextItem * inputChanelsText = new QGraphicsTextItem();
-    QGraphicsTextItem * memSizeText = new QGraphicsTextItem();
 
     empText->setPos(col1, row0);
     freText->setPos(col1, row1);

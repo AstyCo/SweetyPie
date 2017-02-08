@@ -1,7 +1,7 @@
 #ifndef DTINTERVALWIDGET_H
 #define DTINTERVALWIDGET_H
 
-#include "intervalslider.h"
+#include "extensions/intervalslider.h"
 
 #include <QWidget>
 

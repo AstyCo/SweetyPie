@@ -1,5 +1,4 @@
 #include "mainwindow.h"
-#include "appeventfilter.h"
 #include <QApplication>
 #include "QTextCodec"
 
