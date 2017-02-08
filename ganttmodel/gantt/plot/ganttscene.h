@@ -32,6 +32,8 @@ public:
     UtcDateTime posToDt(int pos) const;
     void setTreeInfo(GanttInfoTree *treeInfo);
 
+    const MousePressHelper *mousePressH() const;
+
 protected:
     void mousePressEvent(QGraphicsSceneMouseEvent *event);
     void mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event);

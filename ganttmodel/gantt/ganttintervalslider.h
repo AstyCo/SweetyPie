@@ -4,6 +4,7 @@
 #include "gantt/private_extensions/idtinterval.h"
 #include "extensions/intervalslider.h"
 #include "utcdatetime.h"
+#include "extensions/myutcdatetimeinterval.h"
 
 class GanttWidget;
 
@@ -51,6 +52,7 @@ signals:
 
 public slots:
     void setRange(const UtcDateTime &min, const TimeSpan &ts);
+    void setRangeWithExpansion(const UtcDateTime &min, const TimeSpan &ts);
     void setLimits(long long min, long long max);
     void setLimits(const UtcDateTime &min, const TimeSpan &ts);
     void setLimitsWithOffset(const UtcDateTime &min, const TimeSpan &ts);
@@ -63,7 +65,7 @@ protected:
     void drawSliderLine(QPainter *painter, const QRect &sliderRect) const;
 
     void drawCurrentTime(QPainter *painter, const QRect &sliderRect) const;
-
+    void mouseDoubleClickEvent(QMouseEvent *e);
 
 private:
     bool outOfLimits(const UtcDateTime& dt) const;
@@ -72,6 +74,8 @@ private slots:
     void emitRangeChangedManually();
 
 private:
+    bool _blockChangeSavedLimits;
+    MyUtcDateTimeInterval _savedLimits;
     UtcDateTime m_currentTime;
 
     qreal m_currentTimeRectWidth;

@@ -41,7 +41,7 @@ signals:
     void collapsed(GanttInfoNode *which);
 
 public slots:
-    void onCurrentItemChanged(GanttInfoItem *item);
+    void onCurrentItemChanged(const GanttInfoItem *item);
     void onNodeExpanded();
     void onNodeCollapsed();
     void onClicked(const QModelIndex &index);

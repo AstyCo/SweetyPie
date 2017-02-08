@@ -62,9 +62,12 @@ int GanttInfoTree::height() const
     return heightH(_root);
 }
 
-void GanttInfoTree::onCurrentItemChanged(GanttInfoItem */*item*/)
+void GanttInfoTree::onCurrentItemChanged(const GanttInfoItem *item)
 {
-    /// TODO?
+    if(!item)
+        return;
+    qDebug() << "emit currentChanged" << item->index();
+    emit currentChanged(item->index());
 }
 
 GanttInfoItem *GanttInfoTree::infoForIndex(const QModelIndex &index) const
@@ -76,6 +79,7 @@ GanttInfoItem *GanttInfoTree::infoForIndex(const QModelIndex &index) const
 
 void GanttInfoTree::onClicked(const QModelIndex &index)
 {
+    qDebug() << "currentChanged" << index;
     emit currentChanged(infoForIndex(index.sibling(index.row(),0)));
 }
 

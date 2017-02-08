@@ -120,6 +120,7 @@ void GanttWidget::init()
 {
     _treeInfo = new GanttInfoTree(this);
     _scene = new GanttScene(ui->ganttView,ui->widgetDtLine,this);
+    ui->ganttView->setMousePressH(_scene->mousePressH());
     connectSceneWithInfo();
     connectIntervals();
     connectPlayer();
@@ -142,6 +143,7 @@ void GanttWidget::connectSceneWithInfo()
     connect(_treeInfo,SIGNAL(collapsed(GanttInfoNode*)),_scene,SLOT(onCollapsed(GanttInfoNode*)));
     connect(_treeInfo,SIGNAL(limitsChanged(UtcDateTime,TimeSpan)),_scene,SLOT(onLimitsChanged(UtcDateTime,TimeSpan)));
 
+    connect(_scene,SIGNAL(currentItemChanged(const GanttInfoItem*)),_treeInfo,SLOT(onCurrentItemChanged(const GanttInfoItem*)));
 }
 
 void GanttWidget::connectIntervals()
@@ -149,12 +151,14 @@ void GanttWidget::connectIntervals()
     connect(_treeInfo,SIGNAL(limitsChanged(UtcDateTime,TimeSpan)),
             ui->widgetIntervalSlider,SLOT(setLimitsWithOffset(UtcDateTime,TimeSpan)));
     connect(_treeInfo,SIGNAL(limitsChanged(UtcDateTime,TimeSpan)),
+            ui->widgetIntervalSlider,SLOT(resetHandlesManually()));
+    connect(_treeInfo,SIGNAL(limitsChanged(UtcDateTime,TimeSpan)),
             ui->widgetDtLine,SLOT(setLimitsWithOffset(UtcDateTime,TimeSpan)));
 
     connect(ui->widgetIntervalSlider,SIGNAL(rangeChangedManually(UtcDateTime,TimeSpan)),
                 ui->widgetDtLine,SLOT(setLimits(UtcDateTime,TimeSpan)));
     connect(ui->widgetDtLine,SIGNAL(rangeChangedManually(UtcDateTime,TimeSpan)),
-                ui->widgetIntervalSlider,SLOT(setRange(UtcDateTime,TimeSpan)));
+                ui->widgetIntervalSlider,SLOT(setRangeWithExpansion(UtcDateTime,TimeSpan)));
 
     connect(ui->widgetDtLine,SIGNAL(dtChanged(UtcDateTime)),
                 ui->widgetIntervalSlider,SLOT(setCurrentTime(UtcDateTime)));

@@ -15,7 +15,7 @@ QRectFUnion::QRectFUnion(const QList<QRectF> &rects)
 void QRectFUnion::fillRects(QPainter *painter, const QBrush &brush)
 {
     foreach(const QRectF &rect, _rects)
-        painter->fillRect(rect, brush);
+        painter->fillRect(rect.adjusted(0,5,0,0), brush);
 }
 
 void QRectFUnion::join(const QRectF &newRect)

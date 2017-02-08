@@ -91,6 +91,10 @@ public:
     void setPressedAt(int pos = -1);
     void clearPressed();
 
+public slots:
+    void resetHandles();
+    void resetHandlesManually();
+
 signals:
     void beginMovedManually(long long value);
     void endMovedManually(long long value);

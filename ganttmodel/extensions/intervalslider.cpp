@@ -152,6 +152,16 @@ void IntervalSlider::clearPressed()
     _pressedAt = -1;
 }
 
+void IntervalSlider::resetHandles()
+{
+    setBeginAndEnd(m_minValue, m_maxValue, false);
+}
+
+void IntervalSlider::resetHandlesManually()
+{
+    setBeginAndEnd(m_minValue, m_maxValue, true);
+}
+
 
 void IntervalSlider::setLimits(long long minValue, long long maxValue)
 {
@@ -165,7 +175,7 @@ void IntervalSlider::setLimits(long long minValue, long long maxValue)
     setMinValue(minValue);
     setMaxValue(maxValue);
 
-    setBeginAndEnd(minValue,maxValue,true);
+//    setBeginAndEnd(minValue,maxValue,true);
 }
 
 void IntervalSlider::setHandles(long long beginHandle, long long endHandle, bool manually)
@@ -605,6 +615,6 @@ void IntervalSlider::mousePressEvent(QMouseEvent *e)
 
 void IntervalSlider::mouseDoubleClickEvent(QMouseEvent *e)
 {
-    setBeginAndEnd(m_minValue, m_maxValue, true);
+    resetHandlesManually();
     QWidget::mouseDoubleClickEvent(e);
 }

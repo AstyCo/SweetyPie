@@ -16,6 +16,7 @@
 
 void GanttIntervalSlider::init()
 {
+    _blockChangeSavedLimits = false;
     m_drawCurrentDt = false;
     m_shiftRange = 0;
     m_minTimeSize = 30*_MICROSECONDS_IN_SECOND;
@@ -129,6 +130,14 @@ void GanttIntervalSlider::drawCurrentTime(QPainter *painter, const QRect &slider
     painter->fillRect(currentTimeRect.adjusted(0,0,0,-1), QBrush(m_currentTimeRectColor));
 }
 
+void GanttIntervalSlider::mouseDoubleClickEvent(QMouseEvent *e)
+{
+    _blockChangeSavedLimits = true;
+    setLimits(_savedLimits.min(), _savedLimits.timeSpan());
+    _blockChangeSavedLimits = true;
+    IntervalSlider::mouseDoubleClickEvent(e);
+}
+
 long long GanttIntervalSlider::minTimeSize() const
 {
     return m_minTimeSize;
@@ -206,6 +215,33 @@ void GanttIntervalSlider::setRange(const UtcDateTime &min, const TimeSpan &ts)
     setEndHandle(dtToVal(min+ts));
 }
 
+void GanttIntervalSlider::setRangeWithExpansion(const UtcDateTime &min, const TimeSpan &ts)
+{
+    long long newMin, newMax;
+    bool needChangeLimits = false;
+
+    if(min < valToDt(m_minValue)){
+        needChangeLimits = true;
+        newMin = dtToVal(min);
+    }
+    else
+        newMin = m_minValue;
+
+    if(min + ts > valToDt(m_maxValue)){
+        needChangeLimits = true;
+        newMax = dtToVal(min + ts);
+    }
+    else
+        newMax = m_maxValue;
+
+    if(needChangeLimits){
+        _blockChangeSavedLimits = true;
+        setLimits(newMin, newMax);
+        _blockChangeSavedLimits = false;
+    }
+    setRange(min, ts);
+}
+
 void GanttIntervalSlider::setLimits(long long min, long long max)
 {
     if(min > max)
@@ -213,6 +249,11 @@ void GanttIntervalSlider::setLimits(long long min, long long max)
     if(max - min < m_minTimeSize)
         max = min + m_minTimeSize;
     IntervalSlider::setLimits(min,max);
+
+    if(!_blockChangeSavedLimits){
+        const UtcDateTime tmpMin = valToDt(min);
+        _savedLimits = MyUtcDateTimeInterval(tmpMin, valToDt(max) - tmpMin);
+    }
 }
 
 void GanttIntervalSlider::setMinTimeSize(long long minTimeSize)

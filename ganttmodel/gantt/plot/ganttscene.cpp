@@ -20,6 +20,7 @@
 #include <QGraphicsSceneMouseEvent>
 #include <QPen>
 #include <QtCore/qmath.h>
+#include <QScrollBar>
 #include <QDebug>
 
 
@@ -47,8 +48,8 @@ void GanttScene::drawBackground(QPainter *painter, const QRectF &rect)
 
 GanttGraphicsObject *GanttScene::itemForInfo(const GanttInfoItem *key) const
 {
-    if(!_itemForInfo.value(key))
-        qDebug() << "NULL";
+//    if(!_itemForInfo.value(key))
+//        qDebug() << "NULL";
     return _itemForInfo.value(key);
 }
 
@@ -149,12 +150,22 @@ void GanttScene::mousePressEvent(QGraphicsSceneMouseEvent *event)
 
         }
     }
+    else if (event->button() == Qt::RightButton){
+        GanttGraphicsObject *object = objectForPos(event->scenePos());
+        if(object)
+        {
+            GanttInfoNode *node = object->info()->node();
+            if(node->parent() && !node->isExpanded()) // not root
+                node->changeExpanding();
+        }
+    }
 
     mouseMoveEvent(event);
 }
 
 void GanttScene::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event)
 {
+    qDebug() << "doubleclick";
     QGraphicsScene::mouseDoubleClickEvent(event);
     if(event->buttons() & Qt::LeftButton)
     {
@@ -163,7 +174,9 @@ void GanttScene::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event)
         {
             GanttInfoNode *node = object->info()->node();
             if(node->parent()) // not root
-                node->changeExpanding();
+//                node->changeExpanding();
+//            else
+                emit currentItemChanged(object->info());
         }
     }
 
@@ -192,7 +205,26 @@ void GanttScene::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
         }
     }
     if(_mousePressH.isSlide(event->scenePos())){
-        _dtline->slide((event->lastScenePos().x() - event->scenePos().x()) * 1. / width());
+        _dtline->slide((event->lastScenePos().x() - event->scenePos().x()) * 1. / width());         // HOR scroll
+//        qDebug () << "lastScenePos" << event->lastScenePos()<<
+//                     "newScenePos"<<event->scenePos();
+//        qDebug() << "view height" <<_view->height()
+//                 <<"\nscrollbar minimum"<<_view->verticalScrollBar()->minimum()
+//                <<"\nscrollbar maximum"<<_view->verticalScrollBar()->maximum();
+//        int dy = event->scenePos().y() - event->lastScenePos().y(),
+//            val = _view->verticalScrollBar()->value(),
+//            max = _view->verticalScrollBar()->maximum(),
+//            min = _view->verticalScrollBar()->minimum();
+
+//        if(val + dy > max)
+//            dy = max - val;
+//        if(val + dy < min)
+//            dy = min - val;
+//        if(_view->verticalScrollBar()){
+//            qDebug() << _view->verticalScrollBar()->value();
+//            _view->verticalScrollBar()->setValue(_view->verticalScrollBar()->value() - 1/*dy*/);
+
+//        }
     }
 
     QGraphicsScene::mouseMoveEvent(event);
@@ -269,6 +301,11 @@ void GanttScene::onLeafFinishChanged(/*const UtcDateTime& lastFinish*/)
 
     _infoForFinish.remove(_infoForFinish.key(p_leaf));
     _infoForFinish.insert(p_leaf->start(),p_leaf);
+}
+
+const MousePressHelper *GanttScene::mousePressH() const
+{
+    return &_mousePressH;
 }
 
 void GanttScene::setTreeInfo(GanttInfoTree *treeInfo)
@@ -358,22 +395,23 @@ void GanttScene::setCurrentItem(QGraphicsObject *currentItem)
         {
             _view->ensureVisible(itemRect, 0, _view->height()/2);
         }
-        _currentItem->setZValue(2);
-//        _currentItem->update();
+        _currentItem->setZValue(500);
+        _currentItem->update();
     }
 
-    _hoverObject->setItem(info);   // if no currentItme sets to NULL
+    _hoverObject->setItem(info);   // if no currentItem sets to NULL
 
-    if(lastItem != currentItem)
-        emit currentItemChanged(info);
+//    if(lastItem != currentItem)
+//        emit currentItemChanged(info);
 }
 
 GanttGraphicsObject *GanttScene::objectForPos(const QPointF &pos)
 {
     GanttGraphicsObject *object;
-    if((object = dynamic_cast<GanttGraphicsObject*>(itemAt(pos)))){
-        return object;
-    }
+    foreach(QGraphicsItem *item,items(pos))
+        if((object = dynamic_cast<GanttGraphicsObject*>(item)))
+            return object;
+
     return itemForInfo(_treeInfo->infoForVPos(pos.y()));
 }
 const QList<GanttIntervalGraphicsObject *>& GanttScene::dtItems() const

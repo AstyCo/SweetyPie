@@ -1,6 +1,7 @@
 #ifndef GANTTGRAPHICSVIEW_H
 #define GANTTGRAPHICSVIEW_H
 
+#include "gantt/private_extensions/mousepresshelper.h"
 #include <QGraphicsView>
 
 #include <QModelIndex>
@@ -18,8 +19,12 @@ public:
     GanttGraphicsView(QGraphicsScene * scene, QWidget * parent = 0);
 
     void setScene(QGraphicsScene *scene);
+    void setMousePressH(const MousePressHelper *mph){
+        _mousePressH = mph;
+    }
 
     void setHSliderHeight(int hSliderHeight);
+
 signals:
     void viewResized(const QSize& newSize);
     void maximumHeightChanged();
@@ -39,6 +44,8 @@ private:
 private:
     int m_hSliderHeight;
     QCursor _lastCursor;
+    QPoint _lastPos;
+    const MousePressHelper *_mousePressH;
 };
 
 #endif // GANTTVIEW_H

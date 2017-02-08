@@ -25,6 +25,7 @@ GanttIntervalGraphicsObject::GanttIntervalGraphicsObject(GanttInfoLeaf *info,QGr
         innerInfo()->increaseLinkCnt();
     }
 
+    setZValue(1);
     setAcceptHoverEvents(true);
 }
 
@@ -71,7 +72,7 @@ void GanttIntervalGraphicsObject::paint(QPainter *painter, const QStyleOptionGra
     {
         QRectF drawRect = boundingRect();
         painter->fillRect(drawRect,QBrush(color));
-        painter->drawRect(drawRect);
+//        painter->drawRect(drawRect);
 
         painter->save();
         painter->setOpacity(0.5);
@@ -90,7 +91,7 @@ void GanttIntervalGraphicsObject::paint(QPainter *painter, const QStyleOptionGra
         painter->setRenderHints(QPainter::SmoothPixmapTransform | QPainter::HighQualityAntialiasing | QPainter::Antialiasing);
         QRectF drawRect = QRectF(QPointF(0,0),_boundingRectSize).adjusted(0,RECTANGLE_OFFSET,0,-RECTANGLE_OFFSET);
         painter->fillRect(drawRect,QBrush(color));
-        painter->drawRect(drawRect);
+//        painter->drawRect(drawRect);
         QPainterPath path;
 
         path.moveTo(-MIN_VIS_WIDTH/2,   drawRect.top());
@@ -110,7 +111,7 @@ void GanttIntervalGraphicsObject::paint(QPainter *painter, const QStyleOptionGra
                     drawRect.top());
 
         painter->setOpacity(0.5);
-        painter->fillPath(path,QBrush(Qt::black));
+        painter->fillPath(path,QBrush(color));
         painter->setOpacity(1);
 
     }
@@ -126,12 +127,15 @@ void GanttIntervalGraphicsObject::setBoundingRectSize(const QSizeF &boundingRect
 {
     prepareGeometryChange();
     if(boundingRectSize.width()>MIN_VIS_WIDTH){
-        if(_isSmall){
-            _isSmall = false;
-        }
+        if(zValue()==300)
+            setZValue(1);
+        _isSmall = false;
     }
-    else if(!_isSmall)
+    else {
+        if(zValue() == 1)
+            setZValue(300);
         _isSmall = true;
+    }
 
     const bool needUpdateVisualIntersection = boundingRectSize.width() != _boundingRectSize.width();
     _boundingRectSize = boundingRectSize;

@@ -3,13 +3,14 @@
 
 #include <QDateTime>
 #include <QLine>
+#include <QDebug>
 
 // if   passed less than _slideDelay milliseconds,
 // and  the mouse has not moved farther than _slideDistance
 // or   mouse wasn't moved at all
 // then     user wants to Press , else user wants to Slide
 //
-qint64 MousePressHelper::_slideDelay = 150 * _MILISECONDS_IN_SECOND;
+qint64 MousePressHelper::_slideDelay = 0.5 * _MILISECONDS_IN_SECOND;
 // distance - euclidean norm
 int MousePressHelper::_slideDistance = 15;
 
@@ -43,6 +44,7 @@ bool MousePressHelper::isClick(const QPointF &pos) const
             && QLineF(_pressedAtPos, pos).length() < _slideDistance)
             || _pressedAtPos == pos)
         return true;
+
     return false;
 }
 

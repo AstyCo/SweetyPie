@@ -149,11 +149,14 @@ void DtLine::drawBackground(QPainter *painter)
 
 void DtLine::drawBottom(QPainter *painter)
 {
+    UtcDateTime dt;
+    UtcDateTime nextDt = displayedDtFewer(_min, _mode);
+    int l,r;
+    bool drawLittleHatches = (dtToPos(displayedDtNext(nextDt,_mode)) - dtToPos(nextDt))
+                              * 1. / segmentCountForMode(_mode,_min.date())
+                              > MIN_DISTANCE_BETWEEN_HATCHES;
     if(timeSpanIsValid(_timeSpan))
     {
-        UtcDateTime dt;
-        UtcDateTime nextDt = displayedDtFewer(_min, _mode);
-        int l,r;
         do{
             dt = nextDt;
             nextDt = displayedDtNextHatch(dt, _mode);
@@ -170,10 +173,10 @@ void DtLine::drawBottom(QPainter *painter)
 
                 drawBottomItemText(painter, dt, _mode);
             }
-            else{
-                painter->drawLine(QPointF(l,topHeight),
-                                  QPointF(l,topHeight + bottomHeight*(1. /4))); // little hatch
-            }
+            else if(drawLittleHatches)
+                painter->drawLine( QPointF(l,topHeight),
+                                   QPointF(l,topHeight + bottomHeight*(1. /4))); // little hatch
+
         } while(r <= rect().right());
     }
 }

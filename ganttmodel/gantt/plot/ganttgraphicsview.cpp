@@ -35,7 +35,7 @@ void GanttGraphicsView::setScene(QGraphicsScene *scene)
 
 void GanttGraphicsView::resizeEvent(QResizeEvent *event)
 {
-    qDebug() << "GanttGraphicsView::resizeEvent " << event->size() << event->oldSize() << scene()->height();
+//    qDebug() << "GanttGraphicsView::resizeEvent " << event->size() << event->oldSize() << scene()->height();
     if(scene() && scene()->height() < event->size().height()){
 
 
@@ -76,22 +76,34 @@ void GanttGraphicsView::resizeEvent(QResizeEvent *event)
 
 void GanttGraphicsView::mouseMoveEvent(QMouseEvent *event)
 {
-    QPoint pos = event->pos();
+    int dy = 0;
+//    qDebug() << "lastpos"<<_lastPos << "eventPos" << event->pos();
 
-//    if(rect().contains(pos) && pos.y() > rect().bottom() - m_hSliderHeight)
-//    {
-//        setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
-//    }
-//    else
-//    {
-//        setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-//    }
+    if(!_lastPos.isNull() && _mousePressH->isSlide(mapToScene(event->pos()))){
+        int val = verticalScrollBar()->value(),
+            min = verticalScrollBar()->minimum(),
+            max = verticalScrollBar()->maximum();
+
+        dy  = event->pos().y() - _lastPos.y();
+        if(val - dy > max)
+            dy = val - max;
+        if(val - dy < min)
+            dy = val - min;
+//        qDebug() << "scroll"<< dy;
+        verticalScrollBar()->setValue(val - dy);
+        if(scene())
+            scene()->update();
+        _lastPos = QPoint(event->pos().x(), _lastPos.y() + dy);
+    }
+    else
+        _lastPos = event->pos();
 
     QGraphicsView::mouseMoveEvent(event);
 }
 
 void GanttGraphicsView::leaveEvent(QEvent *e)
 {
+    _lastPos = QPoint();
     setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 
     QGraphicsView::leaveEvent(e);
