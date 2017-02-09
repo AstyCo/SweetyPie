@@ -360,7 +360,7 @@ void MainWindow::on_pushButton_ganttClear_clicked()
 
 void MainWindow::on_radioButton_ganttPlayer_toggled(bool checked)
 {
-    ui->ganttWidget->showPlayer(checked);
+    ui->ganttWidget->setVisiblePlayer(checked);
 }
 
 

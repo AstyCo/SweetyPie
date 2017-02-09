@@ -26,23 +26,10 @@
 
 void GanttScene::drawBackground(QPainter *painter, const QRectF &rect)
 {
-    QGraphicsScene::drawBackground(painter,rect);
+    QGraphicsScene::drawBackground(painter, rect);
 
-    qreal   bgBottom = rect.bottom()
-            ,bgLeft = rect.left() - 1
-            ,bgRight = rect.right() + 1;
-
-    QPen pen(Qt::gray, qreal(0.5));
-    pen.setStyle(Qt::SolidLine);
-    painter->setPen(pen);
-
-    qreal startY = (qCeil(rect.y() / DEFAULT_ITEM_HEIGHT))*DEFAULT_ITEM_HEIGHT;
-
-    while(startY<bgBottom)
-    {
-        painter->drawLine(QPointF(bgLeft,startY),QPointF(bgRight,startY));
-        startY+=DEFAULT_ITEM_HEIGHT;
-    }
+    drawBackgroundExpandedItems(painter, rect);
+    drawBackgroundLines(painter, rect);
 }
 
 
@@ -150,22 +137,12 @@ void GanttScene::mousePressEvent(QGraphicsSceneMouseEvent *event)
 
         }
     }
-    else if (event->button() == Qt::RightButton){
-        GanttGraphicsObject *object = objectForPos(event->scenePos());
-        if(object)
-        {
-            GanttInfoNode *node = object->info()->node();
-            if(node->parent() && !node->isExpanded()) // not root
-                node->changeExpanding();
-        }
-    }
 
     mouseMoveEvent(event);
 }
 
 void GanttScene::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event)
 {
-    qDebug() << "doubleclick";
     QGraphicsScene::mouseDoubleClickEvent(event);
     if(event->buttons() & Qt::LeftButton)
     {
@@ -173,10 +150,14 @@ void GanttScene::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event)
         if(object)
         {
             GanttInfoNode *node = object->info()->node();
-            if(node->parent()) // not root
-//                node->changeExpanding();
-//            else
-                emit currentItemChanged(object->info());
+            if (node->parent()){    // not root
+                if (node->isExpanded())
+                    node->setExpanded(false);
+                else{
+                    emit currentItemChanged(object->info());
+                    node->setExpanded(true);
+                }
+            }
         }
     }
 
@@ -237,9 +218,16 @@ void GanttScene::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
     }
     else if (event->button() == Qt::LeftButton){
         if(_mousePressH.isClick(event->scenePos())){    // Press
-            QGraphicsObject *object = objectForPos(_mousePressH.pos());
-            if(object)
+            GanttGraphicsObject *object = objectForPos(_mousePressH.pos());
+            if(object){
                 setCurrentItem(object);
+
+                GanttInfoNode *node = object->info()->node();
+                if (node->parent()){    // not root
+                    if (node->isExpanded())
+                        emit currentItemChanged(object->info());
+                }
+            }
         }
     }
 
@@ -378,10 +366,11 @@ void GanttScene::setCurrentItem(QGraphicsObject *currentItem)
     GanttInfoItem *info = NULL;
     _currentItem = currentItem;
     if(lastItem){
-        lastItem->setZValue(1);
+        lastItem->setZValue(_savedZValue);
         lastItem->update();
     }
     if(_currentItem){
+        _savedZValue = _currentItem->zValue();
 
         if(GanttIntervalGraphicsObject *graphicsObject =
                 dynamic_cast<GanttIntervalGraphicsObject*>(_currentItem.data()))
@@ -467,6 +456,49 @@ void GanttScene::removePersistentItems()
     removeItem(_playerCurrent);
     removeItem(_crossObject);
     removeItem(_hoverObject);
+}
+
+void GanttScene::drawBackgroundExpandedItems(QPainter *painter, const QRectF &rect)
+{
+    qreal   bgLeft = rect.left() - 1 ,
+            bgWidth = rect.width() + 2;
+    GanttInfoNode *root = _treeInfo->root();
+    for(int i = 0; i < root->size(); ++i){
+        if(root->at(i)->bottom() < rect.top())
+            continue;
+        if(root->at(i)->pos() > rect.bottom())
+            break;
+        GanttInfoNode *node = root->nodeAt(i);
+        if(node && node->isExpanded())
+            painter->fillRect(QRect(bgLeft, node->pos() + RECTANGLE_OFFSET / 2,
+                                    bgWidth, node->height() - RECTANGLE_OFFSET + 2),
+                              QBrush(QColor(0xFFE5CC)));
+
+    }
+}
+
+void GanttScene::drawBackgroundLines(QPainter *painter, const QRectF &rect)
+{
+    qreal   bgBottom = rect.bottom() ,
+            bgLeft = rect.left() - 1 ,
+            bgRight = rect.right() + 1;
+
+
+    QPen pen(Qt::gray, qreal(0.5));
+    pen.setStyle(Qt::SolidLine);
+    painter->setPen(pen);
+    qreal startY = (qCeil(rect.y() / DEFAULT_ITEM_HEIGHT))*DEFAULT_ITEM_HEIGHT;
+
+    while(startY<bgBottom)
+    {
+        painter->drawLine(QPointF(bgLeft,startY),QPointF(bgRight,startY));
+        startY+=DEFAULT_ITEM_HEIGHT;
+    }
+}
+
+void GanttScene::invalidateBackground()
+{
+    invalidate(QRectF(),QGraphicsScene::BackgroundLayer);
 }
 
 void GanttScene::addInfoItem(GanttInfoItem *parent)
@@ -716,6 +748,11 @@ void GanttScene::onItemAdded(GanttInfoItem *item)
     connect(item,SIGNAL(destroyed(QObject*)),this,SLOT(onVisItemDestroyed()));
     connect(item,SIGNAL(expanded()),this,SLOT(updateSceneRect()));
     connect(item,SIGNAL(collapsed()),this,SLOT(updateSceneRect()));
+
+    connect(item,SIGNAL(expanded()),this,SLOT(invalidateBackground()));
+    connect(item,SIGNAL(collapsed()),this,SLOT(invalidateBackground()));
+
+
 
     GanttInfoLeaf *leaf = qobject_cast<GanttInfoLeaf*>(item);
     GanttGraphicsObject *p_object = NULL;

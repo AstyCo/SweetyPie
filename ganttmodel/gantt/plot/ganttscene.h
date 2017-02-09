@@ -119,7 +119,11 @@ private:
     void addPersistentItems();
     void removePersistentItems();
 
+    void drawBackgroundExpandedItems(QPainter *painter, const QRectF &rect);
+    void drawBackgroundLines(QPainter *painter, const QRectF &rect);
+
 private slots:
+    void invalidateBackground();
     void updateIntersectionR(GanttInfoItem *item);   ///< updates intersection recursively
     void onVisItemDestroyed();
     void onGraphicsItemPress();
@@ -144,6 +148,7 @@ private:
     GanttCurrentDtSlider *_playerCurrent;
     GanttDtCrossObject *_crossObject;
     GanttHoverGraphicsObject *_hoverObject;
+    int _savedZValue;
     QPointer<QGraphicsObject> _currentItem;
     MousePressHelper _mousePressH;
 };

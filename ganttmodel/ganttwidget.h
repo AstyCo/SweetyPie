@@ -37,8 +37,22 @@ public:
     void setView(QTreeView *view, bool inner = false);
 
 public slots:
-    void dataReset();
-    void showPlayer(bool show);
+
+    /// --- Спрятать/Показать элементы
+    void showInterval();
+    void hideInterval();
+    void setVisibleInterval(bool value);
+
+    void showDtLine();
+    void hideDtLine();
+    void setVisibleDtLine(bool value);
+
+    void showPlayer();
+    void hidePlayer();
+    void setVisiblePlayer(bool show);
+    // ---
+
+    void dataReset();   ///< Обновляет содержимое диаграммы по модели, вызывать если не вызывалось QAbstractItemModel::reset()
 
 
 private slots:

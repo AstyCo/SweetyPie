@@ -26,7 +26,7 @@ GanttInfoLeaf *GanttInfoNode::leafAt(int index) const
     if(index>=size())
         return NULL;
 
-    return dynamic_cast<GanttInfoLeaf*>(_items[index]);
+    return qobject_cast<GanttInfoLeaf*>(_items[index]);
 }
 
 GanttInfoNode *GanttInfoNode::nodeAt(int index) const
@@ -34,7 +34,7 @@ GanttInfoNode *GanttInfoNode::nodeAt(int index) const
     if(index>=size())
         return NULL;
 
-    return dynamic_cast<GanttInfoNode*>(_items[index]);
+    return qobject_cast<GanttInfoNode*>(_items[index]);
 }
 
 GanttInfoItem *GanttInfoNode::at(int index) const

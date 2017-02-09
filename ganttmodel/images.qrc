@@ -42,6 +42,8 @@
         <file>images/player_buttons/reg_step_on_64.png</file>
         <file>images/player_buttons/stop_off_64.png</file>
         <file>images/player_buttons/stop_on_64.png</file>
+        <file>images/calculator_active.png</file>
+        <file>images/calculator_inactive.png</file>
     </qresource>
     <qresource prefix="/icons">
         <file>icons/clear.png</file>

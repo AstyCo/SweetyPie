@@ -45,6 +45,7 @@ private:
     QRectFUnion _intersectionVisual;
     IntervalUnion _intersection;
 
+    static QPainterPath _circlePath;
 };
 
 #endif // GANTTGRAPHICSITEM_H

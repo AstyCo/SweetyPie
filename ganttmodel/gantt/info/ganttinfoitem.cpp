@@ -300,6 +300,11 @@ int GanttInfoItem::pos() const
     return _pos;
 }
 
+qreal GanttInfoItem::bottom() const
+{
+    return height() + pos();
+}
+
 void GanttInfoItem::setPos(int pos)
 {
     _pos = pos;

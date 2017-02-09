@@ -6,17 +6,35 @@
 
 #include <QPainter>
 #include <QGraphicsSceneMouseEvent>
+#include <QBitmap>
 
 #include <QDebug>
 
-GanttCalcGraphicsObject::GanttCalcGraphicsObject(GanttInfoNode* node, QGraphicsItem *parent)
-    :GanttGraphicsObject(node,parent)
+QRect initializeGeometry(){
+    const int   width = 12,
+                height = 14,
+                topOffset = 1;
+
+    return QRect(0, topOffset,
+                 width, height);
+}
+QPixmap initializePixmap(const QSize &pixmapSize, const QString &filename){
+    QPixmap res(pixmapSize);
+    QImage img(filename);
+    res = res.fromImage(img.scaled(pixmapSize.width(),pixmapSize.height(),
+                                   Qt::IgnoreAspectRatio,Qt::SmoothTransformation));
+
+    return res;
+}
+
+QRect GanttCalcGraphicsObject::_geometry = initializeGeometry();
+
+
+
+void GanttCalcGraphicsObject::init()
 {
-    m_shapePath.moveTo(0,0);
-    m_shapePath.lineTo(0,(DEFAULT_ITEM_HEIGHT-6)/2);
-    m_shapePath.addEllipse(QPointF(0,(DEFAULT_ITEM_HEIGHT/2)),3,3);
-//    m_shapePath.moveTo(0,DEFAULT_ITEM_HEIGHT - (DEFAULT_ITEM_HEIGHT-6)/2);
-//    m_shapePath.lineTo(0,DEFAULT_ITEM_HEIGHT);
+    _pixmapImageActive = initializePixmap(_geometry.size(), ":/images/calculator_active.png");
+    _pixmapImageInactive = initializePixmap(_geometry.size(), ":/images/calculator_inactive.png");
 
     if(innerInfo())
     {
@@ -30,6 +48,12 @@ GanttCalcGraphicsObject::GanttCalcGraphicsObject(GanttInfoNode* node, QGraphicsI
 
     setAcceptHoverEvents(true);
 
+}
+
+GanttCalcGraphicsObject::GanttCalcGraphicsObject(GanttInfoNode* node, QGraphicsItem *parent)
+    :GanttGraphicsObject(node,parent)
+{
+    init();
 }
 
 GanttCalcGraphicsObject::~GanttCalcGraphicsObject()
@@ -46,17 +70,24 @@ GanttCalcGraphicsObject::~GanttCalcGraphicsObject()
 
 QRectF GanttCalcGraphicsObject::boundingRect() const
 {
-    return m_shapePath.controlPointRect();
+    return _geometry;
 }
 
 void GanttCalcGraphicsObject::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
 {
     Q_UNUSED(option);
     Q_UNUSED(widget);
-    QColor color = (_scene->currentItem() == this)?(QColor(Qt::red).darker(130)):(QColor(Qt::red));
-    painter->setRenderHints(QPainter::SmoothPixmapTransform | QPainter::HighQualityAntialiasing | QPainter::Antialiasing);
-    painter->drawPath(m_shapePath);
-    painter->fillPath(m_shapePath,QBrush(color.lighter(130)));
+
+    if(_scene->currentItem() == this)
+        painter->drawPixmap(_geometry, _pixmapImageActive, _pixmapImageActive.rect());
+    else
+        painter->drawPixmap(_geometry, _pixmapImageInactive, _pixmapImageInactive.rect());
+
+//    QColor color = (_scene->currentItem() == this)?(QColor(Qt::red).darker(130)):(QColor(Qt::red));
+//    painter->setRenderHints(/*QPainter::SmoothPixmapTransform |*/ QPainter::HighQualityAntialiasing | QPainter::Antialiasing);
+
+//    painter->drawPath(m_shapePath);
+//    painter->fillPath(m_shapePath,QBrush(color.lighter(130)));
 }
 
 GanttInfoNode *GanttCalcGraphicsObject::innerInfo() const
@@ -92,5 +123,3 @@ void GanttCalcGraphicsObject::hoverLeaveEvent(QGraphicsSceneHoverEvent *event)
 
     QGraphicsItem::hoverLeaveEvent(event);
 }
-
-

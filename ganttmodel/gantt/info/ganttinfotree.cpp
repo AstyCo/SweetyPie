@@ -31,7 +31,8 @@ void GanttInfoTree::connectTreeView(QTreeView *view)
 
     connect(this,SIGNAL(needCollapse(QModelIndex)),view,SLOT(collapse(QModelIndex)));
     connect(this,SIGNAL(needExpand(QModelIndex)),view,SLOT(expand(QModelIndex)));
-    connect(this,SIGNAL(currentChanged(QModelIndex)),view,SLOT(setCurrentIndex(QModelIndex)));
+    connect(this,SIGNAL(currentChanged(QModelIndex, QItemSelectionModel::SelectionFlags)),
+            view->selectionModel(),SLOT(setCurrentIndex(QModelIndex, QItemSelectionModel::SelectionFlags)));
 
     connect(view,SIGNAL(expanded(QModelIndex)),this,SLOT(onExpanded(QModelIndex)));
     connect(view,SIGNAL(collapsed(QModelIndex)),this,SLOT(onCollapsed(QModelIndex)));
@@ -67,7 +68,7 @@ void GanttInfoTree::onCurrentItemChanged(const GanttInfoItem *item)
     if(!item)
         return;
     qDebug() << "emit currentChanged" << item->index();
-    emit currentChanged(item->index());
+    emit currentChanged(item->index(), QItemSelectionModel::Select | QItemSelectionModel::Current);
 }
 
 GanttInfoItem *GanttInfoTree::infoForIndex(const QModelIndex &index) const

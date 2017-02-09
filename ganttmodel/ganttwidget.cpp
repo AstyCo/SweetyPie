@@ -56,7 +56,7 @@ void GanttWidget::setPlayerSpeeds(qreal minMultiply, qreal maxMultiply)
     ui->playerSettings->setMultiplies(minMultiply,maxMultiply);
 }
 
-void GanttWidget::showPlayer(bool show)
+void GanttWidget::setVisiblePlayer(bool show)
 {
     m_playerShown = show;
 
@@ -85,6 +85,46 @@ void GanttWidget::setView(QTreeView *view, bool /*inner*/)
 
 //    view->setModel(_treeInfo->model());
     _treeInfo->connectTreeView(view);
+}
+
+void GanttWidget::showInterval()
+{
+    setVisibleInterval(true);
+}
+
+void GanttWidget::hideInterval()
+{
+    setVisibleInterval(false);
+}
+
+void GanttWidget::setVisibleInterval(bool value)
+{
+    ui->widgetIntervalSlider->setVisible(value);
+}
+
+void GanttWidget::showDtLine()
+{
+    setVisibleDtLine(true);
+}
+
+void GanttWidget::hideDtLine()
+{
+    setVisibleDtLine(false);
+}
+
+void GanttWidget::setVisibleDtLine(bool value)
+{
+    ui->widgetDtLine->setVisible(value);
+}
+
+void GanttWidget::showPlayer()
+{
+    setVisiblePlayer(true);
+}
+
+void GanttWidget::hidePlayer()
+{
+    setVisiblePlayer(false);
 }
 
 void GanttWidget::dataReset()

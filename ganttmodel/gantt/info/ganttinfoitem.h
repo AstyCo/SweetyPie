@@ -35,6 +35,7 @@ public:
     virtual qreal height() const = 0;
     virtual qreal calcPos() const;
     int pos() const;
+    qreal bottom() const;
     void setPos(int pos);
 
     QModelIndex index() const;

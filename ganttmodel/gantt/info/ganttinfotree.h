@@ -33,7 +33,7 @@ signals:
     void itemAdded(GanttInfoItem *item);
     void itemAboutToBeDeleted(GanttInfoItem *item);
     void itemRemoved(GanttInfoItem *item);
-    void currentChanged(const QModelIndex &index);
+    void currentChanged(const QModelIndex &index, QItemSelectionModel::SelectionFlags command);
     void currentChanged(GanttInfoItem *item);
     void needExpand(const QModelIndex &index);
     void needCollapse(const QModelIndex &index);
