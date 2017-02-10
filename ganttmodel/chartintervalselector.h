@@ -47,8 +47,8 @@ public:
   /// Отменяет выделенный интервал
   void clearIntervalSelection();
 
-  void setSelectionModeTargetingPoint(bool b);
-  void clearTargetingPoint();
+  void setSelectionModeTargetPoint(bool b);
+  void clearTargetPoint();
 
   virtual void clearAllSelections();
 
@@ -70,7 +70,7 @@ public slots:
   /// Выделение второй (последней) точки интервала
   void setIntervalSelectionEnd(QPointF pos);
 
-  void setTargetingPoint(qreal value);
+  void setTargetPoint(qreal value);
 
   virtual void setColor(const QColor &color);
 
@@ -83,7 +83,7 @@ signals:
   /// Выбрана вторая точка при выделении интервала
   void intervalSelectionEnded(QPointF p);
   /// Выбрана целевая точка
-  void targetingPointSet(qreal val);
+  void targetPointSet(qreal val);
 
 protected:
   void setIntervalSelectionByState(QPointF pos);
@@ -93,7 +93,7 @@ protected:
   void showSelectionIntervalStart(QPointF start);
   void showSelectionIntervalEnd(QPointF end);
 
-  void showTargetPointing(QPointF point);
+  void showTargetPoint(QPointF point);
 
 private:  
 
@@ -114,7 +114,7 @@ protected:
 
   /// Дата и время начала выделенного интервала
   qreal m_intervalBegin;
-  qreal m_targetingPoint;
+  qreal m_targetPoint;
   /// Дата и время окончания выделенного интервала
   qreal m_intervalEnd;
 
@@ -132,7 +132,7 @@ protected:
   QwtPlotMarker *m_pIntervalMarker[2];
 
   /// Маркер для обозначения точки прицеливания
-  QwtPlotMarker *m_pTargetingMarker;
+  QwtPlotMarker *m_pTargetPointMarker;
 
   QColor _color;
 
@@ -141,7 +141,7 @@ protected:
   enum SelectionState
   {
     ssNone,
-    ssTargetingPoint,
+    ssTargetPoint,
     ssIntervalBegin,
     ssIntervalEnd
   };
@@ -174,11 +174,11 @@ public:
    void setTargetPointByDates(UtcDateTime dt);
 
 signals:
-   void targetingDtSet(UtcDateTime dt);
+   void targetPointDtSet(UtcDateTime dt);
    void intervalSelectionFinished(const UtcDateTime &beg, const UtcDateTime &end);
 
 private slots:
-   void onTargetingPointSet(qreal point);
+   void ontargetPointSet(qreal point);
    void onIntervalSelectionFinish();
 };
 

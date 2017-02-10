@@ -9,6 +9,7 @@
 
 #include <verticalscrollarea.h>
 
+
 typedef Interval<double, double> NumericInterval;
 
 ChartsGroupWidget::ChartsGroupWidget(QWidget *parent) :
@@ -174,14 +175,17 @@ void ChartsGroupWidget::onIntervalSelectionEnd(QPointF pos)
       cc->intervalSelector()->setIntervalSelectionEnd(pos);
 
   emit intervalSelectionEnded(pos);
+  UtcDateTime beg = ChartTimeXYWidget::pointToDt(QPointF(m_charts.first()->intervalSelector()->intervalSelectionBegin(),0));
+  UtcDateTime end = ChartTimeXYWidget::pointToDt(QPointF(m_charts.first()->intervalSelector()->intervalSelectionEnd(),0));
+  emit intervalSelectionFinished(beg,end);
 }
 
-void ChartsGroupWidget::onTargetingDtSet(qreal value)
+void ChartsGroupWidget::ontargetPointDtSet(qreal value)
 {
   ChartIntervalSelector * senderSelector = qobject_cast<ChartIntervalSelector *>(QObject::sender());
   foreach (ChartXYWidget *cc, m_charts)
     if (cc->intervalSelector() != senderSelector)
-      cc->intervalSelector()->setTargetingPoint(value);
+      cc->intervalSelector()->setTargetPoint(value);
 
   QAction *selTargetAct = m_actionsToolBar->getChartAction(caSelectTarget);
   bool b = selTargetAct->blockSignals(true);
@@ -382,7 +386,7 @@ void ChartsGroupWidget::connectChart(ChartXYWidget *chart)
     ChartIntervalSelector *intervalSelector = chart->intervalSelector();
     connect(intervalSelector, SIGNAL(intervalSelectionStarted(QPointF)), SLOT(onIntervalSelectionStart(QPointF)));
     connect(intervalSelector, SIGNAL(intervalSelectionEnded(QPointF)), SLOT(onIntervalSelectionEnd(QPointF)));
-    connect(intervalSelector, SIGNAL(targetingPointSet(qreal)), SLOT(onTargetingDtSet(qreal)));
+    connect(intervalSelector, SIGNAL(targetPointSet(qreal)), SLOT(ontargetPointDtSet(qreal)));
 
     ChartPointSelector * pSelector = chart->pointSelector();
     connect(pSelector, SIGNAL(pointSelected(CurveIndex)), SLOT(onPointSelected(CurveIndex)));
@@ -414,16 +418,16 @@ void ChartsGroupWidget::setSyncChartsByAxisX(bool syncChartsByAxisX)
   interconnectCharts();
 }
 
-void ChartsGroupWidget::setTargetingPoint(UtcDateTime dt)
+void ChartsGroupWidget::setTargetPoint(UtcDateTime dt)
 {
   foreach(ChartXYWidget *cc, m_charts)
-      cc->intervalSelector()->setTargetingPoint(ChartTimeXYWidget::dtToPoint(dt).x());
+      cc->intervalSelector()->setTargetPoint(ChartTimeXYWidget::dtToPoint(dt).x());
 }
 
-void ChartsGroupWidget::clearTargetingPoint()
+void ChartsGroupWidget::clearTargetPoint()
 {
   foreach(ChartXYWidget *cc, m_charts)
-      cc->intervalSelector()->clearTargetingPoint();
+      cc->intervalSelector()->clearTargetPoint();
 }
 
 /*
@@ -562,7 +566,7 @@ void ChartsGroupWidget::onAction_selectTarget_toggled(bool checked)
 
   foreach (ChartXYWidget *chart, m_charts)
   {
-    chart->intervalSelector()->setSelectionModeTargetingPoint(checked);
+    chart->intervalSelector()->setSelectionModeTargetPoint(checked);
   }
 }
 
@@ -663,8 +667,8 @@ void ChartTimeXYGroupWidget::onChartIntervalSelectionEnd(QPointF p)
   qreal begin = senderModel->intervalSelectionBegin();
   qreal end = senderModel->intervalSelectionEnd();
   m_selectionPanel->setSelectedInterval(UtcDateTimeInterval(
-                                                   ChartTimeXYWidget::pointToDt(QPointF(begin,0)),
-                                          ChartTimeXYWidget::pointToDt(QPointF(end,0))));
+                                        ChartTimeXYWidget::pointToDt(QPointF(begin,0)),
+                                        ChartTimeXYWidget::pointToDt(QPointF(end,0))));
 
    emit intervalSelectionEnded();
 }

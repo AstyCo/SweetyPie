@@ -34,12 +34,11 @@ ChartIntervalSelector::ChartIntervalSelector(ChartXYWidget *chart, PlotNavigator
     m_pIntervalMarker[i]->attach(m_plot);
   }
 
-  m_pTargetingMarker = new QwtPlotMarker();
-  m_pTargetingMarker->setLineStyle(QwtPlotMarker::VLine);
-  m_pTargetingMarker->setLinePen(QPen( _color, 3, Qt::DashLine ));
-  m_pTargetingMarker->hide();
-  //m_pTargetingMarker->setZ(100);
-  m_pTargetingMarker->attach(m_plot);  
+  m_pTargetPointMarker = new QwtPlotMarker();
+  m_pTargetPointMarker->setLineStyle(QwtPlotMarker::VLine);
+  m_pTargetPointMarker->setLinePen(QPen( _color, 3, Qt::DashLine ));
+  m_pTargetPointMarker->hide();
+  m_pTargetPointMarker->attach(m_plot);
 }
 
 qreal ChartIntervalSelector::begin() const
@@ -68,7 +67,7 @@ void ChartIntervalSelector::onAction_SelectTarget_toggled(bool checked)
     if (m_selectionState != ssNone)
       clearIntervalSelection();
 
-    m_selectionState = ssTargetingPoint;
+    m_selectionState = ssTargetPoint;
   }
   else
     m_selectionState = ssNone;
@@ -107,25 +106,26 @@ void ChartIntervalSelector::setIntervalSelection(qreal begin, qreal end)
 
     details->setIntervalLabelsVisible(m_hasSelection);
   }
+
 }
 
 
-void ChartIntervalSelector::setSelectionModeTargetingPoint(bool b)
+void ChartIntervalSelector::setSelectionModeTargetPoint(bool b)
 {  
   if (b)
   {
-    clearTargetingPoint();
+    clearTargetPoint();
 
     if (m_selectionState != ssNone)
       clearIntervalSelection();
 
-    m_selectionState = ssTargetingPoint;
+    m_selectionState = ssTargetPoint;
   }
 }
 
-void ChartIntervalSelector::setTargetingPoint(qreal value)
+void ChartIntervalSelector::setTargetPoint(qreal value)
 {
-  if (m_selectionState == ssTargetingPoint)
+  if (m_selectionState == ssTargetPoint)
     m_selectionState = ssNone;
 
   QAction *selTargetAct = m_chart->getActionsToolBar()->getChartAction(caSelectTarget);
@@ -133,20 +133,20 @@ void ChartIntervalSelector::setTargetingPoint(qreal value)
   selTargetAct->setChecked(false);
   selTargetAct->blockSignals(b);
 
-  m_targetingPoint = value;
+  m_targetPoint = value;
   QPointF point(value, 0);
 
-  showTargetPointing(point);
+  showTargetPoint(point);
 
   QList<QwtPlotCurve*> curves = m_chart->curves();
   for(int i = 0; i < curves.size(); i++)
   {
     QwtPlotCurve *curve = curves.at(i);
     ChartCurveStats &stats = m_chart->m_curvesStats[i];
-    long pointTargetingIdx = m_chart->findPointIndexByPos(point, sdRight, i);
+    long pointTargetPointIdx = m_chart->findPointIndexByPos(point, sdRight, i);
 
-    if (pointTargetingIdx != -1)
-      stats.intervalPointingValue = curve->sample(pointTargetingIdx);
+    if (pointTargetPointIdx != -1)
+      stats.intervalPointingValue = curve->sample(pointTargetPointIdx);
     else
       stats.intervalPointingValue = QPointF();
   }
@@ -154,9 +154,9 @@ void ChartIntervalSelector::setTargetingPoint(qreal value)
   m_plot->replot();
 }
 
-void ChartIntervalSelector::clearTargetingPoint()
+void ChartIntervalSelector::clearTargetPoint()
 {
-  if (m_selectionState == ssTargetingPoint)
+  if (m_selectionState == ssTargetPoint)
     m_selectionState = ssNone;
 
   QAction *selTargetAct = m_chart->getActionsToolBar()->getChartAction(caSelectTarget);
@@ -164,7 +164,7 @@ void ChartIntervalSelector::clearTargetingPoint()
   selTargetAct->setChecked(false);
   selTargetAct->blockSignals(b);
 
-  m_pTargetingMarker->hide();
+  m_pTargetPointMarker->hide();
   for(int i = 0; i < m_chart->m_curves.size(); i++)
     m_chart->m_curvesStats[i].intervalPointingValue = QPointF();
 
@@ -257,14 +257,14 @@ void ChartIntervalSelector::showSelectionIntervalEnd(QPointF end)
   m_plot->replot();
 }
 
-void ChartIntervalSelector::showTargetPointing(QPointF point)
+void ChartIntervalSelector::showTargetPoint(QPointF point)
 {
-    m_pTargetingMarker->setValue(point);
+    m_pTargetPointMarker->setValue(point);
 
     if(!m_visible)
         return;
 
-    m_pTargetingMarker->show();
+    m_pTargetPointMarker->show();
     m_plot->replot();
 }
 
@@ -352,7 +352,7 @@ void ChartIntervalSelector::clearAllSelections()
   // скрыть маркеры
   m_pIntervalMarker[0]->hide();
   m_pIntervalMarker[1]->hide();
-  m_pTargetingMarker->hide();
+  m_pTargetPointMarker->hide();
 }
 
 void ChartIntervalSelector::reset()
@@ -409,11 +409,11 @@ void ChartIntervalSelector::onCurvePointSelected(const QPointF &pos)
 
     emit intervalSelectionEnded(pos);
   }
-  else if (m_selectionState == ssTargetingPoint)
+  else if (m_selectionState == ssTargetPoint)
   {
-    setTargetingPoint(pos.x());
+    setTargetPoint(pos.x());
 
-    emit targetingPointSet(pos.x());
+    emit targetPointSet(pos.x());
   }
 }
 
@@ -466,7 +466,7 @@ void ChartIntervalSelector::setColor(const QColor &color)
         m_pIntervalMarker[i]->setLinePen(QPen( _color, 3, Qt::SolidLine ));
     }
 
-    m_pTargetingMarker->setLinePen(QPen( _color, 3, Qt::DashLine ));
+    m_pTargetPointMarker->setLinePen(QPen( _color, 3, Qt::DashLine ));
     m_plot->replot();
 }
 
@@ -475,7 +475,7 @@ void ChartIntervalSelector::setVisible(bool b)
     m_visible = b;
     m_pIntervalMarker[0]->setVisible(b);
     m_pIntervalMarker[1]->setVisible(b);
-    m_pTargetingMarker->setVisible(b);
+    m_pTargetPointMarker->setVisible(b);
     m_plot->replot();
 }
 
@@ -483,7 +483,7 @@ void ChartIntervalSelector::setVisible(bool b)
 ChartTimeIntervalSelector::ChartTimeIntervalSelector(ChartXYWidget *chart, PlotNavigator *nav)
   : ChartIntervalSelector(chart, nav)
 {
-  connect(this, SIGNAL(targetingPointSet(qreal)), SLOT(onTargetingPointSet(qreal)));
+  connect(this, SIGNAL(targetPointSet(qreal)), SLOT(ontargetPointSet(qreal)));
   connect(this, SIGNAL(intervalSelectionEnded(QPointF)), this, SLOT(onIntervalSelectionFinish()));
 }
 
@@ -516,10 +516,10 @@ void ChartTimeIntervalSelector::setIntervalSelectionByDates(UtcDateTime beginDt,
 
 void ChartTimeIntervalSelector::setTargetPointByDates(UtcDateTime dt)
 {
-    setTargetingPoint(ChartTimeXYWidget::dtToPoint(dt).x());
+    setTargetPoint(ChartTimeXYWidget::dtToPoint(dt).x());
 }
 
-void ChartTimeIntervalSelector::onTargetingPointSet(qreal point)
+void ChartTimeIntervalSelector::ontargetPointSet(qreal point)
 {
 //    if(!m_beginLimit.isValid() || !m_endLimit.isValid())
 //        return;
@@ -527,7 +527,7 @@ void ChartTimeIntervalSelector::onTargetingPointSet(qreal point)
 //    QPointF p = ChartTimeXYWidget::dtToPoint(dt);
 //    setTargetPoint(p.x());
 
-	emit targetingDtSet(ChartTimeXYWidget::pointToDt(QPointF(point, 0)));
+    emit targetPointDtSet(ChartTimeXYWidget::pointToDt(QPointF(point, 0)));
 }
 
 
