@@ -126,6 +126,7 @@ public:
 
   /// Дата и время конца выделенного интервала
   UtcDateTime getSelIntervalEndDt();
+
   bool panelSelectIntervalVisible() const;
   void setPanelSelectIntervalVisible(bool vis);
 
