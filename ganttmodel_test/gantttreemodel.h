@@ -10,7 +10,7 @@
 
 class GanttWidget;
 
-class GanttTreeModel : public QAbstractItemModel, public IGanttModel
+class GanttTreeModel : public QAbstractItemModel
 {
     Q_OBJECT
 
@@ -54,51 +54,9 @@ public:
 
     GanttInfoNode *root() const;
 
-    // --- Interface implementation
-
-    virtual IGanttTag   iGanttTag(const QModelIndex &index) const {
-        if(leafForIndex(index))
-            return IGanttModel::IGanttLeaf;
-        return IGanttModel::IGanttNode;
-    }
-
-    QString     iGanttTitle(const QModelIndex &index) const {
-        GanttInfoItem *item =itemForIndex(index);
-        if(item)
-            return item->title();
-        return QString();
-    }
-
-    UtcDateTime iGanttStart(const QModelIndex &index) const {
-        GanttInfoItem *item =itemForIndex(index);
-        if(item)
-            return item->start();
-        return UtcDateTime();
-    }
-    TimeSpan iGanttTimeSpan(const QModelIndex &index) const {
-        GanttInfoItem *item =itemForIndex(index);
-        if(item)
-            return item->timeSpan();
-        return TimeSpan();
-    }
-    QColor      iGanttColor(const QModelIndex &index) const {
-        GanttInfoItem *item =itemForIndex(index);
-        if(item)
-            return item->color();
-        return Qt::green;
-    }
-
-    QModelIndex iGanttIndex(const QString &title) const {
-        QModelIndexList matches = match(index(0,0),Qt::DisplayRole,QVariant::fromValue(title));
-        if(matches.isEmpty()){
-            qDebug() << "not found";
-            return QModelIndex();
-        }
-        return matches.at(0);
-    }
-
-
-    // ---
+    GanttInfoItem* itemForIndex(const QModelIndex& iGanttIndex) const;
+    GanttInfoLeaf* leafForIndex(const QModelIndex& iGanttIndex) const;
+    GanttInfoNode* nodeForIndex(const QModelIndex& iGanttIndex) const;
 
 
 signals:
@@ -110,9 +68,6 @@ public slots:
     void clear();
 
 private:
-    GanttInfoItem* itemForIndex(const QModelIndex& iGanttIndex) const;
-    GanttInfoLeaf* leafForIndex(const QModelIndex& iGanttIndex) const;
-    GanttInfoNode* nodeForIndex(const QModelIndex& iGanttIndex) const;
 
     void setIndex(GanttInfoItem* item);
     GanttInfoItem *itemForNameHelper(const QString& iGanttTitle,GanttInfoNode* node) const;

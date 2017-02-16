@@ -6,8 +6,16 @@
 #include <QGraphicsSceneMouseEvent>
 #include <QPainter>
 
-#define MIN_VIS_WIDTH 8
-#define RECTANGLE_OFFSET 5
+
+QPainterPath initializePath(){
+    QPainterPath res;
+    qreal radius = DEFAULT_ITEM_HEIGHT/2 - RECTANGLE_OFFSET;
+    res.addEllipse(QPointF(0 , RECTANGLE_OFFSET + radius),
+                   radius/1.3, radius);
+    return res;
+}
+
+QPainterPath GanttIntervalGraphicsObject::_circlePath = initializePath();
 
 GanttIntervalGraphicsObject::GanttIntervalGraphicsObject(GanttInfoLeaf *info,QGraphicsItem *parent) :
     GanttGraphicsObject(info,parent)
@@ -53,68 +61,39 @@ QRectF GanttIntervalGraphicsObject::boundingRect() const
 
 QPainterPath GanttIntervalGraphicsObject::shape() const
 {
-    QPainterPath path;
-    path.addRect(QRect(QPoint(0, RECTANGLE_OFFSET),
-                  QSize(_boundingRectSize.width(), _boundingRectSize.height() - 2 * RECTANGLE_OFFSET)));
-    return path;
+    if(!_isSmall){
+        QPainterPath path;
+        path.addRect(QRect(QPoint(0, RECTANGLE_OFFSET),
+                           QSize(_boundingRectSize.width(), _boundingRectSize.height() - 2 * RECTANGLE_OFFSET)));
+        return path;    // Not small shape - rectangle
+    }
+
+    return _circlePath; // Small shape - circle
 }
 
 void GanttIntervalGraphicsObject::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
 {
-    Q_UNUSED(option);
-    Q_UNUSED(widget);
     if(!innerInfo() || !_scene)
         return;
-    QColor color = (_scene->currentItem() == this)?(innerInfo()->color().darker(130)):(innerInfo()->color());
 
-    painter->setPen(QPen(QColor(0x644C26)));
     if(!_isSmall)
     {
+        QColor color = (_scene->currentItem() == this)?(innerInfo()->color().darker(130)):(innerInfo()->color());
+        painter->setPen(QPen(QColor(0x644C26)));
         QRectF drawRect = boundingRect();
         painter->fillRect(drawRect,QBrush(color));
 //        painter->drawRect(drawRect);
 
         painter->save();
-        painter->setOpacity(0.5);
+        painter->setOpacity(0.4);
 
-        if(!_intersectionVisual.isEmpty())
-            _intersectionVisual.fillRects(painter, QBrush(Qt::black));
+        foreach(const QRectF &rect, _intersectionVisual.rects())
+            painter->fillRect(rect.adjusted(0,5,0,0), QBrush(Qt::black));
 
         painter->restore();
-
-//        if(!_intersection.isEmpty())
-//            _intersection.fillRects(painter, QBrush(Qt::black));
-
     }
     else
-    {
-        painter->setRenderHints(QPainter::SmoothPixmapTransform | QPainter::HighQualityAntialiasing | QPainter::Antialiasing);
-        QRectF drawRect = QRectF(QPointF(0,0),_boundingRectSize).adjusted(0,RECTANGLE_OFFSET,0,-RECTANGLE_OFFSET);
-        painter->fillRect(drawRect,QBrush(color));
-//        painter->drawRect(drawRect);
-        QPainterPath path;
-
-        path.moveTo(-MIN_VIS_WIDTH/2,   drawRect.top());
-        path.lineTo(-1,                 drawRect.top() + drawRect.height()/2);
-        path.lineTo(-MIN_VIS_WIDTH/2,   drawRect.bottom());
-        path.lineTo(-MIN_VIS_WIDTH/2,   drawRect.top());
-
-//        path.moveTo(m_boundingRectSize.width(),
-//                                        drawRect.top() + drawRect.height()/2);
-        path.moveTo(_boundingRectSize.width() + MIN_VIS_WIDTH/2,
-                                        drawRect.top());
-        path.lineTo(_boundingRectSize.width() + 1,
-                                        drawRect.top() + drawRect.height()/2);
-        path.lineTo(_boundingRectSize.width() + MIN_VIS_WIDTH/2,
-                                        drawRect.bottom());
-        path.lineTo(_boundingRectSize.width() + MIN_VIS_WIDTH/2,
-                    drawRect.top());
-
-        painter->setOpacity(0.5);
-        painter->fillPath(path,QBrush(color));
-        painter->setOpacity(1);
-
-    }
+        drawSmallInterval(painter, option, widget);
 }
 
 GanttInfoLeaf *GanttIntervalGraphicsObject::innerInfo() const
@@ -127,13 +106,11 @@ void GanttIntervalGraphicsObject::setBoundingRectSize(const QSizeF &boundingRect
 {
     prepareGeometryChange();
     if(boundingRectSize.width()>MIN_VIS_WIDTH){
-        if(zValue()==300)
-            setZValue(1);
+        setZValue(1);
         _isSmall = false;
     }
     else {
-        if(zValue() == 1)
-            setZValue(300);
+        setZValue(600);
         _isSmall = true;
     }
 
@@ -195,6 +172,32 @@ void GanttIntervalGraphicsObject::hoverLeaveEvent(QGraphicsSceneHoverEvent *even
     emit graphicsItemHoverLeave();
 
     QGraphicsItem::hoverLeaveEvent(event);
+}
+
+void GanttIntervalGraphicsObject::drawSmallInterval(QPainter *painter, const QStyleOptionGraphicsItem */*option*/, QWidget */*widget*/)
+{
+    QColor color = (_scene->currentItem() == this)?(innerInfo()->color().darker(130)):(innerInfo()->color());
+
+    painter->setRenderHints(QPainter::HighQualityAntialiasing | QPainter::Antialiasing);
+    painter->drawPath(_circlePath);
+    painter->fillPath(_circlePath,QBrush(color));
+
+    if(!_intersection.isEmpty()){
+        QPainterPath smallIntersectionPath;
+        QRectF tmp = _circlePath.controlPointRect();
+
+        tmp.adjust(0, tmp.height() / 2, 0, 0);
+        smallIntersectionPath.addRect(tmp);
+        smallIntersectionPath &= _circlePath;
+
+        painter->save();
+        painter->setOpacity(0.4);
+
+        painter->fillPath(smallIntersectionPath, QBrush(Qt::black));
+
+        painter->restore();
+
+    }
 }
 
 void GanttIntervalGraphicsObject::updateVisualIntersection()

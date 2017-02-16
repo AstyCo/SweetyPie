@@ -35,6 +35,8 @@ GanttWidget::GanttWidget(QWidget *parent) :
 GanttWidget::~GanttWidget()
 {
     delete ui;
+    if(_builder)
+        delete _builder;
 }
 
 void GanttWidget::installEventWatcherInterval(QObject *watcher)
@@ -56,7 +58,7 @@ void GanttWidget::setPlayerSpeeds(qreal minMultiply, qreal maxMultiply)
     ui->playerSettings->setMultiplies(minMultiply,maxMultiply);
 }
 
-void GanttWidget::showPlayer(bool show)
+void GanttWidget::setVisiblePlayer(bool show)
 {
     m_playerShown = show;
 
@@ -73,9 +75,14 @@ bool GanttWidget::player() const
     return m_playerShown;
 }
 
-void GanttWidget::setModel(IGanttModel *model)
+void GanttWidget::setBuilder(AbstractBuilder *builder)
 {
-    _treeInfo->setModel(model);
+    _scene->setBuilder(builder);
+    _treeInfo->setBuilder(builder);
+
+    if(_builder)
+        delete _builder;
+    _builder = builder;
 }
 
 void GanttWidget::setView(QTreeView *view, bool /*inner*/)
@@ -83,8 +90,47 @@ void GanttWidget::setView(QTreeView *view, bool /*inner*/)
     if(!_treeInfo || !_treeInfo->model())
         return;
 
-//    view->setModel(_treeInfo->model());
     _treeInfo->connectTreeView(view);
+}
+
+void GanttWidget::showInterval()
+{
+    setVisibleInterval(true);
+}
+
+void GanttWidget::hideInterval()
+{
+    setVisibleInterval(false);
+}
+
+void GanttWidget::setVisibleInterval(bool value)
+{
+    ui->widgetIntervalSlider->setVisible(value);
+}
+
+void GanttWidget::showDtLine()
+{
+    setVisibleDtLine(true);
+}
+
+void GanttWidget::hideDtLine()
+{
+    setVisibleDtLine(false);
+}
+
+void GanttWidget::setVisibleDtLine(bool value)
+{
+    ui->widgetDtLine->setVisible(value);
+}
+
+void GanttWidget::showPlayer()
+{
+    setVisiblePlayer(true);
+}
+
+void GanttWidget::hidePlayer()
+{
+    setVisiblePlayer(false);
 }
 
 void GanttWidget::dataReset()
@@ -118,6 +164,7 @@ void GanttWidget::connectPlayer()
 
 void GanttWidget::init()
 {
+    _builder = NULL;
     _treeInfo = new GanttInfoTree(this);
     _scene = new GanttScene(ui->ganttView,ui->widgetDtLine,this);
     ui->ganttView->setMousePressH(_scene->mousePressH());
@@ -142,6 +189,7 @@ void GanttWidget::connectSceneWithInfo()
     connect(_treeInfo,SIGNAL(expanded(GanttInfoNode*)),_scene,SLOT(onExpanded(GanttInfoNode*)));
     connect(_treeInfo,SIGNAL(collapsed(GanttInfoNode*)),_scene,SLOT(onCollapsed(GanttInfoNode*)));
     connect(_treeInfo,SIGNAL(limitsChanged(UtcDateTime,TimeSpan)),_scene,SLOT(onLimitsChanged(UtcDateTime,TimeSpan)));
+
 
     connect(_scene,SIGNAL(currentItemChanged(const GanttInfoItem*)),_treeInfo,SLOT(onCurrentItemChanged(const GanttInfoItem*)));
 }

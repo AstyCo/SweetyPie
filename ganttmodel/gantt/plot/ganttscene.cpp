@@ -26,30 +26,15 @@
 
 void GanttScene::drawBackground(QPainter *painter, const QRectF &rect)
 {
-    QGraphicsScene::drawBackground(painter,rect);
+    QGraphicsScene::drawBackground(painter, rect);
 
-    qreal   bgBottom = rect.bottom()
-            ,bgLeft = rect.left() - 1
-            ,bgRight = rect.right() + 1;
-
-    QPen pen(Qt::gray, qreal(0.5));
-    pen.setStyle(Qt::SolidLine);
-    painter->setPen(pen);
-
-    qreal startY = (qCeil(rect.y() / DEFAULT_ITEM_HEIGHT))*DEFAULT_ITEM_HEIGHT;
-
-    while(startY<bgBottom)
-    {
-        painter->drawLine(QPointF(bgLeft,startY),QPointF(bgRight,startY));
-        startY+=DEFAULT_ITEM_HEIGHT;
-    }
+    drawBackgroundExpandedItems(painter, rect);
+    drawBackgroundLines(painter, rect);
 }
 
 
 GanttGraphicsObject *GanttScene::itemForInfo(const GanttInfoItem *key) const
 {
-//    if(!_itemForInfo.value(key))
-//        qDebug() << "NULL";
     return _itemForInfo.value(key);
 }
 
@@ -73,54 +58,44 @@ void GanttScene::updateSceneItems()
 
 void GanttScene::makeStep(int step)
 {
-    if(_playerCurrent)
-        _playerCurrent->makeStep(step);
+    _playerCurrent->makeStep(step);
 }
 
 void GanttScene::moveSliderToNextEventStart()
 {
-    if(_playerCurrent)
+    const GanttInfoItem* nextEventInfo = _treeInfo->nextStart(slidersDt());
+    if(nextEventInfo)
     {
-        const GanttInfoLeaf* nextEventInfo = nextEvent(slidersDt());
-        if(nextEventInfo)
-        {
-            _playerCurrent->setDt(nextEventInfo->start());
-        }
-        else
-            _playerCurrent->moveToEnd();
+        _playerCurrent->setDt(nextEventInfo->start());
     }
+    else
+        _playerCurrent->moveToEnd();
 }
 
 void GanttScene::moveSliderToPrevEventFinish()
 {
-    if(_playerCurrent)
+    const GanttInfoItem* prevEventInfo = _treeInfo->prevFinish(slidersDt());
+    if(prevEventInfo)
     {
-        const GanttInfoLeaf* prevEventInfo = prevEvent(slidersDt());
-        if(prevEventInfo)
-        {
-            _playerCurrent->setDt(prevEventInfo->finish());
-        }
-        else
-            _playerCurrent->moveToBegin();
+        _playerCurrent->setDt(prevEventInfo->finish());
     }
+    else
+        _playerCurrent->moveToBegin();
 }
 
 void GanttScene::moveSliderToViewStart()
 {
-    if(_playerCurrent)
-        _playerCurrent->moveToRangeStart();
+    _playerCurrent->moveToRangeStart();
 }
 
 void GanttScene::moveSliderToViewFinish()
 {
-    if(_playerCurrent)
-        _playerCurrent->moveToRangeFinish();
+    _playerCurrent->moveToRangeFinish();
 }
 
 void GanttScene::moveSliderToStart()
 {
-    if(_playerCurrent)
-        _playerCurrent->moveToBegin();
+    _playerCurrent->moveToBegin();
 }
 
 void GanttScene::setCurrentItemByInfo(GanttInfoItem *info)
@@ -141,23 +116,10 @@ void GanttScene::setCurrentDt(const UtcDateTime &dt)
 
 void GanttScene::mousePressEvent(QGraphicsSceneMouseEvent *event)
 {
-//    update();
     QGraphicsScene::mousePressEvent(event);
     if(event->button() == Qt::LeftButton){
-        if(!_playerCurrent->mapRectToScene(_playerCurrent->boundingRect())
-                .contains(event->scenePos())){
+        if(!_playerCurrent->sceneBoundingRect().contains(event->scenePos()))
             _mousePressH.press(event->scenePos());
-
-        }
-    }
-    else if (event->button() == Qt::RightButton){
-        GanttGraphicsObject *object = objectForPos(event->scenePos());
-        if(object)
-        {
-            GanttInfoNode *node = object->info()->node();
-            if(node->parent() && !node->isExpanded()) // not root
-                node->changeExpanding();
-        }
     }
 
     mouseMoveEvent(event);
@@ -165,7 +127,6 @@ void GanttScene::mousePressEvent(QGraphicsSceneMouseEvent *event)
 
 void GanttScene::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event)
 {
-    qDebug() << "doubleclick";
     QGraphicsScene::mouseDoubleClickEvent(event);
     if(event->buttons() & Qt::LeftButton)
     {
@@ -173,10 +134,14 @@ void GanttScene::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event)
         if(object)
         {
             GanttInfoNode *node = object->info()->node();
-            if(node->parent()) // not root
-//                node->changeExpanding();
-//            else
-                emit currentItemChanged(object->info());
+            if (node->parent()){    // not root
+                if (node->isExpanded())
+                    node->setExpanded(false);
+                else{
+                    emit currentItemChanged(object->info());
+                    node->setExpanded(true);
+                }
+            }
         }
     }
 
@@ -195,37 +160,13 @@ void GanttScene::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
                 _crossObject->setPos(event->scenePos());
             }
             else
-            {
                 _crossObject->setVisible(false);
-            }
         }
         else
-        {
             qCritical("m_view is null");
-        }
     }
-    if(_mousePressH.isSlide(event->scenePos())){
-        _dtline->slide((event->lastScenePos().x() - event->scenePos().x()) * 1. / width());         // HOR scroll
-//        qDebug () << "lastScenePos" << event->lastScenePos()<<
-//                     "newScenePos"<<event->scenePos();
-//        qDebug() << "view height" <<_view->height()
-//                 <<"\nscrollbar minimum"<<_view->verticalScrollBar()->minimum()
-//                <<"\nscrollbar maximum"<<_view->verticalScrollBar()->maximum();
-//        int dy = event->scenePos().y() - event->lastScenePos().y(),
-//            val = _view->verticalScrollBar()->value(),
-//            max = _view->verticalScrollBar()->maximum(),
-//            min = _view->verticalScrollBar()->minimum();
-
-//        if(val + dy > max)
-//            dy = max - val;
-//        if(val + dy < min)
-//            dy = min - val;
-//        if(_view->verticalScrollBar()){
-//            qDebug() << _view->verticalScrollBar()->value();
-//            _view->verticalScrollBar()->setValue(_view->verticalScrollBar()->value() - 1/*dy*/);
-
-//        }
-    }
+    if(_mousePressH.isSlide(event->scenePos()))
+        _dtline->slide((event->lastScenePos().x() - event->scenePos().x()) * 1. / width());     // HOR scroll
 
     QGraphicsScene::mouseMoveEvent(event);
 }
@@ -237,9 +178,16 @@ void GanttScene::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
     }
     else if (event->button() == Qt::LeftButton){
         if(_mousePressH.isClick(event->scenePos())){    // Press
-            QGraphicsObject *object = objectForPos(_mousePressH.pos());
-            if(object)
+            GanttGraphicsObject *object = objectForPos(_mousePressH.pos());
+            if(object){
                 setCurrentItem(object);
+
+                GanttInfoNode *node = object->info()->node();
+                if (node->parent()){    // not root
+                    if (node->isExpanded())
+                        emit currentItemChanged(object->info());
+                }
+            }
         }
     }
 
@@ -280,29 +228,6 @@ void GanttScene::onVisItemDestroyed()
     updateSceneRect();
 }
 
-void GanttScene::onLeafStartChanged(/*const UtcDateTime& lastStart*/)
-{
-    GanttInfoLeaf* p_leaf = qobject_cast<GanttInfoLeaf*>(sender());
-
-    if(!p_leaf)
-        return;
-
-    _infoForStart.remove(_infoForStart.key(p_leaf));
-    _infoForStart.insert(p_leaf->start(),p_leaf);
-
-}
-
-void GanttScene::onLeafFinishChanged(/*const UtcDateTime& lastFinish*/)
-{
-    GanttInfoLeaf* p_leaf = qobject_cast<GanttInfoLeaf*>(sender());
-
-    if(!p_leaf)
-        return;
-
-    _infoForFinish.remove(_infoForFinish.key(p_leaf));
-    _infoForFinish.insert(p_leaf->start(),p_leaf);
-}
-
 const MousePressHelper *GanttScene::mousePressH() const
 {
     return &_mousePressH;
@@ -313,7 +238,10 @@ void GanttScene::setTreeInfo(GanttInfoTree *treeInfo)
     _treeInfo = treeInfo;
 }
 
-
+void GanttScene::setBuilder(AbstractBuilder *builder)
+{
+    _builder = builder;
+}
 
 QGraphicsItem *GanttScene::currentItem() const
 {
@@ -334,9 +262,7 @@ bool GanttScene::isVisible(const QGraphicsItem *which) const
 QRectF GanttScene::elementsBoundingRect()
 {
     QRectF res;
-    foreach(GanttIntervalGraphicsObject* object,_items)
-        res|=object->sceneBoundingRect();
-    foreach(GanttCalcGraphicsObject *object,_calcItems)
+    foreach(GanttGraphicsObject* object,_items)
         res|=object->sceneBoundingRect();
     return res;
 }
@@ -349,17 +275,14 @@ void GanttScene::clear()
     removePersistentItems();
     QGraphicsScene::clear();
     _items.clear();
-    _calcItems.clear();
     _itemForInfo.clear();
-    _infoForFinish.clear();
-    _infoForStart.clear();
     addPersistentItems();
 }
 
 
 bool GanttScene::sceneHaveItems() const
 {
-    return !(_items.isEmpty() && _calcItems.isEmpty());
+    return !_items.isEmpty();
 }
 
 void GanttScene::onViewResized(const QSize &newSize)
@@ -369,7 +292,7 @@ void GanttScene::onViewResized(const QSize &newSize)
     updateSceneItems();
 }
 
-void GanttScene::setCurrentItem(QGraphicsObject *currentItem)
+void GanttScene::setCurrentItem(GanttGraphicsObject *currentItem)
 {
     if(_currentItem == currentItem)
         return;
@@ -378,17 +301,14 @@ void GanttScene::setCurrentItem(QGraphicsObject *currentItem)
     GanttInfoItem *info = NULL;
     _currentItem = currentItem;
     if(lastItem){
-        lastItem->setZValue(1);
+        lastItem->setZValue(_savedZValue);
         lastItem->update();
     }
     if(_currentItem){
+        _savedZValue = _currentItem->zValue();
 
-        if(GanttIntervalGraphicsObject *graphicsObject =
-                dynamic_cast<GanttIntervalGraphicsObject*>(_currentItem.data()))
-            info = graphicsObject->info();
-        if(GanttCalcGraphicsObject *graphicsObject =
-                dynamic_cast<GanttCalcGraphicsObject*>(_currentItem.data()))
-            info = graphicsObject->info();
+        if(_currentItem)
+            info = _currentItem->info();
 
         QRectF itemRect = _currentItem->mapToScene(_currentItem->boundingRect()).boundingRect();
         if(_view && !isVisible(_currentItem))
@@ -400,9 +320,6 @@ void GanttScene::setCurrentItem(QGraphicsObject *currentItem)
     }
 
     _hoverObject->setItem(info);   // if no currentItem sets to NULL
-
-//    if(lastItem != currentItem)
-//        emit currentItemChanged(info);
 }
 
 GanttGraphicsObject *GanttScene::objectForPos(const QPointF &pos)
@@ -414,32 +331,37 @@ GanttGraphicsObject *GanttScene::objectForPos(const QPointF &pos)
 
     return itemForInfo(_treeInfo->infoForVPos(pos.y()));
 }
-const QList<GanttIntervalGraphicsObject *>& GanttScene::dtItems() const
+
+void GanttScene::connectNewInfo(GanttInfoItem *info)
+{
+    connect(info, SIGNAL(aboutToBeDeleted()), this, SLOT(onInfoDelete()));
+    connect(info, SIGNAL(destroyed(QObject*)), this, SLOT(onVisItemDestroyed()));
+
+    connect(info, SIGNAL(expanded()), this, SLOT(updateSceneRect()));
+    connect(info, SIGNAL(collapsed()), this, SLOT(updateSceneRect()));
+
+    connect(info, SIGNAL(expanded()), this, SLOT(invalidateBackground()));
+    connect(info, SIGNAL(collapsed()), this, SLOT(invalidateBackground()));
+}
+const QList<GanttGraphicsObject *>& GanttScene::dtItems() const
 {
     return _items;
 }
 
 void GanttScene::setDrawCurrentDtSlider(bool enable)
 {
-    if(_playerCurrent)
-        _playerCurrent->setDraw(enable);
+    _playerCurrent->setDraw(enable);
 }
 
 
 void GanttScene::updateSlider()
 {
-    if(!_playerCurrent)
-        return;
-
     _playerCurrent->updateScenePos();
 }
 
 void GanttScene::updateItems()
 {
-    foreach(GanttIntervalGraphicsObject *o, _items)
-        o->updateItemGeometry();
-
-    foreach(GanttCalcGraphicsObject *o, _calcItems)
+    foreach(GanttGraphicsObject *o, _items)
         o->updateItemGeometry();
 }
 
@@ -449,10 +371,10 @@ void GanttScene::createPersistentItems()
     _crossObject = new GanttDtCrossObject(this);
     _hoverObject = new GanttHoverGraphicsObject(this);
 
-    connect(_playerCurrent, SIGNAL(dtChanged(UtcDateTime)),this,SIGNAL(currentDtChanged(UtcDateTime)));
-    connect(_playerCurrent, SIGNAL(dtChanged(UtcDateTime)),_dtline,SLOT(setCurrentDt(UtcDateTime)));
-    connect(_dtline,SIGNAL(dtChangedManually(UtcDateTime)),_playerCurrent,SLOT(setDt(UtcDateTime)));
-    connect(_playerCurrent,SIGNAL(drawChanged(bool)),_dtline,SLOT(showCurrentDt(bool)));
+    connect(_playerCurrent, SIGNAL(dtChanged(UtcDateTime)), this, SIGNAL(currentDtChanged(UtcDateTime)));
+    connect(_playerCurrent, SIGNAL(dtChanged(UtcDateTime)), _dtline, SLOT(setCurrentDt(UtcDateTime)));
+    connect(_dtline, SIGNAL(dtChangedManually(UtcDateTime)), _playerCurrent, SLOT(setDt(UtcDateTime)));
+    connect(_playerCurrent, SIGNAL(drawChanged(bool)), _dtline, SLOT(showCurrentDt(bool)));
 }
 
 void GanttScene::addPersistentItems()
@@ -467,6 +389,49 @@ void GanttScene::removePersistentItems()
     removeItem(_playerCurrent);
     removeItem(_crossObject);
     removeItem(_hoverObject);
+}
+
+void GanttScene::drawBackgroundExpandedItems(QPainter *painter, const QRectF &rect)
+{
+    qreal   bgLeft = rect.left() - 1 ,
+            bgWidth = rect.width() + 2;
+    GanttInfoNode *root = _treeInfo->root();
+    for(int i = 0; i < root->size(); ++i){
+        if(root->at(i)->bottom() < rect.top())
+            continue;
+        if(root->at(i)->pos() > rect.bottom())
+            break;
+        GanttInfoNode *node = root->nodeAt(i);
+        if(node && node->isExpanded())
+            painter->fillRect(QRect(bgLeft, node->pos() + RECTANGLE_OFFSET / 2,
+                                    bgWidth, node->height() - RECTANGLE_OFFSET + 2),
+                              QBrush(QColor(0xFFE5CC)));
+
+    }
+}
+
+void GanttScene::drawBackgroundLines(QPainter *painter, const QRectF &rect)
+{
+    qreal   bgBottom = rect.bottom() ,
+            bgLeft = rect.left() - 1 ,
+            bgRight = rect.right() + 1;
+
+
+    QPen pen(Qt::gray, qreal(0.5));
+    pen.setStyle(Qt::SolidLine);
+    painter->setPen(pen);
+    qreal startY = (qCeil(rect.y() / DEFAULT_ITEM_HEIGHT))*DEFAULT_ITEM_HEIGHT;
+
+    while(startY<bgBottom)
+    {
+        painter->drawLine(QPointF(bgLeft,startY),QPointF(bgRight,startY));
+        startY+=DEFAULT_ITEM_HEIGHT;
+    }
+}
+
+void GanttScene::invalidateBackground()
+{
+    invalidate(QRectF(),QGraphicsScene::BackgroundLayer);
 }
 
 void GanttScene::addInfoItem(GanttInfoItem *parent)
@@ -525,46 +490,23 @@ void GanttScene::updateIntersections()
 
 void GanttScene::onGraphicsItemPress()
 {
-    GanttIntervalGraphicsObject *item = qobject_cast<GanttIntervalGraphicsObject*>(sender());
-    if(item){
-        setCurrentItem(item);
-    }
-
-    GanttCalcGraphicsObject *calcItem = qobject_cast<GanttCalcGraphicsObject*>(sender());
-    if(calcItem)
-    {
-        setCurrentItem(calcItem);
-    }
+    GanttGraphicsObject *graphicsObject = qobject_cast<GanttGraphicsObject*>(sender());
+    if(graphicsObject)
+        setCurrentItem(graphicsObject);
 }
 
 void GanttScene::onGraphicsItemHoverEnter()
 {
-    GanttIntervalGraphicsObject *item = qobject_cast<GanttIntervalGraphicsObject*>(sender());
-    if(item)
-    {
-//        setCurrentItem(item);
-        emit graphicsItemHoverEnter(item->info());
-    }
-
-    GanttCalcGraphicsObject *calcItem = qobject_cast<GanttCalcGraphicsObject*>(sender());
-    if(calcItem)
-    {
-//        setCurrentItem(calcItem);
-        emit graphicsItemHoverEnter(calcItem->info());
-    }
-
-
+    GanttGraphicsObject *graphicsObject = qobject_cast<GanttGraphicsObject*>(sender());
+    if(graphicsObject)
+        emit graphicsItemHoverEnter(graphicsObject->info());
 }
 
 void GanttScene::onGraphicsItemHoverLeave()
 {
-    GanttIntervalGraphicsObject *item = qobject_cast<GanttIntervalGraphicsObject*>(sender());
-    if(item)
-        emit graphicsItemHoverLeave(item->info());
-
-    GanttCalcGraphicsObject *calcItem = qobject_cast<GanttCalcGraphicsObject*>(sender());
-    if(calcItem)
-        emit graphicsItemHoverLeave(calcItem->info());
+    GanttGraphicsObject *graphicsObject = qobject_cast<GanttGraphicsObject*>(sender());
+    if(graphicsObject)
+        emit graphicsItemHoverLeave(graphicsObject->info());
 }
 
 void GanttScene::onInfoDelete()
@@ -573,74 +515,17 @@ void GanttScene::onInfoDelete()
     onItemRemoved(item);
 }
 
-
-
-void GanttScene::onInfoLeafDelete()
+void GanttScene::onItemRemoved(GanttInfoItem *info)
 {
-    const GanttInfoLeaf* leaf = static_cast<const GanttInfoLeaf*>(sender());
-    removeItemForInfoLeaf(leaf);
-}
-
-
-const GanttInfoLeaf *GanttScene::nextEvent(const UtcDateTime &curDt) const
-{
-    if(curDt.isValid())
-    {
-        QMap<UtcDateTime,const GanttInfoLeaf*>::const_iterator it = _infoForStart.constBegin();
-        while (it != _infoForStart.constEnd())
-        {
-            if(curDt < it.key())
-                return it.value();
-            ++it;
-        }
-    }
-
-    return NULL;
-}
-
-const GanttInfoLeaf *GanttScene::prevEvent(const UtcDateTime &curDt) const
-{
-    if(curDt.isValid())
-    {
-        QMapIterator<UtcDateTime,const GanttInfoLeaf*> it(_infoForFinish);
-        it.toBack();
-        while (it.hasPrevious()) {
-            it.previous();
-            if(curDt > it.key())
-                return it.value();
-        }
-    }
-
-    return NULL;
-}
-
-void GanttScene::onItemRemoved(GanttInfoItem *item)
-{
-    qDebug() << "onItemRemoved "<< item->title();
-    if(!item)
+    qDebug() << "onItemRemoved "<< info->title();
+    if(!info)
         return;
-    const GanttInfoLeaf *leaf = qobject_cast<const GanttInfoLeaf*>(item);
-    if(leaf)
-    {
-        GanttIntervalGraphicsObject* graphicsItem = qobject_cast<GanttIntervalGraphicsObject*>(itemForInfo(leaf));
-        if(graphicsItem)
-            _items.removeOne(graphicsItem);
-        _itemForInfo.remove(leaf);
-        _infoForStart.remove(_infoForStart.key(leaf));
-        _infoForFinish.remove(_infoForFinish.key(leaf));
-        if(graphicsItem)
-            graphicsItem->deleteLater();
-    }
 
-    const GanttInfoNode *node = qobject_cast<const GanttInfoNode *>(item);
-    if(node)
+    if(GanttGraphicsObject *graphicsObject = _itemForInfo.value(info))
     {
-        GanttCalcGraphicsObject* graphicsItem = qobject_cast<GanttCalcGraphicsObject*>(itemForInfo(node));
-        if(graphicsItem)
-            _calcItems.removeOne(graphicsItem);
-        _itemForInfo.remove(node);
-        if(graphicsItem)
-            graphicsItem->deleteLater();
+        _items.removeOne(graphicsObject);
+        _itemForInfo.remove(info);
+        graphicsObject->deleteLater();
     }
 }
 
@@ -655,23 +540,6 @@ void GanttScene::onCollapsed(GanttInfoNode *which)
     updateIntersectionR(which);
 }
 
-void GanttScene::removeItemForInfoLeaf(const GanttInfoLeaf *leaf)
-{
-    if(!leaf)
-        return;
-    qDebug() << "removeItemForInfoLeaf " << leaf->title();
-
-    GanttIntervalGraphicsObject* graphicsItem = qobject_cast<GanttIntervalGraphicsObject*>(itemForInfo(leaf));
-    if(graphicsItem)
-        _items.removeOne(graphicsItem);
-    _itemForInfo.remove(leaf);
-    _infoForStart.remove(_infoForStart.key(leaf));
-    _infoForFinish.remove(_infoForFinish.key(leaf));
-    if(graphicsItem)
-        graphicsItem->deleteLater();
-}
-
-
 void GanttScene::updateSliderHeight()
 {
     _playerCurrent->setHeight(height());
@@ -685,6 +553,7 @@ void GanttScene::init()
 
     connectDtLine();
     _currentItem = NULL;
+    _builder = NULL;
 
     setSceneRect(0,0,GANTTSCENE_MIN_WIDTH,0);
 
@@ -707,52 +576,23 @@ UtcDateTime GanttScene::posToDt(int pos) const
     return _dtline->posToDt(pos);
 }
 
-void GanttScene::onItemAdded(GanttInfoItem *item)
+void GanttScene::onItemAdded(GanttInfoItem *info)
 {
-//    qDebug() << "onItemAdded " << item->title();
-    if(!item)
+    if(!info)
         return;
-
-    connect(item,SIGNAL(destroyed(QObject*)),this,SLOT(onVisItemDestroyed()));
-    connect(item,SIGNAL(expanded()),this,SLOT(updateSceneRect()));
-    connect(item,SIGNAL(collapsed()),this,SLOT(updateSceneRect()));
-
-    GanttInfoLeaf *leaf = qobject_cast<GanttInfoLeaf*>(item);
     GanttGraphicsObject *p_object = NULL;
-    if(leaf)
-    {
-//        qDebug() << "leaf";
-        GanttIntervalGraphicsObject *p;
-        p_object = p = new GanttIntervalGraphicsObject(leaf);
 
-        _items.append(p);
-        _itemForInfo.insert(leaf,p);
-        _infoForStart.insert(leaf->start(),leaf);
-        _infoForFinish.insert(leaf->finish(),leaf);
-    }
+    if(_builder)
+        p_object = _builder->createGraphicsObject(info);
     else
-    {
-//        qDebug() << "node";
-        GanttInfoNode *node = qobject_cast<GanttInfoNode*>(item);
-        if(node)
-        {
-            if(node->hasStart())
-            {
-                GanttCalcGraphicsObject *p;
-//                qDebug() << node->title() << " has start";
-                p_object = p = new GanttCalcGraphicsObject(node);
+        qWarning("GanttScene::onItemAdded _builder is NULL");
 
-                _calcItems.append(p);
-                _itemForInfo.insert(node,p);
-            }
-            else
-            {
-//                qDebug() << node->title() << " has no start";
-            }
 
-        }
-    }
     if(p_object){
+        connectNewInfo(info);
+        _items.append(p_object);
+        _itemForInfo.insert(info,p_object);
+
         p_object->setDtLine(_dtline);
         p_object->setScene(this);
 

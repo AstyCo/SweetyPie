@@ -104,6 +104,7 @@ bool GanttInfoItem::isDot() const
     return !_interval.isValid();
 }
 
+
 QList<GanttInfoItem *> GanttInfoItem::siblings() const
 {
     if(_parent)
@@ -298,6 +299,11 @@ qreal GanttInfoItem::calcPos() const
 int GanttInfoItem::pos() const
 {
     return _pos;
+}
+
+qreal GanttInfoItem::bottom() const
+{
+    return height() + pos();
 }
 
 void GanttInfoItem::setPos(int pos)

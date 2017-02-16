@@ -16,6 +16,9 @@
 #define GANTTTREEVIEW_MIN_WIDTH (200)
 
 
+#define MIN_VIS_WIDTH 4
+#define RECTANGLE_OFFSET 5
+
 #define DEFAULT_ITEM_WIDTH      (qreal(20))
 #define DEFAULT_MONTH_WIDTH     (qreal(35))
 

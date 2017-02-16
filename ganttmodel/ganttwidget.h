@@ -4,6 +4,7 @@
 #include "ganttproject_global.h"
 #include "interfaces/iganttmodel.h"
 #include "gantt/info/ganttinfotree.h"
+#include "gantt/builder/abstractbuilder.h"
 
 #include <QModelIndex>
 
@@ -33,12 +34,27 @@ public:
     void setPlayerSpeeds(qreal minMultiply, qreal maxMultiply);///< Устанавливает минимальную и максимальную скорости воспроизведения
     bool player() const;
 
-    void setModel(IGanttModel *model);
+    void setBuilder(AbstractBuilder *builder);
+
     void setView(QTreeView *view, bool inner = false);
 
 public slots:
-    void dataReset();
-    void showPlayer(bool show);
+
+    /// --- Спрятать/Показать элементы
+    void showInterval();
+    void hideInterval();
+    void setVisibleInterval(bool value);
+
+    void showDtLine();
+    void hideDtLine();
+    void setVisibleDtLine(bool value);
+
+    void showPlayer();
+    void hidePlayer();
+    void setVisiblePlayer(bool show);
+    // ---
+
+    void dataReset();   ///< Обновляет содержимое диаграммы по модели, вызывать если не вызывалось QAbstractItemModel::reset()
 
 
 private slots:
@@ -54,6 +70,7 @@ private:
     Ui::GanttWidget *ui;
     GanttInfoTree *_treeInfo;
     GanttScene *_scene;
+    AbstractBuilder *_builder;
 
     bool m_playerShown;
 };

@@ -3,6 +3,7 @@
 
 #include "ganttinfonode.h"
 #include "interfaces/iganttmodel.h"
+#include "gantt/builder/abstractbuilder.h"
 
 #include <QObject>
 #include <QAbstractItemModel>
@@ -16,10 +17,15 @@ public:
     explicit GanttInfoTree(QObject *parent = 0);
 
     QAbstractItemModel *model() const;
-    void setModel(IGanttModel *model);
+    void setModel(QAbstractItemModel *model);
+    void setBuilder(AbstractBuilder *builder);
+
     void connectTreeView(QTreeView *view);
     void disconnectTreeView(QTreeView *view);
     GanttInfoItem *infoForIndex(const QModelIndex &index) const;
+    GanttInfoItem *nextStart(const UtcDateTime &dt) const;
+    GanttInfoItem *prevFinish(const UtcDateTime &dt) const;
+
     GanttInfoNode *root() const;
     GanttInfoItem *infoForVPos(int vpos);
     int height() const;
@@ -33,7 +39,7 @@ signals:
     void itemAdded(GanttInfoItem *item);
     void itemAboutToBeDeleted(GanttInfoItem *item);
     void itemRemoved(GanttInfoItem *item);
-    void currentChanged(const QModelIndex &index);
+    void currentChanged(const QModelIndex &index, QItemSelectionModel::SelectionFlags command);
     void currentChanged(GanttInfoItem *item);
     void needExpand(const QModelIndex &index);
     void needCollapse(const QModelIndex &index);
@@ -52,7 +58,6 @@ public slots:
     void reset();
 private slots:
     void onDataChanged(const QModelIndex &from, const QModelIndex &to);
-//    void onBeginInsertRows(const QModelIndex &parent, int from, int to);
     void onRowsInserted(const QModelIndex &parent, int start, int end);
     void onColumnsInserted(const QModelIndex &parent, int start, int end);
     void onRowsRemoved(const QModelIndex &parent, int start, int end);
@@ -68,23 +73,26 @@ private slots:
 private:
     void fillByModelIndex(const QModelIndex &parent = QModelIndex());
     void setLimits(const QPair<UtcDateTime, UtcDateTime> &newLimits);
-    int heightH(GanttInfoItem *item) const;
+    int  heightH(GanttInfoItem *item) const;
     void onAnyAddition();
     GanttInfoItem *lookupForVPos(int vpos, GanttInfoNode *node);
-//    void fillRecursive(GanttInfoItem *item,const QModelIndex &index);
     void fill(GanttInfoNode *node, const QModelIndex &index, int from, int to);
     GanttInfoItem *makeInfoItem(const QModelIndex &index);
     void disconnectLastModel();
     void connectNewModel();
-
-    QAbstractItemModel *_model; ///< Ссылаются на одно и то же
-    IGanttModel *_iGanttModel;  ///< Ссылаются на одно и то же
+    void clearInfoForDtHelper(QMap<UtcDateTime, GanttInfoItem*> &map,
+                              const UtcDateTime &dt,
+                              GanttInfoItem *item);
+private:
+    QAbstractItemModel *_model;
     GanttInfoNode *_root;
+    AbstractBuilder *_builder;
 
-    QPair<UtcDateTime, UtcDateTime> _limits;            // caches Limits
-    QMap<QModelIndex, GanttInfoItem*> _infoForIndex;    // caches
-    bool _limitsChanged;
 
+    bool _limitsChanged;                                            // caches Limits
+    QPair<UtcDateTime, UtcDateTime> _limits;                        // caches Limits
+    QMap<QModelIndex, GanttInfoItem*> _infoForIndex;                // caches
+    QMap<UtcDateTime,GanttInfoItem*> _infoForStart, _infoForFinish; // caches
 };
 
 #endif // GANTTINFOTREE_H

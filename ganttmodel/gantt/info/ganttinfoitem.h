@@ -16,16 +16,16 @@ class UtcDateTime;
 class GANTTMODELSHARED_EXPORT GanttInfoItem : public QObject
 {
     Q_OBJECT
-
+    void init();
 public:
     GanttInfoItem(QObject *parent = NULL);
-    GanttInfoItem(const QString &title
-                  , const UtcDateTime   &start
-                  , const TimeSpan      &ts
-                  , const QModelIndex   &index = QModelIndex()
-                  , const QColor        &color = Qt::green
-                  , GanttInfoNode       *parentNode = NULL
-                  , QObject             *parent = NULL);
+    GanttInfoItem(const QString &title,
+                  const UtcDateTime   &start,
+                  const TimeSpan      &ts,
+                  const QModelIndex   &index = QModelIndex(),
+                  const QColor        &color = Qt::green,
+                  GanttInfoNode       *parentNode = NULL,
+                  QObject             *parent = NULL);
     virtual ~GanttInfoItem();
 
     GanttInfoNode *parent() const;
@@ -35,6 +35,7 @@ public:
     virtual qreal height() const = 0;
     virtual qreal calcPos() const;
     int pos() const;
+    qreal bottom() const;
     void setPos(int pos);
 
     QModelIndex index() const;
@@ -95,21 +96,19 @@ public:
 private:
     void disconnectParent();
     void connectParent();
-    void init();
 
     GanttInfoNode* _parent;
     QModelIndex _index;
 
     QString _title;
     MyUtcDateTimeInterval _interval;
-//    UtcDateTime _start;
-//    TimeSpan _timeSpan;
     QColor _color;
+
+    int _pos;   // caches vertical pos
 
     unsigned int _linkCnt;
     bool _deleted;
     QMutex _mutex;
-    int _pos;
 };
 
 #endif // GANTTINFOITEM_H

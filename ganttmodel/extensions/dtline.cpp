@@ -173,7 +173,7 @@ void DtLine::drawBottom(QPainter *painter)
 
                 drawBottomItemText(painter, dt, _mode);
             }
-            else if(drawLittleHatches)
+            else if(drawLittleHatches && _mode != days1)    // _mode != days1 is dirty hack TODO
                 painter->drawLine( QPointF(l,topHeight),
                                    QPointF(l,topHeight + bottomHeight*(1. /4))); // little hatch
 

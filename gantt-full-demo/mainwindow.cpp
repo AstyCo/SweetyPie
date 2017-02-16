@@ -8,6 +8,8 @@
 #include "utcdatetime.h"
 #include "gantt/private_extensions/gantt-lib_global_values.h"
 #include "gantttreemodel.h"
+#include "modelwrapper.h"
+#include "gantt/builder/ganttbuilder.h"
 
 
 void MainWindow::init()
@@ -15,8 +17,7 @@ void MainWindow::init()
     _model = new GanttTreeModel();
     ui->treeView->setModel(_model);
     ui->ganttWidget->installEventWatcherInterval(this);
-
-    ui->ganttWidget->setModel(_model);
+    ui->ganttWidget->setBuilder(new GanttBuilder(new ModelWrapper(_model)));
     ui->ganttWidget->setView(ui->treeView);
 }
 
@@ -28,6 +29,7 @@ MainWindow::MainWindow(QWidget *parent) :
     init();
 
     testGantt();
+//    on_pushButton_ganttAddItems_clicked();
     qDebug() << "test data initialized";
 }
 
@@ -96,7 +98,7 @@ void MainWindow::testGantt()
 // 3
     GanttInfoNode *i3 = new GanttInfoNode(
                 "node3",
-                QDateTime::currentDateTime()
+                QDateTime::currentDateTime() + TimeSpan(1,12,0,0)
                 );
     GanttInfoLeaf   *i30 = new GanttInfoLeaf(
                             "leaf3.0",
@@ -112,8 +114,13 @@ void MainWindow::testGantt()
                             "leaf3.2",
                             UtcDateTime(QDateTime::currentDateTime()) + TimeSpan(2,0,0,0),
                             TimeSpan(0,0,0,1)
+                            ),
+                    *i33 = new GanttInfoLeaf(
+                            "leaf3.3",
+                            UtcDateTime(QDateTime::currentDateTime()) + TimeSpan(0,12,0,0),
+                            TimeSpan(3,0,0,1)
                             );
-    i3->append(i30);i3->append(i31);i3->append(i32);
+    i3->append(i30);i3->append(i31);i3->append(i32);i3->append(i33);
 // 4
     GanttInfoNode *i4 = new GanttInfoNode(
                 "node4",
@@ -234,7 +241,7 @@ void MainWindow::on_pushButton_ganttClear_clicked()
 
 void MainWindow::on_radioButton_ganttPlayer_toggled(bool checked)
 {
-    ui->ganttWidget->showPlayer(checked);
+    ui->ganttWidget->setVisiblePlayer(checked);
 }
 
 

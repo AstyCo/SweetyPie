@@ -15,6 +15,21 @@
   </property>
   <widget class="QWidget" name="centralWidget">
    <layout class="QGridLayout" name="gridLayout">
+    <property name="leftMargin">
+     <number>0</number>
+    </property>
+    <property name="topMargin">
+     <number>0</number>
+    </property>
+    <property name="rightMargin">
+     <number>0</number>
+    </property>
+    <property name="bottomMargin">
+     <number>0</number>
+    </property>
+    <property name="spacing">
+     <number>0</number>
+    </property>
     <item row="0" column="0">
      <widget class="QTabWidget" name="tabWidget_chartTimeXYWidget">
       <property name="currentIndex">
@@ -24,7 +39,7 @@
        <attribute name="title">
         <string>Gantt</string>
        </attribute>
-       <layout class="QVBoxLayout" name="verticalLayout" stretch="1,0">
+       <layout class="QVBoxLayout" name="verticalLayout">
         <property name="spacing">
          <number>0</number>
         </property>
@@ -41,18 +56,34 @@
          <number>0</number>
         </property>
         <item>
-         <widget class="QSplitter" name="splitter">
+         <widget class="QSplitter" name="splitter_2">
           <property name="orientation">
-           <enum>Qt::Horizontal</enum>
+           <enum>Qt::Vertical</enum>
           </property>
-          <widget class="QTreeView" name="treeView"/>
-          <widget class="GanttWidget" name="ganttWidget" native="true">
-           <property name="sizePolicy">
-            <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
-             <horstretch>0</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
+          <property name="handleWidth">
+           <number>1</number>
+          </property>
+          <widget class="QWidget" name="widget" native="true">
+           <property name="styleSheet">
+            <string notr="true">background-color: green;</string>
            </property>
+          </widget>
+          <widget class="QSplitter" name="splitter">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="handleWidth">
+            <number>1</number>
+           </property>
+           <widget class="QTreeView" name="treeView"/>
+           <widget class="GanttWidget" name="ganttWidget" native="true">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+           </widget>
           </widget>
          </widget>
         </item>

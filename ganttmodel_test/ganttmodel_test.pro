@@ -71,11 +71,13 @@ INCLUDEPATH += $${DEP_PATH_HEADERS}
 
 SOURCES += main.cpp\
         mainwindow.cpp \
-    gantttreemodel.cpp
+    gantttreemodel.cpp \
+    modelwrapper.cpp
 
 
 HEADERS  += mainwindow.h \
-    gantttreemodel.h
+    gantttreemodel.h \
+    modelwrapper.h
 
 FORMS    += mainwindow.ui
 

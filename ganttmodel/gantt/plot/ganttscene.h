@@ -3,6 +3,7 @@
 
 #include "gantt/private_extensions/mousepresshelper.h"
 #include "scene_objects/ganttcurrentdtslider.h"
+#include "gantt/builder/abstractbuilder.h"
 #include "ganttdtline.h"
 
 #include "hfitscene.h"
@@ -31,6 +32,7 @@ public:
     int dtToPos(const UtcDateTime &dt) const;
     UtcDateTime posToDt(int pos) const;
     void setTreeInfo(GanttInfoTree *treeInfo);
+    void setBuilder(AbstractBuilder *builder);
 
     const MousePressHelper *mousePressH() const;
 
@@ -40,12 +42,6 @@ protected:
     void mouseMoveEvent(QGraphicsSceneMouseEvent *event);
     void mouseReleaseEvent(QGraphicsSceneMouseEvent *event);
     void wheelEvent(QGraphicsSceneWheelEvent *event);
-
-signals:
-    void limitsChanged(const UtcDateTime &min, const TimeSpan &ts);
-
-    void scroll(int delta);
-    void slideByPercent(qreal percent);
 public slots:
     void onTreeInfoReset();
     void onItemAdded(GanttInfoItem *item);
@@ -58,15 +54,9 @@ public slots:
     GanttGraphicsObject* itemForInfo(const GanttInfoItem *key) const;
 
     void updateSliderHeight();
-
     UtcDateTime slidersDt() const;
     void setCurrentDt(const UtcDateTime &dt);
-
-    const GanttInfoLeaf *nextEvent(const UtcDateTime &curDt) const;
-    const GanttInfoLeaf *prevEvent(const UtcDateTime &curDt) const;
-    void removeItemForInfoLeaf(const GanttInfoLeaf* leaf);
-
-    const QList<GanttIntervalGraphicsObject *>& dtItems() const;
+    const QList<GanttGraphicsObject *> &dtItems() const;
 
     void setDrawCurrentDtSlider(bool enable);
 
@@ -102,7 +92,7 @@ public slots:
     void moveSliderToViewFinish();
     void moveSliderToStart();
     void setCurrentItemByInfo(GanttInfoItem *info);
-    void setCurrentItem(QGraphicsObject *currentItem);
+    void setCurrentItem(GanttGraphicsObject *currentItem);
     void addInfoItem(GanttInfoItem *parent);
     void addInfoItem(GanttInfoNode *parent, int from, int to);
     void onLimitsChanged(const UtcDateTime &first, const TimeSpan&ts);
@@ -111,6 +101,7 @@ public slots:
 
 
 private:
+    void connectNewInfo(GanttInfoItem *info);
     void connectDtLine();
 
     void updateSlider();
@@ -119,33 +110,33 @@ private:
     void addPersistentItems();
     void removePersistentItems();
 
+    void drawBackgroundExpandedItems(QPainter *painter, const QRectF &rect);
+    void drawBackgroundLines(QPainter *painter, const QRectF &rect);
+
 private slots:
+    void invalidateBackground();
     void updateIntersectionR(GanttInfoItem *item);   ///< updates intersection recursively
     void onVisItemDestroyed();
     void onGraphicsItemPress();
     void onGraphicsItemHoverEnter();
     void onGraphicsItemHoverLeave();
-
     void onInfoDelete();
-    void onInfoLeafDelete();
-    void onLeafStartChanged();
-    void onLeafFinishChanged();
 
 private:
+    AbstractBuilder *_builder;
 
     GanttInfoTree *_treeInfo;
     GanttDtLine *_dtline;
-    QList<GanttIntervalGraphicsObject*> _items;
-    QList<GanttCalcGraphicsObject*> _calcItems;
-    QMap<const GanttInfoItem*, GanttGraphicsObject*> _itemForInfo;
-    QMap<UtcDateTime,const GanttInfoLeaf*> _infoForStart,
-                                            _infoForFinish;
 
+    QList<GanttGraphicsObject*> _items;
     GanttCurrentDtSlider *_playerCurrent;
     GanttDtCrossObject *_crossObject;
     GanttHoverGraphicsObject *_hoverObject;
-    QPointer<QGraphicsObject> _currentItem;
+    QPointer<GanttGraphicsObject> _currentItem;
+
     MousePressHelper _mousePressH;
+    int _savedZValue;
+    QMap<const GanttInfoItem*, GanttGraphicsObject*> _itemForInfo;  // caches
 };
 
 

@@ -23,23 +23,17 @@ GanttInfoNode::GanttInfoNode(const QString &title
 
 GanttInfoLeaf *GanttInfoNode::leafAt(int index) const
 {
-    if(index>=size())
-        return NULL;
-
-    return dynamic_cast<GanttInfoLeaf*>(_items[index]);
+    return qobject_cast<GanttInfoLeaf*>(at(index));
 }
 
 GanttInfoNode *GanttInfoNode::nodeAt(int index) const
 {
-    if(index>=size())
-        return NULL;
-
-    return dynamic_cast<GanttInfoNode*>(_items[index]);
+    return qobject_cast<GanttInfoNode*>(at(index));
 }
 
 GanttInfoItem *GanttInfoNode::at(int index) const
 {
-    if(index>=size())
+    if( index <0 || index >= _items.size() )
         return NULL;
     return _items[index];
 }

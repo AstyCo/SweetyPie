@@ -68,8 +68,8 @@ void GanttDtCrossObject::paint(QPainter *painter, const QStyleOptionGraphicsItem
     painter->drawText(m_textRect,m_text,QTextOption(Qt::AlignCenter));
     painter->restore();
 
-    painter->setPen(dashPen);
-    painter->drawPath(m_linesPath);
+//    painter->setPen(dashPen);
+//    painter->drawPath(m_linesPath);
 }
 
 void GanttDtCrossObject::setScene(GanttScene *scene)

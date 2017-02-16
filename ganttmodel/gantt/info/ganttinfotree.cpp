@@ -6,22 +6,24 @@ GanttInfoTree::GanttInfoTree(QObject *parent) : QObject(parent)
     init();
 }
 
-void GanttInfoTree::setModel(IGanttModel *model)
+void GanttInfoTree::setModel(QAbstractItemModel *model)
 {
     if(!model)
         return;
-    QAbstractItemModel *itemModel = dynamic_cast<QAbstractItemModel*>(model);
-    if(!itemModel){
-        qWarning("Warning:: trying to set Model not inherited from QAbstractItemModel");
-        return;
-    }
 
     disconnectLastModel();
-    _iGanttModel = model;
-    _model = itemModel;
+    _model = model;
     connectNewModel();
 
     reset();
+}
+
+void GanttInfoTree::setBuilder(AbstractBuilder *builder)
+{
+    _builder = builder;
+
+    if(_builder)
+        setModel(_builder->model());
 }
 
 void GanttInfoTree::connectTreeView(QTreeView *view)
@@ -31,7 +33,8 @@ void GanttInfoTree::connectTreeView(QTreeView *view)
 
     connect(this,SIGNAL(needCollapse(QModelIndex)),view,SLOT(collapse(QModelIndex)));
     connect(this,SIGNAL(needExpand(QModelIndex)),view,SLOT(expand(QModelIndex)));
-    connect(this,SIGNAL(currentChanged(QModelIndex)),view,SLOT(setCurrentIndex(QModelIndex)));
+    connect(this,SIGNAL(currentChanged(QModelIndex, QItemSelectionModel::SelectionFlags)),
+            view->selectionModel(),SLOT(setCurrentIndex(QModelIndex, QItemSelectionModel::SelectionFlags)));
 
     connect(view,SIGNAL(expanded(QModelIndex)),this,SLOT(onExpanded(QModelIndex)));
     connect(view,SIGNAL(collapsed(QModelIndex)),this,SLOT(onCollapsed(QModelIndex)));
@@ -67,7 +70,7 @@ void GanttInfoTree::onCurrentItemChanged(const GanttInfoItem *item)
     if(!item)
         return;
     qDebug() << "emit currentChanged" << item->index();
-    emit currentChanged(item->index());
+    emit currentChanged(item->index(), QItemSelectionModel::Select | QItemSelectionModel::Current);
 }
 
 GanttInfoItem *GanttInfoTree::infoForIndex(const QModelIndex &index) const
@@ -75,6 +78,38 @@ GanttInfoItem *GanttInfoTree::infoForIndex(const QModelIndex &index) const
     if(!index.isValid())
         return _root;
     return _infoForIndex.value(index, NULL);    // NULL default value
+}
+
+GanttInfoItem *GanttInfoTree::nextStart(const UtcDateTime &dt) const
+{
+    if(dt.isValid())
+    {
+        QMap<UtcDateTime,GanttInfoItem*>::const_iterator it = _infoForStart.constBegin();
+        while (it != _infoForStart.constEnd())
+        {
+            if(dt < it.key())
+                return it.value();
+            ++it;
+        }
+    }
+
+    return NULL;
+}
+
+GanttInfoItem *GanttInfoTree::prevFinish(const UtcDateTime &dt) const
+{
+    if(dt.isValid())
+    {
+        QMapIterator<UtcDateTime,GanttInfoItem*> it(_infoForFinish);
+        it.toBack();
+        while (it.hasPrevious()) {
+            it.previous();
+            if(dt > it.key())
+                return it.value();
+        }
+    }
+
+    return NULL;
 }
 
 void GanttInfoTree::onClicked(const QModelIndex &index)
@@ -110,6 +145,8 @@ void GanttInfoTree::clear()
     _root->clear();
 
     _infoForIndex.clear();  // clears cache
+    _infoForStart.clear();  // clears cache
+    _infoForFinish.clear(); // clears cache
 
     emit endRemoveItems();
 }
@@ -152,18 +189,6 @@ void GanttInfoTree::onDataChanged(const QModelIndex &/*from*/, const QModelIndex
     reset();
 }
 
-//void GanttInfoTree::onBeginInsertRows(const QModelIndex &parent, int from, int to)
-//{
-//    qDebug() << "onBeginInsertRows " << parent << ' ' << from << ' ' << to;
-//    if(!_model){
-//        qWarning("onBeginInsertRows called reset w/o model");
-//        return;
-//    }
-//    for(int i = from; i <= to; ++i){
-//        makeInfoItem(parent.child(i,0));
-//    }
-//}
-
 void GanttInfoTree::onRowsInserted(const QModelIndex &parent, int start, int end)
 {
 //    qDebug() << "onRowsIns " << start << " " << end;
@@ -196,6 +221,11 @@ void GanttInfoTree::onItemAboutToBeDeleted()
 
     _infoForIndex.remove(item->index());    // clears cache
 
+    if(_builder && _builder->isEvent(item)){
+        clearInfoForDtHelper(_infoForStart, item->start(), item);
+        clearInfoForDtHelper(_infoForFinish, item->finish(), item);
+    }
+
     if(item)
         emit itemAboutToBeDeleted(item);
 }
@@ -207,64 +237,35 @@ void GanttInfoTree::updateLimits()
 
 GanttInfoItem *GanttInfoTree::lookupForVPos(int vpos, GanttInfoNode *node)
 {
-    bool calcItem = false;
     GanttInfoItem *foundItem = NULL;
     if(vpos < node->pos())
         return NULL;
-    for(int i = 0; i < node->size(); ++i){
-        if(vpos < node->at(i)->pos()){
-            if(i>0)
-                foundItem = node->at(i-1);   // leaf
-            else{
-                calcItem = true;
-                foundItem = node;                   // calc
-            }
+    if((!node->isExpanded() && vpos < node->pos() + node->height())
+        || (node->size()>0 && vpos < node->at(0)->pos()) )
+        return node;
+
+    for(int i = 0; i < node->size(); ++i)
+        if(vpos < node->at(i)->pos() + node->at(i)->height() ){
+            foundItem = node->at(i);   // found
             break;
         }
-    }
+
     if(foundItem){
         GanttInfoNode *p_node = qobject_cast<GanttInfoNode*>(foundItem);
         if(p_node){
-            if(calcItem)
+            if(p_node->size() == 0)
                 return p_node;
-            return lookupForVPos(vpos, p_node);
+            else
+                return lookupForVPos(vpos, p_node);
         }
-        GanttInfoLeaf *p_leaf = qobject_cast<GanttInfoLeaf*>(foundItem);
-        if(p_leaf)
-            return p_leaf;
+        return foundItem;
+    }
 
-        qCritical("ERROR unexpected");
-        return NULL;
-    }
-    else{
-        if(node->size() > 0)
-            if(GanttInfoNode *p_node = qobject_cast<GanttInfoNode*>(node->at(node->size()-1)))
-                return lookupForVPos(vpos,p_node);
-            else return node->at(node->size()-1);
-        else
-            return node;
-    }
+    return NULL; // not found
 }
-
-//void GanttInfoTree::fillRecursive(GanttInfoItem *item, const QModelIndex &index)
-//{
-//    if(!_model){
-//        qWarning("fillRecursive called reset w/o model");
-//        return;
-//    }
-
-//    for(int i = 0; i < _model->rowCount(index); ++i){
-//        QModelIndex childIndex = _model->index(i,0,index);
-//        GanttInfoItem *childItem = makeInfoItem(childIndex);
-//        ((GanttInfoNode*)item)->append(childItem);
-
-//        fillRecursive(childItem,childIndex); // tale recursion
-//    }
-//}
 
 void GanttInfoTree::fill(GanttInfoNode *node, const QModelIndex &index, int from, int to)
 {
-//    qDebug() << "FILL " << node << index << from << to;
     if(!_model){
         qWarning("fill called reset w/o model");
         return;
@@ -279,28 +280,22 @@ void GanttInfoTree::fill(GanttInfoNode *node, const QModelIndex &index, int from
 
 GanttInfoItem *GanttInfoTree::makeInfoItem(const QModelIndex &index)
 {
-    if(!_model){
-        qWarning("makeInfoItem called reset w/o model");
+    if(!_builder){
+        qWarning("makeInfoItem called reset w/o builder");
         return NULL;
     }
-    GanttInfoItem *item;
-    if(_iGanttModel->iGanttTag(index) == IGanttModel::IGanttNode){
-        item = new GanttInfoNode(_iGanttModel->iGanttTitle(index)
-                                 , _iGanttModel->iGanttStart(index)
-                                 , index
-                                 , _iGanttModel->iGanttColor(index) );
-    }
-    else{
-        item = new GanttInfoLeaf(_iGanttModel->iGanttTitle(index)
-                                 , _iGanttModel->iGanttStart(index)
-                                 , _iGanttModel->iGanttTimeSpan(index)
-                                 , index
-                                 , _iGanttModel->iGanttColor(index) );
-    }
+    GanttInfoItem *item = _builder->createInfo(index);
 //    qDebug() << "for index" << index << "createdInfo"  <<item->title() << item;
+    if(item){
+        _infoForIndex.insert(index, item);  // fills cache
 
-    _infoForIndex.insert(index, item);  // fills cache
-    emit itemAdded(item);
+        if(_builder->isEvent(item)){
+            _infoForStart.insert(item->start(), item);      // fills cache
+            _infoForFinish.insert(item->finish(), item);    // fills cache
+        }
+
+        emit itemAdded(item);
+    }
     return item;
 }
 
@@ -308,7 +303,7 @@ void GanttInfoTree::init()
 {
     _limitsChanged = false;
     _model = NULL;
-    _iGanttModel = NULL;
+    _builder = NULL;
 
     _root = new GanttInfoNode(this);
     _root->setExpanded(true);
@@ -340,6 +335,18 @@ void GanttInfoTree::connectNewModel()
             this, SLOT(onRowsRemoved(QModelIndex,int,int)));
     connect(_model, SIGNAL(columnsRemoved(QModelIndex,int,int)),
             this, SLOT(onColumnsRemoved(QModelIndex,int,int)));
+}
+
+void GanttInfoTree::clearInfoForDtHelper(QMap<UtcDateTime, GanttInfoItem *> &map, const UtcDateTime &dt, GanttInfoItem *item)
+{
+    QMap<UtcDateTime,GanttInfoItem*>::iterator i = map.find(dt);
+    while (i != map.end() && i.key() == dt){
+        if(i.value() == item){
+            map.erase(i);
+            break;
+        }
+        ++i;
+    }
 }
 
 void GanttInfoTree::connectNewItem(GanttInfoItem *item)

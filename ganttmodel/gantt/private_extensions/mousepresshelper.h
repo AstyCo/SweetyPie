@@ -17,11 +17,13 @@ public:
     bool isSlide(const QPointF &pos) const;
     inline bool pressed() const;
     inline const QPointF &pos() const;
+    inline Qt::MouseButton button() const;
 
 private:
     bool _pressed;
     QPointF _pressedAtPos;
     qint64 _pressedAtMSecs;
+
 
     static qint64 _slideDelay;
     static int _slideDistance;
@@ -30,5 +32,6 @@ private:
 
 inline bool MousePressHelper::pressed() const { return _pressed;}
 inline const QPointF &MousePressHelper::pos() const { return _pressedAtPos;}
+
 
 #endif // MOUSEPRESSHELPER_H

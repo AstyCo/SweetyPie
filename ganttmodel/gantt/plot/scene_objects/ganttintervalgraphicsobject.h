@@ -34,6 +34,7 @@ protected:
     void hoverLeaveEvent(QGraphicsSceneHoverEvent *event);
 
 private:
+    void drawSmallInterval(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
     void updateVisualIntersection();
 
 
@@ -45,6 +46,7 @@ private:
     QRectFUnion _intersectionVisual;
     IntervalUnion _intersection;
 
+    static QPainterPath _circlePath;
 };
 
 #endif // GANTTGRAPHICSITEM_H

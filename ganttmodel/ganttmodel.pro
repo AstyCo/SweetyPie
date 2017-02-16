@@ -66,7 +66,10 @@ SOURCES += \
     extensions/qrectunion.cpp \
     gantt/private_extensions/mousepresshelper.cpp \
     extensions/intervalunion.cpp \
-    extensions/myutcdatetimeinterval.cpp
+    extensions/myutcdatetimeinterval.cpp \
+    gantt/builder/abstractbuilder.cpp \
+    gantt/builder/ganttbuilder.cpp \
+    gantt/builder/imodelwrapper.cpp
 
 
 HEADERS += \
@@ -123,7 +126,10 @@ HEADERS += \
     gantt/private_extensions/gantt-lib_global_values.h \
     gantt/private_extensions/mousepresshelper.h \
     extensions/intervalunion.h \
-    extensions/myutcdatetimeinterval.h
+    extensions/myutcdatetimeinterval.h \
+    gantt/builder/abstractbuilder.h \
+    gantt/builder/ganttbuilder.h \
+    gantt/builder/imodelwrapper.h
 
 
 RESOURCES += \
@@ -142,7 +148,6 @@ FORMS += \
 
 DISTFILES += \
     ../gantt-lib-include.pri \
-    gantt_uml.qmodel \
     build_config.pri
 
 include(../build_config.pri)

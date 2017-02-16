@@ -13,7 +13,7 @@ class GanttInfoNode;
 class GanttCalcGraphicsObject : public GanttGraphicsObject
 {
     Q_OBJECT
-
+    void init();
 public:
     GanttCalcGraphicsObject(GanttInfoNode* node,QGraphicsItem *parent = NULL);
     ~GanttCalcGraphicsObject();
@@ -34,7 +34,8 @@ protected:
 
 
 private:
-    QPainterPath m_shapePath;
+    QPixmap _pixmapImageActive, _pixmapImageInactive;
+    static QRect _geometry;
 };
 
 #endif // GANTTCALCGRAPHICSITEM_H

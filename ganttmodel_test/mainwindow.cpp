@@ -5,7 +5,9 @@
 #include <stdio.h>
 #include <time.h>
 #include "utcdatetime.h"
+#include "modelwrapper.h"
 
+#include "gantt/builder/ganttbuilder.h"
 #include "gantt/info/ganttinfonode.h"
 #include "gantt/private_extensions/gantt-lib_global_values.h"
 
@@ -234,7 +236,8 @@ QList<GanttInfoItem*> generateTest()
 void MainWindow::testGanttModel()
 {
     _model = new GanttTreeModel(0, this);
-    ui->ganttWidget->setModel(_model);
+
+    ui->ganttWidget->setBuilder(new GanttBuilder(new ModelWrapper(_model)));
     ui->ganttWidget->setView(ui->treeViewGantt);
 //    connect(ui->ganttWidget,SIGNAL(currentDtChanged(UtcDateTime)),this,SLOT(testSignal(UtcDateTime)));
 
@@ -360,7 +363,7 @@ void MainWindow::on_pushButton_ganttClear_clicked()
 
 void MainWindow::on_radioButton_ganttPlayer_toggled(bool checked)
 {
-    ui->ganttWidget->showPlayer(checked);
+    ui->ganttWidget->setVisiblePlayer(checked);
 }
 
 
