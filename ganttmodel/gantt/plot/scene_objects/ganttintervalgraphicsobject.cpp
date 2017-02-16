@@ -17,47 +17,38 @@ QPainterPath initializePath(){
 
 QPainterPath GanttIntervalGraphicsObject::_circlePath = initializePath();
 
-GanttIntervalGraphicsObject::GanttIntervalGraphicsObject(GanttInfoLeaf *info,QGraphicsItem *parent) :
-    GanttGraphicsObject(info,parent)
+void GanttIntervalGraphicsObject::init()
 {
-    _scene = NULL;
     _isSmall = true;
 
-    if(innerInfo())
-    {
-        setToolTip( QString::fromUtf8("Операция:") + '\t' + '\t' + innerInfo()->title()
-                    + '\n' + QString::fromUtf8("Начало:") + '\t' + innerInfo()->start().toString("dd.MM.yyyy HH:mm:ss")
-                    + '\n' + QString::fromUtf8("Окончание:") + '\t' + innerInfo()->finish().toString("dd.MM.yyyy HH:mm:ss"));
-        connect(innerInfo(), SIGNAL(changed()),this,SLOT(updateItemGeometry()));
+    if(info()){
 
-        innerInfo()->increaseLinkCnt();
+        updateToolTip();
+        connect(info(), SIGNAL(changed()),this,SLOT(updateItemGeometry()));
+        connect(info(), SIGNAL(changed()),this,SLOT(updateToolTip()));
+
+        info()->increaseLinkCnt();
     }
 
     setZValue(1);
     setAcceptHoverEvents(true);
 }
 
-GanttIntervalGraphicsObject::~GanttIntervalGraphicsObject()
+GanttIntervalGraphicsObject::GanttIntervalGraphicsObject(GanttInfoLeaf *info,QGraphicsItem *parent) :
+    GanttTextGraphicsObject(info,parent)
 {
-
-    if(_scene)
-    {
-        _scene->removeItem(this);
-        setParentItem(NULL);
-    }
-
-    if(innerInfo())
-        innerInfo()->reduceLinkCnt();
+    init();
 }
 
-QRectF GanttIntervalGraphicsObject::boundingRect() const
-{
-    if(!_isSmall)
-        return QRectF(QPointF(0, RECTANGLE_OFFSET),
-                      QSize(_boundingRectSize.width(), _boundingRectSize.height() - 2 * RECTANGLE_OFFSET));
-    return QRectF(QPointF( -MIN_VIS_WIDTH/2 - 1, RECTANGLE_OFFSET),
-                  QPointF(_boundingRectSize.width()+ MIN_VIS_WIDTH/2 + 1,_boundingRectSize.height() - RECTANGLE_OFFSET));
-}
+
+//QRectF GanttIntervalGraphicsObject::boundingRect() const
+//{
+//    if(!_isSmall)
+//        return QRectF(QPointF(0, RECTANGLE_OFFSET),
+//                      QSize(_boundingRectSize.width(), _boundingRectSize.height() - 2 * RECTANGLE_OFFSET));
+//    return QRectF(QPointF( -MIN_VIS_WIDTH/2 - 1, RECTANGLE_OFFSET),
+//                  QPointF(_boundingRectSize.width()+ MIN_VIS_WIDTH/2 + 1,_boundingRectSize.height() - RECTANGLE_OFFSET));
+//}
 
 QPainterPath GanttIntervalGraphicsObject::shape() const
 {
@@ -71,16 +62,19 @@ QPainterPath GanttIntervalGraphicsObject::shape() const
     return _circlePath; // Small shape - circle
 }
 
-void GanttIntervalGraphicsObject::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
+void GanttIntervalGraphicsObject::paint(QPainter *painter,
+                                        const QStyleOptionGraphicsItem *option,
+                                        QWidget *widget)
 {
-    if(!innerInfo() || !_scene)
+    if(!info())
         return;
 
     if(!_isSmall)
     {
-        QColor color = (_scene->currentItem() == this)?(innerInfo()->color().darker(130)):(innerInfo()->color());
+        QColor color = (_current ? info()->color().darker(130)
+                                : info()->color());
         painter->setPen(QPen(QColor(0x644C26)));
-        QRectF drawRect = boundingRect();
+        QRectF drawRect = shape().controlPointRect();
         painter->fillRect(drawRect,QBrush(color));
 //        painter->drawRect(drawRect);
 
@@ -94,25 +88,28 @@ void GanttIntervalGraphicsObject::paint(QPainter *painter, const QStyleOptionGra
     }
     else
         drawSmallInterval(painter, option, widget);
+
+    GanttTextGraphicsObject::paint(painter, option, widget);
 }
 
-GanttInfoLeaf *GanttIntervalGraphicsObject::innerInfo() const
+
+QString GanttIntervalGraphicsObject::textRight() const
 {
-    return qobject_cast<GanttInfoLeaf*>(m_info);
+    GanttInfoNode *parent = info()->parent();
+    if(parent && parent->isExpanded())
+        return info()->title();
+    return QString();
 }
 
 
 void GanttIntervalGraphicsObject::setBoundingRectSize(const QSizeF &boundingRectSize)
 {
     prepareGeometryChange();
-    if(boundingRectSize.width()>MIN_VIS_WIDTH){
-        setZValue(1);
+    if(boundingRectSize.width()>MIN_VIS_WIDTH)
         _isSmall = false;
-    }
-    else {
-        setZValue(600);
+    else
         _isSmall = true;
-    }
+    updateZValue();
 
     const bool needUpdateVisualIntersection = boundingRectSize.width() != _boundingRectSize.width();
     _boundingRectSize = boundingRectSize;
@@ -123,15 +120,22 @@ void GanttIntervalGraphicsObject::setBoundingRectSize(const QSizeF &boundingRect
 
 void GanttIntervalGraphicsObject::updateItemGeometry()
 {
-    if(!innerInfo())
+    if(!info())
         return;
 
-    qreal startPos = _dtline->dtToPos(innerInfo()->start()),
-          itemWidth = _dtline->dtToPos(innerInfo()->finish()) - startPos;
+    qreal startPos = _dtline->dtToPos(info()->start()),
+          itemWidth = _dtline->dtToPos(info()->finish()) - startPos;
 
     // UPDATE geometry
-    setPos(startPos, innerInfo()->calcPos());
+    setPos(startPos, info()->calcPos());
     setBoundingRectSize(QSizeF(itemWidth, DEFAULT_ITEM_HEIGHT));
+}
+
+void GanttIntervalGraphicsObject::updateToolTip()
+{
+    setToolTip( QString::fromUtf8("Операция:") + '\t' + '\t' + info()->title()
+                + '\n' + QString::fromUtf8("Начало:") + '\t' + info()->start().toString("dd.MM.yyyy HH:mm:ss")
+                + '\n' + QString::fromUtf8("Окончание:") + '\t' + info()->finish().toString("dd.MM.yyyy HH:mm:ss"));
 }
 
 
@@ -155,7 +159,9 @@ void GanttIntervalGraphicsObject::updateIntersection()
 
 void GanttIntervalGraphicsObject::mousePressEvent(QGraphicsSceneMouseEvent *event)
 {
-    qDebug() << "Hi, My boundingRect:" << boundingRect() << "My _intersection:"<<_intersection;
+    qDebug() << "Hi, My boundingRect:" << boundingRect()
+             << "My _intersection:"<<_intersection
+             << "My _current:" << _current;
     QGraphicsItem::mousePressEvent(event);
 }
 
@@ -176,7 +182,8 @@ void GanttIntervalGraphicsObject::hoverLeaveEvent(QGraphicsSceneHoverEvent *even
 
 void GanttIntervalGraphicsObject::drawSmallInterval(QPainter *painter, const QStyleOptionGraphicsItem */*option*/, QWidget */*widget*/)
 {
-    QColor color = (_scene->currentItem() == this)?(innerInfo()->color().darker(130)):(innerInfo()->color());
+    QColor color = (_current ? info()->color().darker(130)
+                            : info()->color());
 
     painter->setRenderHints(QPainter::HighQualityAntialiasing | QPainter::Antialiasing);
     painter->drawPath(_circlePath);

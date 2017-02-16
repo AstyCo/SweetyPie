@@ -303,13 +303,17 @@ bool GanttTreeModel::setData(const QModelIndex &index, const QVariant &value, in
         {
             if (index.column() == titleField)
                 info->setTitle(value.toString());
-            else if (index.column() == startField && leaf)
+            else if (index.column() == startField)
             {
                 UtcDateTime time = UtcDateTime(value.toDateTime());
+                if(leaf){
+                    if(time >= leaf->finish())
+                        return false;
+                    UtcDateTime finish = leaf->finish();
+                    leaf->setTimeSpan(finish - time);
+                }
 
-                if(time >= leaf->finish())
-                    return false;
-                leaf->setStart(time);
+                info->setStart(time);
             }
             else if (index.column() == finishField && leaf)
             {
@@ -320,10 +324,10 @@ bool GanttTreeModel::setData(const QModelIndex &index, const QVariant &value, in
                 leaf->setTimeSpan(time - leaf->start());
             }
         }
-//        else if (role == Qt::CheckStateRole)
-//            info->setDone(value.toBool());
         else
             return false;
+
+        emit dataChanged(index, index);
         return true;
     }
     return false;

@@ -46,6 +46,9 @@ public:
     UtcDateTime finish() const;
     QColor      color() const;
 
+    virtual bool isExpanded() const{
+        return false;
+    }
     bool hasStart() const;
     bool isDot() const;
     virtual GanttInfoNode *node() = 0;
@@ -93,10 +96,10 @@ public:
 
     MyUtcDateTimeInterval getInterval() const;
 
+protected:
+    virtual void disconnectParent();
+    virtual void connectParent();
 private:
-    void disconnectParent();
-    void connectParent();
-
     GanttInfoNode* _parent;
     QModelIndex _index;
 

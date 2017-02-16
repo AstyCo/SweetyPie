@@ -9,7 +9,7 @@
 void GanttDtCrossObject::init()
 {
 
-    setZValue(1000);
+    setZValue(10000);
     m_scene = NULL;
 }
 
@@ -51,11 +51,10 @@ QRectF GanttDtCrossObject::boundingRect() const
 //    return m_linesPath + m_datePath;
 //}
 
-void GanttDtCrossObject::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
+void GanttDtCrossObject::paint(QPainter *painter,
+                               const QStyleOptionGraphicsItem */*option*/,
+                               QWidget */*widget*/)
 {
-    Q_UNUSED(option);
-    Q_UNUSED(widget);
-
     if(!m_scene)
         return;
 
@@ -107,7 +106,8 @@ void GanttDtCrossObject::updatePaths()
         qreal offsetX = 4,
                 offsetY = 0;
 
-        m_text = m_scene->posToDt(scenePos().x()).toString("HH:mm:ss:dd.MM.yyyy");
+        m_text = m_scene->posToDt(scenePos().x()).toString(
+                    QString::fromUtf8("HH:mm (ssсек.)  dd.MM.yyyy"));
 
         QFontMetrics fontMetrics(m_scene->font());
         QRect textRect;

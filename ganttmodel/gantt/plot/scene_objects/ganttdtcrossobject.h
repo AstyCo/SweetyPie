@@ -14,8 +14,6 @@ class GanttDtCrossObject : public QGraphicsObject
 
     void init();
 public:
-//    void setVisible(bool visible);
-
     GanttDtCrossObject(QGraphicsItem *parent = NULL);
     GanttDtCrossObject(GanttScene *scene, QGraphicsItem *parent = NULL);
 
@@ -27,11 +25,7 @@ public:
     void setPos(const QPointF &pos);
     void setPos(qreal x, qreal y);
     void updatePaths();
-
 protected:
-
-private:
-//    QCursor _savedCursor;
     QPainterPath m_linesPath;
     QRect m_textRect;
     QString m_text;

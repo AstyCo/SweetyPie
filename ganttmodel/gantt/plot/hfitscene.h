@@ -16,6 +16,9 @@ public:
         return _view;
     }
 
+signals:
+    void sceneRectAboutToBeChanged(const QRectF &newRect);
+
 public slots:
     virtual void onViewResized(const QSize &newSize);
 

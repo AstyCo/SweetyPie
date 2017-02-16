@@ -7,7 +7,7 @@
 #include <QModelIndex>
 
 class GanttWidget;
-class GanttScene;
+class HFitScene;
 
 
 class GanttGraphicsView : public QGraphicsView
@@ -16,10 +16,10 @@ class GanttGraphicsView : public QGraphicsView
 
 public:
     GanttGraphicsView(QWidget *parent = 0);
-    GanttGraphicsView(QGraphicsScene * scene, QWidget * parent = 0);
+    GanttGraphicsView(HFitScene * scene, QWidget * parent = 0);
 
-    void setScene(QGraphicsScene *scene);
-    void setMousePressH(const MousePressHelper *mph){
+    void setScene(HFitScene *scene);
+    void setMousePressH(MousePressHelper *mph){
         _mousePressH = mph;
     }
 
@@ -45,7 +45,7 @@ private:
     int m_hSliderHeight;
     QCursor _lastCursor;
     QPoint _lastPos;
-    const MousePressHelper *_mousePressH;
+    MousePressHelper *_mousePressH;
 };
 
 #endif // GANTTVIEW_H

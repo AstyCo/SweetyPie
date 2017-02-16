@@ -26,9 +26,14 @@ QPixmap initializePixmap(const QSize &pixmapSize, const QString &filename){
 
     return res;
 }
+QPainterPath initializeGeometryPath(){
+    QPainterPath path;
+    path.addRect(GanttCalcGraphicsObject::_geometry);
+    return path;
+}
 
 QRect GanttCalcGraphicsObject::_geometry = initializeGeometry();
-
+QPainterPath GanttCalcGraphicsObject::_geometryPath = initializeGeometryPath();
 
 
 void GanttCalcGraphicsObject::init()
@@ -36,73 +41,66 @@ void GanttCalcGraphicsObject::init()
     _pixmapImageActive = initializePixmap(_geometry.size(), ":/images/calculator_active.png");
     _pixmapImageInactive = initializePixmap(_geometry.size(), ":/images/calculator_inactive.png");
 
-    if(innerInfo())
+    if(info())
     {
-        setToolTip( QString::fromUtf8("НУ-РЕШ-ВИТОК:") + '\t' + '\t' + innerInfo()->title()
-                    + '\n' + QString::fromUtf8("Время рассчета:") + '\t' + innerInfo()->start().toString("dd.MM.yyyy HH:mm:ss"));
+        updateToolTip();
 
-        connect(innerInfo(), SIGNAL(changed()),this,SLOT(updateItemGeometry()));
+        connect(info(), SIGNAL(changed()),this,SLOT(updateItemGeometry()));
+        connect(info(), SIGNAL(changed()),this,SLOT(updateToolTip()));
 
-        innerInfo()->increaseLinkCnt();
+        info()->increaseLinkCnt();
     }
 
     setAcceptHoverEvents(true);
+    setZValue(500);
 
 }
 
 GanttCalcGraphicsObject::GanttCalcGraphicsObject(GanttInfoNode* node, QGraphicsItem *parent)
-    :GanttGraphicsObject(node,parent)
+    :GanttTextGraphicsObject(node,parent)
 {
     init();
 }
 
-GanttCalcGraphicsObject::~GanttCalcGraphicsObject()
-{
-    if(_scene)
-    {
-        _scene->removeItem(this);
-        setParentItem(NULL);
-    }
 
-    if(innerInfo())
-        innerInfo()->reduceLinkCnt();
-}
 
-QRectF GanttCalcGraphicsObject::boundingRect() const
+QPainterPath GanttCalcGraphicsObject::shape() const
 {
-    return _geometry;
+    return _geometryPath;
 }
 
 void GanttCalcGraphicsObject::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
 {
-    Q_UNUSED(option);
-    Q_UNUSED(widget);
-
-    if(_scene->currentItem() == this)
+    if(_current)
         painter->drawPixmap(_geometry, _pixmapImageActive, _pixmapImageActive.rect());
     else
         painter->drawPixmap(_geometry, _pixmapImageInactive, _pixmapImageInactive.rect());
 
-//    QColor color = (_scene->currentItem() == this)?(QColor(Qt::red).darker(130)):(QColor(Qt::red));
-//    painter->setRenderHints(/*QPainter::SmoothPixmapTransform |*/ QPainter::HighQualityAntialiasing | QPainter::Antialiasing);
-
-//    painter->drawPath(m_shapePath);
-//    painter->fillPath(m_shapePath,QBrush(color.lighter(130)));
+    GanttTextGraphicsObject::paint(painter, option, widget);
 }
 
-GanttInfoNode *GanttCalcGraphicsObject::innerInfo() const
+QString GanttCalcGraphicsObject::textRight() const
 {
-    return qobject_cast<GanttInfoNode*>(m_info);
+    GanttInfoNode *node = qobject_cast<GanttInfoNode*>(info());
+    if(node && node->isExpanded())
+        return node->title();
+    return QString();
 }
 
 void GanttCalcGraphicsObject::updateItemGeometry()
 {
-    if(!_scene || !innerInfo())
+    if(!_dtline || !info())
         return;
 
-    qreal calcPos = _scene->dtToPos(innerInfo()->start());
+    qreal calcPos = _dtline->dtToPos(info()->start());
 
-    setPos(calcPos, innerInfo()->calcPos());
+    setPos(calcPos, info()->calcPos());
+}
+
+void GanttCalcGraphicsObject::updateToolTip()
+{
+    setToolTip( QString::fromUtf8("НУ-РЕШ-ВИТОК:") + '\t' + '\t' + info()->title()
+                + '\n' + QString::fromUtf8("Время рассчета:") + '\t' + info()->start().toString("dd.MM.yyyy HH:mm:ss"));
 }
 
 void GanttCalcGraphicsObject::mousePressEvent(QGraphicsSceneMouseEvent *event)

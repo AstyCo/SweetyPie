@@ -28,7 +28,6 @@ MainWindow::MainWindow(QWidget *parent) :
   ui->setupUi(this);
   ui->tabWidget_chartTimeXYWidget->setCurrentIndex(0);
 
-  installEventFilter(ui->widgetIntervalSlider);
 
   testChartWidget();
   testChartTimeXYWidget();

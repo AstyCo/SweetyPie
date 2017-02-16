@@ -29,7 +29,8 @@ public:
     GanttInfoNode *node();
 
 private:
-
+    virtual void disconnectParent();
+    virtual void connectParent();
 
 };
 

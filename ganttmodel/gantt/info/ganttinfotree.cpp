@@ -144,6 +144,8 @@ void GanttInfoTree::clear()
         _root->callForEachItemRecursively(&deleteInfoItemFunc);
     _root->clear();
 
+    clearLimits();
+
     _infoForIndex.clear();  // clears cache
     _infoForStart.clear();  // clears cache
     _infoForFinish.clear(); // clears cache
@@ -185,6 +187,7 @@ void GanttInfoTree::onNodeCollapsed()
 
 void GanttInfoTree::onDataChanged(const QModelIndex &/*from*/, const QModelIndex &/*to*/)
 {
+    qDebug() << "onDataChanged";
     /// TODO optimization
     reset();
 }
@@ -207,6 +210,10 @@ void GanttInfoTree::onRowsRemoved(const QModelIndex &/*parent*/, int /*start*/, 
 {
     /// TODO optimization
     reset();
+
+    clearLimits();
+    updateLimits();
+    emitLimitsChanged();
 }
 
 void GanttInfoTree::onColumnsRemoved(const QModelIndex &/*parent*/, int /*start*/, int /*end*/)
@@ -385,6 +392,13 @@ void GanttInfoTree::collapseAll()
             node->setExpanded(false);
         }
     }
+}
+
+void GanttInfoTree::clearLimits()
+{
+    _limits.first = UtcDateTime();      // clears limits
+    _limits.second = UtcDateTime();     // clears limits
+    emitLimitsChanged();
 }
 void GanttInfoTree::fillByModelIndex(const QModelIndex &parent)
 {

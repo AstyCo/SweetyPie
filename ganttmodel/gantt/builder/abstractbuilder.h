@@ -18,7 +18,7 @@ public:
     virtual GanttGraphicsObject *createGraphicsObject(GanttInfoItem *info) = 0;
     virtual QAbstractItemModel *model() const = 0;
 
-    virtual bool isEvent(GanttInfoItem *info) const{
+    virtual bool isEvent(GanttInfoItem */*info*/) const{
         return false;
     }
 };

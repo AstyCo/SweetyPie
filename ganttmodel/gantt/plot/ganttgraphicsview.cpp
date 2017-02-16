@@ -17,19 +17,19 @@ GanttGraphicsView::GanttGraphicsView(QWidget *parent) :
 }
 
 
-GanttGraphicsView::GanttGraphicsView(QGraphicsScene * scene, QWidget * parent) :
+GanttGraphicsView::GanttGraphicsView(HFitScene *scene, QWidget * parent) :
     QGraphicsView(scene,parent)
 {
     initialize();
 
-    connect(scene,SIGNAL(sceneRectChanged(QRectF)), this, SLOT(updateMaximumHeight()));
+    connect(scene,SIGNAL(sceneRectAboutToBeChanged(QRectF)), this, SLOT(updateMaximumHeight()));
 }
 
-void GanttGraphicsView::setScene(QGraphicsScene *scene)
+void GanttGraphicsView::setScene(HFitScene *scene)
 {
     QGraphicsView::setScene(scene);
 
-    connect(scene,SIGNAL(sceneRectChanged(QRectF)), this, SLOT(updateMaximumHeight()));
+    connect(scene,SIGNAL(sceneRectAboutToBeChanged(QRectF)), this, SLOT(updateMaximumHeight()));
 }
 
 
@@ -77,9 +77,11 @@ void GanttGraphicsView::resizeEvent(QResizeEvent *event)
 void GanttGraphicsView::mouseMoveEvent(QMouseEvent *event)
 {
     int dy = 0;
-//    qDebug() << "lastpos"<<_lastPos << "eventPos" << event->pos();
 
-    if(!_lastPos.isNull() && _mousePressH->isSlide(mapToScene(event->pos()))){
+    if( !_lastPos.isNull()
+        && _mousePressH->isSlide(event->globalPos())
+        && !_mousePressH->isHorSlide(event->globalPos()))
+    {
         int val = verticalScrollBar()->value(),
             min = verticalScrollBar()->minimum(),
             max = verticalScrollBar()->maximum();
@@ -89,7 +91,7 @@ void GanttGraphicsView::mouseMoveEvent(QMouseEvent *event)
             dy = val - max;
         if(val - dy < min)
             dy = val - min;
-//        qDebug() << "scroll"<< dy;
+
         verticalScrollBar()->setValue(val - dy);
         if(scene())
             scene()->update();

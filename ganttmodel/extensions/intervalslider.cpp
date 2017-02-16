@@ -339,13 +339,13 @@ void IntervalSlider::drawSliderLine(QPainter *painter, const QRect &/*sliderRect
     qDrawShadePanel( painter, getSliderRect(), palette(), true, m_borderWidth , &brush );
 }
 
-bool IntervalSlider::eventFilter(QObject *object, QEvent *p_event)
-{
-    if(p_event->type() == QEvent::KeyPress || p_event->type() == QEvent::KeyRelease)
-        event(p_event);
+//bool IntervalSlider::eventFilter(QObject *object, QEvent *p_event)
+//{
+//    if(p_event->type() == QEvent::KeyPress || p_event->type() == QEvent::KeyRelease)
+//        event(p_event);
 
-    return QWidget::eventFilter(object,p_event);
-}
+//    return QWidget::eventFilter(object,p_event);
+//}
 
 void IntervalSlider::keyPressEvent(QKeyEvent *e)
 {

@@ -42,5 +42,23 @@ GanttInfoNode *GanttInfoLeaf::node()
     return NULL;
 }
 
+void GanttInfoLeaf::disconnectParent()
+{
+    GanttInfoItem::disconnectParent();
+    if(parent()){
+        disconnect( parent(), SIGNAL(expanded()), this, SIGNAL(expanded()));
+        disconnect( parent(), SIGNAL(collapsed()), this, SIGNAL(collapsed()));
+    }
+}
+
+void GanttInfoLeaf::connectParent()
+{
+    GanttInfoItem::connectParent();
+    if(parent()){
+        connect( parent(), SIGNAL(expanded()), this, SIGNAL(expanded()));
+        connect( parent(), SIGNAL(collapsed()), this, SIGNAL(collapsed()));
+    }
+}
+
 
 

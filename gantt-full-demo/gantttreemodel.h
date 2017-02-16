@@ -48,6 +48,9 @@ public:
     void addNode(GanttInfoNode *node);
 //    void addItems(GanttInfoItem* item, bool inner = false);
     void insertItem(GanttInfoItem *item, GanttInfoNode *parent = NULL);
+    bool canFetchMore(const QModelIndex &parent) const{
+        return true;
+    }
 
     GanttInfoItem *itemForName(const QString& iGanttTitle) const;
 

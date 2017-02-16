@@ -71,6 +71,7 @@ private slots:
     void collapseAll();
 
 private:
+    void clearLimits();
     void fillByModelIndex(const QModelIndex &parent = QModelIndex());
     void setLimits(const QPair<UtcDateTime, UtcDateTime> &newLimits);
     int  heightH(GanttInfoItem *item) const;

@@ -1,31 +1,39 @@
 #ifndef GANTTGRAPHICSITEM_H
 #define GANTTGRAPHICSITEM_H
 
-#include "ganttgraphicsobject.h"
+#include "gantttextgraphicsobject.h"
 #include "gantt/info/ganttinfoleaf.h"
 #include "extensions/intervalunion.h"
 #include "extensions/qrectunion.h"
 
 #include <QPointer>
 
-class GanttIntervalGraphicsObject : public GanttGraphicsObject
+class GanttIntervalGraphicsObject : public GanttTextGraphicsObject
 {
     Q_OBJECT
 
+    void init();
 public:
     GanttIntervalGraphicsObject(GanttInfoLeaf *info,QGraphicsItem *parent = 0);
-    virtual ~GanttIntervalGraphicsObject();
 
-    QRectF boundingRect() const;
+//    QRectF boundingRect() const;
     QPainterPath shape() const;
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
 
-    GanttInfoLeaf *innerInfo() const;
+    QString textRight() const;
+
+    virtual int inactiveZValue() const{
+        if(!_isSmall)
+            return 1;
+        else
+            return 600;
+    }
 
 public slots:
     void setBoundingRectSize(const QSizeF &boundingRectSize);
 
     void updateItemGeometry();
+    void updateToolTip();
     void updateIntersection();
 
 protected:

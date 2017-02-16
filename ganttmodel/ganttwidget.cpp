@@ -39,14 +39,6 @@ GanttWidget::~GanttWidget()
         delete _builder;
 }
 
-void GanttWidget::installEventWatcherInterval(QObject *watcher)
-{
-    if(!watcher){
-        qCritical("GanttWidget::installEventFilterInterval: null watcher");
-        return;
-    }
-    watcher->installEventFilter(ui->widgetIntervalSlider);
-}
 
 void GanttWidget::setCurrentDt(const UtcDateTime &dt)
 {

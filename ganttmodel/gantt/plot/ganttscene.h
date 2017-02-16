@@ -34,7 +34,8 @@ public:
     void setTreeInfo(GanttInfoTree *treeInfo);
     void setBuilder(AbstractBuilder *builder);
 
-    const MousePressHelper *mousePressH() const;
+    MousePressHelper *mousePressH();
+    void setCursor(Qt::CursorShape cursor);
 
 protected:
     void mousePressEvent(QGraphicsSceneMouseEvent *event);
@@ -76,8 +77,6 @@ signals:
     void graphicsItemHoverEnter(const GanttInfoItem*);
     void graphicsItemHoverLeave(const GanttInfoItem*);
     void currentItemChanged(const GanttInfoItem*);
-
-
 
 public slots:
     void onViewResized(const QSize& newSize);
@@ -135,8 +134,8 @@ private:
     QPointer<GanttGraphicsObject> _currentItem;
 
     MousePressHelper _mousePressH;
-    int _savedZValue;
     QMap<const GanttInfoItem*, GanttGraphicsObject*> _itemForInfo;  // caches
+    Qt::CursorShape _savedCursor;
 };
 
 

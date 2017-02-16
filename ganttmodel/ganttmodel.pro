@@ -69,7 +69,8 @@ SOURCES += \
     extensions/myutcdatetimeinterval.cpp \
     gantt/builder/abstractbuilder.cpp \
     gantt/builder/ganttbuilder.cpp \
-    gantt/builder/imodelwrapper.cpp
+    gantt/builder/imodelwrapper.cpp \
+    gantt/plot/scene_objects/gantttextgraphicsobject.cpp
 
 
 HEADERS += \
@@ -129,7 +130,8 @@ HEADERS += \
     extensions/myutcdatetimeinterval.h \
     gantt/builder/abstractbuilder.h \
     gantt/builder/ganttbuilder.h \
-    gantt/builder/imodelwrapper.h
+    gantt/builder/imodelwrapper.h \
+    gantt/plot/scene_objects/gantttextgraphicsobject.h
 
 
 RESOURCES += \

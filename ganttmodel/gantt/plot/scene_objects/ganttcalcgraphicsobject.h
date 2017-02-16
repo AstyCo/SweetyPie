@@ -1,7 +1,7 @@
 #ifndef GANTTCALCGRAPHICSITEM_H
 #define GANTTCALCGRAPHICSITEM_H
 
-#include "ganttgraphicsobject.h"
+#include "gantttextgraphicsobject.h"
 #include <QPainterPath>
 
 #include <QPointer>
@@ -10,21 +10,25 @@ class GanttHeader;
 class GanttScene;
 class GanttInfoNode;
 
-class GanttCalcGraphicsObject : public GanttGraphicsObject
+class GanttCalcGraphicsObject : public GanttTextGraphicsObject
 {
     Q_OBJECT
     void init();
 public:
     GanttCalcGraphicsObject(GanttInfoNode* node,QGraphicsItem *parent = NULL);
-    ~GanttCalcGraphicsObject();
 
-    QRectF boundingRect() const;
+    QPainterPath shape() const;
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
 
-    GanttInfoNode *innerInfo() const;
+    QString textRight() const;
+
+    virtual int inactiveZValue() const{
+        return 500;
+    }
 
 public slots:
     void updateItemGeometry();
+    void updateToolTip();
 
 protected:
     void mousePressEvent(QGraphicsSceneMouseEvent *event);
@@ -36,6 +40,8 @@ protected:
 private:
     QPixmap _pixmapImageActive, _pixmapImageInactive;
     static QRect _geometry;
+    static QPainterPath _geometryPath;
+    friend QPainterPath initializeGeometryPath();
 };
 
 #endif // GANTTCALCGRAPHICSITEM_H

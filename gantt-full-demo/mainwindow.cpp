@@ -16,7 +16,6 @@ void MainWindow::init()
 {
     _model = new GanttTreeModel();
     ui->treeView->setModel(_model);
-    ui->ganttWidget->installEventWatcherInterval(this);
     ui->ganttWidget->setBuilder(new GanttBuilder(new ModelWrapper(_model)));
     ui->ganttWidget->setView(ui->treeView);
 }

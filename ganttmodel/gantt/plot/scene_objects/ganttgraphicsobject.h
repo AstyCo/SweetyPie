@@ -1,14 +1,16 @@
 #ifndef GANTTGRAPHICSOBJECT_H
 #define GANTTGRAPHICSOBJECT_H
 
+#include "ganttproject_global.h"
 #include "extensions/dtline.h"
 #include <QGraphicsObject>
 #include <QPointer>
+#include <QFont>
 
 class GanttInfoItem;
 class GanttScene;
 
-class GanttGraphicsObject : public QGraphicsObject
+class GANTTMODELSHARED_EXPORT GanttGraphicsObject : public QGraphicsObject
 {
     Q_OBJECT
 
@@ -18,12 +20,17 @@ public:
     virtual ~GanttGraphicsObject();
 
     virtual GanttInfoItem *info() const;
-
     virtual void setScene(GanttScene *scene);
-    void setDtLine(DtLine *dtline);
+
+    inline void setDtLine(DtLine *dtline);
+    void setCurrent(bool newValue);
+    void updateZValue();
+
+    virtual int inactiveZValue() const = 0;
 
 public slots:
     virtual void updateItemGeometry();
+    virtual void updateToolTip();
 
 signals:
     void graphicsItemPressed();
@@ -32,8 +39,13 @@ signals:
 
 protected:
     DtLine *_dtline;
-    GanttScene *_scene;
     QPointer<GanttInfoItem> m_info;
+
+    bool _current;
 };
+
+// INLINE FUNCTIONS
+inline void GanttGraphicsObject::setDtLine(DtLine *dtline) { _dtline = dtline;}
+
 
 #endif // GANTTGRAPHICSOBJECT_H

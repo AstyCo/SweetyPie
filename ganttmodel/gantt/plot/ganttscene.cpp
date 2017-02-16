@@ -41,10 +41,12 @@ GanttGraphicsObject *GanttScene::itemForInfo(const GanttInfoItem *key) const
 
 void GanttScene::updateSceneRect()
 {
-    if(!sceneHaveItems())
-        setSceneRect(0,0,sceneRect().width(),0);
-    else
-        setSceneRect(0,0,sceneRect().width(),_treeInfo->height());
+    QRect newRect = (sceneHaveItems()
+                     ? QRect( 0, 0, sceneRect().width(), _treeInfo->height())
+                     : QRect( 0, 0, sceneRect().width(), 0) );
+
+    emit sceneRectAboutToBeChanged(newRect);
+    setSceneRect(newRect);
 
     updateSliderHeight();
 }
@@ -119,7 +121,7 @@ void GanttScene::mousePressEvent(QGraphicsSceneMouseEvent *event)
     QGraphicsScene::mousePressEvent(event);
     if(event->button() == Qt::LeftButton){
         if(!_playerCurrent->sceneBoundingRect().contains(event->scenePos()))
-            _mousePressH.press(event->scenePos());
+            _mousePressH.press(event->screenPos());
     }
 
     mouseMoveEvent(event);
@@ -151,22 +153,22 @@ void GanttScene::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event)
 void GanttScene::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
 {
     if(event->buttons() & Qt::RightButton){
-        if(_view)
-        {
-            QRectF viewRect = _view->mapToScene(_view->viewport()->geometry()).boundingRect();
-            if(viewRect.contains(event->scenePos()))
-            {
-                _crossObject->setVisible(true);
-                _crossObject->setPos(event->scenePos());
-            }
-            else
-                _crossObject->setVisible(false);
+        if(_view){
+            setCursor(Qt::PointingHandCursor);
+            _crossObject->setVisible(true);
+            _crossObject->setPos(event->scenePos());
         }
         else
             qCritical("m_view is null");
     }
-    if(_mousePressH.isSlide(event->scenePos()))
+    if( _mousePressH.isSlide(event->screenPos())
+        && !_mousePressH.isVerSlide(event->screenPos()))
+    {
+        setCursor(Qt::ClosedHandCursor);
         _dtline->slide((event->lastScenePos().x() - event->scenePos().x()) * 1. / width());     // HOR scroll
+    }
+    else if( _savedCursor == Qt::ClosedHandCursor)
+        setCursor(Qt::ArrowCursor);
 
     QGraphicsScene::mouseMoveEvent(event);
 }
@@ -175,9 +177,10 @@ void GanttScene::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
 {
     if(event->button() == Qt::RightButton){
         _crossObject->setVisible(false);
+        setCursor(Qt::ArrowCursor);
     }
     else if (event->button() == Qt::LeftButton){
-        if(_mousePressH.isClick(event->scenePos())){    // Press
+        if(_mousePressH.isClick(event->screenPos())){    // Press
             GanttGraphicsObject *object = objectForPos(_mousePressH.pos());
             if(object){
                 setCurrentItem(object);
@@ -228,9 +231,18 @@ void GanttScene::onVisItemDestroyed()
     updateSceneRect();
 }
 
-const MousePressHelper *GanttScene::mousePressH() const
+MousePressHelper *GanttScene::mousePressH()
 {
     return &_mousePressH;
+}
+
+void GanttScene::setCursor(Qt::CursorShape cursor)
+{
+    _savedCursor = cursor;
+    foreach(QGraphicsView *view, views()){
+        if(view->viewport())
+            view->viewport()->setCursor(cursor);
+    }
 }
 
 void GanttScene::setTreeInfo(GanttInfoTree *treeInfo)
@@ -297,26 +309,20 @@ void GanttScene::setCurrentItem(GanttGraphicsObject *currentItem)
     if(_currentItem == currentItem)
         return;
 
-    QGraphicsItem *lastItem = _currentItem;
+    GanttGraphicsObject *lastItem = _currentItem;
     GanttInfoItem *info = NULL;
     _currentItem = currentItem;
-    if(lastItem){
-        lastItem->setZValue(_savedZValue);
-        lastItem->update();
-    }
-    if(_currentItem){
-        _savedZValue = _currentItem->zValue();
+    if(lastItem)
+        lastItem->setCurrent(false);
 
-        if(_currentItem)
-            info = _currentItem->info();
+    if(_currentItem){
+        info = _currentItem->info();
 
         QRectF itemRect = _currentItem->mapToScene(_currentItem->boundingRect()).boundingRect();
         if(_view && !isVisible(_currentItem))
-        {
             _view->ensureVisible(itemRect, 0, _view->height()/2);
-        }
-        _currentItem->setZValue(500);
-        _currentItem->update();
+
+        _currentItem->setCurrent(true);
     }
 
     _hoverObject->setItem(info);   // if no currentItem sets to NULL
@@ -438,7 +444,8 @@ void GanttScene::addInfoItem(GanttInfoItem *parent)
 {
     if(!parent)
         return;
-    onItemAdded(parent);
+    if(parent->parent())    // if not Root
+        onItemAdded(parent);
     if(GanttInfoNode *node = qobject_cast<GanttInfoNode*>(parent)){
         for(int i = 0; i < node->size(); ++i){
             addInfoItem(node->at(i));

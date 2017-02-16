@@ -18,7 +18,7 @@ void GanttCurrentDtSlider::init()
     setDraw(false);
 
     setCursor(PLAYER_CURSOR_OVER);
-    setZValue(20);
+    setZValue(9000);
 
     initPath();
 }

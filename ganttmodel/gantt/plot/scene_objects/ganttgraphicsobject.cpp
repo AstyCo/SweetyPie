@@ -2,10 +2,9 @@
 #include "gantt/plot/ganttscene.h"
 #include "gantt/info/ganttinfoitem.h"
 
-
 void GanttGraphicsObject::init()
 {
-    _scene = NULL;
+    _current = false;
     _dtline = NULL;
 }
 
@@ -13,11 +12,19 @@ GanttGraphicsObject::GanttGraphicsObject(GanttInfoItem*item,QGraphicsItem *paren
     :QGraphicsObject(parent)
 {
     m_info = item;
+
+    init();
 }
 
 GanttGraphicsObject::~GanttGraphicsObject()
 {
+    if(scene()){
+        scene()->removeItem(this);
+        setParentItem(NULL);
+    }
 
+    if(info())
+        info()->reduceLinkCnt();
 }
 
 GanttInfoItem *GanttGraphicsObject::info() const
@@ -30,15 +37,33 @@ void GanttGraphicsObject::setScene(GanttScene *scene)
 {
     if(!scene)
         return;
-    _scene = scene;
-    _scene->addItem(this);
+
+    scene->addItem(this);
 
 }
 
-void GanttGraphicsObject::setDtLine(DtLine *dtline){
-    _dtline = dtline;
-}
-
-void GanttGraphicsObject::updateItemGeometry(){
+void GanttGraphicsObject::updateItemGeometry()
+{
     qWarning() << "GanttGraphicsObject::updateItemGeometry using, no override";
+}
+
+void GanttGraphicsObject::updateToolTip()
+{
+    qWarning() << "GanttGraphicsObject::updateToolTip using, no override";
+}
+
+void GanttGraphicsObject::setCurrent(bool newValue)
+{
+    _current = newValue;
+
+    updateZValue();
+    update();
+}
+
+void GanttGraphicsObject::updateZValue()
+{
+    if(_current)
+        setZValue(600);
+    else
+        setZValue(inactiveZValue());
 }

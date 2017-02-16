@@ -194,8 +194,9 @@ QPair<UtcDateTime,UtcDateTime> GanttInfoItem::myMax(
 
 void GanttInfoItem::disconnectParent()
 {
-    if(_parent)
+    if(_parent){
         disconnect(this,SIGNAL(aboutToBeDeleted()),_parent,SLOT(onChildDeleted()));
+    }
 }
 
 void GanttInfoItem::connectParent()

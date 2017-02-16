@@ -115,7 +115,7 @@ protected:
         const QRect& handleRect, bool is_selected = false) const;
     virtual void drawSliderLine(QPainter *painter, const QRect &sliderRect ) const;
 
-    bool eventFilter(QObject *, QEvent *);
+//    bool eventFilter(QObject *, QEvent *);
 
     void mouseMoveEvent( QMouseEvent *e );
     void mouseReleaseEvent( QMouseEvent *e );
