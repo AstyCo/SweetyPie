@@ -4,7 +4,7 @@
 
 ## Сводка по include
 
-| File | Info |
+| File | Information |
 | ------ | ------ |
 | **ganttmodel/gantt/factory/ganttfactory.h(.cpp)** | объявление(реализация) GanttFactory |
 | **extensions-gui/interfaces/imodelwrapper.h(.cpp)** | объявление(реализацию) IModelWrapper |
