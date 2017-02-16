@@ -181,7 +181,7 @@ void GanttScene::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
     }
     else if (event->button() == Qt::LeftButton){
         if(_mousePressH.isClick(event->screenPos())){    // Press
-            GanttGraphicsObject *object = objectForPos(_mousePressH.pos());
+            GanttGraphicsObject *object = objectForPos(_view->mapToScene(_view->mapFromGlobal(_mousePressH.pos().toPoint())));
             if(object){
                 setCurrentItem(object);
 

@@ -48,7 +48,7 @@ public:
     void addNode(GanttInfoNode *node);
 //    void addItems(GanttInfoItem* item, bool inner = false);
     void insertItem(GanttInfoItem *item, GanttInfoNode *parent = NULL);
-    bool canFetchMore(const QModelIndex &parent) const{
+    bool canFetchMore(const QModelIndex &/*parent*/) const{
         return true;
     }
 
