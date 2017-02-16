@@ -3,12 +3,13 @@
 Зависит от extensions-lib
 
 ## Сводка по include
-**ganttmodel/gantt/factory/ganttfactory.h(.cpp)** 
-    - объявление(реализация) GanttFactory
-**extensions-gui/interfaces/imodelwrapper.h(.cpp)** 
-    - объявление(реализацию) IModelWrapper
-**extensions-gui/interfaces/abstractganttfactory.h(.cpp)** 
-    - объявление(реализацию) AbstractGanttFactory
+
+| File | Info |
+| ------ | ------ |
+| **ganttmodel/gantt/factory/ganttfactory.h(.cpp)** | объявление(реализация) GanttFactory |
+| **extensions-gui/interfaces/imodelwrapper.h(.cpp)** | объявление(реализацию) IModelWrapper |
+| **extensions-gui/interfaces/abstractganttfactory.h(.cpp)** | объявление(реализацию) AbstractGanttFactory|
+
 ## How to
 
 Пример использования:
