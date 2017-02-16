@@ -3,7 +3,7 @@
 
 #include "gantt/private_extensions/mousepresshelper.h"
 #include "scene_objects/ganttcurrentdtslider.h"
-#include "gantt/builder/abstractbuilder.h"
+#include "extensions-gui/interfaces/abstractganttfactory.h"
 #include "ganttdtline.h"
 
 #include "hfitscene.h"
@@ -32,7 +32,7 @@ public:
     int dtToPos(const UtcDateTime &dt) const;
     UtcDateTime posToDt(int pos) const;
     void setTreeInfo(GanttInfoTree *treeInfo);
-    void setBuilder(AbstractBuilder *builder);
+    void setFactory(AbstractGanttFactory *factory);
 
     MousePressHelper *mousePressH();
     void setCursor(Qt::CursorShape cursor);
@@ -65,6 +65,7 @@ public slots:
 
 
     bool isVisible(const QGraphicsItem* which) const;
+    bool needVScroll(const QGraphicsItem *which) const;
     QRectF elementsBoundingRect();
 
     void clear();
@@ -108,6 +109,7 @@ private:
     void createPersistentItems();
     void addPersistentItems();
     void removePersistentItems();
+    void scrollViewToCurrentItem();
 
     void drawBackgroundExpandedItems(QPainter *painter, const QRectF &rect);
     void drawBackgroundLines(QPainter *painter, const QRectF &rect);
@@ -122,7 +124,7 @@ private slots:
     void onInfoDelete();
 
 private:
-    AbstractBuilder *_builder;
+    AbstractGanttFactory *_factory;
 
     GanttInfoTree *_treeInfo;
     GanttDtLine *_dtline;

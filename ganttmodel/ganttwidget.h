@@ -2,9 +2,8 @@
 #define GANTTWIDGET_H
 
 #include "ganttproject_global.h"
-#include "interfaces/iganttmodel.h"
 #include "gantt/info/ganttinfotree.h"
-#include "gantt/builder/abstractbuilder.h"
+#include "extensions-gui/interfaces/abstractganttfactory.h"
 
 #include <QModelIndex>
 
@@ -32,7 +31,7 @@ public:
     void setPlayerSpeeds(qreal minMultiply, qreal maxMultiply);///< Устанавливает минимальную и максимальную скорости воспроизведения
     bool player() const;
 
-    void setBuilder(AbstractBuilder *builder);
+    void setFactory(AbstractGanttFactory *factory);
 
     void setView(QTreeView *view, bool inner = false);
 
@@ -68,7 +67,7 @@ private:
     Ui::GanttWidget *ui;
     GanttInfoTree *_treeInfo;
     GanttScene *_scene;
-    AbstractBuilder *_builder;
+    AbstractGanttFactory *_factory;
 
     bool m_playerShown;
 };

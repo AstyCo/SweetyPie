@@ -2,8 +2,7 @@
 #define GANTTINFOTREE_H
 
 #include "ganttinfonode.h"
-#include "interfaces/iganttmodel.h"
-#include "gantt/builder/abstractbuilder.h"
+#include "extensions-gui/interfaces/abstractganttfactory.h"
 
 #include <QObject>
 #include <QAbstractItemModel>
@@ -18,7 +17,7 @@ public:
 
     QAbstractItemModel *model() const;
     void setModel(QAbstractItemModel *model);
-    void setBuilder(AbstractBuilder *builder);
+    void setFactory(AbstractGanttFactory *factory);
 
     void connectTreeView(QTreeView *view);
     void disconnectTreeView(QTreeView *view);
@@ -87,7 +86,7 @@ private:
 private:
     QAbstractItemModel *_model;
     GanttInfoNode *_root;
-    AbstractBuilder *_builder;
+    AbstractGanttFactory *_factory;
 
 
     bool _limitsChanged;                                            // caches Limits

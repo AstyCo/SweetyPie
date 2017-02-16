@@ -1,7 +1,7 @@
 #ifndef MODELWRAPPER_H
 #define MODELWRAPPER_H
 
-#include "gantt/builder/imodelwrapper.h"
+#include "extensions-gui/interfaces/imodelwrapper.h"
 #include "gantttreemodel.h"
 
 class ModelWrapper : public IModelWrapper

@@ -1,10 +1,11 @@
-#ifndef GANTTBUILDER_H
-#define GANTTBUILDER_H
+#ifndef GANTTFACTORY_H
+#define GANTTFACTORY_H
 
-#include "abstractbuilder.h"
-#include "imodelwrapper.h"
+#include "ganttproject_global.h"
+#include "extensions-gui/interfaces/abstractganttfactory.h"
+#include "extensions-gui/interfaces/imodelwrapper.h"
 
-class GANTTMODELSHARED_EXPORT GanttBuilder : public AbstractBuilder
+class GANTTMODELSHARED_EXPORT GanttFactory : public AbstractGanttFactory
 {
 public:
     enum RegisteredGraphicsObjectType{
@@ -15,8 +16,8 @@ public:
 
 
     // Construtor
-    explicit GanttBuilder(IModelWrapper *wrapper);
-    ~GanttBuilder();
+    explicit GanttFactory(IModelWrapper *wrapper);
+    ~GanttFactory();
 
     virtual GanttInfoItem *createInfo(const QModelIndex &index);
     virtual GanttGraphicsObject *createGraphicsObject(GanttInfoItem *info);
@@ -29,4 +30,4 @@ private:
     static RegisteredGraphicsObjectType readTag(const QString &tag);
 };
 
-#endif // GANTTBUILDER_H
+#endif // GANTTFACTORY_H

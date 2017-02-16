@@ -7,7 +7,7 @@
 #include "utcdatetime.h"
 #include "modelwrapper.h"
 
-#include "gantt/builder/ganttbuilder.h"
+#include "gantt/factory/ganttfactory.h"
 #include "gantt/info/ganttinfonode.h"
 #include "gantt/private_extensions/gantt-lib_global_values.h"
 
@@ -236,7 +236,7 @@ void MainWindow::testGanttModel()
 {
     _model = new GanttTreeModel(0, this);
 
-    ui->ganttWidget->setBuilder(new GanttBuilder(new ModelWrapper(_model)));
+    ui->ganttWidget->setFactory(new GanttFactory(new ModelWrapper(_model)));
     ui->ganttWidget->setView(ui->treeViewGantt);
 //    connect(ui->ganttWidget,SIGNAL(currentDtChanged(UtcDateTime)),this,SLOT(testSignal(UtcDateTime)));
 

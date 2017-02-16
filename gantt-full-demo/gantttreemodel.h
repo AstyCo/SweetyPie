@@ -4,7 +4,6 @@
 #include "ganttproject_global.h"
 #include "gantt/info/ganttinfoleaf.h"
 #include "gantt/info/ganttinfonode.h"
-#include "interfaces/iganttmodel.h"
 
 #include <QAbstractItemModel>
 

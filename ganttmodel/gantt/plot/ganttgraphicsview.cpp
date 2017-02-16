@@ -22,14 +22,14 @@ GanttGraphicsView::GanttGraphicsView(HFitScene *scene, QWidget * parent) :
 {
     initialize();
 
-    connect(scene,SIGNAL(sceneRectAboutToBeChanged(QRectF)), this, SLOT(updateMaximumHeight()));
+//    connect(scene,SIGNAL(sceneRectAboutToBeChanged(QRectF)), this, SLOT(updateMaximumHeight()));
 }
 
 void GanttGraphicsView::setScene(HFitScene *scene)
 {
     QGraphicsView::setScene(scene);
 
-    connect(scene,SIGNAL(sceneRectAboutToBeChanged(QRectF)), this, SLOT(updateMaximumHeight()));
+//    connect(scene,SIGNAL(sceneRectAboutToBeChanged(QRectF)), this, SLOT(updateMaximumHeight()));
 }
 
 

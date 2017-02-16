@@ -35,8 +35,8 @@ GanttWidget::GanttWidget(QWidget *parent) :
 GanttWidget::~GanttWidget()
 {
     delete ui;
-    if(_builder)
-        delete _builder;
+    if(_factory)
+        delete _factory;
 }
 
 
@@ -67,14 +67,14 @@ bool GanttWidget::player() const
     return m_playerShown;
 }
 
-void GanttWidget::setBuilder(AbstractBuilder *builder)
+void GanttWidget::setFactory(AbstractGanttFactory *factory)
 {
-    _scene->setBuilder(builder);
-    _treeInfo->setBuilder(builder);
+    _scene->setFactory(factory);
+    _treeInfo->setFactory(factory);
 
-    if(_builder)
-        delete _builder;
-    _builder = builder;
+    if(_factory)
+        delete _factory;
+    _factory = factory;
 }
 
 void GanttWidget::setView(QTreeView *view, bool /*inner*/)
@@ -156,7 +156,7 @@ void GanttWidget::connectPlayer()
 
 void GanttWidget::init()
 {
-    _builder = NULL;
+    _factory = NULL;
     _treeInfo = new GanttInfoTree(this);
     _scene = new GanttScene(ui->ganttView,ui->widgetDtLine,this);
     ui->ganttView->setMousePressH(_scene->mousePressH());

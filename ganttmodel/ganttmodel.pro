@@ -67,10 +67,8 @@ SOURCES += \
     gantt/private_extensions/mousepresshelper.cpp \
     extensions/intervalunion.cpp \
     extensions/myutcdatetimeinterval.cpp \
-    gantt/builder/abstractbuilder.cpp \
-    gantt/builder/ganttbuilder.cpp \
-    gantt/builder/imodelwrapper.cpp \
-    gantt/plot/scene_objects/gantttextgraphicsobject.cpp
+    gantt/plot/scene_objects/gantttextgraphicsobject.cpp \
+    gantt/factory/ganttfactory.cpp
 
 
 HEADERS += \
@@ -128,10 +126,8 @@ HEADERS += \
     gantt/private_extensions/mousepresshelper.h \
     extensions/intervalunion.h \
     extensions/myutcdatetimeinterval.h \
-    gantt/builder/abstractbuilder.h \
-    gantt/builder/ganttbuilder.h \
-    gantt/builder/imodelwrapper.h \
-    gantt/plot/scene_objects/gantttextgraphicsobject.h
+    gantt/plot/scene_objects/gantttextgraphicsobject.h \
+    gantt/factory/ganttfactory.h
 
 
 RESOURCES += \

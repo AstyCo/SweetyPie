@@ -18,12 +18,12 @@ void GanttInfoTree::setModel(QAbstractItemModel *model)
     reset();
 }
 
-void GanttInfoTree::setBuilder(AbstractBuilder *builder)
+void GanttInfoTree::setFactory(AbstractGanttFactory *factory)
 {
-    _builder = builder;
+    _factory = factory;
 
-    if(_builder)
-        setModel(_builder->model());
+    if(_factory)
+        setModel(_factory->model());
 }
 
 void GanttInfoTree::connectTreeView(QTreeView *view)
@@ -228,7 +228,7 @@ void GanttInfoTree::onItemAboutToBeDeleted()
 
     _infoForIndex.remove(item->index());    // clears cache
 
-    if(_builder && _builder->isEvent(item)){
+    if(_factory && _factory->isEvent(item)){
         clearInfoForDtHelper(_infoForStart, item->start(), item);
         clearInfoForDtHelper(_infoForFinish, item->finish(), item);
     }
@@ -287,16 +287,16 @@ void GanttInfoTree::fill(GanttInfoNode *node, const QModelIndex &index, int from
 
 GanttInfoItem *GanttInfoTree::makeInfoItem(const QModelIndex &index)
 {
-    if(!_builder){
-        qWarning("makeInfoItem called reset w/o builder");
+    if(!_factory){
+        qWarning("makeInfoItem called reset w/o factory");
         return NULL;
     }
-    GanttInfoItem *item = _builder->createInfo(index);
+    GanttInfoItem *item = _factory->createInfo(index);
 //    qDebug() << "for index" << index << "createdInfo"  <<item->title() << item;
     if(item){
         _infoForIndex.insert(index, item);  // fills cache
 
-        if(_builder->isEvent(item)){
+        if(_factory->isEvent(item)){
             _infoForStart.insert(item->start(), item);      // fills cache
             _infoForFinish.insert(item->finish(), item);    // fills cache
         }
@@ -310,7 +310,7 @@ void GanttInfoTree::init()
 {
     _limitsChanged = false;
     _model = NULL;
-    _builder = NULL;
+    _factory = NULL;
 
     _root = new GanttInfoNode(this);
     _root->setExpanded(true);
@@ -331,6 +331,8 @@ void GanttInfoTree::connectNewModel()
     connect(_model, SIGNAL(modelReset()),
             this,SLOT(reset()));
 
+    connect(_model, SIGNAL(layoutChanged()),
+            this, SLOT(reset()));
     connect(_model, SIGNAL(dataChanged(QModelIndex,QModelIndex)),
             this, SLOT(onDataChanged(QModelIndex,QModelIndex)));
     connect(_model, SIGNAL(columnsInserted(QModelIndex,int,int)),

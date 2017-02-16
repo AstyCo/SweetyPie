@@ -250,9 +250,9 @@ void GanttScene::setTreeInfo(GanttInfoTree *treeInfo)
     _treeInfo = treeInfo;
 }
 
-void GanttScene::setBuilder(AbstractBuilder *builder)
+void GanttScene::setFactory(AbstractGanttFactory *factory)
 {
-    _builder = builder;
+    _factory = factory;
 }
 
 QGraphicsItem *GanttScene::currentItem() const
@@ -262,9 +262,13 @@ QGraphicsItem *GanttScene::currentItem() const
 
 bool GanttScene::isVisible(const QGraphicsItem *which) const
 {
-    if(!_view)
-        return false;
+    QRectF viewRect = _view->mapToScene(_view->viewport()->geometry()).boundingRect();
+    QRectF itemBR = which->sceneBoundingRect();
+    return viewRect.contains( itemBR);
+}
 
+bool GanttScene::needVScroll(const QGraphicsItem *which) const
+{
     QRectF viewRect = _view->mapToScene(_view->viewport()->geometry()).boundingRect();
     QRectF itemBR = which->sceneBoundingRect();
 
@@ -317,10 +321,7 @@ void GanttScene::setCurrentItem(GanttGraphicsObject *currentItem)
 
     if(_currentItem){
         info = _currentItem->info();
-
-        QRectF itemRect = _currentItem->mapToScene(_currentItem->boundingRect()).boundingRect();
-        if(_view && !isVisible(_currentItem))
-            _view->ensureVisible(itemRect, 0, _view->height()/2);
+        scrollViewToCurrentItem();
 
         _currentItem->setCurrent(true);
     }
@@ -395,6 +396,31 @@ void GanttScene::removePersistentItems()
     removeItem(_playerCurrent);
     removeItem(_crossObject);
     removeItem(_hoverObject);
+}
+
+void GanttScene::scrollViewToCurrentItem()
+{
+    if(!_currentItem){
+        qWarning("GanttScene::scrollViewToCurrentItem");
+        return;
+    }
+    if(isVisible(_currentItem))
+        return; // Don't scroll if visible
+
+    QRectF itemRect = _currentItem->mapToScene(_currentItem->boundingRect()).boundingRect();
+
+    // Vertical Scroll
+    _view->ensureVisible(itemRect, 0, _view->height()/2);
+
+    // Horizontal Scroll
+    TimeSpan dtLineTs = _dtline->timeSpan(),
+            itemTs = _currentItem->info()->timeSpan();
+    if(itemTs > dtLineTs){
+        dtLineTs = itemTs * 1.2;
+        _dtline->setTimeSpan(dtLineTs, true);
+    }
+
+    _dtline->setMin(_currentItem->info()->start() + itemTs / 2 - dtLineTs / 2, true); // center on currentItem
 }
 
 void GanttScene::drawBackgroundExpandedItems(QPainter *painter, const QRectF &rect)
@@ -560,7 +586,7 @@ void GanttScene::init()
 
     connectDtLine();
     _currentItem = NULL;
-    _builder = NULL;
+    _factory = NULL;
 
     setSceneRect(0,0,GANTTSCENE_MIN_WIDTH,0);
 
@@ -589,10 +615,10 @@ void GanttScene::onItemAdded(GanttInfoItem *info)
         return;
     GanttGraphicsObject *p_object = NULL;
 
-    if(_builder)
-        p_object = _builder->createGraphicsObject(info);
+    if(_factory)
+        p_object = _factory->createGraphicsObject(info);
     else
-        qWarning("GanttScene::onItemAdded _builder is NULL");
+        qWarning("GanttScene::onItemAdded _factory is NULL");
 
 
     if(p_object){

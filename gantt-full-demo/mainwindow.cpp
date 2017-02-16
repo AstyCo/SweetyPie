@@ -9,14 +9,14 @@
 #include "gantt/private_extensions/gantt-lib_global_values.h"
 #include "gantttreemodel.h"
 #include "modelwrapper.h"
-#include "gantt/builder/ganttbuilder.h"
+#include "gantt/factory/ganttfactory.h"
 
 
 void MainWindow::init()
 {
     _model = new GanttTreeModel();
     ui->treeView->setModel(_model);
-    ui->ganttWidget->setBuilder(new GanttBuilder(new ModelWrapper(_model)));
+    ui->ganttWidget->setFactory(new GanttFactory(new ModelWrapper(_model)));
     ui->ganttWidget->setView(ui->treeView);
 }
 

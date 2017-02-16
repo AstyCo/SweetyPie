@@ -1,28 +1,28 @@
-#include "ganttbuilder.h"
+#include "ganttfactory.h"
 
 
 #include "gantt/info/ganttinfonode.h"
 #include "gantt/plot/scene_objects/ganttintervalgraphicsobject.h"
 #include "gantt/plot/scene_objects/ganttcalcgraphicsobject.h"
 
-GanttBuilder::GanttBuilder(IModelWrapper *wrapper)
-    : AbstractBuilder()
+GanttFactory::GanttFactory(IModelWrapper *wrapper)
+    : AbstractGanttFactory()
 {
     if(!wrapper)
-        qWarning("GanttBuilder(IModelWrapper *wrapper) :: wrapper is NULL");
+        qWarning("GanttFactory(IModelWrapper *wrapper) :: wrapper is NULL");
 
     _wrapper = wrapper;
 }
 
-GanttBuilder::~GanttBuilder()
+GanttFactory::~GanttFactory()
 {
     if(_wrapper)
         delete _wrapper;
     else
-        qWarning("GanttBuilder::~GanttBuilder");
+        qWarning("GanttFactory::~GanttFactory");
 }
 
-GanttInfoItem *GanttBuilder::createInfo(const QModelIndex &index)
+GanttInfoItem *GanttFactory::createInfo(const QModelIndex &index)
 {
     if(_wrapper){
         GanttInfoItem *item = NULL;
@@ -42,19 +42,16 @@ GanttInfoItem *GanttBuilder::createInfo(const QModelIndex &index)
                                      , _wrapper->color(index) );
             break;
         default:
-            qWarning("GanttBuilder::createInfo");
+            qWarning("GanttFactory::createInfo");
         }
-
-//        _infoForIndex.insert(index, item);  // fills cache
-//        emit itemAdded(item);
         return item;
 
     }
-    qWarning("GanttBuilder::createInfo");
+    qWarning("GanttFactory::createInfo");
     return NULL;
 }
 
-GanttGraphicsObject *GanttBuilder::createGraphicsObject(GanttInfoItem *info)
+GanttGraphicsObject *GanttFactory::createGraphicsObject(GanttInfoItem *info)
 {
     if(_wrapper){
         switch(readTag(_wrapper->tag(info->index()))){
@@ -71,30 +68,30 @@ GanttGraphicsObject *GanttBuilder::createGraphicsObject(GanttInfoItem *info)
                 qWarning("not node");
             break;
         default:
-            qWarning("GanttBuilder::createGraphicsObject");
+            qWarning("GanttFactory::createGraphicsObject");
         }
     }
-    qWarning("GanttBuilder::createGraphicsObject");
+    qWarning("GanttFactory::createGraphicsObject");
     return NULL;
 }
 
-QAbstractItemModel *GanttBuilder::model() const
+QAbstractItemModel *GanttFactory::model() const
 {
     if(_wrapper)
         return _wrapper->model();
-    qWarning("GanttBuilder::model");
+    qWarning("GanttFactory::model");
     return NULL;
 }
 
-bool GanttBuilder::isEvent(GanttInfoItem *info) const
+bool GanttFactory::isEvent(GanttInfoItem *info) const
 {
     if(_wrapper)
         return _wrapper->isEvent(info->index());
 
-    return AbstractBuilder::isEvent(info);
+    return AbstractGanttFactory::isEvent(info);
 }
 
-GanttBuilder::RegisteredGraphicsObjectType GanttBuilder::readTag(const QString &tag)
+GanttFactory::RegisteredGraphicsObjectType GanttFactory::readTag(const QString &tag)
 {
     if(tag == "Interval")
         return GanttIntervalGraphicsObjectType;
