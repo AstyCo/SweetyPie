@@ -144,8 +144,4 @@ FORMS += \
     ganttwidget.ui \
     dtintervalwidget/dtintervalwidget.ui
 
-DISTFILES += \
-    ../gantt-lib-include.pri \
-    build_config.pri
-
 include(../build_config.pri)

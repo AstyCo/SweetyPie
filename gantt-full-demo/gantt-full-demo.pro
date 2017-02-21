@@ -25,8 +25,4 @@ HEADERS  += mainwindow.h \
 
 FORMS    += mainwindow.ui
 
-DISTFILES += \
-    ../demo-lib-include.pri \
-    ../gantt-lib-include.pri
-
 RESOURCES +=

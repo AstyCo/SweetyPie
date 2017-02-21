@@ -46,7 +46,7 @@ protected:
 public slots:
     void onTreeInfoReset();
     void onItemAdded(GanttInfoItem *item);
-    void onItemRemoved(GanttInfoItem* item);
+    void onGraphicsObjectDestroyed(QObject *object);
     void onExpanded(GanttInfoNode *which);
     void onCollapsed(GanttInfoNode *which);
 
@@ -113,6 +113,11 @@ private:
 
     void drawBackgroundExpandedItems(QPainter *painter, const QRectF &rect);
     void drawBackgroundLines(QPainter *painter, const QRectF &rect);
+    void drawBackgroundExpandedNode(QPainter *painter, GanttInfoNode *node, int nest,
+                                    int bgLeft, int bgWidth, bool isLast);
+    void drawBackgroundExpandedNodeRect(QPainter *painter, int nest,
+                                        int bgLeft, int bgWidth,
+                                        int top, int bottom);
 
 private slots:
     void invalidateBackground();
@@ -121,7 +126,6 @@ private slots:
     void onGraphicsItemPress();
     void onGraphicsItemHoverEnter();
     void onGraphicsItemHoverLeave();
-    void onInfoDelete();
 
 private:
     AbstractGanttFactory *_factory;

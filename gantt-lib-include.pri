@@ -36,10 +36,10 @@ CONFIG(release, debug|release) {
   }
 }
 
+INCLUDEPATH += $${DEP_PATH_HEADERS}
 INCLUDEPATH += $${DEP_PATH_HEADERS}/extensions
 INCLUDEPATH += $${DEP_PATH_HEADERS}/extensions-gui
 # qwt
-INCLUDEPATH += $${DEP_PATH_HEADERS}
 INCLUDEPATH += $${DEP_PATH_HEADERS}/qwt
 
 INCLUDEPATH += ../ganttmodel/memoryplanningwidget

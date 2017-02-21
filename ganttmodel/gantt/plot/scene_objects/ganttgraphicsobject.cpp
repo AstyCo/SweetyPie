@@ -18,11 +18,6 @@ GanttGraphicsObject::GanttGraphicsObject(GanttInfoItem*item,QGraphicsItem *paren
 
 GanttGraphicsObject::~GanttGraphicsObject()
 {
-    if(scene()){
-        scene()->removeItem(this);
-        setParentItem(NULL);
-    }
-
     if(info())
         info()->reduceLinkCnt();
 }

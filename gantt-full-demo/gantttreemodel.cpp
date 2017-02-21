@@ -333,24 +333,37 @@ bool GanttTreeModel::setData(const QModelIndex &index, const QVariant &value, in
     return false;
 }
 
-void GanttTreeModel::addItems(const QList<GanttInfoItem *> &items)
+void GanttTreeModel::addItems(const QList<GanttInfoItem *> &items, GanttInfoNode *destNode)
 {
+    qDebug() << "Add Items: ";
+    foreach(GanttInfoItem *item, items){
+        qDebug() << "\t"<<item->title();
+    }
+
+    if(destNode == NULL)
+        destNode = m_root;
     int cnt = 0;
     QMap<QString, GanttInfoNode*> tmpNodesForNames;
     foreach(GanttInfoItem *item, items){
-        if(GanttInfoNode *nodeForName = qobject_cast<GanttInfoNode*>(itemForName(item->title())))
+        GanttInfoNode *nodeForName;
+        if((nodeForName = qobject_cast<GanttInfoNode*>(itemForName(item->title(), destNode)))
+           && item->parent() != destNode)
             tmpNodesForNames.insert(item->title(), nodeForName);
         else
             ++cnt;
     }
-    int first = (m_root->isEmpty()? 0 : m_root->size());
     if(cnt > 0){
-        beginInsertRows(QModelIndex(), first, first + cnt - 1);
+        int first;
+        if (destNode->isEmpty() || destNode == items.at(0)->parent()) /// TODO dirty hack
+            first = 0;
+        else
+            first = destNode->size();
+        beginInsertRows(destNode->index(), first, first + cnt - 1);
         for(int i = 0; i < items.size(); ++i){
             if(tmpNodesForNames.contains(items.at(i)->title()))
                 continue;
 
-            insertItem(items.at(i));
+            insertItem(items.at(i), destNode);
         }
         endInsertRows();
 
@@ -358,7 +371,7 @@ void GanttTreeModel::addItems(const QList<GanttInfoItem *> &items)
             if(tmpNodesForNames.contains(items.at(i)->title()))
                 continue;
             if(GanttInfoNode *node = qobject_cast<GanttInfoNode*>(items.at(i)))
-                addNode(node);
+                addItems(node->items(), node);
         }
 
     }
@@ -366,20 +379,13 @@ void GanttTreeModel::addItems(const QList<GanttInfoItem *> &items)
         for(int i = 0; i < items.size(); ++i){
             if(tmpNodesForNames.contains(items.at(i)->title())){
                 GanttInfoNode *insertToNode = tmpNodesForNames.value(items.at(i)->title());
-                int first = (insertToNode->isEmpty()?0:insertToNode->size());
                 GanttInfoNode *extNode = qobject_cast<GanttInfoNode*>(items.at(i));
                 if(!extNode || extNode->isEmpty())
                     continue;
-                beginInsertRows(insertToNode->index(), first, first + extNode->size() - 1);
-                for(int i = 0; i < extNode->size(); ++i)
-                    insertItem(extNode->at(i),insertToNode);
-                endInsertRows();
+
+                addItems(extNode->items(), insertToNode);
             }
         }
-
-
-
-
 
     emit itemsAdded();
 }
@@ -393,6 +399,12 @@ void GanttTreeModel::addNode(GanttInfoNode *node)
         setIndex(node->at(i));
     }
     endInsertRows();
+
+    foreach(GanttInfoItem *item, node->items()){
+        if(GanttInfoNode *node = qobject_cast<GanttInfoNode*>(item))
+            addItems(node->items(), node);
+    }
+
 }
 
 //void GanttTreeModel::addItems(GanttInfoItem *item, bool inner)
@@ -443,15 +455,18 @@ void GanttTreeModel::addNode(GanttInfoNode *node)
 void GanttTreeModel::insertItem(GanttInfoItem *item, GanttInfoNode *parent)
 {
     if(!parent)
-        parent = m_root;
+        return;
 
-    parent->append(item);
+    if(item->parent() != parent)
+        parent->append(item);
     setIndex(item);
 }
 
-GanttInfoItem *GanttTreeModel::itemForName(const QString &title) const
+GanttInfoItem *GanttTreeModel::itemForName(const QString &title, GanttInfoNode *parent) const
 {
-    return itemForNameHelper(title,m_root);
+    if(!parent)
+        parent = m_root;
+    return itemForNameHelper(title,parent);
 }
 
 

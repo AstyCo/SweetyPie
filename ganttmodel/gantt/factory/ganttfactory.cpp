@@ -56,12 +56,14 @@ GanttGraphicsObject *GanttFactory::createGraphicsObject(GanttInfoItem *info)
     if(_wrapper){
         switch(readTag(_wrapper->tag(info->index()))){
         case GanttIntervalGraphicsObjectType:
+            qDebug() << "created Interval" << info->title();
             if(GanttInfoLeaf *leaf = qobject_cast<GanttInfoLeaf*>(info))
                 return new GanttIntervalGraphicsObject(leaf);
             else
                 qWarning("not leaf");
             break;
         case GanttCalcGraphicsObjectType:
+            qDebug() << "created CalcDt" << info->title();
             if(GanttInfoNode *node = qobject_cast<GanttInfoNode*>(info))
                 return new GanttCalcGraphicsObject(node);
             else

@@ -16,6 +16,7 @@ void MainWindow::init()
 {
     _model = new GanttTreeModel();
     ui->treeView->setModel(_model);
+
     ui->ganttWidget->setFactory(new GanttFactory(new ModelWrapper(_model)));
     ui->ganttWidget->setView(ui->treeView);
 }
@@ -47,13 +48,15 @@ void MainWindow::testGantt()
 {
     QList<GanttInfoItem*> testList;
 
-// 0 : add only leaf
+//! [0] : add only leaf
     GanttInfoLeaf *i0 = new GanttInfoLeaf(
                 "leaf0",
                 QDateTime::currentDateTime(),
                 TimeSpan(1,10,12,13)
                 );
-// 1
+//! [0]
+
+//! [1]
     GanttInfoNode *i1 = new GanttInfoNode(
                 "node1",
                 QDateTime::currentDateTime()
@@ -76,8 +79,9 @@ void MainWindow::testGantt()
     i1->append(i10);
     i1->append(i11);
     i1->append(i12);
+//! [1]
 
-// 2
+//! [2]
     GanttInfoNode *i2 = new GanttInfoNode(
                 "node2",
                 QDateTime::currentDateTime()
@@ -94,7 +98,9 @@ void MainWindow::testGantt()
                             );
     i2->append(i20);
     i2->append(i21);
-// 3
+//! [2]
+
+//! [3]
     GanttInfoNode *i3 = new GanttInfoNode(
                 "node3",
                 QDateTime::currentDateTime() + TimeSpan(1,12,0,0)
@@ -120,7 +126,9 @@ void MainWindow::testGantt()
                             TimeSpan(3,0,0,1)
                             );
     i3->append(i30);i3->append(i31);i3->append(i32);i3->append(i33);
-// 4
+//! [3]
+
+//! [4]
     GanttInfoNode *i4 = new GanttInfoNode(
                 "node4",
                 QDateTime::currentDateTime()
@@ -141,7 +149,9 @@ void MainWindow::testGantt()
                             TimeSpan(0,0,0,1)
                             );
     i4->append(i40);i4->append(i41);i4->append(i42);
-// 5
+//! [4]
+
+//! [5]
     GanttInfoNode *i5 = new GanttInfoNode(
                 "node5",
                 QDateTime::currentDateTime()
@@ -162,11 +172,42 @@ void MainWindow::testGantt()
                             TimeSpan(2,0,0,0)
                             );
     i5->append(i50);i5->append(i51);i5->append(i52);
+//! [5]
 
-
-
+//! [6]
+    GanttInfoNode   *i6 = new GanttInfoNode(
+                        "node6",
+                        QDateTime::currentDateTime()
+                        );
+    GanttInfoNode   *i60 = new GanttInfoNode(
+                        "node6.0",
+                        QDateTime::currentDateTime() + TimeSpan(1, 0, 0, 0)
+                        );
+    GanttInfoNode   *i600 = new GanttInfoNode(
+                        "leaf6.0.0",
+                        QDateTime::currentDateTime() + TimeSpan(2, 0, 0, 0)
+                        );
+    GanttInfoLeaf   *i6000 = new GanttInfoLeaf(
+                        "leaf6.0.0.0",
+                        UtcDateTime(QDateTime::currentDateTime()) + TimeSpan(0,0,0,0),
+                        TimeSpan(2,0,0,0)
+                        );
+    GanttInfoLeaf   *i6001 = new GanttInfoLeaf(
+                        "leaf6.0.0.1",
+                        UtcDateTime(QDateTime::currentDateTime()) + TimeSpan(1,0,0,0),
+                        TimeSpan(2,0,0,0)
+                        );
+    GanttInfoLeaf   *i6002 = new GanttInfoLeaf(
+                        "leaf6.0.0.2",
+                        UtcDateTime(QDateTime::currentDateTime()) + TimeSpan(2,0,0,0),
+                        TimeSpan(2,0,0,0)
+                        );
+    i6->append(i60);
+    i60->append(i600);
+    i600->append(i6000);i600->append(i6001);i600->append(i6002);
+//! [6]
     // add to model
-    testList << i0 << i1 << i2 << i3 << i4 << i5;
+    testList << i0 << i1 << i2 << i3 << i4 << i5 << i6;
     _model->addItems(testList);
 }
 

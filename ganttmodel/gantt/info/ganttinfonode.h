@@ -62,6 +62,7 @@ private slots:
     void onSelfExpandingChange();
 
 private:
+    void collapseChilds();
 
     QList<GanttInfoItem*> _items;
     

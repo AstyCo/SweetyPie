@@ -43,15 +43,15 @@ public:
     bool setData(const QModelIndex &iGanttIndex, const QVariant &value,
                  int role = Qt::EditRole);
 
-    void addItems(const QList<GanttInfoItem*>& items);
+    void addItems(const QList<GanttInfoItem*>& items, GanttInfoNode *destNode = NULL);
     void addNode(GanttInfoNode *node);
 //    void addItems(GanttInfoItem* item, bool inner = false);
-    void insertItem(GanttInfoItem *item, GanttInfoNode *parent = NULL);
+    void insertItem(GanttInfoItem *item, GanttInfoNode *parent);
     bool canFetchMore(const QModelIndex &/*parent*/) const{
         return true;
     }
 
-    GanttInfoItem *itemForName(const QString& iGanttTitle) const;
+    GanttInfoItem *itemForName(const QString& iGanttTitle, GanttInfoNode *parent = NULL) const;
 
 
     GanttInfoNode *root() const;

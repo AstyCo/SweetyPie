@@ -3,7 +3,6 @@
 
 #include <QMainWindow>
 #include "utcdatetime.h"
-#include "gantttreemodel.h"
 
 
 namespace Ui {
@@ -26,7 +25,6 @@ private:
     void testChartTimeXYWidget();
     void testChartsGroupWidget();
     void testChartXYGroupWidget();
-    void testGanttModel();
     void testMemoryPlanningWidget();
     void testDtIntervalWidget();
 
@@ -36,15 +34,9 @@ private slots:
     void on_checkBox_syncAxisX_toggled(bool checked);
     void on_pushButton_clicked();
     void on_checkBox_showLegend_toggled(bool checked);
-    void on_pushButton_ganttAddItems_clicked();
-    void on_pushButton_ganttClear_clicked();
-    void on_radioButton_ganttPlayer_toggled(bool checked);
     void on_pushButton_2_clicked();
     void on_pushButton_3_clicked();
     void on_pushButton_4_clicked();
-
-private:
-    GanttTreeModel *_model;
 };
 
 #endif // MAINWINDOW_H

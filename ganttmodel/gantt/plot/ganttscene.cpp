@@ -28,8 +28,10 @@ void GanttScene::drawBackground(QPainter *painter, const QRectF &rect)
 {
     QGraphicsScene::drawBackground(painter, rect);
 
-    drawBackgroundExpandedItems(painter, rect);
-    drawBackgroundLines(painter, rect);
+    QRect lineRect(sceneRect().left(), rect.y(), sceneRect().width(), rect.height());
+
+    drawBackgroundExpandedItems(painter, lineRect);
+    drawBackgroundLines(painter, lineRect);
 }
 
 
@@ -211,7 +213,7 @@ void GanttScene::wheelEvent(QGraphicsSceneWheelEvent *event)
 
 void GanttScene::onTreeInfoReset()
 {
-    clear();
+//    clear();
     addInfoItem(_treeInfo->root());
     updateIntersections();
     updateSceneRect();
@@ -286,7 +288,7 @@ QRectF GanttScene::elementsBoundingRect()
 void GanttScene::clear()
 {
 //    qDebug() << "GANTT CLEAR";
-    _currentItem = NULL;
+//    _currentItem = NULL;
 
     removePersistentItems();
     QGraphicsScene::clear();
@@ -341,9 +343,6 @@ GanttGraphicsObject *GanttScene::objectForPos(const QPointF &pos)
 
 void GanttScene::connectNewInfo(GanttInfoItem *info)
 {
-    connect(info, SIGNAL(aboutToBeDeleted()), this, SLOT(onInfoDelete()));
-    connect(info, SIGNAL(destroyed(QObject*)), this, SLOT(onVisItemDestroyed()));
-
     connect(info, SIGNAL(expanded()), this, SLOT(updateSceneRect()));
     connect(info, SIGNAL(collapsed()), this, SLOT(updateSceneRect()));
 
@@ -435,10 +434,7 @@ void GanttScene::drawBackgroundExpandedItems(QPainter *painter, const QRectF &re
             break;
         GanttInfoNode *node = root->nodeAt(i);
         if(node && node->isExpanded())
-            painter->fillRect(QRect(bgLeft, node->pos() + RECTANGLE_OFFSET / 2,
-                                    bgWidth, node->height() - RECTANGLE_OFFSET + 2),
-                              QBrush(QColor(0xFFE5CC)));
-
+            drawBackgroundExpandedNode(painter, node, 0, bgLeft, bgWidth, true);
     }
 }
 
@@ -458,6 +454,54 @@ void GanttScene::drawBackgroundLines(QPainter *painter, const QRectF &rect)
     {
         painter->drawLine(QPointF(bgLeft,startY),QPointF(bgRight,startY));
         startY+=DEFAULT_ITEM_HEIGHT;
+    }
+}
+
+void GanttScene::drawBackgroundExpandedNode(QPainter *painter, GanttInfoNode *node,
+                                            int nest, int bgLeft, int bgWidth, bool isLast)
+{
+    static const int dy = 3;
+    int top = node->pos();
+    int bottom = top + DEFAULT_ITEM_HEIGHT;
+
+    drawBackgroundExpandedNodeRect(painter, nest, bgLeft, bgWidth,
+                                   (nest ? top : top + dy),
+                                   ((isLast && node->isEmpty()) ? bottom - dy : bottom) );
+    top += DEFAULT_ITEM_HEIGHT;
+    if(node->isExpanded()){
+        for (int i = 0; i < node->size(); ++i) {
+            GanttInfoNode *childNode = node->nodeAt(i);
+            if (childNode) {
+                // draw node
+                drawBackgroundExpandedNodeRect(painter, nest + 1, bgLeft, bgWidth, top, bottom);
+                // draw child node
+                drawBackgroundExpandedNode(painter, childNode, nest + 1, bgLeft, bgWidth, (i == node->size() - 1));
+
+                top = bottom = childNode->pos() + childNode->height();
+            }
+            else {
+                bottom += DEFAULT_ITEM_HEIGHT;
+            }
+        }
+
+        drawBackgroundExpandedNodeRect(painter, nest + 1, bgLeft, bgWidth, top, (isLast ? bottom - dy : bottom));
+    }
+}
+
+void GanttScene::drawBackgroundExpandedNodeRect(QPainter *painter, int nest,
+                                                int bgLeft, int bgWidth,
+                                                int top, int bottom)
+{
+    static const int tabSpace = 40;
+    int dx = nest * tabSpace;
+
+    if (top < bottom){
+        if (dx < bgWidth){
+            painter->fillRect(QRect(bgLeft + dx, top, bgWidth - dx, bottom - top),
+                              QBrush(QColor(0xFFE5CC).lighter(105)));
+        }
+        painter->fillRect(QRect(bgLeft, top, dx, bottom - top),
+                          QBrush(QColor(0xFFE5CC).darker(105)));
     }
 }
 
@@ -542,26 +586,18 @@ void GanttScene::onGraphicsItemHoverLeave()
         emit graphicsItemHoverLeave(graphicsObject->info());
 }
 
-void GanttScene::onInfoDelete()
+void GanttScene::onGraphicsObjectDestroyed(QObject *p_object)
 {
-    GanttInfoItem* item = static_cast<GanttInfoItem*>(sender());
-    onItemRemoved(item);
-}
+    if(GanttGraphicsObject *object = qobject_cast<GanttGraphicsObject*>(p_object)){
+        if(object->info())
+            _itemForInfo.remove(object->info());
+        else
+            qDebug() << "onGraphicsObjectDestroyed() info is NULL";
+        _items.removeOne(object);
 
-void GanttScene::onItemRemoved(GanttInfoItem *info)
-{
-    qDebug() << "onItemRemoved "<< info->title();
-    if(!info)
-        return;
-
-    if(GanttGraphicsObject *graphicsObject = _itemForInfo.value(info))
-    {
-        _items.removeOne(graphicsObject);
-        _itemForInfo.remove(info);
-        graphicsObject->deleteLater();
+        updateSceneRect();  // Item Removed so SceneRectChanged
     }
 }
-
 
 void GanttScene::onExpanded(GanttInfoNode *which)
 {
@@ -622,6 +658,7 @@ void GanttScene::onItemAdded(GanttInfoItem *info)
 
 
     if(p_object){
+        connect(p_object, SIGNAL(destroyed(QObject*)), this, SLOT(onGraphicsObjectDestroyed(QObject*)));
         connectNewInfo(info);
         _items.append(p_object);
         _itemForInfo.insert(info,p_object);

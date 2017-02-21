@@ -144,6 +144,13 @@ void GanttInfoNode::onSelfExpandingChange()
         parent()->onItemExpandingChange(row());
 }
 
+void GanttInfoNode::collapseChilds()
+{
+    foreach (GanttInfoItem *item, _items)
+        if (GanttInfoNode *node = qobject_cast<GanttInfoNode*>(item))
+            node->setExpanded(false);
+}
+
 void GanttInfoNode::init()
 {
     _expanded = false;
@@ -186,6 +193,8 @@ void GanttInfoNode::setExpanded(bool newExpanded)
     }
     else if(_expanded && !newExpanded){
         _expanded = newExpanded;
+        collapseChilds();
+
         emit collapsed();
     }
     else
