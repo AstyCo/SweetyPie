@@ -77,6 +77,9 @@ public slots:
   virtual void setVisible(bool b);
 
   void onCurvePointSelected(const QPointF &pos);
+
+  void setZTop();
+  void setZBottom();
 signals:
   /// Выбрана первая точка при выделении интервала
   void intervalSelectionStarted(QPointF p);

@@ -417,6 +417,22 @@ void ChartIntervalSelector::onCurvePointSelected(const QPointF &pos)
   }
 }
 
+void ChartIntervalSelector::setZTop()
+{
+    m_pIntervalMarker[0]->setZ(100);
+    m_pIntervalMarker[1]->setZ(100);
+    m_pTargetPointMarker->setZ(100);
+    m_plot->replot();
+}
+
+void ChartIntervalSelector::setZBottom()
+{
+    m_pIntervalMarker[0]->setZ(0);
+    m_pIntervalMarker[1]->setZ(0);
+    m_pTargetPointMarker->setZ(0);
+    m_plot->replot();
+}
+
 void ChartIntervalSelector::updateCurvesIntervalStats()
 {
   QPointF posBegin = m_pIntervalMarker[0]->value();
