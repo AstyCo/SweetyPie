@@ -1,6 +1,7 @@
 #include "gantttreemodel.h"
 
 #include "gantt/private_extensions/gantt-lib_global_values.h"
+#include "gantt/info/treewalker.h"
 
 #include <QSize>
 
@@ -179,6 +180,12 @@ GanttInfoNode *GanttTreeModel::nodeForIndex(const QModelIndex &index) const
     return dynamic_cast<GanttInfoNode*>(itemForIndex(index));
 }
 
+void GanttTreeModel::printTree() const
+{
+    qDebug() << "printTree";
+    printTreeR(m_root, 0);
+}
+
 void GanttTreeModel::setIndex(GanttInfoItem *item)
 {
     if(!item->index().isValid())
@@ -222,8 +229,9 @@ void GanttTreeModel::clear()
 {
     beginRemoveRows(QModelIndex(),0,m_root->size());
 
-    m_root->callForEachItemRecursively(&deleteFunc);
-    m_root->clear();
+    callRecursively(m_root, &deleteFunc);
+//    m_root->clear();
+    qDebug() << "MODEL m_root size after clear " << m_root->size();
 
     endRemoveRows();
 
@@ -335,10 +343,10 @@ bool GanttTreeModel::setData(const QModelIndex &index, const QVariant &value, in
 
 void GanttTreeModel::addItems(const QList<GanttInfoItem *> &items, GanttInfoNode *destNode)
 {
-    qDebug() << "Add Items: ";
-    foreach(GanttInfoItem *item, items){
-        qDebug() << "\t"<<item->title();
-    }
+//    qDebug() << "Add Items: ";
+//    foreach(GanttInfoItem *item, items){
+//        qDebug() << "\t"<<item->title();
+//    }
 
     if(destNode == NULL)
         destNode = m_root;

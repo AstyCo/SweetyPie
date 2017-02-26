@@ -62,6 +62,8 @@ public:
     GanttInfoNode* nodeForIndex(const QModelIndex& iGanttIndex) const;
 
 
+    void printTree() const;
+
 signals:
     void itemsAdded(GanttInfoItem*);
     void itemsAdded();

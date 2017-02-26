@@ -1,7 +1,7 @@
 #ifndef MYUTCDATETIMEINTERVAL_H
 #define MYUTCDATETIMEINTERVAL_H
 
-#include "ganttproject_global.h"
+#include "gantt-static-lib-global.h"
 #include "utcdatetime.h"
 #include <QPair>
 
@@ -29,7 +29,7 @@ private:
     TimeSpan _timeSpan;
 };
 
-GANTTMODELSHARED_EXPORT QDebug operator<<(QDebug d, const MyUtcDateTimeInterval &u);
+GANTTSTATICLIB_EXPORT QDebug operator<<(QDebug d, const MyUtcDateTimeInterval &u);
 // INLINE FUNCTIONS
 
 inline UtcDateTime MyUtcDateTimeInterval::end() const { return _min + _timeSpan;}

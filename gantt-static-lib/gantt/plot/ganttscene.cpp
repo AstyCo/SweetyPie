@@ -120,6 +120,7 @@ void GanttScene::setCurrentDt(const UtcDateTime &dt)
 
 void GanttScene::mousePressEvent(QGraphicsSceneMouseEvent *event)
 {
+    qDebug() << tr("scene contains %1 items").arg(QString::number(items().size()));
     QGraphicsScene::mousePressEvent(event);
     if(event->button() == Qt::LeftButton){
         if(!_playerCurrent->sceneBoundingRect().contains(event->scenePos()))
@@ -182,7 +183,7 @@ void GanttScene::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
         setCursor(Qt::ArrowCursor);
     }
     else if (event->button() == Qt::LeftButton){
-        if(_mousePressH.isClick(event->screenPos())){    // Press
+        if (_mousePressH.isClick(event->screenPos())){    // Press
             GanttGraphicsObject *object = objectForPos(_view->mapToScene(_view->mapFromGlobal(_mousePressH.pos().toPoint())));
             if(object){
                 setCurrentItem(object);
@@ -193,6 +194,9 @@ void GanttScene::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
                         emit currentItemChanged(object->info());
                 }
             }
+        }
+        else if (_savedCursor == Qt::ClosedHandCursor){
+            setCursor(Qt::ArrowCursor);
         }
     }
 
@@ -231,6 +235,25 @@ void GanttScene::connectDtLine()
 void GanttScene::onVisItemDestroyed()
 {
     updateSceneRect();
+}
+
+void GanttScene::onInfoAboutToBeDeleted()
+{
+    GanttInfoItem *info = qobject_cast<GanttInfoItem*>(sender());
+    if(!info)
+        return;
+
+    GanttGraphicsObject *graphicsObject = _itemForInfo.value(info, NULL);
+
+    if(graphicsObject){
+        _itemForInfo.remove(info);          // clear cache
+        _items.removeOne(graphicsObject);   // clear cache
+
+        removeItem(graphicsObject);     // delete graphics object
+        graphicsObject->deleteLater();  // delete graphics object
+
+        updateSceneRect();  // Item Removed so SceneRectChanged
+    }
 }
 
 MousePressHelper *GanttScene::mousePressH()
@@ -287,7 +310,7 @@ QRectF GanttScene::elementsBoundingRect()
 
 void GanttScene::clear()
 {
-//    qDebug() << "GANTT CLEAR";
+    qDebug() << "GANTT CLEAR";
 //    _currentItem = NULL;
 
     removePersistentItems();
@@ -586,19 +609,6 @@ void GanttScene::onGraphicsItemHoverLeave()
         emit graphicsItemHoverLeave(graphicsObject->info());
 }
 
-void GanttScene::onGraphicsObjectDestroyed(QObject *p_object)
-{
-    if(GanttGraphicsObject *object = qobject_cast<GanttGraphicsObject*>(p_object)){
-        if(object->info())
-            _itemForInfo.remove(object->info());
-        else
-            qDebug() << "onGraphicsObjectDestroyed() info is NULL";
-        _items.removeOne(object);
-
-        updateSceneRect();  // Item Removed so SceneRectChanged
-    }
-}
-
 void GanttScene::onExpanded(GanttInfoNode *which)
 {
     updateIntersectionR(which);
@@ -623,6 +633,7 @@ void GanttScene::init()
     connectDtLine();
     _currentItem = NULL;
     _factory = NULL;
+    _savedCursor = Qt::ArrowCursor;
 
     setSceneRect(0,0,GANTTSCENE_MIN_WIDTH,0);
 
@@ -658,7 +669,7 @@ void GanttScene::onItemAdded(GanttInfoItem *info)
 
 
     if(p_object){
-        connect(p_object, SIGNAL(destroyed(QObject*)), this, SLOT(onGraphicsObjectDestroyed(QObject*)));
+        connect(info, SIGNAL(aboutToBeDeleted()), this, SLOT(onInfoAboutToBeDeleted()));
         connectNewInfo(info);
         _items.append(p_object);
         _itemForInfo.insert(info,p_object);

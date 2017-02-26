@@ -160,17 +160,6 @@ void GanttInfoNode::init()
     connect(this,SIGNAL(collapsed()),this,SLOT(onSelfExpandingChange()));
 }
 
-void GanttInfoNode::callForEachItemRecursively(void (*func)(GanttInfoItem *))
-{
-    if(!func)
-        return;
-
-    foreach(GanttInfoItem* item, _items)
-        item->callForEachItemRecursively(func);
-
-    (*func)(this);
-}
-
 void GanttInfoNode::updatePos()
 {
     GanttInfoItem::updatePos();

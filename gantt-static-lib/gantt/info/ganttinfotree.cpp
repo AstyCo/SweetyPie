@@ -1,5 +1,7 @@
 #include "ganttinfotree.h"
 #include "gantt/private_extensions/gantt-lib_global_values.h"
+#include "treewalker.h"
+
 
 GanttInfoTree::GanttInfoTree(QObject *parent) : QObject(parent)
 {
@@ -134,15 +136,18 @@ void GanttInfoTree::onCollapsed(const QModelIndex &index)
 
 void deleteInfoItemFunc(GanttInfoItem* item)
 {
-    if(item->parent())
+    if(item->parent()){
         item->deleteInfoItem();
+    }
 }
 
 void GanttInfoTree::clear()
 {
     if(_root)
-        _root->callForEachItemRecursively(&deleteInfoItemFunc);
-    _root->clear();
+        callRecursively(_root, &deleteInfoItemFunc);
+
+    qDebug() << "TREE m_root size after clear " << _root->size();
+//    _root->clear();
 
     clearLimits();
 
@@ -155,6 +160,7 @@ void GanttInfoTree::clear()
 
 void GanttInfoTree::reset()
 {
+    qDebug() << "reset +";
     if(!_model){
         qWarning("GanttInfoTree called reset w/o model");
         return;
@@ -165,6 +171,7 @@ void GanttInfoTree::reset()
 
     emit treeReset();
     onAnyAddition();
+    qDebug() << "reset -";
 }
 
 void GanttInfoTree::onNodeExpanded()
@@ -190,11 +197,13 @@ void GanttInfoTree::onDataChanged(const QModelIndex &/*from*/, const QModelIndex
     qDebug() << "onDataChanged";
     /// TODO optimization
     reset();
+//    clear();
 }
 
 void GanttInfoTree::onRowsInserted(const QModelIndex &parent, int start, int end)
 {
-//    qDebug() << "onRowsIns " << start << " " << end;
+    qDebug() << "onRowsIns " << start << " " << end;
+    printTreeR(_root, 0);
     fill(qobject_cast<GanttInfoNode*>(infoForIndex(parent)), parent, start, end);
 
     onAnyAddition();

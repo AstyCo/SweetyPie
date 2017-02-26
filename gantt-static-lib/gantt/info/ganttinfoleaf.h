@@ -9,7 +9,7 @@
 
 class GanttInfoNode;
 
-class GANTTMODELSHARED_EXPORT GanttInfoLeaf : public GanttInfoItem
+class GANTTSTATICLIB_EXPORT GanttInfoLeaf : public GanttInfoItem
 {
     Q_OBJECT
 
@@ -25,7 +25,6 @@ public:
 
     int columnCount() const;
     qreal height() const;
-    void callForEachItemRecursively(void (*func)(GanttInfoItem*));
     GanttInfoNode *node();
 
 private:

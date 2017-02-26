@@ -29,11 +29,6 @@ qreal GanttInfoLeaf::height() const
     return DEFAULT_ITEM_WIDTH;
 }
 
-void GanttInfoLeaf::callForEachItemRecursively(void (*func)(GanttInfoItem *))
-{
-    if(func)
-        (*func)(this);
-}
 
 GanttInfoNode *GanttInfoLeaf::node()
 {

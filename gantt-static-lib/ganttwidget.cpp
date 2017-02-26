@@ -13,6 +13,8 @@ GanttWidget::GanttWidget(QWidget *parent) :
     ui(new Ui::GanttWidget)
 {
     ui->setupUi(this);
+    Q_INIT_RESOURCE(images);
+
     init();
 
     ui->playerControl->hide();

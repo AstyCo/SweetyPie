@@ -1,0 +1,13 @@
+#ifndef GANTTSTATICLIBGLOBAL_H
+#define GANTTSTATICLIBGLOBAL_H
+
+#include <QtCore/qglobal.h>
+
+#if defined(GANTT_STATIC_LIBRARY)
+#  define GANTTSTATICLIB_EXPORT
+#else
+#  define GANTTSTATICLIB_EXPORT
+#endif
+
+
+#endif // GANTTSTATICLIBGLOBAL_H

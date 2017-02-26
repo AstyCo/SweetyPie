@@ -3,7 +3,7 @@
 
 #include <QPainter>
 #include <QWidget>
-#include "ganttproject_global.h"
+#include "gantt-static-lib-global.h"
 #include <QDebug>
 
 /*!
@@ -33,7 +33,7 @@
  */
 
 
-class GANTTMODELSHARED_EXPORT IntervalSlider : public QWidget
+class GANTTSTATICLIB_EXPORT IntervalSlider : public QWidget
 {
     Q_OBJECT
 

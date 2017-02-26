@@ -18,32 +18,6 @@
         <file>images/filequit.png</file>
         <file>images/filesave.png</file>
         <file>images/icon.png</file>
-        <file>images/player_buttons/back_off_64.png</file>
-        <file>images/player_buttons/back_on_64.png</file>
-        <file>images/player_buttons/back_step_off_64.png</file>
-        <file>images/player_buttons/back_step_on_64.png</file>
-        <file>images/player_buttons/begin_off_64.png</file>
-        <file>images/player_buttons/begin_on_64.png</file>
-        <file>images/player_buttons/end_off_64.png</file>
-        <file>images/player_buttons/end_on_64.png</file>
-        <file>images/player_buttons/forward_off_64.png</file>
-        <file>images/player_buttons/forward_on_64.png</file>
-        <file>images/player_buttons/forward_step_off_64.png</file>
-        <file>images/player_buttons/forward_step_on_64.png</file>
-        <file>images/player_buttons/next_off_64.png</file>
-        <file>images/player_buttons/next_on_64.png</file>
-        <file>images/player_buttons/pause_off_64.png</file>
-        <file>images/player_buttons/pause_on_64.png</file>
-        <file>images/player_buttons/prev_off_64.png</file>
-        <file>images/player_buttons/prev_on_64.png</file>
-        <file>images/player_buttons/rec_off_64.png</file>
-        <file>images/player_buttons/rec_on_64.png</file>
-        <file>images/player_buttons/reg_speed_on_64.png</file>
-        <file>images/player_buttons/reg_step_on_64.png</file>
-        <file>images/player_buttons/stop_off_64.png</file>
-        <file>images/player_buttons/stop_on_64.png</file>
-        <file>images/calculator_active.png</file>
-        <file>images/calculator_inactive.png</file>
     </qresource>
     <qresource prefix="/icons">
         <file>icons/clear.png</file>

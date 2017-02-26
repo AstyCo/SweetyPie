@@ -46,7 +46,6 @@ protected:
 public slots:
     void onTreeInfoReset();
     void onItemAdded(GanttInfoItem *item);
-    void onGraphicsObjectDestroyed(QObject *object);
     void onExpanded(GanttInfoNode *which);
     void onCollapsed(GanttInfoNode *which);
 
@@ -123,6 +122,7 @@ private slots:
     void invalidateBackground();
     void updateIntersectionR(GanttInfoItem *item);   ///< updates intersection recursively
     void onVisItemDestroyed();
+    void onInfoAboutToBeDeleted();
     void onGraphicsItemPress();
     void onGraphicsItemHoverEnter();
     void onGraphicsItemHoverLeave();

@@ -1,7 +1,7 @@
 #ifndef GANTTINFOITEM_H
 #define GANTTINFOITEM_H
 
-#include "ganttproject_global.h"
+#include "gantt-static-lib-global.h"
 #include "utcdatetime.h"
 #include "extensions/myutcdatetimeinterval.h"
 
@@ -13,7 +13,7 @@
 class GanttInfoNode;
 class UtcDateTime;
 
-class GANTTMODELSHARED_EXPORT GanttInfoItem : public QObject
+class GANTTSTATICLIB_EXPORT GanttInfoItem : public QObject
 {
     Q_OBJECT
     void init();
@@ -59,7 +59,6 @@ public:
     static QPair<UtcDateTime,UtcDateTime> getLimits(const GanttInfoItem *root);
     QPair<UtcDateTime,UtcDateTime> getLimits() const;
     virtual bool operator==(const GanttInfoItem& another);
-    virtual void callForEachItemRecursively(void (*func)(GanttInfoItem*)) = 0;
 
     void increaseLinkCnt();
     void reduceLinkCnt();

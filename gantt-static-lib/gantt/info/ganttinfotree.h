@@ -8,6 +8,8 @@
 #include <QAbstractItemModel>
 #include <QTreeView>
 
+#include <QtConcurrentRun>
+
 class GanttInfoTree : public QObject
 {
     Q_OBJECT

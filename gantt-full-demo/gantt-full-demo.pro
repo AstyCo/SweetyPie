@@ -11,8 +11,12 @@ greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 TARGET = gantt-full-demo
 TEMPLATE = app
 
+CONFIG += depend_includepath
+
 include(../gantt-lib-include.pri)
 include(../demo-lib-include.pri)
+
+CONFIG += depend_includepath
 
 SOURCES += main.cpp\
         mainwindow.cpp \

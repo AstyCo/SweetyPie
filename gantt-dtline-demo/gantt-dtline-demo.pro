@@ -11,6 +11,7 @@ greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 TARGET = gantt-demo
 TEMPLATE = app
 
+include(../gantt-static-lib-include.pri)
 include(../gantt-lib-include.pri)
 include(../demo-lib-include.pri)
 
