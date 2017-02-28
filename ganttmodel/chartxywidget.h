@@ -18,6 +18,15 @@
 #include "chartactionstoolbar.h"
 #include "chartsettingsdlg.h"
 #include "chartintervalselector.h"
+#include "chartpointselector.h"
+
+class QwtPlotCurve;
+class QwtPlotGrid;
+class QwtPlotPanner;
+class PlotNavigator;
+class QwtPlotMarker;
+class ChartPointSelector;
+class ChartIntervalSelector;
 
 namespace Ui {
 class ChartXYWidget;
@@ -39,12 +48,6 @@ struct GANTTMODELSHARED_EXPORT ChartCurveStats
   QPointF intervalPointingValue;
   QPointF intervalEndValue;
 };
-
-class QwtPlotCurve;
-class QwtPlotGrid;
-class QwtPlotPanner;
-class PlotNavigator;
-class QwtPlotMarker;
 
 /// Основной класс для графиков
 class GANTTMODELSHARED_EXPORT ChartXYWidget : public QWidget
@@ -157,19 +160,24 @@ public:
 
   CurveIndex findClosestPointAllCurves(const QPointF &pos, SearchDirection direction=sdAny) const;
 
-  ChartIntervalSelector *selector() const;
+  ChartIntervalSelector *intervalSelector() const;
+  ChartPointSelector * pointSelector() const;
 
 
+  ChartSettings getSettings() const;
+
+  QList<CurveDetailsGroupBox *> getPanelCurveDetailsList() const;
 
 public slots:
   /// Полное перерисовка полотна
-  void fullReplot();
+  virtual void fullReplot();
   /// Установить автоматический масштаб
   void autoZoom();
   /// Отрисовывать сетку
   void setGrid(bool b);
   /// Переместить видимую область графика
   void moveCanvas(int dx, int dy);
+
 
 signals: 
   /// Данные для построения графика изменились
@@ -181,6 +189,8 @@ signals:
 
   void zoomed(const QRectF &rect);
 
+  void selected(const QPointF &p);
+
 protected:
   Ui::ChartXYWidget *ui;
 
@@ -191,7 +201,10 @@ protected:
   QList<PlotInterval *> m_zones;
   QList<QLabel *> m_zoneLegendWidgets;
   QList<CurveDetailsGroupBox *> m_panelCurveDetailsList;
-  ChartIntervalSelector *m_selectionModel;
+  ChartIntervalSelector *m_intervalSelectorModel;
+  ChartPointSelector * m_pointSelectorModel;
+
+  QwtPlotPicker *m_picker;
 
   QwtPlotGrid *m_pGrid;
   PlotNavigator *m_navigator;
@@ -200,6 +213,7 @@ protected:
   QwtPlotMarker *m_pMaxLeftMarker;
   QwtPlotMarker *m_pMinRightMarker;
   QwtPlotMarker *m_pMaxRightMarker;
+
 
 
   ChartSettings m_settings;

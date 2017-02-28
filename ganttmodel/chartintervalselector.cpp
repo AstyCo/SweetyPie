@@ -11,66 +11,34 @@
 #include "chartxywidget.h"
 #include "plotnavigator.h"
 #include "plotkeyeventhandler.h"
+#include "charttimexywidget.h"
 
 ChartIntervalSelector::ChartIntervalSelector(ChartXYWidget *chart, PlotNavigator *nav)
   : QObject(chart), m_chart(chart), m_plot(chart->getPlot()), m_navigator(nav)
 {
-  m_selectedPointIndex = CurveIndex();
+
   m_selectionState = ssNone;
   m_hasSelection = false;
 
-  // объект отслеживает перемещение и нажатие кнопки мыши
-  m_picker = new QwtPlotPicker(QwtPlot::xBottom, QwtPlot::yLeft,
-                               QwtPicker::CrossRubberBand, QwtPicker::AlwaysOff, m_plot->canvas());
-  QwtPickerMachine* pickerMachine = new QwtPickerClickPointMachine();
-  m_picker->setStateMachine(pickerMachine);
-  // отключить перемещение курсора клавишами влево вправо
-  m_picker->setKeyPattern(QwtEventPattern::KeyLeft, Qt::Key_unknown);
-  m_picker->setKeyPattern(QwtEventPattern::KeyRight, Qt::Key_unknown);
-
-  //connect(m_panner, SIGNAL(panned(int, int)), SLOT(onPlotPanned()));
-
-  connect(m_picker, SIGNAL(selected(const QPointF&)), this, SLOT(onCurvePointSelected(const QPointF&)));
-
-  m_keyEventHandler = new PlotKeyEventHandler(m_plot);
-  m_plot->installEventFilter(m_keyEventHandler);
-  connect(m_keyEventHandler, SIGNAL(nextPointSelected(bool)), SLOT(onNextCurvePointSelected(bool)));
-
   m_selIntAct = m_chart->getActionsToolBar()->getChartAction(caSelectInterval);
-  // создать маркеры, которыми будем помечать выбранную точку
-  m_pMarker[0] = new QwtPlotMarker();
-  m_pMarker[0]->setLabelAlignment(Qt::AlignRight | Qt::AlignBottom);
-  QwtSymbol * sym = new QwtSymbol(QwtSymbol::Diamond, QBrush(Qt::magenta, Qt::SolidPattern),
-                                  QPen(Qt::black, 0.0, Qt::SolidLine), QSize(7, 7));
-  m_pMarker[0]->setSymbol(sym);
-  m_pMarker[0]->setLineStyle(QwtPlotMarker::VLine);
-  m_pMarker[0]->setLinePen(QPen( Qt::black, 0, Qt::DashLine ));
-  m_pMarker[0]->hide();
-  m_pMarker[0]->attach(m_plot);
 
-  m_pMarker[1] = new QwtPlotMarker();
-  m_pMarker[1]->setLabelAlignment(Qt::AlignLeft | Qt::AlignTop);
-  m_pMarker[1]->setLineStyle(QwtPlotMarker::HLine);
-  m_pMarker[1]->setLinePen(QPen( Qt::black, 0, Qt::DashLine ));
-  m_pMarker[1]->hide();
-  m_pMarker[1]->attach(m_plot);
-
+  m_visible = true;
+  _color = Qt::red;
   // создать маркеры, которыми будет обозначена область выделения
   for(int i = 0; i <= 1; i++)
   {
     m_pIntervalMarker[i] = new QwtPlotMarker();
     m_pIntervalMarker[i]->setLineStyle(QwtPlotMarker::VLine);
-    m_pIntervalMarker[i]->setLinePen(QPen( Qt::red, 3, Qt::SolidLine ));
+    m_pIntervalMarker[i]->setLinePen(QPen( _color, 3, Qt::SolidLine ));
     m_pIntervalMarker[i]->hide();
     m_pIntervalMarker[i]->attach(m_plot);
   }
 
-  m_pTargetingMarker = new QwtPlotMarker();
-  m_pTargetingMarker->setLineStyle(QwtPlotMarker::VLine);
-  m_pTargetingMarker->setLinePen(QPen( Qt::magenta, 3, Qt::SolidLine ));
-  m_pTargetingMarker->hide();
-  //m_pTargetingMarker->setZ(100);
-  m_pTargetingMarker->attach(m_plot);  
+  m_pTargetPointMarker = new QwtPlotMarker();
+  m_pTargetPointMarker->setLineStyle(QwtPlotMarker::VLine);
+  m_pTargetPointMarker->setLinePen(QPen( _color, 3, Qt::DashLine ));
+  m_pTargetPointMarker->hide();
+  m_pTargetPointMarker->attach(m_plot);
 }
 
 qreal ChartIntervalSelector::begin() const
@@ -99,7 +67,7 @@ void ChartIntervalSelector::onAction_SelectTarget_toggled(bool checked)
     if (m_selectionState != ssNone)
       clearIntervalSelection();
 
-    m_selectionState = ssTargetingPoint;
+    m_selectionState = ssTargetPoint;
   }
   else
     m_selectionState = ssNone;
@@ -138,26 +106,26 @@ void ChartIntervalSelector::setIntervalSelection(qreal begin, qreal end)
 
     details->setIntervalLabelsVisible(m_hasSelection);
   }
+
 }
 
 
-void ChartIntervalSelector::setSelectionModeTargetingPoint(bool b)
+void ChartIntervalSelector::setSelectionModeTargetPoint(bool b)
 {  
-
   if (b)
   {
-    clearTargetingPoint();
+    clearTargetPoint();
 
     if (m_selectionState != ssNone)
       clearIntervalSelection();
 
-    m_selectionState = ssTargetingPoint;
+    m_selectionState = ssTargetPoint;
   }
 }
 
-void ChartIntervalSelector::setTargetingPoint(qreal value)
+void ChartIntervalSelector::setTargetPoint(qreal value)
 {
-  if (m_selectionState == ssTargetingPoint)
+  if (m_selectionState == ssTargetPoint)
     m_selectionState = ssNone;
 
   QAction *selTargetAct = m_chart->getActionsToolBar()->getChartAction(caSelectTarget);
@@ -165,21 +133,20 @@ void ChartIntervalSelector::setTargetingPoint(qreal value)
   selTargetAct->setChecked(false);
   selTargetAct->blockSignals(b);
 
-  m_targetingPoint = value;
+  m_targetPoint = value;
   QPointF point(value, 0);
 
-  m_pTargetingMarker->setValue(point);
-  m_pTargetingMarker->show();
+  showTargetPoint(point);
 
   QList<QwtPlotCurve*> curves = m_chart->curves();
   for(int i = 0; i < curves.size(); i++)
   {
     QwtPlotCurve *curve = curves.at(i);
     ChartCurveStats &stats = m_chart->m_curvesStats[i];
-    long pointTargetingIdx = m_chart->findPointIndexByPos(point, sdRight, i);
+    long pointTargetPointIdx = m_chart->findPointIndexByPos(point, sdRight, i);
 
-    if (pointTargetingIdx != -1)
-      stats.intervalPointingValue = curve->sample(pointTargetingIdx);
+    if (pointTargetPointIdx != -1)
+      stats.intervalPointingValue = curve->sample(pointTargetPointIdx);
     else
       stats.intervalPointingValue = QPointF();
   }
@@ -187,9 +154,9 @@ void ChartIntervalSelector::setTargetingPoint(qreal value)
   m_plot->replot();
 }
 
-void ChartIntervalSelector::clearTargetingPoint()
+void ChartIntervalSelector::clearTargetPoint()
 {
-  if (m_selectionState == ssTargetingPoint)
+  if (m_selectionState == ssTargetPoint)
     m_selectionState = ssNone;
 
   QAction *selTargetAct = m_chart->getActionsToolBar()->getChartAction(caSelectTarget);
@@ -197,7 +164,7 @@ void ChartIntervalSelector::clearTargetingPoint()
   selTargetAct->setChecked(false);
   selTargetAct->blockSignals(b);
 
-  m_pTargetingMarker->hide();
+  m_pTargetPointMarker->hide();
   for(int i = 0; i < m_chart->m_curves.size(); i++)
     m_chart->m_curvesStats[i].intervalPointingValue = QPointF();
 
@@ -206,14 +173,6 @@ void ChartIntervalSelector::clearTargetingPoint()
 
 void ChartIntervalSelector::clearIntervalSelection()
 {
-  /*
-  for(int i = 0; i < m_chart->curves().size(); i++)
-  {
-    ChartCurveStats &stats = m_curvesStats[i];
-    stats.intervalBeginValue = QPointF();
-    stats.intervalEndValue = QPointF();
-  }
-  */
   m_selectionState = ssNone;
   m_hasSelection = false;
   foreach(CurveDetailsGroupBox *panel, m_chart->detailedPanels())
@@ -260,49 +219,29 @@ void ChartIntervalSelector::setIntervalSelectionEnd(QPointF pos)
   }
 }
 
-void ChartIntervalSelector::selectPointByIndex(CurveIndex idx)
-{
-  QList<QwtPlotCurve *> curves = m_chart->curves();
-  if ((idx.indexCurve < 0) || (idx.indexCurve > curves.size() - 1))
-    return;
 
-  if ((idx.indexPoint >= 0) && (idx.indexPoint < curves.at(idx.indexCurve)->dataSize()))
-  {
-    m_selectedPointIndex = idx;
-    updateDetailsPanelsSelPoint();
-    drawMarkerOnCurve();
-  }
-}
 
-void ChartIntervalSelector::showSelectionPoint(QwtText xLbl, QwtText yLbl, QPointF point, QwtPlot::Axis axis)
-{
-  m_pMarker[0]->setLabel(xLbl);
-  m_pMarker[0]->setValue(point);
-  m_pMarker[0]->show();
 
-  m_pMarker[1]->setLabel(yLbl);
-  m_pMarker[1]->setValue(point);
-  m_pMarker[1]->setYAxis(axis);
-  if(axis == QwtPlot::yRight)
-    m_pMarker[1]->setLabelAlignment(Qt::AlignRight | Qt::AlignTop);
-  else
-    m_pMarker[1]->setLabelAlignment(Qt::AlignLeft | Qt::AlignTop);
-
-  m_pMarker[1]->show();
-  m_plot->replot();
-}
 
 void ChartIntervalSelector::showSelectionInterval(QPointF start, QPointF end)
 {
-  m_pIntervalMarker[0]->setValue(start);
-  m_pIntervalMarker[0]->show();
-  m_pIntervalMarker[1]->setValue(end);
-  m_pIntervalMarker[1]->show();
-  m_plot->replot();
+    m_pIntervalMarker[0]->setValue(start);
+    m_pIntervalMarker[1]->setValue(end);
+
+    if(!m_visible)
+        return;
+
+    m_pIntervalMarker[0]->show();
+    m_pIntervalMarker[1]->show();
+    m_plot->replot();
 }
 void ChartIntervalSelector::showSelectionIntervalStart(QPointF start)
 {
   m_pIntervalMarker[0]->setValue(start);
+
+  if(!m_visible)
+        return;
+
   m_pIntervalMarker[0]->show();
   m_plot->replot();
 }
@@ -310,12 +249,27 @@ void ChartIntervalSelector::showSelectionIntervalStart(QPointF start)
 void ChartIntervalSelector::showSelectionIntervalEnd(QPointF end)
 {
   m_pIntervalMarker[1]->setValue(end);
+
+  if(!m_visible)
+        return;
+
   m_pIntervalMarker[1]->show();
   m_plot->replot();
 }
 
+void ChartIntervalSelector::showTargetPoint(QPointF point)
+{
+    m_pTargetPointMarker->setValue(point);
 
-void ChartIntervalSelector::setIntervalSelection(bool b)
+    if(!m_visible)
+        return;
+
+    m_pTargetPointMarker->show();
+    m_plot->replot();
+}
+
+
+void ChartIntervalSelector::onAction_SelectInterval_toggled(bool b)
 {
   if(b)
   {
@@ -391,19 +345,14 @@ void ChartIntervalSelector::setIntervalSelectionByState(QPointF pos)
   m_plot->replot();
 }
 
-void ChartIntervalSelector::clearSelectedPoint()
-{
-  m_pMarker[0]->hide();
-  m_pMarker[1]->hide();
-}
+
 
 void ChartIntervalSelector::clearAllSelections()
 {
   // скрыть маркеры
-  clearSelectedPoint();
   m_pIntervalMarker[0]->hide();
   m_pIntervalMarker[1]->hide();
-  m_pTargetingMarker->hide();
+  m_pTargetPointMarker->hide();
 }
 
 void ChartIntervalSelector::reset()
@@ -411,7 +360,6 @@ void ChartIntervalSelector::reset()
   m_beginLimit = CurveIndex();
   m_endLimit = CurveIndex();
 
-  m_selectedPointIndex = CurveIndex();
   m_selectionState = ssNone;
   m_hasSelection = false;
   m_selectionBeginPointIdx = CurveIndex();
@@ -425,23 +373,23 @@ void ChartIntervalSelector::onCurveAdded(QwtPlotCurve *curve)
   {
     if(! m_beginLimit.isValid())
     {
-      m_beginLimit.indexCurve = m_chart->m_curves.size();
+      m_beginLimit.indexCurve = m_chart->m_curves.size()-1;
       m_beginLimit.indexPoint = 0;
     }
     else if(curve->sample(0).x() < m_chart->m_curves[m_beginLimit.indexCurve]->sample(m_beginLimit.indexPoint).x())
     {
-      m_beginLimit.indexCurve = m_chart->m_curves.size();
+      m_beginLimit.indexCurve = m_chart->m_curves.size()-1;
       m_beginLimit.indexPoint = 0;
     }
 
     if (! m_endLimit.isValid())
     {
-      m_endLimit.indexCurve = m_chart->m_curves.size();
+      m_endLimit.indexCurve = m_chart->m_curves.size()-1;
       m_endLimit.indexPoint = curve->dataSize() - 1;
     }
     else if(curve->sample(curve->dataSize() - 1).x() > m_chart->m_curves[m_endLimit.indexCurve]->sample(m_endLimit.indexPoint).x())
     {
-      m_endLimit.indexCurve = m_chart->m_curves.size();
+      m_endLimit.indexCurve = m_chart->m_curves.size()-1;
       m_endLimit.indexPoint = curve->dataSize() - 1;
     }
   }
@@ -449,40 +397,7 @@ void ChartIntervalSelector::onCurveAdded(QwtPlotCurve *curve)
 
 void ChartIntervalSelector::onCurvePointSelected(const QPointF &pos)
 {
-  QList<QwtPlotCurve *> curves = m_chart->curves();
-  if (m_selectionState == ssNone)
-  {
-
-    // найти и выделить точку с учетом выделенного интервала
-    CurveIndex selPointIdx = m_chart->findClosestPointAllCurves(pos);
-
-    if(!selPointIdx.isValid())
-      return;
-
-    if ((curves.size() > 1) && (m_selectedPointIndex.indexCurve != selPointIdx.indexCurve))
-    {
-      if (m_selectedPointIndex.isValid())
-      {
-        QwtPlotCurve *focusCurve = curves[m_selectedPointIndex.indexCurve];
-        QPen focusCurvePen = focusCurve->pen();
-        focusCurvePen.setWidth(focusCurvePen.width() - 1);
-        focusCurve->setPen(focusCurvePen);
-      }
-
-      QwtPlotCurve *newFocusCurve = curves[selPointIdx.indexCurve];
-      QPen newFocusCurvePen = newFocusCurve->pen();
-      newFocusCurvePen.setWidth(newFocusCurvePen.width() + 1);
-      newFocusCurve->setPen(newFocusCurvePen);
-    }
-
-    m_selectedPointIndex = selPointIdx;
-
-    drawMarkerOnCurve();
-    updateDetailsPanelsSelPoint();
-
-    emit pointSelected(m_selectedPointIndex);
-  }
-  else if (m_selectionState == ssIntervalBegin)
+  if (m_selectionState == ssIntervalBegin)
   {
     setIntervalSelectionStart(pos);
 
@@ -494,133 +409,29 @@ void ChartIntervalSelector::onCurvePointSelected(const QPointF &pos)
 
     emit intervalSelectionEnded(pos);
   }
-  else if (m_selectionState == ssTargetingPoint)
+  else if (m_selectionState == ssTargetPoint)
   {
-    setTargetingPoint(pos.x());
+    setTargetPoint(pos.x());
 
-    emit targetingPointSet(pos.x());
+    emit targetPointSet(pos.x());
   }
 }
 
-
-void ChartIntervalSelector::drawMarkerOnCurve()
+void ChartIntervalSelector::setZTop()
 {
-  if (!m_selectedPointIndex.isValid())
-    return;
-
-  QwtPlotCurve *curve = m_chart->m_curves[m_selectedPointIndex.indexCurve];
-  QPointF p = curve->sample(m_selectedPointIndex.indexPoint);
-
-  QString xLbl, yLbl;
-  m_chart->getCurvePointLabel(m_selectedPointIndex, xLbl, yLbl);
-  QwtText txtX(xLbl), txtY(yLbl);
-  txtX.setFont(m_chart->m_settings.m_markerLabelFont);
-  txtY.setFont(m_chart->m_settings.m_markerLabelFont);
-
-  txtX.setBackgroundBrush(QBrush(Qt::white));
-  txtY.setBackgroundBrush(QBrush(Qt::white));
-  txtX.setRenderFlags(Qt::AlignLeft);
-  txtY.setRenderFlags(Qt::AlignLeft);
-
-  showSelectionPoint(txtX, txtY, p, (QwtPlot::Axis)curve->yAxis());
+    m_pIntervalMarker[0]->setZ(100);
+    m_pIntervalMarker[1]->setZ(100);
+    m_pTargetPointMarker->setZ(100);
+    m_plot->replot();
 }
 
-void ChartIntervalSelector::onCurveVisibilityChanged(int curveIdx, bool b)
+void ChartIntervalSelector::setZBottom()
 {
-  if(!b)
-  {
-    if (m_selectedPointIndex.isValid())
-    {
-      if (curveIdx == m_selectedPointIndex.indexCurve)
-        clearSelectedPoint();
-    }
-  }
+    m_pIntervalMarker[0]->setZ(0);
+    m_pIntervalMarker[1]->setZ(0);
+    m_pTargetPointMarker->setZ(0);
+    m_plot->replot();
 }
-
-void ChartIntervalSelector::onNextCurvePointSelected(bool prev)
-{
-  if (! m_selectedPointIndex.isValid())
-    return;
-
-  QwtPlotCurve *curve = m_chart->m_curves.at(m_selectedPointIndex.indexCurve);
-  QwtSeriesData<QPointF> *samples = curve->data();
-
-  if (samples->size() == 0)
-    return;
-
-  //int step = m_settings.keyStep;
-  int step = 1;
-
-  long startIdx = 0;
-  long endIdx = samples->size() - 1;
-  // если выбран интервал, то ограничиваем зону поиска точками из этого интервала
-  if (m_hasSelection)
-  {
-    startIdx = m_selectionBeginPointIdx.indexPoint;
-    endIdx = m_selectionEndPointIdx.indexPoint;
-  }
-  if (startIdx > endIdx)
-  {
-    // ни одна точка не попала в интервал
-    return;
-  }
-  if (m_selectedPointIndex.indexPoint > -1)
-  {
-    // предыдущая точка имеется
-    if (!prev)
-    {
-
-      if ((m_selectedPointIndex.indexPoint + step) < endIdx)
-        m_selectedPointIndex.indexPoint += step;
-      else
-        m_selectedPointIndex.indexPoint = endIdx;
-    }
-    else
-    {
-      if ((m_selectedPointIndex.indexPoint - step) >= startIdx)
-        m_selectedPointIndex.indexPoint -= step;
-      else
-        m_selectedPointIndex.indexPoint = startIdx;
-    }
-  }
-  else
-  {
-    // предыдущая точка отсутствует
-    if (!prev)
-      m_selectedPointIndex.indexPoint = step;
-    else
-      m_selectedPointIndex.indexPoint = endIdx - step;
-
-    if (m_selectedPointIndex.indexPoint < startIdx)
-      m_selectedPointIndex.indexPoint = startIdx;
-    else if (m_selectedPointIndex.indexPoint > endIdx)
-      m_selectedPointIndex.indexPoint = endIdx;
-  }
-  drawMarkerOnCurve();
-  m_chart->m_panelCurveDetailsList[m_selectedPointIndex.indexCurve]
-      ->setCurrentSelPointIndex(m_selectedPointIndex.indexPoint);
-
-  emit pointSelected(m_selectedPointIndex);
-}
-
-
-void ChartIntervalSelector::updateDetailsPanelsSelPoint()
-{
-  QList<QwtPlotCurve*> curves = m_chart->curves();
-  for(int i = 0; i < m_chart->detailedPanels().count(); i++)
-  {
-    CurveDetailsGroupBox *details = m_chart->detailedPanels().at(i);
-    if(m_selectedPointIndex.isValid()
-      && (curves[m_selectedPointIndex.indexCurve] == details->curve()))
-    {
-      details->setCurrentSelPointIndex(m_selectedPointIndex.indexPoint);
-    }
-    else
-      details->setCurrentSelPointIndex(-1);
-  }
-}
-
-
 
 void ChartIntervalSelector::updateCurvesIntervalStats()
 {
@@ -653,32 +464,53 @@ void ChartIntervalSelector::updateCurvesIntervalStats()
   }
 }
 
-
-QPointF dtToPoint(const UtcDateTime &dt, double y = 0)
+bool ChartIntervalSelector::visible() const
 {
-  return QPointF(double(dt.toMicrosecondsSinceEpoch() / 1000), y);
+    return m_visible;
 }
 
-UtcDateTime pointToDt(const QPointF &p)
+QColor ChartIntervalSelector::color() const
 {
-  return UtcDateTime::fromMicrosecondsSinceEpoch((long long)p.x() * 1000);
+    return _color;
+}
+
+void ChartIntervalSelector::setColor(const QColor &color)
+{
+    _color = color;
+    for(int i = 0; i <= 1; i++)
+    {
+        m_pIntervalMarker[i]->setLinePen(QPen( _color, 3, Qt::SolidLine ));
+    }
+
+    m_pTargetPointMarker->setLinePen(QPen( _color, 3, Qt::DashLine ));
+    m_plot->replot();
+}
+
+void ChartIntervalSelector::setVisible(bool b)
+{
+    m_visible = b;
+    m_pIntervalMarker[0]->setVisible(b);
+    m_pIntervalMarker[1]->setVisible(b);
+    m_pTargetPointMarker->setVisible(b);
+    m_plot->replot();
 }
 
 
 ChartTimeIntervalSelector::ChartTimeIntervalSelector(ChartXYWidget *chart, PlotNavigator *nav)
   : ChartIntervalSelector(chart, nav)
 {
-  connect(this, SIGNAL(targetingPointSet(qreal)), SLOT(onTargetingPointSet(qreal)));
+  connect(this, SIGNAL(targetPointSet(qreal)), SLOT(ontargetPointSet(qreal)));
+  connect(this, SIGNAL(intervalSelectionEnded(QPointF)), this, SLOT(onIntervalSelectionFinish()));
 }
 
 UtcDateTime ChartTimeIntervalSelector::getIntervalSelectionBeginDt()
 {
-  return pointToDt(QPointF(m_intervalBegin, 0));
+  return ChartTimeXYWidget::pointToDt(QPointF(m_intervalBegin, 0));
 }
 
 UtcDateTime ChartTimeIntervalSelector::getIntervalSelectionEndDt()
 {
-  return pointToDt(QPointF(m_intervalEnd, 0));
+  return ChartTimeXYWidget::pointToDt(QPointF(m_intervalEnd, 0));
 }
 
 void ChartTimeIntervalSelector::setIntervalSelectionByDates(UtcDateTime beginDt, UtcDateTime endDt)
@@ -692,22 +524,40 @@ void ChartTimeIntervalSelector::setIntervalSelectionByDates(UtcDateTime beginDt,
   if(!m_beginLimit.isValid() || !m_endLimit.isValid())
     return;
 
-  QPointF startP = dtToPoint(beginDt);
-  QPointF endP = dtToPoint(endDt);
+  QPointF startP = ChartTimeXYWidget::dtToPoint(beginDt);
+  QPointF endP = ChartTimeXYWidget::dtToPoint(endDt);
 
   setIntervalSelection(startP.x(), endP.x());
 }
 
-void ChartTimeIntervalSelector::onTargetingPointSet(qreal point)
+void ChartTimeIntervalSelector::setTargetPointByDates(UtcDateTime dt)
 {
-  emit targetingDtSet(pointToDt(QPointF(point, 0)));
+    setTargetPoint(ChartTimeXYWidget::dtToPoint(dt).x());
+}
+
+void ChartTimeIntervalSelector::ontargetPointSet(qreal point)
+{
+//    if(!m_beginLimit.isValid() || !m_endLimit.isValid())
+//        return;
+
+//    QPointF p = ChartTimeXYWidget::dtToPoint(dt);
+//    setTargetPoint(p.x());
+
+    emit targetPointDtSet(ChartTimeXYWidget::pointToDt(QPointF(point, 0)));
+}
+
+
+void ChartTimeIntervalSelector::onIntervalSelectionFinish()
+{
+    emit intervalSelectionFinished(ChartTimeXYWidget::pointToDt(QPointF(intervalSelectionBegin(),0)),
+                                   ChartTimeXYWidget::pointToDt(QPointF(intervalSelectionEnd(),0)));
 }
 
 UtcDateTime ChartTimeIntervalSelector::minimumDt()
 {
   UtcDateTime rez;
   if (m_beginLimit.isValid())
-    rez = pointToDt(m_chart->curves()[m_beginLimit.indexCurve]->sample(m_beginLimit.indexPoint));
+    rez = ChartTimeXYWidget::pointToDt(m_chart->curves()[m_beginLimit.indexCurve]->sample(m_beginLimit.indexPoint));
 
   return rez;
 }
@@ -716,7 +566,7 @@ UtcDateTime ChartTimeIntervalSelector::maximumDt()
 {
   UtcDateTime rez;
   if (m_endLimit.isValid())
-    rez = pointToDt(m_chart->curves()[m_endLimit.indexCurve]->sample(m_endLimit.indexPoint));
+    rez = ChartTimeXYWidget::pointToDt(m_chart->curves()[m_endLimit.indexCurve]->sample(m_endLimit.indexPoint));
 
   return rez;
 }

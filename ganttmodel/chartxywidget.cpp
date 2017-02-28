@@ -7,6 +7,7 @@
 #include <QSplitter>
 #include <QColorDialog>
 #include <QMenu>
+#include <qwt_picker_machine.h>
 
 #include <qwt/qwt_plot.h>
 #include <qwt/qwt_plot_curve.h>
@@ -51,19 +52,34 @@ ChartXYWidget::ChartXYWidget(QWidget * parent) :
   connect(m_navigator, SIGNAL(panned(int, int)), SIGNAL(panned(int, int)));
   connect(m_navigator, SIGNAL(zoomed(QRectF)), SIGNAL(zoomed(QRectF)));
 
+  // объект отслеживает перемещение и нажатие кнопки мыши
+  m_picker = new QwtPlotPicker(QwtPlot::xBottom, QwtPlot::yLeft,
+                               QwtPicker::CrossRubberBand, QwtPicker::AlwaysOff, ui->m_plot->canvas());
+  QwtPickerMachine* pickerMachine = new QwtPickerClickPointMachine();
+  m_picker->setStateMachine(pickerMachine);
+  // отключить перемещение курсора клавишами влево вправо
+  m_picker->setKeyPattern(QwtEventPattern::KeyLeft, Qt::Key_unknown);
+  m_picker->setKeyPattern(QwtEventPattern::KeyRight, Qt::Key_unknown);
+
 
   m_pMinLeftMarker = 0;
   m_pMaxLeftMarker = 0;
   m_pMinRightMarker = 0;
   m_pMaxRightMarker = 0;
 
-  m_selectionModel = new ChartIntervalSelector(this, m_navigator);
+  m_intervalSelectorModel = new ChartIntervalSelector(this, m_navigator);
   m_showLegend = false;
 
   connect(m_actionsToolBar->getChartAction(caSelectInterval), SIGNAL(toggled(bool)),
-          m_selectionModel, SLOT(setIntervalSelection(bool)));
+          m_intervalSelectorModel, SLOT(onAction_SelectInterval_toggled(bool)));
   connect(m_actionsToolBar->getChartAction(caSelectTarget), SIGNAL(toggled(bool)),
-          m_selectionModel, SLOT(onAction_SelectTarget_toggled(bool)));
+          m_intervalSelectorModel, SLOT(onAction_SelectTarget_toggled(bool)));
+
+  m_pointSelectorModel = new ChartPointSelector(this,m_navigator);
+
+  connect(m_picker, SIGNAL(selected(const QPointF&)), m_intervalSelectorModel, SLOT(onCurvePointSelected(const QPointF&)));
+  connect(m_picker, SIGNAL(selected(const QPointF&)), m_pointSelectorModel, SLOT(onCurvePointSelected(const QPointF&)));
+  connect(m_picker,SIGNAL(selected(QPointF)),this,SIGNAL(selected(QPointF)));
 
   setPanelCurveDetailsVisible(true);  
 
@@ -85,7 +101,7 @@ ChartXYWidget::~ChartXYWidget()
 
 void ChartXYWidget::fullReplot()
 {
-  m_selectionModel->clearAllSelections();
+  m_intervalSelectorModel->clearAllSelections();
   autoZoom();
 }
 
@@ -377,9 +393,24 @@ void ChartXYWidget::moveCanvas( int dx, int dy )
   plot->replot();  
 }
 
-ChartIntervalSelector *ChartXYWidget::selector() const
+QList<CurveDetailsGroupBox *> ChartXYWidget::getPanelCurveDetailsList() const
 {
-  return m_selectionModel;
+    return m_panelCurveDetailsList;
+}
+
+ChartSettings ChartXYWidget::getSettings() const
+{
+    return m_settings;
+}
+
+ChartIntervalSelector *ChartXYWidget::intervalSelector() const
+{
+    return m_intervalSelectorModel;
+}
+
+ChartPointSelector *ChartXYWidget::pointSelector() const
+{
+    return m_pointSelectorModel;
 }
 
 bool ChartXYWidget::showLegend() const
@@ -617,7 +648,7 @@ void ChartXYWidget::setCurveVisible(bool b)
 {
   CurveDetailsGroupBox *curveDlg = (CurveDetailsGroupBox *)QObject::sender();
   int curveIdx = m_curves.indexOf(curveDlg->curve());
-  m_selectionModel->onCurveVisibilityChanged(curveIdx, b);
+  m_pointSelectorModel->onCurveVisibilityChanged(curveIdx, b);
 
   ui->m_plot->replot();
 }
@@ -721,10 +752,11 @@ void ChartXYWidget::setData(const QString &title, const QVector<QPointF> &data, 
   stats.maxValue = QPointF(curve->maxXValue(), curve->maxYValue());
   stats.minValue = QPointF(curve->minXValue(), curve->minYValue());
 
-  m_selectionModel->onCurveAdded(curve);
 
   m_curves.append(curve);
   m_curvesStats.append(stats);      
+
+  m_intervalSelectorModel->onCurveAdded(curve);
 
   CurveDetailsGroupBox * details = new CurveDetailsGroupBox(curve, this);
   details->setCurveCheckable(m_curves.size() > 1);
@@ -842,7 +874,7 @@ void ChartXYWidget::clearChart()
     m_pMaxRightMarker = 0;
   }
 
-  m_selectionModel->reset();
+  m_intervalSelectorModel->reset();
 
   ui->m_plot->replot();
 }

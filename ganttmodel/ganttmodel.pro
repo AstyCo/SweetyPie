@@ -41,7 +41,9 @@ SOURCES += \
     chartxywidget.cpp \
     chartintervalselectionwidget.cpp \
     chartintervalselector.cpp \
-    dtintervalwidget/dtintervalwidget.cpp
+    dtintervalwidget/dtintervalwidget.cpp \
+    chartpointselector.cpp \
+    curveindex.cpp
 
 
 HEADERS += \
@@ -70,7 +72,9 @@ HEADERS += \
     chartxywidget.h \
     chartintervalselectionwidget.h \
     chartintervalselector.h \
-    dtintervalwidget/dtintervalwidget.h
+    dtintervalwidget/dtintervalwidget.h \
+    chartpointselector.h \
+    curveindex.h
 
 
 RESOURCES += \

@@ -36,8 +36,8 @@ public:
   bool syncChartsByAxisX() const;
   void setSyncChartsByAxisX(bool syncChartsByAxisX);
 
-  void setTargetingPoint(UtcDateTime dt);
-  void clearTargetingPoint();
+  void setTargetPoint(UtcDateTime dt);
+  void clearTargetPoint();
 
   ChartActionsToolBar *getActionsToolBar() const;
 
@@ -49,6 +49,7 @@ public:
 signals:
   /// Выбрана вторая точка при выделении интервала
   void intervalSelectionEnded(QPointF p);
+  void intervalSelectionFinished(const UtcDateTime &beg,const UtcDateTime &end);
   void targetPointSelected(UtcDateTime dt);
 
 public slots:
@@ -64,7 +65,7 @@ protected slots:
   void onPointSelected(CurveIndex idx);
   void onIntervalSelectionStart(QPointF pos);
   void onIntervalSelectionEnd(QPointF pos);
-  void onTargetingDtSet(qreal value);
+  void ontargetPointDtSet(qreal value);
   void onScaleChanged(qreal scaleFactor, QPoint anchorPoint);
   void onChartPanned(int dx, int dy);
 
@@ -126,6 +127,7 @@ public:
 
   /// Дата и время конца выделенного интервала
   UtcDateTime getSelIntervalEndDt();
+
   bool panelSelectIntervalVisible() const;
   void setPanelSelectIntervalVisible(bool vis);
 
