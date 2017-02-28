@@ -121,6 +121,8 @@ private:
 private slots:
     void invalidateBackground();
     void updateIntersectionR(GanttInfoItem *item);   ///< updates intersection recursively
+    void onDoubleClick(const QPointF &pos); ///< screen pos
+    void onClick(const QPointF &pos);   ///< screen pos
     void onVisItemDestroyed();
     void onInfoAboutToBeDeleted();
     void onGraphicsItemPress();

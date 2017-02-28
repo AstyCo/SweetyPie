@@ -11,16 +11,27 @@
 // then     user wants to Press , else user wants to Slide
 //
 qint64 MousePressHelper::_slideDelay = 0.5 * _MILISECONDS_IN_SECOND;
+
 // distance - euclidean norm
 int MousePressHelper::_slideDistance = 15;
 int MousePressHelper::_updateDistance = 40;
 
+// emit clickDelayElapsed after _doubleClickDelay[msec]
+int MousePressHelper::_doubleClickDelay = 300;
+
 void MousePressHelper::init()
 {
     _pressed = false;
+
+    _clickTimer.setSingleShot(true);
+    _clickTimer.setInterval(_doubleClickDelay);
+    connect(&_clickTimer, SIGNAL(timeout()), this, SLOT(emitClickDelayElapsed()));
 }
 
-MousePressHelper::MousePressHelper()
+QVector
+
+MousePressHelper::MousePressHelper(QObject *parent)
+    :QObject(parent)
 {
 
 }
@@ -30,12 +41,33 @@ void MousePressHelper::press(const QPointF &pos)
     _pressed = true;
     _nextPressedAtPos = _pressedAtPos = pos;
     _pressedAtMSecs = QDateTime::currentMSecsSinceEpoch();
+    qDebug() << "timer Started";
+    _clickTimer.start();
 
     _horSlide = _verSlide = true;   // helpers
 }
 
+void MousePressHelper::doubleClick(const QPointF &pos)
+{
+    qDebug() << "doubleClick stop";
+    _clickTimer.stop();
+
+    emit doubleClicked(pos);
+}
+
+void MousePressHelper::move(const QPointF &pos)
+{
+    if (_pressed && _pressedAtPos != pos) {
+        qDebug() << "move stop";
+        _clickTimer.stop();
+    }
+}
+
 void MousePressHelper::release()
 {
+    qDebug() << "release stop";
+
+    _clickTimer.stop();
     _pressed = false;
 }
 
@@ -102,6 +134,12 @@ bool MousePressHelper::isVerSlide(const QPointF &pos)
         _verSlide = false;
         return false;
     }
+}
+
+void MousePressHelper::emitClickDelayElapsed()
+{
+    qDebug() << "emitClickDelayElapsed";
+    emit clickDelayElapsed(_pressedAtPos);
 }
 
 

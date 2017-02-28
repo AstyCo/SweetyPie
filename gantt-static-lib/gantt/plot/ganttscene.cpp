@@ -133,22 +133,9 @@ void GanttScene::mousePressEvent(QGraphicsSceneMouseEvent *event)
 void GanttScene::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event)
 {
     QGraphicsScene::mouseDoubleClickEvent(event);
+
     if(event->buttons() & Qt::LeftButton)
-    {
-        GanttGraphicsObject *object = objectForPos(event->scenePos());
-        if(object)
-        {
-            GanttInfoNode *node = object->info()->node();
-            if (node->parent()){    // not root
-                if (node->isExpanded())
-                    node->setExpanded(false);
-                else{
-                    emit currentItemChanged(object->info());
-                    node->setExpanded(true);
-                }
-            }
-        }
-    }
+        _mousePressH.doubleClick(event->screenPos());
 
     mouseMoveEvent(event);
 }
@@ -173,6 +160,7 @@ void GanttScene::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
     else if( _savedCursor == Qt::ClosedHandCursor)
         setCursor(Qt::ArrowCursor);
 
+    _mousePressH.move(event->screenPos());
     QGraphicsScene::mouseMoveEvent(event);
 }
 
@@ -183,19 +171,7 @@ void GanttScene::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
         setCursor(Qt::ArrowCursor);
     }
     else if (event->button() == Qt::LeftButton){
-        if (_mousePressH.isClick(event->screenPos())){    // Press
-            GanttGraphicsObject *object = objectForPos(_view->mapToScene(_view->mapFromGlobal(_mousePressH.pos().toPoint())));
-            if(object){
-                setCurrentItem(object);
-
-                GanttInfoNode *node = object->info()->node();
-                if (node->parent()){    // not root
-                    if (node->isExpanded())
-                        emit currentItemChanged(object->info());
-                }
-            }
-        }
-        else if (_savedCursor == Qt::ClosedHandCursor){
+        if (_savedCursor == Qt::ClosedHandCursor){
             setCursor(Qt::ArrowCursor);
         }
     }
@@ -583,6 +559,40 @@ void GanttScene::updateIntersectionR(GanttInfoItem *item)
         qCritical("GanttScene::updateIntersection");
 }
 
+void GanttScene::onDoubleClick(const QPointF &pos)
+{
+    qDebug() << "scene onDoubleClick " << pos;
+    GanttGraphicsObject *object = objectForPos(pos);
+    if(object)
+    {
+        GanttInfoNode *node = object->info()->node();
+        if (node->parent()){    // not root
+            if (node->isExpanded()) {
+                node->setExpanded(false);
+            }
+            else{
+                emit currentItemChanged(object->info());
+                node->setExpanded(true);
+            }
+        }
+    }
+}
+
+void GanttScene::onClick(const QPointF &pos)
+{
+    qDebug() << "scene onClick " << pos;
+    GanttGraphicsObject *object = objectForPos(_view->mapToScene(_view->mapFromGlobal(pos.toPoint())));
+    if(object){
+        setCurrentItem(object);
+
+        GanttInfoNode *node = object->info()->node();
+        if (node->parent()){    // not root
+            if (node->isExpanded())
+                emit currentItemChanged(object->info());
+        }
+    }
+}
+
 void GanttScene::updateIntersections()
 {
     updateIntersectionR(_treeInfo->root());
@@ -638,6 +648,10 @@ void GanttScene::init()
     setSceneRect(0,0,GANTTSCENE_MIN_WIDTH,0);
 
     createPersistentItems();
+
+    connect(&_mousePressH, SIGNAL(clickDelayElapsed(QPointF)), this, SLOT(onClick(QPointF)));
+    connect(&_mousePressH, SIGNAL(doubleClicked(QPointF)), this, SLOT(onDoubleClick(QPointF)));
+
 }
 
 GanttScene::GanttScene(GanttGraphicsView *view, GanttDtLine *dtline, QObject *parent)
