@@ -1,4 +1,3 @@
-INCLUDEPATH += "$$PWD/ganttmodel"
 LIBS = -L$$DESTDIR $$LIBS
 
 CONFIG(release, debug|release) {

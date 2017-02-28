@@ -1,14 +1,14 @@
 #ifndef DTLINE_H
 #define DTLINE_H
 
-#include "gantt-static-lib-global.h"
+#include "ganttproject_global.h"
 #include "utcdatetime.h"
 #include "timespan_extension.h"
 
 #include <QWidget>
 #include <QPair>
 
-class GANTTSTATICLIB_EXPORT DtLine : public QWidget
+class GANTTMODELSHARED_EXPORT DtLine : public QWidget
 {
     Q_OBJECT
     void init();

@@ -2,8 +2,9 @@ TEMPLATE = subdirs
 
 CONFIG +=  ordered
 
-SUBDIRS +=  gantt-static-lib \
-            gantt-full-demo \
+SUBDIRS +=  \
+#            gantt-static-lib \
+#            gantt-dtline-demo \
             ganttmodel \
             ganttmodel_test \
-            gantt-dtline-demo
+            gantt-full-demo

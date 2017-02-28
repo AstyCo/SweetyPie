@@ -1,7 +1,6 @@
 #ifndef GANTTTREEMODEL_H
 #define GANTTTREEMODEL_H
 
-#include "ganttproject_global.h"
 #include "gantt/info/ganttinfoleaf.h"
 #include "gantt/info/ganttinfonode.h"
 

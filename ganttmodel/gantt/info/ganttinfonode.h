@@ -7,7 +7,7 @@
 
 class GanttScene;
 
-class GANTTSTATICLIB_EXPORT GanttInfoNode : public GanttInfoItem
+class GANTTMODELSHARED_EXPORT GanttInfoNode : public GanttInfoItem
 {
     Q_OBJECT
 

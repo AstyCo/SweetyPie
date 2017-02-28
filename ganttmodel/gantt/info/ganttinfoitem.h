@@ -1,7 +1,7 @@
 #ifndef GANTTINFOITEM_H
 #define GANTTINFOITEM_H
 
-#include "gantt-static-lib-global.h"
+#include "ganttproject_global.h"
 #include "utcdatetime.h"
 #include "extensions/myutcdatetimeinterval.h"
 
@@ -13,7 +13,7 @@
 class GanttInfoNode;
 class UtcDateTime;
 
-class GANTTSTATICLIB_EXPORT GanttInfoItem : public QObject
+class GANTTMODELSHARED_EXPORT GanttInfoItem : public QObject
 {
     Q_OBJECT
     void init();

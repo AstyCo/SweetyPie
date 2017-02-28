@@ -1,13 +1,13 @@
 #ifndef QRECTUNION_H
 #define QRECTUNION_H
 
-#include "gantt-static-lib-global.h"
+#include "ganttproject_global.h"
 #include <QPainter>
 #include <QList>
 #include <QRect>
 #include <QDebug>
 
-class GANTTSTATICLIB_EXPORT QRectFUnion
+class GANTTMODELSHARED_EXPORT QRectFUnion
 {
     friend QRectFUnion operator*(const QRectFUnion &f, qreal coef);
 public:
@@ -38,8 +38,8 @@ void QRectFUnion::clear() { _rects.clear();}
 const QList<QRectF> &QRectFUnion::rects() const { return _rects;}
 
 
-GANTTSTATICLIB_EXPORT QDebug operator<<(QDebug, const QRectFUnion&);
-GANTTSTATICLIB_EXPORT QRectFUnion operator*(const QRectFUnion &f, qreal coef);
-GANTTSTATICLIB_EXPORT QRectFUnion operator*(qreal coef, const QRectFUnion &f);
+GANTTMODELSHARED_EXPORT QDebug operator<<(QDebug, const QRectFUnion&);
+GANTTMODELSHARED_EXPORT QRectFUnion operator*(const QRectFUnion &f, qreal coef);
+GANTTMODELSHARED_EXPORT QRectFUnion operator*(qreal coef, const QRectFUnion &f);
 
 #endif // QRECTUNION_H

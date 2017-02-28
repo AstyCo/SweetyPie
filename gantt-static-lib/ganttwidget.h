@@ -1,7 +1,6 @@
 #ifndef GANTTWIDGET_H
 #define GANTTWIDGET_H
 
-#include "gantt-static-lib-global.h"
 #include "gantt/info/ganttinfotree.h"
 #include "extensions-gui/interfaces/abstractganttfactory.h"
 
@@ -19,7 +18,7 @@ class GanttWidget;
 class GanttScene;
 
 
-class GANTTSTATICLIB_EXPORT GanttWidget : public QWidget
+class GanttWidget : public QWidget
 {
     Q_OBJECT
     void init();

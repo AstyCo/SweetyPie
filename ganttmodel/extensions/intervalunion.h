@@ -2,7 +2,7 @@
 #define INTERVALUNION_H
 
 
-#include "gantt-static-lib-global.h"
+#include "ganttproject_global.h"
 
 #include "extensions/myutcdatetimeinterval.h"
 #include "utcdatetime.h"
@@ -10,7 +10,7 @@
 #include <QList>
 #include <QDebug>
 
-class GANTTSTATICLIB_EXPORT IntervalUnion
+class GANTTMODELSHARED_EXPORT IntervalUnion
 {
     friend IntervalUnion operator*(const IntervalUnion &f, qreal coef);
 public:
@@ -41,8 +41,8 @@ void IntervalUnion::clear() { _intervals.clear();}
 const QList<MyUtcDateTimeInterval> &IntervalUnion::intervals() const { return _intervals;}
 
 
-GANTTSTATICLIB_EXPORT QDebug operator<<(QDebug, const IntervalUnion&);
-GANTTSTATICLIB_EXPORT IntervalUnion operator*(const IntervalUnion &f, qreal coef);
-GANTTSTATICLIB_EXPORT IntervalUnion operator*(qreal coef, const IntervalUnion &f);
+GANTTMODELSHARED_EXPORT QDebug operator<<(QDebug, const IntervalUnion&);
+GANTTMODELSHARED_EXPORT IntervalUnion operator*(const IntervalUnion &f, qreal coef);
+GANTTMODELSHARED_EXPORT IntervalUnion operator*(qreal coef, const IntervalUnion &f);
 
 #endif // INTERVALUNION_H

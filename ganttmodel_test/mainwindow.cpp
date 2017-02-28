@@ -105,8 +105,8 @@ void MainWindow::testChartTimeXYWidget()
                                                  */
   ui->checkBox_showLegend->setChecked(true);
 
-  connect(ui->widgetIntervalSlider, SIGNAL(valueChanged(IntervalSlider::ClippedHandle, long long)), this, SLOT(setInterval()));
-
+  connect(ui->widgetIntervalSlider, SIGNAL(beginMoved(long long)), this, SLOT(setInterval()));
+  connect(ui->widgetIntervalSlider, SIGNAL(endMoved(long long)), this, SLOT(setInterval()));
 
 }
 

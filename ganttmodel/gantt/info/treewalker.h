@@ -5,7 +5,7 @@
 #include "gantt/info/ganttinfoleaf.h"
 
 QString makeTabs(int n);
-void printTreeR(GanttInfoItem *item, int nest);
+GANTTMODELSHARED_EXPORT void printTreeR(GanttInfoItem *item, int nest);
 
 template <typename T>
 void callRecursively(GanttInfoItem *item, T (*functionPointer)(GanttInfoItem *))

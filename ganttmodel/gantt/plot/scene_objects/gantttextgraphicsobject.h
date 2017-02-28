@@ -1,11 +1,11 @@
 #ifndef GANTTTEXTGRAPHICSOBJECT_H
 #define GANTTTEXTGRAPHICSOBJECT_H
 
-#include "gantt-static-lib-global.h"
+#include "ganttproject_global.h"
 #include "ganttgraphicsobject.h"
 
 
-class GANTTSTATICLIB_EXPORT GanttTextGraphicsObject : public GanttGraphicsObject
+class GANTTMODELSHARED_EXPORT GanttTextGraphicsObject : public GanttGraphicsObject
 {
     Q_OBJECT
 

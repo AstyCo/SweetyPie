@@ -1,7 +1,7 @@
 #ifndef GANTTGRAPHICSOBJECT_H
 #define GANTTGRAPHICSOBJECT_H
 
-#include "gantt-static-lib-global.h"
+#include "ganttproject_global.h"
 #include "extensions/dtline.h"
 #include <QGraphicsObject>
 #include <QPointer>
@@ -10,7 +10,7 @@
 class GanttInfoItem;
 class GanttScene;
 
-class GANTTSTATICLIB_EXPORT GanttGraphicsObject : public QGraphicsObject
+class GANTTMODELSHARED_EXPORT GanttGraphicsObject : public QGraphicsObject
 {
     Q_OBJECT
 

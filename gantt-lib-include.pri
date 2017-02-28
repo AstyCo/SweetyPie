@@ -1,17 +1,29 @@
-include(gantt-static-lib-include.pri)
+DESTDIR = $$OUT_PWD/../bin
 
-message(added library: "$$DESTDIR/libgantt-static-lib.a")
-LIBS += "$$DESTDIR/libgantt-static-lib.a" # link static library
+# подключить библиотеки и *.h файлы
+CONFIG += depend_includepath
+unix: CONFIG += debug_and_release debug_and_release_target
 
-message(added to INCLUDEPATH: $$_PRO_FILE_PWD_/../gantt-static-lib)
-INCLUDEPATH += $$_PRO_FILE_PWD_/../gantt-static-lib # include headers
+# выведем сообщение компилятора в каком режиме собираем (для проверки)
+release:message(Building in release mode.)
+debug:message(Building in debug mode.)
+
+# пути к зависимым библиотекам
+unix {
+  DEP_PATH_LIBS = /usr/lib64
+  DEP_PATH_HEADERS = /usr/include
+} else:win32 {
+  DEP_PATH_LIBS = C:/lib64
+  DEP_PATH_HEADERS = C:/include
+}
 
 
 LIBS += -L$${DEP_PATH_LIBS}
 
 CONFIG(release, debug|release) {
-  LIBS += -lqwt
+  LIBS += -lextensions -lextensions-gui -lqwt
 } else:CONFIG(debug, debug|release) {
+    LIBS += -lextensionsd -lextensions-guid
   unix {
     LIBS += -lqwt
   } else:win32 {
@@ -22,6 +34,13 @@ CONFIG(release, debug|release) {
 # qwt
 INCLUDEPATH += $${DEP_PATH_HEADERS}/qwt
 
+INCLUDEPATH += $${DEP_PATH_HEADERS}
+INCLUDEPATH += $${DEP_PATH_HEADERS}/extensions
+INCLUDEPATH += $${DEP_PATH_HEADERS}/extensions-gui
+
+INCLUDEPATH += ../ganttmodel
 INCLUDEPATH += ../ganttmodel/memoryplanningwidget
 INCLUDEPATH += ../ganttmodel/memoryplanningwidget/memoryline
 INCLUDEPATH += ../ganttmodel/memoryplanningwidget/memorygrid
+
+

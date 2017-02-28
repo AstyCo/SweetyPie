@@ -9,7 +9,7 @@
 
 class GanttInfoNode;
 
-class GANTTSTATICLIB_EXPORT GanttInfoLeaf : public GanttInfoItem
+class GANTTMODELSHARED_EXPORT GanttInfoLeaf : public GanttInfoItem
 {
     Q_OBJECT
 

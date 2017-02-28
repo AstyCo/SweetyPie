@@ -1,11 +1,11 @@
 #ifndef GANTTFACTORY_H
 #define GANTTFACTORY_H
 
-#include "gantt-static-lib-global.h"
+#include "ganttproject_global.h"
 #include "extensions-gui/interfaces/abstractganttfactory.h"
 #include "extensions-gui/interfaces/imodelwrapper.h"
 
-class GANTTSTATICLIB_EXPORT GanttFactory : public AbstractGanttFactory
+class GANTTMODELSHARED_EXPORT GanttFactory : public AbstractGanttFactory
 {
 public:
     enum RegisteredGraphicsObjectType{
