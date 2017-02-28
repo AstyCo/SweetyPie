@@ -79,8 +79,8 @@ void GanttGraphicsView::mouseMoveEvent(QMouseEvent *event)
     int dy = 0;
 
     if( !_lastPos.isNull()
-        && _mousePressH->isSlide(event->globalPos())
-        && !_mousePressH->isHorSlide(event->globalPos()))
+        && _mousePressH->isSlide()
+        && !_mousePressH->isHorSlide())
     {
         int val = verticalScrollBar()->value(),
             min = verticalScrollBar()->minimum(),

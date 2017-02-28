@@ -120,7 +120,7 @@ void GanttScene::setCurrentDt(const UtcDateTime &dt)
 
 void GanttScene::mousePressEvent(QGraphicsSceneMouseEvent *event)
 {
-    qDebug() << tr("scene contains %1 items").arg(QString::number(items().size()));
+//    qDebug() << tr("scene contains %1 items").arg(QString::number(items().size()));
     QGraphicsScene::mousePressEvent(event);
     if(event->button() == Qt::LeftButton){
         if(!_playerCurrent->sceneBoundingRect().contains(event->scenePos()))
@@ -142,8 +142,8 @@ void GanttScene::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event)
 
 void GanttScene::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
 {
-    if(event->buttons() & Qt::RightButton){
-        if(_view){
+    if (event->buttons() & Qt::RightButton) {
+        if (_view) {
             setCursor(Qt::PointingHandCursor);
             _crossObject->setVisible(true);
             _crossObject->setPos(event->scenePos());
@@ -151,14 +151,18 @@ void GanttScene::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
         else
             qCritical("m_view is null");
     }
-    if( _mousePressH.isSlide(event->screenPos())
-        && !_mousePressH.isVerSlide(event->screenPos()))
-    {
+    if (_mousePressH.isSlide()) {
+        _mousePressH.setSlided();
         setCursor(Qt::ClosedHandCursor);
-        _dtline->slide((event->lastScenePos().x() - event->scenePos().x()) * 1. / width());     // HOR scroll
+
+        if (!_mousePressH.isVerSlide()) {
+            _dtline->slide((event->lastScenePos().x() - event->scenePos().x())
+                           * 1. / width());     // HOR scroll
+        }
     }
-    else if( _savedCursor == Qt::ClosedHandCursor)
+    else if (_savedCursor == Qt::ClosedHandCursor) {
         setCursor(Qt::ArrowCursor);
+    }
 
     _mousePressH.move(event->screenPos());
     QGraphicsScene::mouseMoveEvent(event);
@@ -562,7 +566,7 @@ void GanttScene::updateIntersectionR(GanttInfoItem *item)
 void GanttScene::onDoubleClick(const QPointF &pos)
 {
     qDebug() << "scene onDoubleClick " << pos;
-    GanttGraphicsObject *object = objectForPos(pos);
+    GanttGraphicsObject *object = objectForPos(_view->mapToScene(_view->mapFromGlobal(pos.toPoint())));
     if(object)
     {
         GanttInfoNode *node = object->info()->node();

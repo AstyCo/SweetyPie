@@ -17,39 +17,38 @@ int MousePressHelper::_slideDistance = 15;
 int MousePressHelper::_updateDistance = 40;
 
 // emit clickDelayElapsed after _doubleClickDelay[msec]
-int MousePressHelper::_doubleClickDelay = 300;
+int MousePressHelper::_doubleClickDelay = 180;
 
 void MousePressHelper::init()
 {
     _pressed = false;
+    _doubleClick = false;
+    _slided = false;
 
     _clickTimer.setSingleShot(true);
     _clickTimer.setInterval(_doubleClickDelay);
     connect(&_clickTimer, SIGNAL(timeout()), this, SLOT(emitClickDelayElapsed()));
 }
 
-QVector
-
 MousePressHelper::MousePressHelper(QObject *parent)
     :QObject(parent)
 {
-
+    init();
 }
 
 void MousePressHelper::press(const QPointF &pos)
 {
     _pressed = true;
+    _doubleClick = _slided = false;
     _nextPressedAtPos = _pressedAtPos = pos;
     _pressedAtMSecs = QDateTime::currentMSecsSinceEpoch();
-    qDebug() << "timer Started";
-    _clickTimer.start();
 
     _horSlide = _verSlide = true;   // helpers
 }
 
 void MousePressHelper::doubleClick(const QPointF &pos)
 {
-    qDebug() << "doubleClick stop";
+    _doubleClick = true;
     _clickTimer.stop();
 
     emit doubleClicked(pos);
@@ -57,71 +56,62 @@ void MousePressHelper::doubleClick(const QPointF &pos)
 
 void MousePressHelper::move(const QPointF &pos)
 {
-    if (_pressed && _pressedAtPos != pos) {
-        qDebug() << "move stop";
-        _clickTimer.stop();
-    }
+    _currentMousePos = pos;
+}
+
+void MousePressHelper::setSlided()
+{
+    if(_slided)
+        return;
+
+    _slided = true;
 }
 
 void MousePressHelper::release()
 {
-    qDebug() << "release stop";
+    qDebug() << "release";
+    if (!_doubleClick)
+        _clickTimer.start();
 
-    _clickTimer.stop();
     _pressed = false;
 }
 
-//void MousePressHelper::updatePressedAtPos(const QPointF &newPos)
-//{
-//    if(!_pressed)
-//        return;
-//    if( _pressedAtPos == _nextPressedAtPos
-//            && QLineF(_nextPressedAtPos, newPos).length() > _updateDistance / 2)
-//        _nextPressedAtPos = newPos;
-
-//    if(QLineF(_pressedAtPos, newPos).length() > _updateDistance)
-//        _pressedAtPos = _nextPressedAtPos;
-//}
-
-bool MousePressHelper::isClick(const QPointF &pos) const
+bool MousePressHelper::isClick() const
 {
     if(!_pressed)
         return false;
-    if((QDateTime::currentMSecsSinceEpoch() - _pressedAtMSecs < _slideDelay
-            && QLineF(_pressedAtPos, pos).length() < _slideDistance)
-            || _pressedAtPos == pos)
-        return true;
 
-    return false;
+    return isClickH(_currentMousePos);
 }
 
-bool MousePressHelper::isSlide(const QPointF &pos) const
+bool MousePressHelper::isSlide() const
 {
     if(!_pressed)
         return false;
-    return !isClick(pos);
+
+    return !isClickH(_currentMousePos);
 }
 
-bool MousePressHelper::isHorSlide(const QPointF &pos)
+bool MousePressHelper::isHorSlide()
 {
-    if(!_pressed || !_horSlide)
+    if (!_pressed || !_horSlide)
         return false;
-    QLineF direction(_pressedAtPos, pos);
+    QLineF direction(_pressedAtPos, _currentMousePos);
     qreal angle = direction.angle();
     static const int delta = 15;
-    if(angle < delta
+    if (angle < delta
             || angle > 360 - delta
             || (angle > 180 - delta && angle < 180 + delta))
         return true;
-    else{
+    else {
         _horSlide = false;
         return false;
     }
 }
 
-bool MousePressHelper::isVerSlide(const QPointF &pos)
+bool MousePressHelper::isVerSlide()
 {
-    QLineF direction(_pressedAtPos, pos);
+    QLineF direction(_pressedAtPos, _currentMousePos);
     qreal angle = direction.angle();
 
     if(!_pressed || !_verSlide)
@@ -136,10 +126,21 @@ bool MousePressHelper::isVerSlide(const QPointF &pos)
     }
 }
 
+bool MousePressHelper::isClickH(const QPointF &pos) const
+{
+    return (QDateTime::currentMSecsSinceEpoch() - _pressedAtMSecs < _slideDelay
+                && QLineF(_pressedAtPos, pos).length() < _slideDistance)
+            || _pressedAtPos == pos;
+
+}
+
 void MousePressHelper::emitClickDelayElapsed()
 {
     qDebug() << "emitClickDelayElapsed";
-    emit clickDelayElapsed(_pressedAtPos);
+    if(!_slided){
+        qDebug() << "!_slided";
+        emit clickDelayElapsed(_pressedAtPos);
+    }
 }
 
 

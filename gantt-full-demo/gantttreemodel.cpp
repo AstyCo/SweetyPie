@@ -230,8 +230,7 @@ void GanttTreeModel::clear()
     beginRemoveRows(QModelIndex(),0,m_root->size());
 
     callRecursively(m_root, &deleteFunc);
-//    m_root->clear();
-    qDebug() << "MODEL m_root size after clear " << m_root->size();
+//    qDebug() << "MODEL m_root size after clear " << m_root->size();
 
     endRemoveRows();
 

@@ -214,7 +214,7 @@ void MainWindow::testGantt()
     // add to model
     testList << i0 << i1 << i2 << i3 << i4 << i5 << i6;
     _model->addItems(testList);
-    _model->printTree();
+//    _model->printTree();
 }
 
 QList<GanttInfoItem*> generateTest()
@@ -278,7 +278,7 @@ QList<GanttInfoItem*> generateTest()
 void MainWindow::on_pushButton_ganttAddItems_clicked()
 {
     _model->addItems(generateTest());
-    _model->printTree();
+//    _model->printTree();
 }
 
 void MainWindow::on_pushButton_ganttClear_clicked()

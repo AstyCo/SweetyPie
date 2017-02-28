@@ -146,7 +146,7 @@ void GanttInfoTree::clear()
     if(_root)
         callRecursively(_root, &deleteInfoItemFunc);
 
-    qDebug() << "TREE m_root size after clear " << _root->size();
+//    qDebug() << "TREE m_root size after clear " << _root->size();
 //    _root->clear();
 
     clearLimits();
@@ -160,7 +160,7 @@ void GanttInfoTree::clear()
 
 void GanttInfoTree::reset()
 {
-    qDebug() << "reset +";
+//    qDebug() << "reset +";
     if(!_model){
         qWarning("GanttInfoTree called reset w/o model");
         return;
@@ -171,7 +171,7 @@ void GanttInfoTree::reset()
 
     emit treeReset();
     onAnyAddition();
-    qDebug() << "reset -";
+//    qDebug() << "reset -";
 }
 
 void GanttInfoTree::onNodeExpanded()
@@ -203,7 +203,7 @@ void GanttInfoTree::onDataChanged(const QModelIndex &/*from*/, const QModelIndex
 void GanttInfoTree::onRowsInserted(const QModelIndex &parent, int start, int end)
 {
     qDebug() << "onRowsIns " << start << " " << end;
-    printTreeR(_root, 0);
+//    printTreeR(_root, 0);
     fill(qobject_cast<GanttInfoNode*>(infoForIndex(parent)), parent, start, end);
 
     onAnyAddition();

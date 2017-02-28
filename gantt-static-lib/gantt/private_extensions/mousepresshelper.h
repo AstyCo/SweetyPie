@@ -16,12 +16,13 @@ public:
     void press(const QPointF &pos);
     void doubleClick(const QPointF &pos);
     void move(const QPointF &pos);
+    void setSlided();
     void release();
 
-    bool isClick(const QPointF &pos) const;
-    bool isSlide(const QPointF &pos) const;
-    bool isHorSlide(const QPointF &pos);
-    bool isVerSlide(const QPointF &pos);
+    bool isClick() const;
+    bool isSlide() const;
+    bool isHorSlide();
+    bool isVerSlide();
 
     inline bool pressed() const;
     inline const QPointF &pos() const;
@@ -32,11 +33,19 @@ signals:
     void doubleClicked(const QPointF &pos);
 
 private:
+    bool isClickH(const QPointF &pos) const;
+
+private:
     bool _pressed;
-    QPointF _pressedAtPos, _nextPressedAtPos;
+    bool _doubleClick;
+    bool _slided;
+    bool _horSlide;
+    bool _verSlide;
+    QPointF _pressedAtPos;
+    QPointF _nextPressedAtPos;
+    QPointF _currentMousePos;
     qint64 _pressedAtMSecs;
 
-    bool _horSlide, _verSlide;
     QTimer _clickTimer;
 
 private slots:
