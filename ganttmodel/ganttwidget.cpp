@@ -87,6 +87,11 @@ void GanttWidget::setView(QTreeView *view, bool /*inner*/)
     _treeInfo->connectTreeView(view);
 }
 
+QAbstractItemModel *GanttWidget::model() const
+{
+    return _treeInfo->model();
+}
+
 void GanttWidget::showInterval()
 {
     setVisibleInterval(true);

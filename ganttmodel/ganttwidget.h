@@ -32,8 +32,9 @@ public:
     bool player() const;
 
     void setFactory(AbstractGanttFactory *factory);
-
     void setView(QTreeView *view, bool inner = false);
+
+    QAbstractItemModel *model() const;
 
 public slots:
 
