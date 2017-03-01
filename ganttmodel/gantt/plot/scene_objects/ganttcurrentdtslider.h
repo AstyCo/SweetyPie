@@ -2,7 +2,7 @@
 #define GANTTCURRENTTIMESLIDER_H
 
 #include "utcdatetime.h"
-#include "gantt/info/ganttinfonode.h"
+#include "gantt/info/ganttinfoitem.h"
 #include "extensions/dtline.h"
 
 

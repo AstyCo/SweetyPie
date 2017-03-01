@@ -1,7 +1,6 @@
 #include "ganttfactory.h"
 
-
-#include "gantt/info/ganttinfonode.h"
+#include "gantt/info/ganttinfoitem.h"
 #include "gantt/plot/scene_objects/ganttintervalgraphicsobject.h"
 #include "gantt/plot/scene_objects/ganttcalcgraphicsobject.h"
 
@@ -25,29 +24,13 @@ GanttFactory::~GanttFactory()
 GanttInfoItem *GanttFactory::createInfo(const QModelIndex &index)
 {
     if(_wrapper){
-        GanttInfoItem *item = NULL;
-
-        switch(readTag(_wrapper->tag(index))){
-        case GanttIntervalGraphicsObjectType:
-            item = new GanttInfoLeaf(_wrapper->title(index)
-                                     , _wrapper->start(index)
-                                     , _wrapper->length(index)
-                                     , index
-                                     , _wrapper->color(index) );
-            break;
-        case GanttCalcGraphicsObjectType:
-            item = new GanttInfoNode(_wrapper->title(index)
-                                     , _wrapper->start(index)
-                                     , index
-                                     , _wrapper->color(index) );
-            break;
-        default:
-            qWarning("GanttFactory::createInfo");
-        }
-        return item;
-
+        return new GanttInfoItem( _wrapper->title(index)
+                                  , _wrapper->start(index)
+                                  , _wrapper->length(index)
+                                  , index
+                                  , _wrapper->color(index) );
     }
-    qWarning("GanttFactory::createInfo");
+    qWarning("GanttFactory::createInfo called with NULL _wrapper");
     return NULL;
 }
 
@@ -56,24 +39,16 @@ GanttGraphicsObject *GanttFactory::createGraphicsObject(GanttInfoItem *info)
     if(_wrapper){
         switch(readTag(_wrapper->tag(info->index()))){
         case GanttIntervalGraphicsObjectType:
-            qDebug() << "created Interval" << info->title();
-            if(GanttInfoLeaf *leaf = qobject_cast<GanttInfoLeaf*>(info))
-                return new GanttIntervalGraphicsObject(leaf);
-            else
-                qWarning("not leaf");
-            break;
+//            qDebug() << "created Interval" << info->title();
+            return new GanttIntervalGraphicsObject(info);
         case GanttCalcGraphicsObjectType:
-            qDebug() << "created CalcDt" << info->title();
-            if(GanttInfoNode *node = qobject_cast<GanttInfoNode*>(info))
-                return new GanttCalcGraphicsObject(node);
-            else
-                qWarning("not node");
-            break;
+//            qDebug() << "created CalcDt" << info->title();
+            return new GanttCalcGraphicsObject(info);
         default:
             qWarning("GanttFactory::createGraphicsObject");
         }
     }
-    qWarning("GanttFactory::createGraphicsObject");
+    qWarning("GanttFactory::createGraphicsObject called with NULL _wrapper");
     return NULL;
 }
 

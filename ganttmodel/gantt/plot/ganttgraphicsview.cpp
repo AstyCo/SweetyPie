@@ -1,6 +1,6 @@
 #include "ganttgraphicsview.h"
 #include "ganttscene.h"
-#include "gantt/info/ganttinfonode.h"
+#include "gantt/info/ganttinfoitem.h"
 
 #include "gantt/private_extensions/gantt-lib_global_values.h"
 

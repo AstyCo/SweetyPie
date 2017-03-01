@@ -52,7 +52,7 @@ void GanttInfoTree::disconnectTreeView(QTreeView *view)
     }
 }
 
-GanttInfoNode *GanttInfoTree::root() const
+GanttInfoItem *GanttInfoTree::root() const
 {
     return _root;
 }
@@ -122,14 +122,14 @@ void GanttInfoTree::onClicked(const QModelIndex &index)
 
 void GanttInfoTree::onExpanded(const QModelIndex &index)
 {
-    GanttInfoNode *node = dynamic_cast<GanttInfoNode*>(infoForIndex(index));
+    GanttInfoItem *node = infoForIndex(index);
     if(node)
         node->setExpanded(true);
 }
 
 void GanttInfoTree::onCollapsed(const QModelIndex &index)
 {
-    GanttInfoNode *node = dynamic_cast<GanttInfoNode*>(infoForIndex(index));
+    GanttInfoItem *node = infoForIndex(index);
     if(node)
         node->setExpanded(false);
 }
@@ -176,7 +176,7 @@ void GanttInfoTree::reset()
 
 void GanttInfoTree::onNodeExpanded()
 {
-    GanttInfoNode *node = qobject_cast<GanttInfoNode*>(sender());
+    GanttInfoItem *node = qobject_cast<GanttInfoItem*>(sender());
     if(!node)
         return;
     emit expanded(node);
@@ -185,7 +185,7 @@ void GanttInfoTree::onNodeExpanded()
 
 void GanttInfoTree::onNodeCollapsed()
 {
-    GanttInfoNode *node = qobject_cast<GanttInfoNode*>(sender());
+    GanttInfoItem *node = qobject_cast<GanttInfoItem*>(sender());
     if(!node)
         return;
     emit collapsed(node);
@@ -204,7 +204,7 @@ void GanttInfoTree::onRowsInserted(const QModelIndex &parent, int start, int end
 {
     qDebug() << "onRowsIns " << start << " " << end;
 //    printTreeR(_root, 0);
-    fill(qobject_cast<GanttInfoNode*>(infoForIndex(parent)), parent, start, end);
+    fill(infoForIndex(parent), parent, start, end);
 
     onAnyAddition();
 }
@@ -251,7 +251,7 @@ void GanttInfoTree::updateLimits()
     updateLimitsByItem(_root);
 }
 
-GanttInfoItem *GanttInfoTree::lookupForVPos(int vpos, GanttInfoNode *node)
+GanttInfoItem *GanttInfoTree::lookupForVPos(int vpos, GanttInfoItem *node)
 {
     GanttInfoItem *foundItem = NULL;
     if(vpos < node->pos())
@@ -267,20 +267,16 @@ GanttInfoItem *GanttInfoTree::lookupForVPos(int vpos, GanttInfoNode *node)
         }
 
     if(foundItem){
-        GanttInfoNode *p_node = qobject_cast<GanttInfoNode*>(foundItem);
-        if(p_node){
-            if(p_node->size() == 0)
-                return p_node;
-            else
-                return lookupForVPos(vpos, p_node);
-        }
-        return foundItem;
+        if(foundItem->size() == 0)
+            return foundItem;
+        else
+            return lookupForVPos(vpos, foundItem);
     }
 
     return NULL; // not found
 }
 
-void GanttInfoTree::fill(GanttInfoNode *node, const QModelIndex &index, int from, int to)
+void GanttInfoTree::fill(GanttInfoItem *node, const QModelIndex &index, int from, int to)
 {
     if(!_model){
         qWarning("fill called reset w/o model");
@@ -321,7 +317,7 @@ void GanttInfoTree::init()
     _model = NULL;
     _factory = NULL;
 
-    _root = new GanttInfoNode(this);
+    _root = new GanttInfoItem(this);
     _root->setExpanded(true);
     _root->setTitle(QString("GanttInfoTree_ROOT"));
 
@@ -371,10 +367,8 @@ void GanttInfoTree::connectNewItem(GanttInfoItem *item)
 {
     connect(item,SIGNAL(aboutToBeDeleted()),this,SLOT(onItemAboutToBeDeleted()));
 
-    if(GanttInfoNode *node = qobject_cast<GanttInfoNode*>(item)){
-        connect(node,SIGNAL(expanded()),this,SLOT(onNodeExpanded()));
-        connect(node,SIGNAL(collapsed()),this,SLOT(onNodeCollapsed()));
-    }
+    connect(item,SIGNAL(expanded()),this,SLOT(onNodeExpanded()));
+    connect(item,SIGNAL(collapsed()),this,SLOT(onNodeCollapsed()));
 
 }
 
@@ -397,7 +391,7 @@ void GanttInfoTree::collapseAll()
 {
     for(int i = 0; i<_root->size() ; ++i)
     {
-        GanttInfoNode *node = _root->nodeAt(i);
+        GanttInfoItem *node = _root->at(i);
         if(node && node->isExpanded())
         {
             node->setExpanded(false);
@@ -416,8 +410,7 @@ void GanttInfoTree::fillByModelIndex(const QModelIndex &parent)
 //    qDebug() << "fillByModelIndex " << parent;
     if((!parent.isValid() || _model->canFetchMore(parent)) && _model->hasChildren(parent)){
 //        qDebug() << "fill " << parent << _model->rowCount(parent)-1;
-        fill(static_cast<GanttInfoNode*>(infoForIndex(parent)),
-             parent, 0, _model->rowCount(parent) - 1);
+        fill(infoForIndex(parent), parent, 0, _model->rowCount(parent) - 1);
 
         for(int i=0; i < _model->rowCount(parent); ++i)
             fillByModelIndex(_model->index(i, 0, parent));
@@ -432,10 +425,8 @@ void GanttInfoTree::setLimits(const QPair<UtcDateTime, UtcDateTime> &newLimits)
 
 int GanttInfoTree::heightH(GanttInfoItem *item) const
 {
-    if(GanttInfoNode *node = qobject_cast<GanttInfoNode*>(item)){
-        if(!node->isEmpty())
-            return heightH(node->at(node->size() - 1));
-    }
+    if(!item->isEmpty())
+        return heightH(item->at(item->size() - 1));
     return item->pos() + DEFAULT_ITEM_HEIGHT * 1.5;
 }
 

@@ -8,14 +8,13 @@
 
 class GanttHeader;
 class GanttScene;
-class GanttInfoNode;
 
 class GanttCalcGraphicsObject : public GanttTextGraphicsObject
 {
     Q_OBJECT
     void init();
 public:
-    GanttCalcGraphicsObject(GanttInfoNode* node,QGraphicsItem *parent = NULL);
+    GanttCalcGraphicsObject(GanttInfoItem* node,QGraphicsItem *parent = NULL);
 
     QPainterPath shape() const;
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);

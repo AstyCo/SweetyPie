@@ -1,8 +1,8 @@
 #ifndef TREEWALKER_H
 #define TREEWALKER_H
 
-#include "gantt/info/ganttinfonode.h"
-#include "gantt/info/ganttinfoleaf.h"
+#include "ganttproject_global.h"
+#include "gantt/info/ganttinfoitem.h"
 
 QString makeTabs(int n);
 GANTTMODELSHARED_EXPORT void printTreeR(GanttInfoItem *item, int nest);
@@ -10,12 +10,8 @@ GANTTMODELSHARED_EXPORT void printTreeR(GanttInfoItem *item, int nest);
 template <typename T>
 void callRecursively(GanttInfoItem *item, T (*functionPointer)(GanttInfoItem *))
 {
-    GanttInfoNode *node = qobject_cast<GanttInfoNode*>(item);
-
-    if (node) {
-        foreach (GanttInfoItem* childItem, node->items())
-            callRecursively(childItem, functionPointer);
-    }
+    foreach (GanttInfoItem* childItem, item->items())
+        callRecursively(childItem, functionPointer);
 
     (*functionPointer)(item);
 }
@@ -23,10 +19,8 @@ void callRecursively(GanttInfoItem *item, T (*functionPointer)(GanttInfoItem *))
 template <typename T, typename Param1, typename Arg1>
 void callRecursively(GanttInfoItem *item, T (*functionPointer)(GanttInfoItem *, Param1), const Arg1 &arg1)
 {
-    if ( GanttInfoNode *node = qobject_cast<GanttInfoNode*>(item)) {
-        foreach (GanttInfoItem* childItem, node->items())
-            callRecursively(childItem, functionPointer, arg1);
-    }
+    foreach (GanttInfoItem* childItem, item->items())
+        callRecursively(childItem, functionPointer, arg1);
 
     (*functionPointer)(item, arg1);
 }

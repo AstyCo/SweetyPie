@@ -11,8 +11,7 @@ QFontMetrics GanttTextGraphicsObject::_fontMetrics(GanttTextGraphicsObject::_cap
 GanttTextGraphicsObject::GanttTextGraphicsObject(GanttInfoItem *item, QGraphicsItem *parent)
     : GanttGraphicsObject( item, parent)
 {
-//    connect( item, SIGNAL(expanded()), this, SLOT(onExpansionChange()));
-//    connect( item, SIGNAL(collapsed()), this, SLOT(onExpansionChange()));
+
 }
 
 void GanttTextGraphicsObject::paint(QPainter *painter,

@@ -180,13 +180,13 @@ void GanttWidget::connectSceneWithInfo()
 
     connect(_treeInfo,SIGNAL(currentChanged(GanttInfoItem*)),_scene,SLOT(setCurrentItemByInfo(GanttInfoItem*)));
     connect(_treeInfo,SIGNAL(treeReset()),_scene,SLOT(onTreeInfoReset()));
-    connect(_treeInfo,SIGNAL(rowsInserted(GanttInfoNode*,int,int)),_scene,SLOT(addInfoItem(GanttInfoNode*,int,int)));
+    connect(_treeInfo,SIGNAL(rowsInserted(GanttInfoItem*,int,int)),_scene,SLOT(addInfoItem(GanttInfoItem*,int,int)));
 
 
     connect(_treeInfo,SIGNAL(endRemoveItems()),_scene,SLOT(updateSceneRect()));
 
-    connect(_treeInfo,SIGNAL(expanded(GanttInfoNode*)),_scene,SLOT(onExpanded(GanttInfoNode*)));
-    connect(_treeInfo,SIGNAL(collapsed(GanttInfoNode*)),_scene,SLOT(onCollapsed(GanttInfoNode*)));
+    connect(_treeInfo,SIGNAL(expanded(GanttInfoItem*)),_scene,SLOT(onExpanded(GanttInfoItem*)));
+    connect(_treeInfo,SIGNAL(collapsed(GanttInfoItem*)),_scene,SLOT(onCollapsed(GanttInfoItem*)));
     connect(_treeInfo,SIGNAL(limitsChanged(UtcDateTime,TimeSpan)),_scene,SLOT(onLimitsChanged(UtcDateTime,TimeSpan)));
 
 

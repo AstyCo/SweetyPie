@@ -1,7 +1,7 @@
 #include "ganttintervalgraphicsobject.h"
 #include "gantt/plot/ganttscene.h"
 #include "gantt/private_extensions/gantt-lib_global_values.h"
-#include "gantt/info/ganttinfonode.h"
+#include "gantt/info/ganttinfoitem.h"
 
 #include <QGraphicsSceneMouseEvent>
 #include <QPainter>
@@ -34,7 +34,7 @@ void GanttIntervalGraphicsObject::init()
     setAcceptHoverEvents(true);
 }
 
-GanttIntervalGraphicsObject::GanttIntervalGraphicsObject(GanttInfoLeaf *info,QGraphicsItem *parent) :
+GanttIntervalGraphicsObject::GanttIntervalGraphicsObject(GanttInfoItem *info, QGraphicsItem *parent) :
     GanttTextGraphicsObject(info,parent)
 {
     init();
@@ -95,8 +95,8 @@ void GanttIntervalGraphicsObject::paint(QPainter *painter,
 
 QString GanttIntervalGraphicsObject::textRight() const
 {
-    GanttInfoNode *parent = info()->parent();
-    if(parent && parent->isExpanded())
+    GanttInfoItem *parentNode = info()->parent();
+    if(parentNode && parentNode->isExpanded())
         return info()->title();
     return QString();
 }
@@ -142,7 +142,7 @@ void GanttIntervalGraphicsObject::updateToolTip()
 void GanttIntervalGraphicsObject::updateIntersection()
 {
     _intersection.clear();
-    GanttInfoNode *parentNode = info()->parent();
+    GanttInfoItem *parentNode = info()->parent();
 //    qDebug() << "updateIntersection " << info()->title() << parentNode->isExpanded();
     if(parentNode && !parentNode->isExpanded()){
         MyUtcDateTimeInterval thisInterval = info()->getInterval();

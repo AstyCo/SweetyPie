@@ -2,7 +2,7 @@
 #include "gantt/private_extensions/gantt-lib_global_values.h"
 
 #include "gantt/plot/ganttscene.h"
-#include "gantt/info/ganttinfonode.h"
+#include "gantt/info/ganttinfoitem.h"
 
 #include <QPainter>
 #include <QGraphicsSceneMouseEvent>
@@ -56,7 +56,7 @@ void GanttCalcGraphicsObject::init()
 
 }
 
-GanttCalcGraphicsObject::GanttCalcGraphicsObject(GanttInfoNode* node, QGraphicsItem *parent)
+GanttCalcGraphicsObject::GanttCalcGraphicsObject(GanttInfoItem *node, QGraphicsItem *parent)
     :GanttTextGraphicsObject(node,parent)
 {
     init();
@@ -81,9 +81,9 @@ void GanttCalcGraphicsObject::paint(QPainter *painter, const QStyleOptionGraphic
 
 QString GanttCalcGraphicsObject::textRight() const
 {
-    GanttInfoNode *node = qobject_cast<GanttInfoNode*>(info());
-    if(node && node->isExpanded())
-        return node->title();
+    GanttInfoItem *parentNode = info()->parent();
+    if(parentNode && parentNode->isExpanded())
+        return info()->title();
     return QString();
 }
 

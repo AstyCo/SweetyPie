@@ -52,8 +52,6 @@ SOURCES += \
     extensions/timespan_extension.cpp \
     gantt/factory/ganttfactory.cpp \
     gantt/info/ganttinfoitem.cpp \
-    gantt/info/ganttinfoleaf.cpp \
-    gantt/info/ganttinfonode.cpp \
     gantt/info/ganttinfotree.cpp \
     gantt/info/treewalker.cpp \
     gantt/player/ganttplayercontrol.cpp \
@@ -112,8 +110,6 @@ HEADERS += \
     extensions/timespan_extension.h \
     gantt/factory/ganttfactory.h \
     gantt/info/ganttinfoitem.h \
-    gantt/info/ganttinfoleaf.h \
-    gantt/info/ganttinfonode.h \
     gantt/info/ganttinfotree.h \
     gantt/info/treewalker.h \
     gantt/player/ganttplayercontrol.h \

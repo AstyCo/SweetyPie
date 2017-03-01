@@ -11,7 +11,7 @@ QAbstractItemModel *ModelWrapper::model() const{
 }
 
 QString ModelWrapper::tag(const QModelIndex &index) const{
-    if(_model && _model->leafForIndex(index))
+    if(_model && _model->itemForIndex(index)->title().contains("leaf"))
         return "Interval";
     return "CalcDt";
 }

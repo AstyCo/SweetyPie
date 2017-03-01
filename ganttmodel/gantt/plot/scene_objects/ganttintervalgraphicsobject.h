@@ -2,7 +2,6 @@
 #define GANTTGRAPHICSITEM_H
 
 #include "gantttextgraphicsobject.h"
-#include "gantt/info/ganttinfoleaf.h"
 #include "extensions/intervalunion.h"
 #include "extensions/qrectunion.h"
 
@@ -14,7 +13,7 @@ class GanttIntervalGraphicsObject : public GanttTextGraphicsObject
 
     void init();
 public:
-    GanttIntervalGraphicsObject(GanttInfoLeaf *info,QGraphicsItem *parent = 0);
+    GanttIntervalGraphicsObject(GanttInfoItem *info,QGraphicsItem *parent = 0);
 
 //    QRectF boundingRect() const;
     QPainterPath shape() const;

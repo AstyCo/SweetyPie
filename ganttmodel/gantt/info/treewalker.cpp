@@ -2,15 +2,10 @@
 
 void printTreeR(GanttInfoItem *item, int nest)
 {
-    if (GanttInfoNode *node = qobject_cast<GanttInfoNode*>(item)){
-        qDebug() << makeTabs(nest) + node->title();
+    qDebug() << makeTabs(nest) + item->title();
 
-        foreach(GanttInfoItem *childItem, node->items())
-            printTreeR(childItem, nest + 1);
-    }
-    else {
-        qDebug() << makeTabs(nest) + item->title();
-    }
+    foreach(GanttInfoItem *childItem, item->items())
+        printTreeR(childItem, nest + 1);
 }
 
 QString makeTabs(int n)

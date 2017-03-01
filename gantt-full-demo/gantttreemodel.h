@@ -1,8 +1,7 @@
 #ifndef GANTTTREEMODEL_H
 #define GANTTTREEMODEL_H
 
-#include "gantt/info/ganttinfoleaf.h"
-#include "gantt/info/ganttinfonode.h"
+#include "gantt/info/ganttinfoitem.h"
 
 #include <QAbstractItemModel>
 
@@ -26,7 +25,7 @@ public:
 
 
 public:
-    GanttTreeModel(GanttInfoNode *root = NULL,QObject * parent = 0);
+    GanttTreeModel(GanttInfoItem *root = NULL, QObject * parent = 0);
     ~GanttTreeModel();
 
     QVariant data(const QModelIndex &iGanttIndex, int role) const;
@@ -42,31 +41,28 @@ public:
     bool setData(const QModelIndex &iGanttIndex, const QVariant &value,
                  int role = Qt::EditRole);
 
-    void addItems(const QList<GanttInfoItem*>& items, GanttInfoNode *destNode = NULL);
-    void addNode(GanttInfoNode *node);
+    void addItems(const QList<GanttInfoItem*>& items, GanttInfoItem *destNode = NULL);
+    void addNode(GanttInfoItem *node);
 //    void addItems(GanttInfoItem* item, bool inner = false);
-    void insertItem(GanttInfoItem *item, GanttInfoNode *parent);
+    void insertItem(GanttInfoItem *item, GanttInfoItem *parent);
     bool canFetchMore(const QModelIndex &/*parent*/) const{
         return true;
     }
 
-    GanttInfoItem *itemForName(const QString& iGanttTitle, GanttInfoNode *parent = NULL) const;
+    GanttInfoItem *itemForName(const QString& iGanttTitle, GanttInfoItem *parent = NULL) const;
 
 
-    GanttInfoNode *root() const;
+    GanttInfoItem *root() const;
 
 
     GanttInfoItem* itemForIndex(const QModelIndex& iGanttIndex) const;
-    GanttInfoLeaf* leafForIndex(const QModelIndex& iGanttIndex) const;
-    GanttInfoNode* nodeForIndex(const QModelIndex& iGanttIndex) const;
-
 
     void printTree() const;
 
 signals:
     void itemsAdded(GanttInfoItem*);
     void itemsAdded();
-    void needCollapse(GanttInfoNode*);
+    void needCollapse(GanttInfoItem*);
 
 public slots:
     void clear();
@@ -74,11 +70,11 @@ public slots:
 private:
 
     void setIndex(GanttInfoItem* item);
-    GanttInfoItem *itemForNameHelper(const QString& iGanttTitle,GanttInfoNode* node) const;
+    GanttInfoItem *itemForNameHelper(const QString& iGanttTitle, GanttInfoItem *node) const;
 
 private:
 
-    GanttInfoNode *m_root;
+    GanttInfoItem *m_root;
 
     friend class GanttWidget;
 

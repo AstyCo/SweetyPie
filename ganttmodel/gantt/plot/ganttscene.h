@@ -5,22 +5,18 @@
 #include "scene_objects/ganttcurrentdtslider.h"
 #include "extensions-gui/interfaces/abstractganttfactory.h"
 #include "ganttdtline.h"
-
+#include "gantt/info/ganttinfotree.h"
 #include "hfitscene.h"
+
 #include <QMap>
 #include <QPointer>
 
-//class GanttGraphicsView;
 class GanttIntervalGraphicsObject;
 class GanttCalcGraphicsObject;
 class GanttGraphicsObject;
 class GanttDtCrossObject;
 class GanttHoverGraphicsObject;
 class GanttInfoTree;
-
-//class QModelIndex;
-
-#include "gantt/info/ganttinfotree.h"
 
 class GanttScene : public HFitScene
 {
@@ -46,8 +42,8 @@ protected:
 public slots:
     void onTreeInfoReset();
     void onItemAdded(GanttInfoItem *item);
-    void onExpanded(GanttInfoNode *which);
-    void onCollapsed(GanttInfoNode *which);
+    void onExpanded(GanttInfoItem *which);
+    void onCollapsed(GanttInfoItem *which);
 
     void drawBackground(QPainter *painter, const QRectF &rect); ///< Задний план содержит сетку
 
@@ -93,7 +89,7 @@ public slots:
     void setCurrentItemByInfo(GanttInfoItem *info);
     void setCurrentItem(GanttGraphicsObject *currentItem);
     void addInfoItem(GanttInfoItem *parent);
-    void addInfoItem(GanttInfoNode *parent, int from, int to);
+    void addInfoItem(GanttInfoItem *parent, int from, int to);
     void onLimitsChanged(const UtcDateTime &first, const TimeSpan&ts);
 
     GanttGraphicsObject *objectForPos(const QPointF& pos);
@@ -112,7 +108,7 @@ private:
 
     void drawBackgroundExpandedItems(QPainter *painter, const QRectF &rect);
     void drawBackgroundLines(QPainter *painter, const QRectF &rect);
-    void drawBackgroundExpandedNode(QPainter *painter, GanttInfoNode *node, int nest,
+    void drawBackgroundExpandedNode(QPainter *painter, GanttInfoItem *node, int nest,
                                     int bgLeft, int bgWidth, bool isLast);
     void drawBackgroundExpandedNodeRect(QPainter *painter, int nest,
                                         int bgLeft, int bgWidth,

@@ -10,7 +10,6 @@
 #include <QModelIndex>
 #include <QMutex>
 
-class GanttInfoNode;
 class UtcDateTime;
 
 class GANTTMODELSHARED_EXPORT GanttInfoItem : public QObject
@@ -18,21 +17,25 @@ class GANTTMODELSHARED_EXPORT GanttInfoItem : public QObject
     Q_OBJECT
     void init();
 public:
+    enum InfoType {
+        Node,
+        Leaf
+    };
+
     GanttInfoItem(QObject *parent = NULL);
     GanttInfoItem(const QString &title,
                   const UtcDateTime   &start,
-                  const TimeSpan      &ts,
+                  const TimeSpan      &ts = TimeSpan(),
                   const QModelIndex   &index = QModelIndex(),
                   const QColor        &color = Qt::green,
-                  GanttInfoNode       *parentNode = NULL,
+                  GanttInfoItem       *parentNode = NULL,
                   QObject             *parent = NULL);
     virtual ~GanttInfoItem();
 
-    GanttInfoNode *parent() const;
+    GanttInfoItem *parent() const;
     int row() const;
 
-    virtual int columnCount() const = 0;
-    virtual qreal height() const = 0;
+    qreal height() const;
     virtual qreal calcPos() const;
     int pos() const;
     qreal bottom() const;
@@ -43,29 +46,39 @@ public:
     QString     title() const;
     UtcDateTime start() const;
     TimeSpan timeSpan() const;
-    UtcDateTime finish() const;
     QColor      color() const;
+    UtcDateTime finish() const;
 
-    virtual bool isExpanded() const{
-        return false;
-    }
+    virtual bool isExpanded() const;
+    bool hasChilds() const;
     bool hasStart() const;
-    bool isDot() const;
-    virtual GanttInfoNode *node() = 0;
+    bool hasDuration() const;
+
     QList<GanttInfoItem *> siblings() const;
-
-
 
     static QPair<UtcDateTime,UtcDateTime> getLimits(const GanttInfoItem *root);
     QPair<UtcDateTime,UtcDateTime> getLimits() const;
     virtual bool operator==(const GanttInfoItem& another);
 
-    void increaseLinkCnt();
-    void reduceLinkCnt();
-    virtual int indexOf(const GanttInfoItem* p_item) const;
+    int indexOf(const GanttInfoItem* p_item) const;
+
+    GanttInfoItem *at(int index) const;
+    GanttInfoItem *operator[](int index) const;
+    QList<GanttInfoItem *> items() const;
+
+    int size() const;
+    bool isEmpty() const;
+    void clear();
+    void append(GanttInfoItem* item);
+    void append(const QList<GanttInfoItem*>& items);
+    bool removeOne(GanttInfoItem* item);
+
+    GanttInfoItem *closestNode();
+
 signals:
     void expanded();
     void collapsed();
+
     void parentChanged();
     void indexChanged();
     void titleChanged();
@@ -74,17 +87,24 @@ signals:
     void timeSpanChanged();
     void colorChanged();
     void posChanged();
+    void itemsChanged();
 
     void changed();
 
 public slots:
-    virtual void updatePos();
+    void setIndex(const QModelIndex &index);
+    void setParent(GanttInfoItem *parent);
     void setStart(const UtcDateTime &start);
     void setTimeSpan(const TimeSpan &ts);
     void setColor(const QColor &color);
     void setTitle(const QString &title);
-    void setIndex(const QModelIndex &index);
-    void setParent(GanttInfoNode *parent);
+
+    void setExpanded(bool expanded);
+    void changeExpanding();
+
+    void updatePos();
+    void increaseLinkCnt();
+    void reduceLinkCnt();
     void deleteInfoItem();
     void tryDelete();
 
@@ -95,22 +115,40 @@ public:
 
     MyUtcDateTimeInterval getInterval() const;
 
-protected:
+private slots:
+    void onChildDeleted();
+    void collapseChilds();
+    void onSelfExpandingChange();
+    void onItemExpandingChange(int id);
+
+
+private:
     virtual void disconnectParent();
     virtual void connectParent();
 private:
-    GanttInfoNode* _parent;
-    QModelIndex _index;
+    GanttInfoItem *_parent;         ///< represents parent
+    QModelIndex _index;             ///< info connects to model index
+//    InfoType _type;                 ///< proper way to check for whatis
+    QList<GanttInfoItem*> _items;   ///< list of child elements
+
+    //@{
+    /** The Data of GanttInfoItem */
 
     QString _title;
     MyUtcDateTimeInterval _interval;
     QColor _color;
+    //@}
 
-    int _pos;   // caches vertical pos
+    bool _expanded; ///< current expansion state
+    int _pos;       ///< caches vertical pos
+
+    //@{
+    /** For thread safe */
 
     unsigned int _linkCnt;
     bool _deleted;
     QMutex _mutex;
+    //@}
 };
 
 #endif // GANTTINFOITEM_H

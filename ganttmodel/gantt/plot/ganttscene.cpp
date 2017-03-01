@@ -9,8 +9,7 @@
 #include "scene_objects/ganttdtcrossobject.h"
 #include "scene_objects/gantthovergraphicsobject.h"
 
-#include "gantt/info/ganttinfoleaf.h"
-#include "gantt/info/ganttinfonode.h"
+#include "gantt/info/ganttinfoitem.h"
 
 #include <QApplication>
 #include <QGraphicsView>
@@ -429,13 +428,15 @@ void GanttScene::drawBackgroundExpandedItems(QPainter *painter, const QRectF &re
 {
     qreal   bgLeft = rect.left() - 1 ,
             bgWidth = rect.width() + 2;
-    GanttInfoNode *root = _treeInfo->root();
+    GanttInfoItem *root = _treeInfo->root();
     for(int i = 0; i < root->size(); ++i){
-        if(root->at(i)->bottom() < rect.top())
+        GanttInfoItem *node = root->at(i);
+
+        if(node->bottom() < rect.top())
             continue;
-        if(root->at(i)->pos() > rect.bottom())
+        if(node->pos() > rect.bottom())
             break;
-        GanttInfoNode *node = root->nodeAt(i);
+
         if(node && node->isExpanded())
             drawBackgroundExpandedNode(painter, node, 0, bgLeft, bgWidth, true);
     }
@@ -460,7 +461,7 @@ void GanttScene::drawBackgroundLines(QPainter *painter, const QRectF &rect)
     }
 }
 
-void GanttScene::drawBackgroundExpandedNode(QPainter *painter, GanttInfoNode *node,
+void GanttScene::drawBackgroundExpandedNode(QPainter *painter, GanttInfoItem *node,
                                             int nest, int bgLeft, int bgWidth, bool isLast)
 {
     static const int dy = 3;
@@ -473,8 +474,8 @@ void GanttScene::drawBackgroundExpandedNode(QPainter *painter, GanttInfoNode *no
     top += DEFAULT_ITEM_HEIGHT;
     if(node->isExpanded()){
         for (int i = 0; i < node->size(); ++i) {
-            GanttInfoNode *childNode = node->nodeAt(i);
-            if (childNode) {
+            GanttInfoItem *childNode = node->at(i);
+            if (childNode->isEmpty()) {
                 // draw node
                 drawBackgroundExpandedNodeRect(painter, nest + 1, bgLeft, bgWidth, top, bottom);
                 // draw child node
@@ -519,14 +520,13 @@ void GanttScene::addInfoItem(GanttInfoItem *parent)
         return;
     if(parent->parent())    // if not Root
         onItemAdded(parent);
-    if(GanttInfoNode *node = qobject_cast<GanttInfoNode*>(parent)){
-        for(int i = 0; i < node->size(); ++i){
-            addInfoItem(node->at(i));
-        }
+
+    for(int i = 0; i < parent->size(); ++i){
+        addInfoItem(parent->at(i));
     }
 }
 
-void GanttScene::addInfoItem(GanttInfoNode *parent, int from, int to)
+void GanttScene::addInfoItem(GanttInfoItem *parent, int from, int to)
 {
     if(!parent)
         return;
@@ -546,21 +546,17 @@ void GanttScene::onLimitsChanged(const UtcDateTime &first, const TimeSpan &ts)
 
 void GanttScene::updateIntersectionR(GanttInfoItem *item)
 {
-    if(GanttInfoNode *node = qobject_cast<GanttInfoNode*>(item)){
-        for(int i = 0; i < node->size(); ++i)
-            updateIntersectionR(node->at(i));
+    for (int i = 0; i < item->size(); ++i)
+        updateIntersectionR(item->at(i));
+
+    if (GanttIntervalGraphicsObject *graphicsObject
+            = qobject_cast<GanttIntervalGraphicsObject*>(itemForInfo(item))) {
+        graphicsObject->updateIntersection();
+
     }
-    else if(GanttInfoLeaf *leaf = qobject_cast<GanttInfoLeaf*>(item)){
-        if(!qobject_cast<GanttIntervalGraphicsObject*>(itemForInfo(leaf))){
-//            qDebug() << leaf->title() << leaf;
-            foreach(const GanttInfoItem* item,_itemForInfo.keys())
-                qDebug() << item->title() << item << _itemForInfo.value(item);
-            Q_ASSERT(false);
-        }
-        ((GanttIntervalGraphicsObject*)itemForInfo(leaf))->updateIntersection();
-    }
-    else
+    else {
         qCritical("GanttScene::updateIntersection");
+    }
 }
 
 void GanttScene::onDoubleClick(const QPointF &pos)
@@ -569,7 +565,7 @@ void GanttScene::onDoubleClick(const QPointF &pos)
     GanttGraphicsObject *object = objectForPos(_view->mapToScene(_view->mapFromGlobal(pos.toPoint())));
     if(object)
     {
-        GanttInfoNode *node = object->info()->node();
+        GanttInfoItem *node = object->info()->closestNode();
         if (node->parent()){    // not root
             if (node->isExpanded()) {
                 node->setExpanded(false);
@@ -589,7 +585,7 @@ void GanttScene::onClick(const QPointF &pos)
     if(object){
         setCurrentItem(object);
 
-        GanttInfoNode *node = object->info()->node();
+        GanttInfoItem *node = object->info()->closestNode();
         if (node->parent()){    // not root
             if (node->isExpanded())
                 emit currentItemChanged(object->info());
@@ -623,12 +619,12 @@ void GanttScene::onGraphicsItemHoverLeave()
         emit graphicsItemHoverLeave(graphicsObject->info());
 }
 
-void GanttScene::onExpanded(GanttInfoNode *which)
+void GanttScene::onExpanded(GanttInfoItem *which)
 {
     updateIntersectionR(which);
 }
 
-void GanttScene::onCollapsed(GanttInfoNode *which)
+void GanttScene::onCollapsed(GanttInfoItem *which)
 {
     updateIntersectionR(which);
 }

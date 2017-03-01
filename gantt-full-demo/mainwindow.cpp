@@ -54,7 +54,7 @@ void MainWindow::testGantt()
     QList<GanttInfoItem*> testList;
 
 //! [0] : add only leaf
-    GanttInfoLeaf *i0 = new GanttInfoLeaf(
+    GanttInfoItem *i0 = new GanttInfoItem(
                 "leaf0",
                 QDateTime::currentDateTime(),
                 TimeSpan(1,10,12,13)
@@ -62,21 +62,21 @@ void MainWindow::testGantt()
 //! [0]
 
 //! [1]
-    GanttInfoNode *i1 = new GanttInfoNode(
+    GanttInfoItem *i1 = new GanttInfoItem(
                 "node1",
                 QDateTime::currentDateTime()
                 );
-    GanttInfoLeaf   *i10 = new GanttInfoLeaf(
+    GanttInfoItem   *i10 = new GanttInfoItem(
                             "leaf1.0",
                             UtcDateTime(2017,02,03,15,33,10),
                             TimeSpan(1,10,12,13)
                             ),
-                    *i11 = new GanttInfoLeaf(
+                    *i11 = new GanttInfoItem(
                             "leaf1.1",
                             UtcDateTime(2017,02,05,15,33,10),
                             TimeSpan(1,10,12,13)
                             ),
-                    *i12 = new GanttInfoLeaf(
+                    *i12 = new GanttInfoItem(
                             "leaf1.2",
                             UtcDateTime(2017,02,04,15,33,10),
                             TimeSpan(1,10,12,13)
@@ -87,16 +87,16 @@ void MainWindow::testGantt()
 //! [1]
 
 //! [2]
-    GanttInfoNode *i2 = new GanttInfoNode(
+    GanttInfoItem *i2 = new GanttInfoItem(
                 "node2",
                 QDateTime::currentDateTime()
                 );
-    GanttInfoLeaf   *i20 = new GanttInfoLeaf(
+    GanttInfoItem   *i20 = new GanttInfoItem(
                             "leaf2.0",
                             UtcDateTime(QDateTime::currentDateTime()) - TimeSpan(4,0,0,0),
                             TimeSpan(3,10,12,13)
                             ),
-                    *i21 = new GanttInfoLeaf(
+                    *i21 = new GanttInfoItem(
                             "leaf2.1",
                             UtcDateTime(QDateTime::currentDateTime()) + TimeSpan(1,0,0,0),
                             TimeSpan(1,10,12,13)
@@ -106,26 +106,26 @@ void MainWindow::testGantt()
 //! [2]
 
 //! [3]
-    GanttInfoNode *i3 = new GanttInfoNode(
+    GanttInfoItem *i3 = new GanttInfoItem(
                 "node3",
                 QDateTime::currentDateTime() + TimeSpan(1,12,0,0)
                 );
-    GanttInfoLeaf   *i30 = new GanttInfoLeaf(
+    GanttInfoItem   *i30 = new GanttInfoItem(
                             "leaf3.0",
                             UtcDateTime(QDateTime::currentDateTime()) - TimeSpan(1,0,0,0),
                             TimeSpan(0,0,0,1)
                             ),
-                    *i31 = new GanttInfoLeaf(
+                    *i31 = new GanttInfoItem(
                             "leaf3.1",
                             UtcDateTime(QDateTime::currentDateTime()) + TimeSpan(1,0,0,0),
                             TimeSpan(0,0,0,1)
                             ),
-                    *i32 = new GanttInfoLeaf(
+                    *i32 = new GanttInfoItem(
                             "leaf3.2",
                             UtcDateTime(QDateTime::currentDateTime()) + TimeSpan(2,0,0,0),
                             TimeSpan(0,0,0,1)
                             ),
-                    *i33 = new GanttInfoLeaf(
+                    *i33 = new GanttInfoItem(
                             "leaf3.3",
                             UtcDateTime(QDateTime::currentDateTime()) + TimeSpan(0,12,0,0),
                             TimeSpan(3,0,0,1)
@@ -134,21 +134,21 @@ void MainWindow::testGantt()
 //! [3]
 
 //! [4]
-    GanttInfoNode *i4 = new GanttInfoNode(
+    GanttInfoItem *i4 = new GanttInfoItem(
                 "node4",
                 QDateTime::currentDateTime()
                 );
-    GanttInfoLeaf   *i40 = new GanttInfoLeaf(
+    GanttInfoItem   *i40 = new GanttInfoItem(
                             "leaf4.0",
                             UtcDateTime(QDateTime::currentDateTime()) + TimeSpan(1,0,0,0),
                             TimeSpan(0,0,0,1)
                             ),
-                    *i41 = new GanttInfoLeaf(
+                    *i41 = new GanttInfoItem(
                             "leaf4.1",
                             UtcDateTime(QDateTime::currentDateTime()) + TimeSpan(1,0,0,0),
                             TimeSpan(0,0,0,1)
                             ),
-                    *i42 = new GanttInfoLeaf(
+                    *i42 = new GanttInfoItem(
                             "leaf4.2",
                             UtcDateTime(QDateTime::currentDateTime()) + TimeSpan(1,0,0,0),
                             TimeSpan(0,0,0,1)
@@ -157,21 +157,21 @@ void MainWindow::testGantt()
 //! [4]
 
 //! [5]
-    GanttInfoNode *i5 = new GanttInfoNode(
+    GanttInfoItem *i5 = new GanttInfoItem(
                 "node5",
                 QDateTime::currentDateTime()
                 );
-    GanttInfoLeaf   *i50 = new GanttInfoLeaf(
+    GanttInfoItem   *i50 = new GanttInfoItem(
                             "leaf5.0",
                             UtcDateTime(QDateTime::currentDateTime()) + TimeSpan(1,0,0,0),
                             TimeSpan(2,0,0,0)
                             ),
-                    *i51 = new GanttInfoLeaf(
+                    *i51 = new GanttInfoItem(
                             "leaf5.1",
                             UtcDateTime(QDateTime::currentDateTime()) + TimeSpan(1,0,0,0),
                             TimeSpan(2,0,0,0)
                             ),
-                    *i52 = new GanttInfoLeaf(
+                    *i52 = new GanttInfoItem(
                             "leaf5.2",
                             UtcDateTime(QDateTime::currentDateTime()) + TimeSpan(1,0,0,0),
                             TimeSpan(2,0,0,0)
@@ -180,29 +180,29 @@ void MainWindow::testGantt()
 //! [5]
 
 //! [6]
-    GanttInfoNode   *i6 = new GanttInfoNode(
+    GanttInfoItem   *i6 = new GanttInfoItem(
                         "node6",
                         QDateTime::currentDateTime()
                         );
-    GanttInfoNode   *i60 = new GanttInfoNode(
+    GanttInfoItem   *i60 = new GanttInfoItem(
                         "node6.0",
                         QDateTime::currentDateTime() + TimeSpan(1, 0, 0, 0)
                         );
-    GanttInfoNode   *i600 = new GanttInfoNode(
+    GanttInfoItem   *i600 = new GanttInfoItem(
                         "leaf6.0.0",
                         QDateTime::currentDateTime() + TimeSpan(2, 0, 0, 0)
                         );
-    GanttInfoLeaf   *i6000 = new GanttInfoLeaf(
+    GanttInfoItem   *i6000 = new GanttInfoItem(
                         "leaf6.0.0.0",
                         UtcDateTime(QDateTime::currentDateTime()) + TimeSpan(0,0,0,0),
                         TimeSpan(2,0,0,0)
                         );
-    GanttInfoLeaf   *i6001 = new GanttInfoLeaf(
+    GanttInfoItem   *i6001 = new GanttInfoItem(
                         "leaf6.0.0.1",
                         UtcDateTime(QDateTime::currentDateTime()) + TimeSpan(1,0,0,0),
                         TimeSpan(2,0,0,0)
                         );
-    GanttInfoLeaf   *i6002 = new GanttInfoLeaf(
+    GanttInfoItem   *i6002 = new GanttInfoItem(
                         "leaf6.0.0.2",
                         UtcDateTime(QDateTime::currentDateTime()) + TimeSpan(2,0,0,0),
                         TimeSpan(2,0,0,0)
@@ -223,7 +223,7 @@ QList<GanttInfoItem*> generateTest()
     QList<GanttInfoItem*> testList;
     for(int i = kk; i<80 + kk; ++i)
     {
-        GanttInfoNode *node = new GanttInfoNode;
+        GanttInfoItem *node = new GanttInfoItem;
 
         node->setTitle("node"+QString::number(i));
         int year = 2014 + qrand()%2,
@@ -241,7 +241,7 @@ QList<GanttInfoItem*> generateTest()
 
         for(int j = 0; j<max; ++j)
         {
-            GanttInfoLeaf *leaf = new GanttInfoLeaf;
+            GanttInfoItem *leaf = new GanttInfoItem;
 
             int year = 2016,
                     month = 1 /*+ qrand()%6*/,

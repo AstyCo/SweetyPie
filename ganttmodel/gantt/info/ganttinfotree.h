@@ -1,8 +1,8 @@
 #ifndef GANTTINFOTREE_H
 #define GANTTINFOTREE_H
 
-#include "ganttinfonode.h"
 #include "extensions-gui/interfaces/abstractganttfactory.h"
+#include "utcdatetime.h"
 
 #include <QObject>
 #include <QAbstractItemModel>
@@ -27,7 +27,7 @@ public:
     GanttInfoItem *nextStart(const UtcDateTime &dt) const;
     GanttInfoItem *prevFinish(const UtcDateTime &dt) const;
 
-    GanttInfoNode *root() const;
+    GanttInfoItem *root() const;
     GanttInfoItem *infoForVPos(int vpos);
     int height() const;
 
@@ -35,7 +35,7 @@ public:
 signals:
     void treeReset();
     void limitsChanged(const UtcDateTime &min, const TimeSpan &ts);
-    void rowsInserted(GanttInfoNode *parent, int from, int to);
+    void rowsInserted(GanttInfoItem *parent, int from, int to);
     void endRemoveItems();
     void itemAdded(GanttInfoItem *item);
     void itemAboutToBeDeleted(GanttInfoItem *item);
@@ -44,8 +44,8 @@ signals:
     void currentChanged(GanttInfoItem *item);
     void needExpand(const QModelIndex &index);
     void needCollapse(const QModelIndex &index);
-    void expanded(GanttInfoNode *which);
-    void collapsed(GanttInfoNode *which);
+    void expanded(GanttInfoItem *which);
+    void collapsed(GanttInfoItem *which);
 
 public slots:
     void onCurrentItemChanged(const GanttInfoItem *item);
@@ -77,8 +77,8 @@ private:
     void setLimits(const QPair<UtcDateTime, UtcDateTime> &newLimits);
     int  heightH(GanttInfoItem *item) const;
     void onAnyAddition();
-    GanttInfoItem *lookupForVPos(int vpos, GanttInfoNode *node);
-    void fill(GanttInfoNode *node, const QModelIndex &index, int from, int to);
+    GanttInfoItem *lookupForVPos(int vpos, GanttInfoItem *node);
+    void fill(GanttInfoItem *node, const QModelIndex &index, int from, int to);
     GanttInfoItem *makeInfoItem(const QModelIndex &index);
     void disconnectLastModel();
     void connectNewModel();
@@ -87,7 +87,7 @@ private:
                               GanttInfoItem *item);
 private:
     QAbstractItemModel *_model;
-    GanttInfoNode *_root;
+    GanttInfoItem *_root;
     AbstractGanttFactory *_factory;
 
 
