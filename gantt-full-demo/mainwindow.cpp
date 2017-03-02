@@ -185,7 +185,7 @@ void MainWindow::testGantt()
                         QDateTime::currentDateTime()
                         );
     GanttInfoItem   *i60 = new GanttInfoItem(
-                        "node6.0",
+                        "leafButNode6.0",
                         QDateTime::currentDateTime() + TimeSpan(1, 0, 0, 0)
                         );
     GanttInfoItem   *i600 = new GanttInfoItem(

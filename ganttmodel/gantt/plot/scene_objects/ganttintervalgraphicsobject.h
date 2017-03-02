@@ -15,7 +15,6 @@ class GanttIntervalGraphicsObject : public GanttTextGraphicsObject
 public:
     GanttIntervalGraphicsObject(GanttInfoItem *info,QGraphicsItem *parent = 0);
 
-//    QRectF boundingRect() const;
     QPainterPath shape() const;
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
 

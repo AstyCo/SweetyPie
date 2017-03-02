@@ -40,16 +40,6 @@ GanttIntervalGraphicsObject::GanttIntervalGraphicsObject(GanttInfoItem *info, QG
     init();
 }
 
-
-//QRectF GanttIntervalGraphicsObject::boundingRect() const
-//{
-//    if(!_isSmall)
-//        return QRectF(QPointF(0, RECTANGLE_OFFSET),
-//                      QSize(_boundingRectSize.width(), _boundingRectSize.height() - 2 * RECTANGLE_OFFSET));
-//    return QRectF(QPointF( -MIN_VIS_WIDTH/2 - 1, RECTANGLE_OFFSET),
-//                  QPointF(_boundingRectSize.width()+ MIN_VIS_WIDTH/2 + 1,_boundingRectSize.height() - RECTANGLE_OFFSET));
-//}
-
 QPainterPath GanttIntervalGraphicsObject::shape() const
 {
     if(!_isSmall){
@@ -96,7 +86,11 @@ void GanttIntervalGraphicsObject::paint(QPainter *painter,
 QString GanttIntervalGraphicsObject::textRight() const
 {
     GanttInfoItem *parentNode = info()->parent();
-    if(parentNode && parentNode->isExpanded())
+
+    if ( parentNode
+            && parentNode->isExpanded()
+            && ( info()->isExpanded()
+                 || info()->isEmpty() ))
         return info()->title();
     return QString();
 }

@@ -82,7 +82,11 @@ void GanttCalcGraphicsObject::paint(QPainter *painter, const QStyleOptionGraphic
 QString GanttCalcGraphicsObject::textRight() const
 {
     GanttInfoItem *parentNode = info()->parent();
-    if(parentNode && parentNode->isExpanded())
+
+    if ( parentNode
+            && parentNode->isExpanded()
+            && ( info()->isExpanded()
+                 || info()->isEmpty() ))
         return info()->title();
     return QString();
 }

@@ -6,5 +6,5 @@ SUBDIRS +=  \
 #            gantt-static-lib \
 #            gantt-dtline-demo \
             ganttmodel \
-            ganttmodel_test \
+#            ganttmodel_test \
             gantt-full-demo

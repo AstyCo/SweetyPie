@@ -465,6 +465,7 @@ void GanttScene::drawBackgroundExpandedNode(QPainter *painter, GanttInfoItem *no
                                             int nest, int bgLeft, int bgWidth, bool isLast)
 {
     static const int dy = 3;
+
     int top = node->pos();
     int bottom = top + DEFAULT_ITEM_HEIGHT;
 
@@ -475,7 +476,7 @@ void GanttScene::drawBackgroundExpandedNode(QPainter *painter, GanttInfoItem *no
     if(node->isExpanded()){
         for (int i = 0; i < node->size(); ++i) {
             GanttInfoItem *childNode = node->at(i);
-            if (childNode->isEmpty()) {
+            if (childNode->hasChilds()) {
                 // draw node
                 drawBackgroundExpandedNodeRect(painter, nest + 1, bgLeft, bgWidth, top, bottom);
                 // draw child node
