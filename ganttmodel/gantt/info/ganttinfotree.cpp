@@ -390,13 +390,7 @@ void GanttInfoTree::emitLimitsChanged()
 void GanttInfoTree::collapseAll()
 {
     for(int i = 0; i<_root->size() ; ++i)
-    {
-        GanttInfoItem *node = _root->at(i);
-        if(node && node->isExpanded())
-        {
-            node->setExpanded(false);
-        }
-    }
+        _root->at(i)->collapse();
 }
 
 void GanttInfoTree::clearLimits()

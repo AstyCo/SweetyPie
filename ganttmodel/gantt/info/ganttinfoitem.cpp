@@ -60,6 +60,16 @@ void GanttInfoItem::setExpanded(bool newExpanded)
         _expanded = newExpanded;
 }
 
+void GanttInfoItem::collapse()
+{
+    setExpanded(false);
+}
+
+void GanttInfoItem::expand()
+{
+    setExpanded(true);
+}
+
 void GanttInfoItem::changeExpanding()
 {
     setExpanded(!isExpanded());
@@ -222,17 +232,24 @@ void GanttInfoItem::collapseChilds()
 
 void GanttInfoItem::onSelfExpandingChange()
 {
-    for(int i = 0; i < size(); ++i)
-        at(i)->updatePos();
+    onItemExpandingChange(-1);
+//    for(int i = 0; i < size(); ++i)
+//        at(i)->updatePos();
 
-    if(parent())
-        parent()->onItemExpandingChange(row());
+//    if(_parent)
+//        _parent->onItemExpandingChange(this->row());
 }
 
 void GanttInfoItem::onItemExpandingChange(int id)
 {
+    if(id < 0)
+        id = -1;
+
     for (int i = id + 1; i < size(); ++i)
         at(i)->updatePos();
+
+    if(_parent)
+        _parent->onItemExpandingChange(this->row());
 }
 
 QColor GanttInfoItem::color() const
@@ -430,7 +447,7 @@ qreal GanttInfoItem::calcPos() const
     if(!_parent->isExpanded())
         return base;
 
-    qreal offset = (_parent->parent())?(DEFAULT_ITEM_HEIGHT):(0); // if root needn't extra offset
+    qreal offset = (_parent->parent() ? DEFAULT_ITEM_HEIGHT : 0); // if root needn't extra offset
     const QList<GanttInfoItem*>& items = _parent->_items;
     // looking for this item, stops on found
     for(int i = 0; i < items.size(); ++i)

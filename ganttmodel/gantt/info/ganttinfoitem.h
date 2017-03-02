@@ -100,6 +100,8 @@ public slots:
     void setTitle(const QString &title);
 
     void setExpanded(bool expanded);
+    void collapse();
+    void expand();
     void changeExpanding();
 
     void updatePos();
