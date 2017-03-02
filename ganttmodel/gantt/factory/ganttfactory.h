@@ -1,3 +1,11 @@
+/*!
+ * \file
+ * \brief Header with default implementation of AbstractGanttFactory
+ *
+ * Class GanttFactory implements abstract methods of AbstractGanttFactory,
+ * using realisation of IModelWrapper interface (GanttFactory follows
+ * Template Method pattern).
+*/
 #ifndef GANTTFACTORY_H
 #define GANTTFACTORY_H
 
