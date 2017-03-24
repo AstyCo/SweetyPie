@@ -210,11 +210,11 @@ void GanttTreeModel::clear()
 
 }
 
-void GanttTreeModel::reset()
-{
-    clear();
-    QAbstractItemModel::reset();
-}
+//void GanttTreeModel::reset()
+//{
+//    clear();
+//    QAbstractItemModel::reset();
+//}
 
 
 

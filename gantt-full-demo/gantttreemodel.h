@@ -69,7 +69,7 @@ signals:
 
 public slots:
     void clear();
-    void reset();
+//    void reset();
 
 private:
 
