@@ -1,3 +1,10 @@
+/*!
+ * \file
+ * \~russian
+ * \brief Файл содержит реализацию GanttGraphicsObject class.
+ * \~englist
+ * \brief File contains realization of GanttGraphicsObject class.
+ */
 #include "ganttgraphicsobject.h"
 #include "gantt/plot/ganttscene.h"
 #include "gantt/info/ganttinfoitem.h"

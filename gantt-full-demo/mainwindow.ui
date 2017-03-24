@@ -110,6 +110,20 @@
            </widget>
           </item>
           <item>
+           <widget class="QPushButton" name="pushButton_ganttDump">
+            <property name="text">
+             <string>Сохранить</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="pushButton_ganttLoad">
+            <property name="text">
+             <string>Загрузить</string>
+            </property>
+           </widget>
+          </item>
+          <item>
            <widget class="QPushButton" name="pushButton_ganttClear">
             <property name="text">
              <string>Очистить</string>
@@ -117,16 +131,16 @@
            </widget>
           </item>
           <item>
-           <widget class="QPushButton" name="pushButton_ganttAddItems">
+           <widget class="QPushButton" name="pushButton_ganttAddItem">
             <property name="text">
-             <string>Добавить</string>
+             <string>Добавить событие</string>
             </property>
            </widget>
           </item>
           <item>
-           <widget class="QPushButton" name="pushButton">
+           <widget class="QPushButton" name="pushButton_ganttAddItems">
             <property name="text">
-             <string>Добавить спец.</string>
+             <string>Добавить ген.</string>
             </property>
            </widget>
           </item>

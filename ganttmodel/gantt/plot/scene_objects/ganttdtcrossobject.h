@@ -1,3 +1,10 @@
+/*!
+ * \file
+ * \~russian
+ * \brief Файл содержит объявление GanttDtCrossObject class.
+ * \~englist
+ * \brief File contains definition of GanttDtCrossObject class.
+ */
 #ifndef GANTTDTCROSSOBJECT_H
 #define GANTTDTCROSSOBJECT_H
 
@@ -9,6 +16,12 @@
 
 class GanttScene;
 
+/*!
+ * \~russian
+ * \brief Класс GanttDtCrossObject class отображает окно с текущее временем
+ * \~english
+ * \brief The GanttDtCrossObject class represents window with current time
+ */
 class GanttDtCrossObject : public QGraphicsObject
 {
 

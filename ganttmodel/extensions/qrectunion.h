@@ -1,3 +1,10 @@
+/*!
+ * \file
+ * \~russian
+ * \brief Файл содержит объявление QRectFUnion class.
+ * \~englist
+ * \brief File contains definition of QRectFUnion class.
+ */
 #ifndef QRECTUNION_H
 #define QRECTUNION_H
 
@@ -7,6 +14,12 @@
 #include <QRect>
 #include <QDebug>
 
+/*!
+ * \~russian
+ * \brief Класс GanttCurrentDtSlider class представляет объединение QRectF class
+ * \~english
+ * \brief The IntervalUnion class class represents union of QRectF class
+ */
 class GANTTMODELSHARED_EXPORT QRectFUnion
 {
     friend QRectFUnion operator*(const QRectFUnion &f, qreal coef);

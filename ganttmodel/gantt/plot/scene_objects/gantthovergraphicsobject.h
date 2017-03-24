@@ -1,3 +1,10 @@
+/*!
+ * \file
+ * \~russian
+ * \brief Файл содержит объявление GanttHoverGraphicsObject class.
+ * \~englist
+ * \brief File contains definition of GanttHoverGraphicsObject class.
+ */
 #ifndef GANTTHOVERGRAPHICSOBJECT_H
 #define GANTTHOVERGRAPHICSOBJECT_H
 
@@ -7,6 +14,12 @@
 
 class GanttScene;
 
+/*!
+ * \~russian
+ * \brief Класс GanttHoverGraphicsObject class подсвечивает выбранное событие
+ * \~english
+ * \brief The GanttHoverGraphicsObject class highlihts chosen event
+ */
 class GanttHoverGraphicsObject : public QGraphicsObject
 {
     Q_OBJECT

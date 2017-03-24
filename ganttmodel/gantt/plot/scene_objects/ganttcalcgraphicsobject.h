@@ -1,3 +1,10 @@
+/*!
+ * \file
+ * \~russian
+ * \brief Файл содержит объявление GanttCalcGraphicsObject class.
+ * \~englist
+ * \brief File contains definition of GanttCalcGraphicsObject class.
+ */
 #ifndef GANTTCALCGRAPHICSITEM_H
 #define GANTTCALCGRAPHICSITEM_H
 
@@ -9,6 +16,12 @@
 class GanttHeader;
 class GanttScene;
 
+/*!
+ * \~russian
+ * \brief Класс GanttIntervalGraphicsObject class точечное событие (с подписью)
+ * \~english
+ * \brief The GanttIntervalGraphicsObject class is dot event
+ */
 class GanttCalcGraphicsObject : public GanttTextGraphicsObject
 {
     Q_OBJECT

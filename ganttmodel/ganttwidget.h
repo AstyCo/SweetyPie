@@ -1,3 +1,10 @@
+/*!
+ * \file
+ * \~russian
+ * \brief Файл содержит объявление GanttWidget class.
+ * \~englist
+ * \brief File contains definition of GanttWidget class.
+ */
 #ifndef GANTTWIDGET_H
 #define GANTTWIDGET_H
 
@@ -18,7 +25,12 @@ class GanttWidget;
 
 class GanttScene;
 
-
+/*!
+ * \~russian
+ * \brief Класс GanttWidget class предоставляет функции для работы с диаграммой Ганта.
+ * \~english
+ * \brief The GanttWidget class сlass let the functionality to work with Gantt chart.
+ */
 class GANTTMODELSHARED_EXPORT GanttWidget : public QWidget
 {
     Q_OBJECT
@@ -29,12 +41,23 @@ public:
 
     void setCurrentDt(const UtcDateTime &dt);
     void setPlayerSpeeds(qreal minMultiply, qreal maxMultiply);///< Устанавливает минимальную и максимальную скорости воспроизведения
+    /// \return Плеер отображен?
     bool player() const;
-
+    /// Устанавливает AbstractGanttFactory class
     void setFactory(AbstractGanttFactory *factory);
+    /// Устанавливает QTreeView class связанную с диаграммой Ганта
     void setView(QTreeView *view, bool inner = false);
 
     QAbstractItemModel *model() const;
+
+    /// \return UtcDateTime class время для QPointF class точки в QWidget class координатах
+    UtcDateTime dtForPos(const QPointF &pos) const;
+
+    /// \return QModelIndex class индекс элемента текущей модели(GanttWidget::model) для QPointF class точки в QWidget class координатах
+    QModelIndex indexForPos(const QPointF &pos) const;
+
+    QPoint mapPosToGlobal(const QPoint &pos) const;
+
 
 public slots:
 

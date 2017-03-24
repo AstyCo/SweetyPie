@@ -1,3 +1,10 @@
+/*!
+ * \file
+ * \~russian
+ * \brief Файл содержит реализацию GanttIntervalGraphicsObject class.
+ * \~englist
+ * \brief File contains realization of GanttIntervalGraphicsObject class.
+ */
 #include "ganttintervalgraphicsobject.h"
 #include "gantt/plot/ganttscene.h"
 #include "gantt/private_extensions/gantt-lib_global_values.h"
@@ -153,9 +160,9 @@ void GanttIntervalGraphicsObject::updateIntersection()
 
 void GanttIntervalGraphicsObject::mousePressEvent(QGraphicsSceneMouseEvent *event)
 {
-    qDebug() << "Hi, My boundingRect:" << boundingRect()
-             << "My _intersection:"<<_intersection
-             << "My _current:" << _current;
+//    qDebug() << "Hi, My boundingRect:" << boundingRect()
+//             << "My _intersection:"<<_intersection
+//             << "My _current:" << _current;
     QGraphicsItem::mousePressEvent(event);
 }
 

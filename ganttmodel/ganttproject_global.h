@@ -1,3 +1,10 @@
+/*!
+ * \file
+ * \~russian
+ * \brief Файл для экспорта C++ библиотеки
+ * \~englist
+ * \brief File for export C++ lib
+ */
 #ifndef GANTTMODEL_GLOBAL_H
 #define GANTTMODEL_GLOBAL_H
 

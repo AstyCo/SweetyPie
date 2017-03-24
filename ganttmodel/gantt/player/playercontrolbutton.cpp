@@ -1,3 +1,10 @@
+/*!
+ * \file
+ * \~russian
+ * \brief Файл содержит реализацию PlayerControlButton class.
+ * \~englist
+ * \brief File contains realization of PlayerControlButton class.
+ */
 #include "playercontrolbutton.h"
 
 #include <QPainter>

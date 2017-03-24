@@ -1,10 +1,22 @@
+/*!
+ * \file
+ * \~russian
+ * \brief Файл содержит объявление IModelWrapper class.
+ * \~englist
+ * \brief File contains definition of IModelWrapper class.
+ */
 #ifndef MOUSEPRESSHELPER_H
 #define MOUSEPRESSHELPER_H
 
 #include <QPoint>
 #include <QObject>
 #include <QTimer>
-
+/*!
+ * \~russian
+ * \brief Класс MousePressHelper class инкапсулирует обработку событий мыши
+ * \~english
+ * \brief The MousePressHelper class incapsulates mouse handling
+ */
 class MousePressHelper : public QObject
 {
     Q_OBJECT

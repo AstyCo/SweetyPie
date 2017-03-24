@@ -1,3 +1,10 @@
+/*!
+ * \file
+ * \~russian
+ * \brief Файл содержит объявление GanttPlayerControl class.
+ * \~englist
+ * \brief File contains definition of GanttPlayerControl class.
+ */
 #ifndef GANTTPLAYERCONTROL_H
 #define GANTTPLAYERCONTROL_H
 
@@ -10,6 +17,12 @@ class GanttPlayerControl;
 class GanttPlayerSettings;
 class PlayerControlButton;
 
+/*!
+ * \~russian
+ * \brief Класс GanttPlayerControl class - элемент управления плеером
+ * \~english
+ * \brief The GanttPlayerControl class class is player's control element
+ */
 class GanttPlayerControl : public QWidget
 {
     Q_OBJECT

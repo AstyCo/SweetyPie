@@ -1,3 +1,10 @@
+/*!
+ * \file
+ * \~russian
+ * \brief Файл содержит вспомогательный функции для работы с древовидными структурами
+ * \~englist
+ * \brief File contains functions to work with tree structures
+ */
 #ifndef TREEWALKER_H
 #define TREEWALKER_H
 

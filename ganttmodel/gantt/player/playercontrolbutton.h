@@ -1,3 +1,10 @@
+/*!
+ * \file
+ * \~russian
+ * \brief Файл содержит объявление PlayerControlButton class.
+ * \~englist
+ * \brief File contains definition of PlayerControlButton class.
+ */
 #ifndef PLAYERCONTROLBUTTON_H
 #define PLAYERCONTROLBUTTON_H
 
@@ -5,6 +12,12 @@
 #include <QIcon>
 #include <QPen>
 
+/*!
+ * \~russian
+ * \brief Класс PlayerControlButton class - кнопка плеера
+ * \~english
+ * \brief The PlayerControlButton class is player button
+ */
 class PlayerControlButton : public QPushButton
 {
     Q_OBJECT

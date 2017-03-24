@@ -1,3 +1,10 @@
+/*!
+ * \file
+ * \~russian
+ * \brief Файл содержит объявление GanttIntervalSlider class.
+ * \~englist
+ * \brief File contains definition of GanttIntervalSlider class.
+ */
 #ifndef GANTTINTERVALSLIDER_H
 #define GANTTINTERVALSLIDER_H
 
@@ -8,6 +15,12 @@
 
 class GanttWidget;
 
+/*!
+ * \~russian
+ * \brief Класс GanttIntervalSlider class является IntervalSlider class с UtcDataTime class значениями
+ * \~english
+ * \brief The GanttIntervalSlider class is IntervalSlider class with UtcDataTime class values
+ */
 class GanttIntervalSlider : public IntervalSlider, public IDtInterval
 {
     Q_OBJECT

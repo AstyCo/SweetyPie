@@ -1,3 +1,10 @@
+/*!
+ * \file
+ * \~russian
+ * \brief Файл содержит реализацию MyUtcDateTimeInterval class.
+ * \~englist
+ * \brief File contains realization of MyUtcDateTimeInterval class.
+ */
 #include "myutcdatetimeinterval.h"
 
 MyUtcDateTimeInterval::MyUtcDateTimeInterval()

@@ -1,3 +1,10 @@
+/*!
+ * \file
+ * \~russian
+ * \brief Файл содержит реализацию IntervalUnion class.
+ * \~englist
+ * \brief File contains realization of IntervalUnion class.
+ */
 #include "intervalunion.h"
 #include "extensions/timespan_extension.h"
 

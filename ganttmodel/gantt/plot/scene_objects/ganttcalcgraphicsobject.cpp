@@ -1,3 +1,10 @@
+/*!
+ * \file
+ * \~russian
+ * \brief Файл содержит реализацию GanttCalcGraphicsObject class.
+ * \~englist
+ * \brief File contains realization of GanttCalcGraphicsObject class.
+ */
 #include "ganttcalcgraphicsobject.h"
 #include "gantt/private_extensions/gantt-lib_global_values.h"
 

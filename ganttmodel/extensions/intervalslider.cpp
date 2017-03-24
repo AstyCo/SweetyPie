@@ -1,3 +1,10 @@
+/*!
+ * \file
+ * \~russian
+ * \brief Файл содержит реализацию IntervalSlider class.
+ * \~englist
+ * \brief File contains realization of IntervalSlider class.
+ */
 #include "intervalslider.h"
 
 #include <QPainter>

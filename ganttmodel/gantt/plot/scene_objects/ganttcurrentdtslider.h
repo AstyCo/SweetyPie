@@ -1,4 +1,11 @@
-﻿#ifndef GANTTCURRENTTIMESLIDER_H
+﻿/*!
+ * \file
+ * \~russian
+ * \brief Файл содержит объявление GanttCurrentDtSlider class.
+ * \~englist
+ * \brief File contains definition of GanttCurrentDtSlider class.
+ */
+#ifndef GANTTCURRENTTIMESLIDER_H
 #define GANTTCURRENTTIMESLIDER_H
 
 #include "utcdatetime.h"
@@ -11,6 +18,12 @@
 
 class GanttScene;
 
+/*!
+ * \~russian
+ * \brief Класс GanttCurrentDtSlider class отображает текущее время
+ * \~english
+ * \brief The GanttCurrentDtSlider class represents current time
+ */
 class GanttCurrentDtSlider : public QGraphicsObject
 {
     Q_OBJECT

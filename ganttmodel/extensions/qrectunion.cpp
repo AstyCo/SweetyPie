@@ -1,3 +1,10 @@
+/*!
+ * \file
+ * \~russian
+ * \brief Файл содержит реализацию QRectFUnion class.
+ * \~englist
+ * \brief File contains realization of QRectFUnion class.
+ */
 #include "qrectunion.h"
 
 #include <QTransform>

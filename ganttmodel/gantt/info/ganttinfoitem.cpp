@@ -1,3 +1,10 @@
+/*!
+ * \file
+ * \~russian
+ * \brief Файл содержит реализацию GanttInfoItem class.
+ * \~englist
+ * \brief File contains realization of GanttInfoItem class.
+ */
 #include "ganttinfoitem.h"
 
 #include "gantt/private_extensions/gantt-lib_global_values.h"
@@ -134,6 +141,16 @@ bool GanttInfoItem::isEmpty() const
 void GanttInfoItem::clear()
 {
     _items.clear();
+}
+
+void GanttInfoItem::insert(int at, GanttInfoItem *item)
+{
+    if(!item)
+        return;
+
+    item->setParent(this);
+    _items.insert(at, item);
+    emit itemsChanged();
 }
 
 

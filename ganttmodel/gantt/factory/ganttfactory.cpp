@@ -1,3 +1,10 @@
+/*!
+ * \file
+ * \~russian
+ * \brief Файл содержит реализацию GanttFactory class.
+ * \~englist
+ * \brief File contains realization of GanttFactory class.
+ */
 #include "ganttfactory.h"
 
 #include "gantt/info/ganttinfoitem.h"

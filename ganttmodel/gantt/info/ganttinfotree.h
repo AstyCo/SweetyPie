@@ -1,3 +1,10 @@
+/*!
+ * \file
+ * \~russian
+ * \brief Файл содержит объявление GanttInfoTree class.
+ * \~englist
+ * \brief File contains definition of GanttInfoTree class.
+ */
 #ifndef GANTTINFOTREE_H
 #define GANTTINFOTREE_H
 
@@ -10,6 +17,12 @@
 
 #include <QtConcurrentRun>
 
+/*!
+ * \~russian
+ * \brief Класс GanttInfoTree class содержит информацию по всем событиям
+ * \~english
+ * \brief The GanttInfoTree class class contains information of all events
+ */
 class GanttInfoTree : public QObject
 {
     Q_OBJECT

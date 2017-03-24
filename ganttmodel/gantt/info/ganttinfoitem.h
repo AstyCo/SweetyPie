@@ -1,3 +1,10 @@
+/*!
+ * \file
+ * \~russian
+ * \brief Файл содержит объявление GanttInfoItem class.
+ * \~englist
+ * \brief File contains definition of GanttInfoItem class.
+ */
 #ifndef GANTTINFOITEM_H
 #define GANTTINFOITEM_H
 
@@ -12,6 +19,12 @@
 
 class UtcDateTime;
 
+/*!
+ * \~russian
+ * \brief Класс GanttInfoItem class содержит информацию о событии
+ * \~english
+ * \brief The GanttInfoItem class class contains information of event
+ */
 class GANTTMODELSHARED_EXPORT GanttInfoItem : public QObject
 {
     Q_OBJECT
@@ -69,6 +82,7 @@ public:
     int size() const;
     bool isEmpty() const;
     void clear();
+    void insert(int at, GanttInfoItem* item);
     void append(GanttInfoItem* item);
     void append(const QList<GanttInfoItem*>& items);
     bool removeOne(GanttInfoItem* item);

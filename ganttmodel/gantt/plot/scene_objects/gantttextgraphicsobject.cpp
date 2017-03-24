@@ -1,3 +1,10 @@
+/*!
+ * \file
+ * \~russian
+ * \brief Файл содержит реализацию GanttTextGraphicsObject class.
+ * \~englist
+ * \brief File contains realization of GanttTextGraphicsObject class.
+ */
 #include "gantttextgraphicsobject.h"
 
 #include "gantt/private_extensions/gantt-lib_global_values.h"
@@ -76,6 +83,6 @@ QRect GanttTextGraphicsObject::textRightRect() const
 
 void GanttTextGraphicsObject::onExpansionChange()
 {
-    qDebug() << "onExp";
+//    qDebug() << "onExp";
     prepareGeometryChange();
 }

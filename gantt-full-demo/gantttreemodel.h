@@ -45,6 +45,8 @@ public:
     void addNode(GanttInfoItem *node);
 //    void addItems(GanttInfoItem* item, bool inner = false);
     void insertItem(GanttInfoItem *item, GanttInfoItem *parent);
+    void addAfter(GanttInfoItem *item, GanttInfoItem *targetItem);
+    void addBefore(GanttInfoItem *item, GanttInfoItem *targetItem);
     bool canFetchMore(const QModelIndex &/*parent*/) const{
         return true;
     }
@@ -59,6 +61,7 @@ public:
 
     void printTree() const;
 
+
 signals:
     void itemsAdded(GanttInfoItem*);
     void itemsAdded();
@@ -66,6 +69,7 @@ signals:
 
 public slots:
     void clear();
+    void reset();
 
 private:
 

@@ -1,3 +1,10 @@
+/*!
+ * \file
+ * \~russian
+ * \brief Файл содержит реализацию GanttDtCrossObject class.
+ * \~englist
+ * \brief File contains realization of GanttDtCrossObject class.
+ */
 #include "ganttdtcrossobject.h"
 #include "gantt/plot/ganttscene.h"
 

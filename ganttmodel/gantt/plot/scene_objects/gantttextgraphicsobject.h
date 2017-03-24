@@ -1,10 +1,22 @@
+/*!
+ * \file
+ * \~russian
+ * \brief Файл содержит объявление GanttTextGraphicsObject class.
+ * \~englist
+ * \brief File contains definition of GanttTextGraphicsObject class.
+ */
 #ifndef GANTTTEXTGRAPHICSOBJECT_H
 #define GANTTTEXTGRAPHICSOBJECT_H
 
 #include "ganttproject_global.h"
 #include "ganttgraphicsobject.h"
 
-
+/*!
+ * \~russian
+ * \brief Класс GanttGraphicsView class событие с подписью
+ * \~english
+ * \brief The GanttGraphicsView class signed event
+ */
 class GANTTMODELSHARED_EXPORT GanttTextGraphicsObject : public GanttGraphicsObject
 {
     Q_OBJECT

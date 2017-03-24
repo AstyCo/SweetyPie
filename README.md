@@ -43,9 +43,18 @@
 на диаграмме Гантта)
     
 GanttFactory реализует AbstractGanttFactory
+
     virtual GanttInfoItem *createInfo(const QModelIndex &index) = 0;
     virtual GanttGraphicsObject *createGraphicsObject(GanttInfoItem *info) = 0;
     virtual QAbstractItemModel *model() const = 0;
     virtual bool isEvent(GanttInfoItem */*info*/) const;
     
-    
+## Диаграмма классов
+![alt text](../../UML.bmp "QtGantt class diagram")
+
+## Диаграмма объектов
+![alt text](../../OBJ.bmp "QtGantt object diagram")
+
+## Инструментальные средства
+ - Язык разработки: С++
+ - Используемая библиотеки: Qt

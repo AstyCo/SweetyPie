@@ -1,3 +1,10 @@
+/*!
+ * \file
+ * \~russian
+ * \brief Файл содержит объявление GanttIntervalGraphicsObject class.
+ * \~englist
+ * \brief File contains definition of GanttIntervalGraphicsObject class.
+ */
 #ifndef GANTTGRAPHICSITEM_H
 #define GANTTGRAPHICSITEM_H
 
@@ -6,7 +13,12 @@
 #include "extensions/qrectunion.h"
 
 #include <QPointer>
-
+/*!
+ * \~russian
+ * \brief Класс GanttIntervalGraphicsObject class продолжительное событие (с подписью)
+ * \~english
+ * \brief The GanttIntervalGraphicsObject class is continuous event
+ */
 class GanttIntervalGraphicsObject : public GanttTextGraphicsObject
 {
     Q_OBJECT

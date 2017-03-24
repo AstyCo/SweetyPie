@@ -1,3 +1,10 @@
+/*!
+ * \file
+ * \~russian
+ * \brief Файл содержит реализацию HFitScene class.
+ * \~englist
+ * \brief File contains realization of HFitScene class.
+ */
 #include "hfitscene.h"
 #include "gantt/private_extensions/gantt-lib_global_values.h"
 

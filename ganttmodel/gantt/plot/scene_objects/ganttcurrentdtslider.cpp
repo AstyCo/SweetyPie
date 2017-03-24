@@ -1,3 +1,10 @@
+/*!
+ * \file
+ * \~russian
+ * \brief Файл содержит реализацию GanttCurrentDtSlider class.
+ * \~englist
+ * \brief File contains realization of GanttCurrentDtSlider class.
+ */
 #include "ganttcurrentdtslider.h"
 #include "gantt/private_extensions/gantt-lib_global_values.h"
 #include "gantt/plot/ganttscene.h"

@@ -1,3 +1,10 @@
+/*!
+ * \file
+ * \~russian
+ * \brief Файл содержит реализацию GanttDtLine class.
+ * \~englist
+ * \brief File contains realization of GanttDtLine class.
+ */
 #include "ganttdtline.h"
 #include "gantt/private_extensions/gantt-lib_global_values.h"
 

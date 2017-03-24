@@ -1,3 +1,10 @@
+/*!
+ * \file
+ * \~russian
+ * \brief Файл содержит расширения TimeSpan class
+ * \~englist
+ * \brief File contains extensions of TimeSpan class
+ */
 #ifndef TIMESPAN_EXTENSION_H
 #define TIMESPAN_EXTENSION_H
 

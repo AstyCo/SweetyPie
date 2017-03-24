@@ -1,3 +1,10 @@
+/*!
+ * \file
+ * \~russian
+ * \brief Файл с глобальными константами
+ * \~englist
+ * \brief File contains global constants
+ */
 #ifndef GANTTLIB_GLOBAL_VALUES_H
 #define GANTTLIB_GLOBAL_VALUES_H
 

@@ -1,3 +1,10 @@
+/*!
+ * \file
+ * \~russian
+ * \brief Файл содержит реализацию GanttScene class.
+ * \~englist
+ * \brief File contains realization of GanttScene class.
+ */
 #include "ganttscene.h"
 #include "extensions/dtline.h"
 #include "gantt/info/ganttinfotree.h"
@@ -170,6 +177,8 @@ void GanttScene::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
 void GanttScene::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
 {
     if(event->button() == Qt::RightButton){
+//        if (_mousePressH.isClick())
+//            emit customContextMenuRequested(event->scenePos());
         _crossObject->setVisible(false);
         setCursor(Qt::ArrowCursor);
     }
@@ -289,7 +298,7 @@ QRectF GanttScene::elementsBoundingRect()
 
 void GanttScene::clear()
 {
-    qDebug() << "GANTT CLEAR";
+//    qDebug() << "GANTT CLEAR";
 //    _currentItem = NULL;
 
     removePersistentItems();
@@ -562,7 +571,7 @@ void GanttScene::updateIntersectionR(GanttInfoItem *item)
 
 void GanttScene::onDoubleClick(const QPointF &pos)
 {
-    qDebug() << "scene onDoubleClick " << pos;
+//    qDebug() << "scene onDoubleClick " << pos;
     GanttGraphicsObject *object = objectForPos(_view->mapToScene(_view->mapFromGlobal(pos.toPoint())));
     if(object)
     {
@@ -581,7 +590,7 @@ void GanttScene::onDoubleClick(const QPointF &pos)
 
 void GanttScene::onClick(const QPointF &pos)
 {
-    qDebug() << "scene onClick " << pos;
+//    qDebug() << "scene onClick " << pos;
     GanttGraphicsObject *object = objectForPos(_view->mapToScene(_view->mapFromGlobal(pos.toPoint())));
     if(object){
         setCurrentItem(object);
@@ -652,7 +661,6 @@ void GanttScene::init()
 
     connect(&_mousePressH, SIGNAL(clickDelayElapsed(QPointF)), this, SLOT(onClick(QPointF)));
     connect(&_mousePressH, SIGNAL(doubleClicked(QPointF)), this, SLOT(onDoubleClick(QPointF)));
-
 }
 
 GanttScene::GanttScene(GanttGraphicsView *view, GanttDtLine *dtline, QObject *parent)

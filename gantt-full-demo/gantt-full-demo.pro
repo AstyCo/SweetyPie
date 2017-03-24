@@ -17,12 +17,18 @@ include(../demo-lib-include.pri)
 SOURCES += main.cpp\
         mainwindow.cpp \
     gantttreemodel.cpp \
-    modelwrapper.cpp
+    modelwrapper.cpp \
+    itemadditiondialog.cpp \
+    additiongeneratedwizard.cpp
 
 HEADERS  += mainwindow.h \
     gantttreemodel.h \
-    modelwrapper.h
+    modelwrapper.h \
+    itemadditiondialog.h \
+    additiongeneratedwizard.h
 
-FORMS    += mainwindow.ui
+FORMS    += mainwindow.ui \
+    itemadditiondialog.ui \
+    additiongeneratedwizard.ui
 
 RESOURCES +=

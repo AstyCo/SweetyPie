@@ -1,3 +1,10 @@
+/*!
+ * \file
+ * \~russian
+ * \brief Файл содержит реализацию GanttWidget class.
+ * \~englist
+ * \brief File contains realization of GanttWidget class.
+ */
 #include "ganttwidget.h"
 #include "ui_ganttwidget.h"
 
@@ -26,6 +33,8 @@ GanttWidget::GanttWidget(QWidget *parent) :
         layout()->setSpacing(0);
     }
 
+    setContextMenuPolicy(Qt::CustomContextMenu);
+
 //    ui->treeView->setContentsMargins(0,0,0,0);
 //    ui->treeView->setVerticalScrollMode(QAbstractItemView::ScrollPerPixel);
 //    ui->treeView->verticalScrollBar()->setStyleSheet("QScrollBar {width:0px;}");
@@ -41,12 +50,29 @@ GanttWidget::~GanttWidget()
         delete _factory;
 }
 
-
+/*!
+ * \~russian
+ * \brief GanttWidget::setCurrentDt установливает текущее время
+ * \param dt новое значение
+ * \~english
+ * \brief GanttWidget::setCurrentDt sets current time
+ * \param dt new value
+ */
 void GanttWidget::setCurrentDt(const UtcDateTime &dt)
 {
     _scene->setCurrentDt(dt);
 }
 
+/*!
+ * \~russian
+ * \brief GanttWidget::setPlayerSpeeds установливает мин./макс. множители плеера
+ * \param minMultiply мин.
+ * \param maxMultiply макс.
+ * \~english
+ * \brief GanttWidget::setPlayerSpeeds sets min/max player multiplayers
+ * \param minMultiply min.
+ * \param maxMultiply max.
+ */
 void GanttWidget::setPlayerSpeeds(qreal minMultiply, qreal maxMultiply)
 {
     ui->playerSettings->setMultiplies(minMultiply,maxMultiply);
@@ -90,6 +116,26 @@ void GanttWidget::setView(QTreeView *view, bool /*inner*/)
 QAbstractItemModel *GanttWidget::model() const
 {
     return _treeInfo->model();
+}
+
+UtcDateTime GanttWidget::dtForPos(const QPointF &pos) const
+{
+    return _scene->posToDt(pos.x());
+}
+
+QModelIndex GanttWidget::indexForPos(const QPointF &pos) const
+{
+    GanttInfoItem *tmp = _treeInfo->infoForVPos(pos.y());
+    if (tmp)
+        return tmp->index();
+
+    qDebug() << "index not found";
+    return QModelIndex();
+}
+
+QPoint GanttWidget::mapPosToGlobal(const QPoint &pos) const
+{
+    return ui->ganttView->mapToGlobal(pos);
 }
 
 void GanttWidget::showInterval()
@@ -139,7 +185,7 @@ void GanttWidget::dataReset()
 
 void GanttWidget::onGanttViewCustomContextMenuRequested(const QPoint &point)
 {
-    QPoint widgetPoint =ui->ganttView->mapTo(this,point);
+//    QPoint widgetPoint =ui->ganttView->mapTo(this,point);
 
     emit customContextMenuRequested(point);
 }
@@ -172,6 +218,7 @@ void GanttWidget::init()
     connectPlayer();
 
     connect(ui->ganttView,SIGNAL(maximumHeightChanged()),this,SLOT(onGanttViewMaximumHeightChanged()));
+    connect(ui->ganttView,SIGNAL(customContextMenuRequested(QPoint)),this,SIGNAL(customContextMenuRequested(QPoint)));
 }
 
 void GanttWidget::connectSceneWithInfo()

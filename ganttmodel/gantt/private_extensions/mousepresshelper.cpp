@@ -1,3 +1,10 @@
+/*!
+ * \file
+ * \~russian
+ * \brief Файл содержит реализацию MousePressHelper class.
+ * \~englist
+ * \brief File contains realization of MousePressHelper class.
+ */
 #include "mousepresshelper.h"
 #include "gantt-lib_global_values.h"
 
@@ -69,7 +76,7 @@ void MousePressHelper::setSlided()
 
 void MousePressHelper::release()
 {
-    qDebug() << "release";
+//    qDebug() << "release";
     if (!_doubleClick)
         _clickTimer.start();
 
@@ -136,9 +143,9 @@ bool MousePressHelper::isClickH(const QPointF &pos) const
 
 void MousePressHelper::emitClickDelayElapsed()
 {
-    qDebug() << "emitClickDelayElapsed";
+//    qDebug() << "emitClickDelayElapsed";
     if(!_slided){
-        qDebug() << "!_slided";
+//        qDebug() << "!_slided";
         emit clickDelayElapsed(_pressedAtPos);
     }
 }

@@ -1,3 +1,10 @@
+/*!
+ * \file
+ * \~russian
+ * \brief Файл содержит реализацию GanttPlayerSettings class.
+ * \~englist
+ * \brief File contains realization of GanttPlayerSettings class.
+ */
 #include "ganttplayersettings.h"
 
 #include <QMenu>

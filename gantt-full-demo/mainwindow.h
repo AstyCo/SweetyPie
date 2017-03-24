@@ -4,6 +4,7 @@
 #include <QMainWindow>
 #include "utcdatetime.h"
 #include "gantttreemodel.h"
+#include "itemadditiondialog.h"
 
 namespace Ui {
 class MainWindow;
@@ -27,12 +28,23 @@ private:
 
     Ui::MainWindow *ui;
     GanttTreeModel *_model;
+    GanttInfoItem *_item, *_newItem;
+    ItemAdditionDialog *_dlg;
 
 private slots:
-    void on_pushButton_ganttAddItems_clicked();
+    void addBefore();
+    void addAfter();
+
+    void addFirst();
+    void addLast();
+
+    void onCustomContextMenuRequested(const QPoint &pos);
     void on_pushButton_ganttClear_clicked();
     void on_radioButton_ganttPlayer_toggled(bool checked);
-    void on_pushButton_clicked();
+    void on_pushButton_ganttAddItems_clicked();
+
+private:
+    GanttInfoItem *produceItem(const ItemAdditionDialog *dlg);
 };
 
 #endif // MAINWINDOW_H

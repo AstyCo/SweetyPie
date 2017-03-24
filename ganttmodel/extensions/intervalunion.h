@@ -1,3 +1,10 @@
+/*!
+ * \file
+ * \~russian
+ * \brief Файл содержит объявление IntervalUnion class.
+ * \~englist
+ * \brief File contains definition of IntervalUnion class.
+ */
 #ifndef INTERVALUNION_H
 #define INTERVALUNION_H
 
@@ -10,6 +17,12 @@
 #include <QList>
 #include <QDebug>
 
+/*!
+ * \~russian
+ * \brief Класс IntervalUnion class представляет объединение MyUtcDateTimeInterval class
+ * \~english
+ * \brief The IntervalUnion class class represents union of MyUtcDateTimeInterval class
+ */
 class GANTTMODELSHARED_EXPORT IntervalUnion
 {
     friend IntervalUnion operator*(const IntervalUnion &f, qreal coef);

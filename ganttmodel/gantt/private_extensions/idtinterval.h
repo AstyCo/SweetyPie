@@ -1,8 +1,21 @@
+/*!
+ * \file
+ * \~russian
+ * \brief Файл содержит интерфейс IDtInterval class.
+ * \~englist
+ * \brief File contains interface IDtInterval class.
+ */
 #ifndef IDTINTERVAL_H
 #define IDTINTERVAL_H
 
 #include "utcdatetime.h"
 
+/*!
+ * \~russian
+ * \brief Класс IDtInterval class задает набор функций для объекта, выступающего в роли UtcDataTime class интервала
+ * \~english
+ * \brief The IDtInterval class sets interface for UtcDataTime class interval
+ */
 class IDtInterval
 {
 public:

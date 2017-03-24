@@ -1,3 +1,10 @@
+/*!
+ * \file
+ * \~russian
+ * \brief Файл содержит объявление IntervalSlider class.
+ * \~englist
+ * \brief File contains definition of IntervalSlider class.
+ */
 #ifndef INTERVALSLIDER_H
 #define INTERVALSLIDER_H
 
@@ -7,29 +14,14 @@
 #include <QDebug>
 
 /*!
- * \brief The IntervalSlider class
- *
- * signals: beginMoved(long long val),
- *          endMoved(long long val)
- *
- * members: long long handleH - width() of handle
- *          long long sliderV - height() of slider rectangle
- *          long long offsetV - vertical offset of [slider rectangle] in external widget
- *
- *
+ * \~russian
+ * \brief Класс IntervalSlider class представляет двух-бегунковый слайдер
  *
  * Переопределяя функции drawHandle, drawSliderLine в классе-потомке можно настроить вид слайдера.
+ * \~english
+ * \brief Class IntervalSlider class represents slider with two handles
  *
- * Чтобы класс мог реагировать на сигналы от клавиатуры, необходимо установить слайдер как фильтр для
- * объекта, принимающего сигналы от клавиатуры, пример:
- *
- *  В Конструкторе MainWindow::
- *      {
- *          ...
- *          installEventFilter(ui->widgetIntervalSlider);
- *          ...
- *      }
- *
+ * Overloading drawHandle, drawSliderLine you may set the view of slider.
  */
 
 

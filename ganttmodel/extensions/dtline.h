@@ -1,3 +1,10 @@
+/*!
+ * \file
+ * \~russian
+ * \brief Файл содержит объявление DtLine class.
+ * \~englist
+ * \brief File contains definition of DtLine class.
+ */
 #ifndef DTLINE_H
 #define DTLINE_H
 
@@ -8,6 +15,13 @@
 #include <QWidget>
 #include <QPair>
 
+
+/*!
+ * \~russian
+ * \brief Класс DtLine class представляет временную ось от секунд до лет
+ * \~english
+ * \brief The DtLine class class represents datetime-line (from seconds to years)
+ */
 class GANTTMODELSHARED_EXPORT DtLine : public QWidget
 {
     Q_OBJECT

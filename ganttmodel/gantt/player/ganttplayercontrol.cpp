@@ -1,3 +1,10 @@
+/*!
+ * \file
+ * \~russian
+ * \brief Файл содержит реализацию GanttPlayerControl class.
+ * \~englist
+ * \brief File contains realization of GanttPlayerControl class.
+ */
 #include "ganttplayercontrol.h"
 #include "ui_ganttplayercontrol.h"
 #include "ganttplayersettings.h"

@@ -1,3 +1,10 @@
+/*!
+ * \file
+ * \~russian
+ * \brief Файл содержит объявление GanttGraphicsView class.
+ * \~englist
+ * \brief File contains definition of GanttGraphicsView class.
+ */
 #ifndef GANTTGRAPHICSVIEW_H
 #define GANTTGRAPHICSVIEW_H
 
@@ -9,7 +16,12 @@
 class GanttWidget;
 class HFitScene;
 
-
+/*!
+ * \~russian
+ * \brief Класс GanttGraphicsView class отвечает за отрисовку GanttScene class
+ * \~english
+ * \brief The GanttGraphicsView class do drawing of GanttScene class
+ */
 class GanttGraphicsView : public QGraphicsView
 {
     Q_OBJECT

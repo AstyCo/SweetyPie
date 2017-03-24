@@ -1,9 +1,16 @@
 /*!
  * \file
- * \brief Header with default implementation of AbstractGanttFactory
+ * \~russian
+ * \brief Заголовочный файл с объявлением GanttFactory class
  *
- * Class GanttFactory implements abstract methods of AbstractGanttFactory,
- * using realisation of IModelWrapper interface (GanttFactory follows
+ * Класс GanttFactory class реализует абстрактные методы класса AbstractGanttFactory class,
+ * используя конкретную реализацию IModelWrapper class. В большинстве случаев, достаточно
+ * реализовать IModelWrapper class, и использовать данную реализацию AbstractGanttFactory class.
+ * \~english
+ * \brief Header with default implementation of AbstractGanttFactory class
+ *
+ * Class GanttFactory class implements abstract methods of AbstractGanttFactory class,
+ * using realization of IModelWrapper class interface (GanttFactory class follows
  * Template Method pattern).
 */
 #ifndef GANTTFACTORY_H
@@ -13,6 +20,19 @@
 #include "extensions-gui/interfaces/abstractganttfactory.h"
 #include "extensions-gui/interfaces/imodelwrapper.h"
 
+/*!
+ * \~russian
+ * \brief Класс GanttFactory class реализует абстрактные методы класса AbstractGanttFactory class, используя конкретную реализацию IModelWrapper class.
+ *
+ * Класс GanttFactory class реализует абстрактные методы класса AbstractGanttFactory class,
+ * используя конкретную реализацию IModelWrapper class. В большинстве случаев, достаточно
+ * реализовать IModelWrapper class, и использовать данную реализацию AbstractGanttFactory class.
+ * \~english
+ * \brief The GanttFactory class class realise abstract methods of AbstractGanttFactory class, using concrete realization of IModelWrapper class.
+ *
+ * The GanttFactory class realize abstract methods of AbstractGanttFactory class,
+ * using concrete realization of IModelWrapper class.
+ */
 class GANTTMODELSHARED_EXPORT GanttFactory : public AbstractGanttFactory
 {
 public:

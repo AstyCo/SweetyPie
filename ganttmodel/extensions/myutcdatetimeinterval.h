@@ -1,3 +1,10 @@
+/*!
+ * \file
+ * \~russian
+ * \brief Файл содержит объявление MyUtcDateTimeInterval class.
+ * \~englist
+ * \brief File contains definition of MyUtcDateTimeInterval class.
+ */
 #ifndef MYUTCDATETIMEINTERVAL_H
 #define MYUTCDATETIMEINTERVAL_H
 
@@ -5,7 +12,12 @@
 #include "utcdatetime.h"
 #include <QPair>
 
-
+/*!
+ * \~russian
+ * \brief Класс MyUtcDateTimeInterval class - UtcDataTimeInterval class с <min, timespan> вместом <min, max>
+ * \~english
+ * \brief The MyUtcDateTimeInterval class class is UtcDataTimeInterval class with <min, timespan> but <min, max>
+ */
 class MyUtcDateTimeInterval
 {
 public:

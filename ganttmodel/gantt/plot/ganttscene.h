@@ -1,3 +1,10 @@
+/*!
+ * \file
+ * \~russian
+ * \brief Файл содержит объявление GanttScene class.
+ * \~englist
+ * \brief File contains definition of GanttScene class.
+ */
 #ifndef GANTTSCENE_H
 #define GANTTSCENE_H
 
@@ -18,6 +25,16 @@ class GanttDtCrossObject;
 class GanttHoverGraphicsObject;
 class GanttInfoTree;
 
+/*!
+ * \~russian
+ * \brief Класс GanttScene class содержит объекты сцены
+ *
+ * Содержит объекты сцены. Отвечает за логику при изменении размеров и взаимодействия с мышкой.
+ * \~english
+ * \brief The GanttScene class contains scene objects
+ *
+ * Contains scene objects. Reacts on resize and mouse events.
+ */
 class GanttScene : public HFitScene
 {
     Q_OBJECT
@@ -68,6 +85,7 @@ public slots:
 
 
 signals:
+//    void customContextMenuRequested(const QPoint &pos);
     void currentDtChanged(const UtcDateTime& dt);
 
     void graphicsItemHoverEnter(const GanttInfoItem*);

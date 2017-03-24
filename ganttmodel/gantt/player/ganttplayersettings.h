@@ -1,3 +1,10 @@
+/*!
+ * \file
+ * \~russian
+ * \brief Файл содержит объявление GanttPlayerSettings class.
+ * \~englist
+ * \brief File contains definition of GanttPlayerSettings class.
+ */
 #ifndef GANTTPLAYERSETTINGS_H
 #define GANTTPLAYERSETTINGS_H
 
@@ -8,6 +15,12 @@
 class QLabel;
 class QSlider;
 
+/*!
+ * \~russian
+ * \brief Класс GanttPlayerSettings class - настройки плеера
+ * \~english
+ * \brief The GanttPlayerSettings class is player's settings
+ */
 class GanttPlayerSettings : public QToolBar
 {
     Q_OBJECT

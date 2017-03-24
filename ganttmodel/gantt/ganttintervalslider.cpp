@@ -1,3 +1,10 @@
+/*!
+ * \file
+ * \~russian
+ * \brief Файл содержит реализацию GanttIntervalSlider class.
+ * \~englist
+ * \brief File contains realization of GanttIntervalSlider class.
+ */
 #include "ganttintervalslider.h"
 #include "utcdatetime.h"
 #include "timespan.h"

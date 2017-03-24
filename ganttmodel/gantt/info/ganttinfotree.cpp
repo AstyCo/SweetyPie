@@ -1,3 +1,10 @@
+/*!
+ * \file
+ * \~russian
+ * \brief Файл содержит реализацию GanttInfoTree class.
+ * \~englist
+ * \brief File contains realization of GanttInfoTree class.
+ */
 #include "ganttinfotree.h"
 #include "gantt/private_extensions/gantt-lib_global_values.h"
 #include "treewalker.h"
@@ -71,7 +78,7 @@ void GanttInfoTree::onCurrentItemChanged(const GanttInfoItem *item)
 {
     if(!item)
         return;
-    qDebug() << "emit currentChanged" << item->index();
+//    qDebug() << "emit currentChanged" << item->index();
     emit currentChanged(item->index(), QItemSelectionModel::Select | QItemSelectionModel::Current);
 }
 
@@ -116,7 +123,7 @@ GanttInfoItem *GanttInfoTree::prevFinish(const UtcDateTime &dt) const
 
 void GanttInfoTree::onClicked(const QModelIndex &index)
 {
-    qDebug() << "currentChanged" << index;
+//    qDebug() << "currentChanged" << index;
     emit currentChanged(infoForIndex(index.sibling(index.row(),0)));
 }
 
@@ -194,7 +201,7 @@ void GanttInfoTree::onNodeCollapsed()
 
 void GanttInfoTree::onDataChanged(const QModelIndex &/*from*/, const QModelIndex &/*to*/)
 {
-    qDebug() << "onDataChanged";
+//    qDebug() << "onDataChanged";
     /// TODO optimization
     reset();
 //    clear();
@@ -202,7 +209,7 @@ void GanttInfoTree::onDataChanged(const QModelIndex &/*from*/, const QModelIndex
 
 void GanttInfoTree::onRowsInserted(const QModelIndex &parent, int start, int end)
 {
-    qDebug() << "onRowsIns " << start << " " << end;
+//    qDebug() << "onRowsIns " << start << " " << end;
 //    printTreeR(_root, 0);
     fill(infoForIndex(parent), parent, start, end);
 

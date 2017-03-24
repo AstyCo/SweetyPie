@@ -1,3 +1,10 @@
+/*!
+ * \file
+ * \~russian
+ * \brief Файл содержит объявление GanttGraphicsObject class.
+ * \~englist
+ * \brief File contains definition of GanttGraphicsObject class.
+ */
 #ifndef GANTTGRAPHICSOBJECT_H
 #define GANTTGRAPHICSOBJECT_H
 
@@ -10,6 +17,12 @@
 class GanttInfoItem;
 class GanttScene;
 
+/*!
+ * \~russian
+ * \brief Класс GanttGraphicsObject class отображает событие
+ * \~english
+ * \brief The GanttGraphicsObject class represents event
+ */
 class GANTTMODELSHARED_EXPORT GanttGraphicsObject : public QGraphicsObject
 {
     Q_OBJECT

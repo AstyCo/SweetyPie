@@ -1,8 +1,21 @@
+/*!
+ * \file
+ * \~russian
+ * \brief Файл содержит объявление GanttDtLine class.
+ * \~englist
+ * \brief File contains definition of GanttDtLine class.
+ */
 #ifndef GANTTDTLINE_H
 #define GANTTDTLINE_H
 
 #include "extensions/dtline.h"
 
+/*!
+ * \~russian
+ * \brief Класс GanttDtLine class временная линейка с отображением текущего времени
+ * \~english
+ * \brief The GanttDtLine class timeline with current time
+ */
 class GanttDtLine : public DtLine
 {
     Q_OBJECT

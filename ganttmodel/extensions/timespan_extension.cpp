@@ -1,3 +1,10 @@
+/*!
+ * \file
+ * \~russian
+ * \brief Файл содержит реализацию вспомогательных функций
+ * \~englist
+ * \brief File contains realization of extra functions
+ */
 #include "timespan_extension.h"
 
 
