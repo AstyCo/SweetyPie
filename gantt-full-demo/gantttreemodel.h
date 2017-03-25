@@ -62,6 +62,9 @@ public:
 
     void printTree() const;
 
+    void serialize(const QString &filename);
+    void deserialize(const QString &filename);
+
 
 signals:
     void itemsAdded(GanttInfoItem*);
@@ -80,10 +83,15 @@ private:
 
 private:
 
-    GanttInfoItem *m_root;
+    GanttInfoItem *_root;
 
-    friend class GanttWidget;
+    friend QDataStream &operator<<(QDataStream &ds, const GanttTreeModel &tm);
+    friend QDataStream &operator>>(QDataStream &ds, GanttTreeModel &tm);
 
 };
+
+QDataStream &operator<<(QDataStream &ds, const GanttTreeModel &tm);
+QDataStream &operator>>(QDataStream &ds, GanttTreeModel &tm);
+
 
 #endif // GANTTTREEMODEL_H

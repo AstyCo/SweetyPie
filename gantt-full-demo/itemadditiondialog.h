@@ -1,9 +1,10 @@
 #ifndef ITEMADDITIONDIALOG_H
 #define ITEMADDITIONDIALOG_H
 
-#include <QDialog>
-
 #include "extensions/utcdatetime.h"
+
+#include <QDialog>
+#include <QSettings>
 
 namespace Ui {
 class ItemAdditionDialog;
@@ -17,7 +18,7 @@ public:
     explicit ItemAdditionDialog(QWidget *parent = 0);
     ~ItemAdditionDialog();
 
-    void setStart(const UtcDateTime &dt);
+    void moveStart(const UtcDateTime &dt);
 
     QString title() const;
     QColor color() const;
@@ -34,12 +35,17 @@ private slots:
     void on_checkBoxInterval_stateChanged(int arg1);
 
 private:
+    void saveSettings();
+    void loadSettings();
+
+    void setColor(const QColor &color);
     void hideFinish();
     void showFinish();
 
 private:
     QColor _color;
     Ui::ItemAdditionDialog *ui;
+    QSettings _settings;
 };
 
 #endif // ITEMADDITIONDIALOG_H

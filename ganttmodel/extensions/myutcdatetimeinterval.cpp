@@ -60,3 +60,28 @@ QDebug operator<<(QDebug d, const MyUtcDateTimeInterval &u)
 {
     return d << "MyUtcDateTimeInterval(" << u.min() << u.timeSpan() << ')';
 }
+
+QDataStream &operator<<(QDataStream &ds, const MyUtcDateTimeInterval &i)
+{
+    long long mcsecs = i._timeSpan.totalMicroseconds();
+    long long mcsecsFromEpoch = i._min.toMicrosecondsSinceEpoch();
+
+    ds << mcsecs;
+    ds << mcsecsFromEpoch;
+
+    return ds;
+}
+
+QDataStream &operator>>(QDataStream &ds, MyUtcDateTimeInterval &i)
+{
+    long long mcsecs;
+    long long mcsecsFromEpoch;
+
+    ds >> mcsecs;
+    ds >> mcsecsFromEpoch;
+
+    i._timeSpan = TimeSpan::fromMicroseconds(mcsecs);
+    i._min = UtcDateTime::fromMicrosecondsSinceEpoch(mcsecsFromEpoch);
+
+    return ds;
+}

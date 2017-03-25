@@ -2,27 +2,60 @@
 
 #include "gantt/private_extensions/gantt-lib_global_values.h"
 #include "gantt/info/treewalker.h"
+#include "extensions/myutcdatetimeinterval.h"
 
 #include <QSize>
+#include <QFile>
 
 Q_DECLARE_METATYPE(UtcDateTime)
+
+template <typename T>
+void dumpToFile(const QString &filename, const T &o)
+{
+    QFile file(filename);
+
+    if (!file.open(QFile::WriteOnly)) {
+        qWarning(QString("error on openning file \'%1\' - dump failed").arg(filename).toLocal8Bit().data());
+        return;
+    }
+
+    QDataStream ds(&file);
+
+    ds << o;
+}
+
+template <typename T>
+void loadFromDump(const QString &filename, T &o)
+{
+    QFile file(filename);
+
+    if (!file.open(QFile::ReadOnly)) {
+        qWarning(QString("error on openning file \'%1\' - load from dump failed").arg(filename).toLocal8Bit().data());
+        return;
+    }
+
+    QDataStream ds(&file);
+
+    ds >> o;
+}
 
 GanttTreeModel::GanttTreeModel(GanttInfoItem *root,QObject * parent)
     : QAbstractItemModel(parent)
 {
 
-    m_root = root;
+    _root = root;
 
-    if(!m_root)
-        m_root = new GanttInfoItem;
+    if(!_root)
+        _root = new GanttInfoItem;
 
-    m_root->setExpanded(true);
+    _root->setExpanded(true);
 //    setIndex(m_root);
 }
 
 GanttTreeModel::~GanttTreeModel()
 {
     clear();
+    _root->deleteLater();
 }
 
 QVariant GanttTreeModel::data(const QModelIndex &index, int role) const
@@ -41,7 +74,7 @@ QVariant GanttTreeModel::data(const QModelIndex &index, int role) const
         return QVariant();
 
     GanttInfoItem *item = itemForIndex(index);
-    if (item == m_root) {
+    if (item == _root) {
         return QVariant();
     }
     else if (item->hasDuration()) {
@@ -131,7 +164,7 @@ QModelIndex GanttTreeModel::index(int row, int column, const QModelIndex &parent
 
     if (!parent.isValid())
     {
-        parentNode = m_root;
+        parentNode = _root;
     }
     else
         parentNode = itemForIndex(parent);
@@ -149,7 +182,7 @@ GanttInfoItem *GanttTreeModel::itemForIndex(const QModelIndex &index) const
 {
     if (!index.isValid())
     {
-        return m_root;
+        return _root;
     }
 
     return static_cast<GanttInfoItem*>(index.internalPointer());
@@ -158,14 +191,20 @@ GanttInfoItem *GanttTreeModel::itemForIndex(const QModelIndex &index) const
 void GanttTreeModel::printTree() const
 {
     qDebug() << "printTree";
-    printTreeR(m_root, 0);
+    printTreeR(_root, 0);
 }
 
-//void GanttTreeModel::setIndex(GanttInfoItem *item)
-//{
-////    if(!item->index().isValid())
-//        item->setIndex((item==m_root)?(QModelIndex()):(createIndex(item->row(),0,item)));
-//}
+void GanttTreeModel::serialize(const QString &filename)
+{
+    dumpToFile(filename, *this);
+}
+
+void GanttTreeModel::deserialize(const QString &filename)
+{
+    beginResetModel();
+    loadFromDump(filename, *this);
+    endResetModel();
+}
 
 GanttInfoItem *GanttTreeModel::itemForNameHelper(const QString &title,GanttInfoItem* node) const
 {
@@ -187,7 +226,7 @@ GanttInfoItem *GanttTreeModel::itemForNameHelper(const QString &title,GanttInfoI
 }
 GanttInfoItem *GanttTreeModel::root() const
 {
-    return m_root;
+    return _root;
 }
 
 
@@ -201,9 +240,9 @@ void deleteFunc(GanttInfoItem* item)
 
 void GanttTreeModel::clear()
 {
-    beginRemoveRows(QModelIndex(),0,m_root->size());
+    beginRemoveRows(QModelIndex(),0,_root->size());
 
-    callRecursively(m_root, &deleteFunc);
+    callRecursively(_root, &deleteFunc);
 //    qDebug() << "MODEL m_root size after clear " << m_root->size();
 
     endRemoveRows();
@@ -215,8 +254,8 @@ GanttInfoItem *GanttTreeModel::infoForIndex(const QModelIndex &index) const
     if (index.parent().isValid())
         return infoForIndex(index.parent())->at(index.row());
     if (index.isValid())
-        return m_root->at(index.row());
-    return m_root;
+        return _root->at(index.row());
+    return _root;
 }
 
 QModelIndex GanttTreeModel::indexForInfo(const GanttInfoItem *item) const
@@ -263,7 +302,7 @@ QModelIndex GanttTreeModel::parent(const QModelIndex &index) const
         return QModelIndex();
     }
 
-    if (parentNode == m_root)
+    if (parentNode == _root)
     {
         return QModelIndex();
     }
@@ -279,7 +318,7 @@ int GanttTreeModel::rowCount(const QModelIndex &parent) const
         return 0;
 
     if (!parent.isValid())
-        parentNode = m_root;
+        parentNode = _root;
     else if(!(parentNode = itemForIndex(parent)))
         return 0;
 
@@ -336,7 +375,7 @@ bool GanttTreeModel::setData(const QModelIndex &index, const QVariant &value, in
 void GanttTreeModel::addItems(const QList<GanttInfoItem *> &items, GanttInfoItem *destNode)
 {
     if(destNode == NULL)
-        destNode = m_root;
+        destNode = _root;
     int cnt = 0;
     QMap<QString, GanttInfoItem*> tmpItemsForNames;
     foreach(GanttInfoItem *item, items){
@@ -454,7 +493,7 @@ void GanttTreeModel::addBefore(GanttInfoItem *item, GanttInfoItem *targetItem)
         return;
     if (targetItem == NULL) {
         beginInsertRows(QModelIndex(), 0 , 0);
-        m_root->insert(0, item);
+        _root->insert(0, item);
     }
     else {
         QModelIndex index = indexForInfo(targetItem);
@@ -473,8 +512,90 @@ void GanttTreeModel::addBefore(GanttInfoItem *item, GanttInfoItem *targetItem)
 GanttInfoItem *GanttTreeModel::itemForName(const QString &title, GanttInfoItem *parent) const
 {
     if(!parent)
-        parent = m_root;
+        parent = _root;
     return itemForNameHelper(title,parent);
 }
 
+//void serializeHelper(QDataStream &ds, const GanttInfoItem &item, const GanttInfoItem *parent)
+//{
+//    ds << item.title();
+//    ds << item.interval();
+//    ds << item.color();
+//    ds << item.isExpanded();
+//    ds << item.pos();
 
+//    ds << item.size();
+//    for (int i=0; i < item.size(); ++i) {
+//        serializeHelper(ds, item.at(i), &item);
+//    }
+//}
+
+void deserializeHelper(QDataStream &ds, GanttInfoItem *item, GanttInfoItem *parent)
+{
+    QString title;
+    ds >> title;
+    item->setTitle(title);
+    MyUtcDateTimeInterval interval;
+    ds >> interval;
+    item->setStart(interval.min());
+    item->setTimeSpan(interval.timeSpan());
+    QColor color;
+    ds >> color;
+    item->setColor(color);
+    bool exp;
+    ds >> exp;
+    item->setExpanded(exp);
+    int pos;
+    ds >> pos;
+    item->setPos(pos);
+
+    int childrenCnt;
+    ds >> childrenCnt;
+    for (int i=0; i < childrenCnt; ++i) {
+        GanttInfoItem *child = new GanttInfoItem();
+        deserializeHelper(ds, child, item);
+        item->append(child);
+    }
+}
+
+inline QDataStream &operator<<(QDataStream &ds, const GanttInfoItem &item)
+{
+    ds << item.title();
+    ds << item.interval();
+    ds << item.color();
+    ds << item.isExpanded();
+    ds << item.pos();
+
+    ds << item.size();
+    for (int i=0; i < item.size(); ++i)
+        ds << *item.at(i);
+
+    return ds;
+}
+
+inline QDataStream &operator>>(QDataStream &ds, GanttInfoItem &i)
+{
+    deserializeHelper(ds, &i, NULL);
+
+    return ds;
+}
+
+QDataStream &operator<<(QDataStream &ds, const GanttTreeModel &tm)
+{
+    ds << *tm._root;
+
+    return ds;
+}
+
+QDataStream &operator>>(QDataStream &ds, GanttTreeModel &tm)
+{
+    tm.clear();
+    if (!tm._root) {
+        tm._root = new GanttInfoItem();
+        tm._root->setTitle("ROOT");
+        tm._root->setExpanded(true);
+    }
+    ds >> *tm._root;
+
+    return ds;
+}

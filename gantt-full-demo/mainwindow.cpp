@@ -16,6 +16,8 @@
 #include <QKeyEvent>
 #include <QWidgetAction>
 #include <QLabel>
+#include <QFileDialog>
+#include <QMessageBox>
 
 void MainWindow::init()
 {
@@ -102,7 +104,7 @@ void MainWindow::onCustomContextMenuRequested(const QPoint &pos)
     qDebug() << "indexforpos" << ui->ganttWidget->indexForPos(pos);
     _item = NULL;
     ItemAdditionDialog dlg(this);
-    dlg.setStart(ui->ganttWidget->dtForPos(pos));
+    dlg.moveStart(ui->ganttWidget->dtForPos(pos));
     _dlg = &dlg;
 
     UtcDateTime dt = ui->ganttWidget->dtForPos(pos);
@@ -175,6 +177,7 @@ void MainWindow::on_pushButton_ganttAddItems_clicked()
 
 GanttInfoItem *MainWindow::produceItem(const ItemAdditionDialog *dlg)
 {
+    qDebug() << "isDot?" << dlg->isDot() << "duration" << dlg->finish() - dlg->start();
     return new GanttInfoItem(
                 dlg->title(),
                 dlg->start(),
@@ -182,4 +185,26 @@ GanttInfoItem *MainWindow::produceItem(const ItemAdditionDialog *dlg)
 //                QModelIndex(),
                 dlg->color()
                 );
+}
+
+void MainWindow::on_pushButton_ganttDump_clicked()
+{
+    QString filename = QFileDialog::getSaveFileName(this, tr("Сохранение модели"),
+                                                    "",
+                                                    "Gantt model dump (*.gmdd);;");
+    if (!filename.isEmpty()) {
+        qDebug() << "dump fn" << filename;
+        _model->serialize(filename);
+    }
+}
+
+void MainWindow::on_pushButton_ganttLoad_clicked()
+{
+    QString filename = QFileDialog::getOpenFileName(this, tr("Загрузка модели"),
+                                                    "",
+                                                    "Gantt model dump (*.gmdd);;");
+    if (!filename.isEmpty()) {
+        qDebug() << "load fn" << filename;
+        _model->deserialize(filename);
+    }
 }

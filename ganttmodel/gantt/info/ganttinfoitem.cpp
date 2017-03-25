@@ -43,6 +43,11 @@ QString GanttInfoItem::title() const
     return _title;
 }
 
+MyUtcDateTimeInterval GanttInfoItem::interval() const
+{
+    return _interval;
+}
+
 void GanttInfoItem::setTitle(const QString &title)
 {
     if(title == _title)
@@ -197,7 +202,7 @@ GanttInfoItem *GanttInfoItem::closestNode()
 
 void GanttInfoItem::updatePos()
 {
-    qDebug() << title() << "updatePos";
+//    qDebug() << title() << "updatePos";
     setPos(calcPos());
 
     if (!_items.isEmpty()) {

@@ -10,7 +10,9 @@
 
 #include "ganttproject_global.h"
 #include "utcdatetime.h"
+
 #include <QPair>
+#include <QDataStream>
 
 /*!
  * \~russian
@@ -18,7 +20,7 @@
  * \~english
  * \brief The MyUtcDateTimeInterval class class is UtcDataTimeInterval class with <min, timespan> but <min, max>
  */
-class MyUtcDateTimeInterval
+class GANTTMODELSHARED_EXPORT MyUtcDateTimeInterval
 {
 public:
     MyUtcDateTimeInterval();
@@ -35,6 +37,10 @@ public:
     inline void setMin(const UtcDateTime &newValue);
     inline const TimeSpan &timeSpan() const;
     inline void setTimeSpan(const TimeSpan &newValue);
+
+    friend QDataStream &operator<<(QDataStream &ds, const MyUtcDateTimeInterval &i);
+    friend QDataStream &operator>>(QDataStream &ds, MyUtcDateTimeInterval &i);
+
 
 private:
     UtcDateTime _min;
@@ -55,6 +61,9 @@ inline void MyUtcDateTimeInterval::setMin(const UtcDateTime &newValue) { _min = 
 inline const TimeSpan &MyUtcDateTimeInterval::timeSpan() const { return _timeSpan;}
 
 inline void MyUtcDateTimeInterval::setTimeSpan(const TimeSpan &newValue) { _timeSpan = newValue;}
+
+GANTTMODELSHARED_EXPORT QDataStream &operator<<(QDataStream &ds, const MyUtcDateTimeInterval &i);
+GANTTMODELSHARED_EXPORT QDataStream &operator>>(QDataStream &ds, MyUtcDateTimeInterval &i);
 
 
 #endif // MYUTCDATETIMEINTERVAL_H

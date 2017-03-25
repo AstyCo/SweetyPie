@@ -3,6 +3,7 @@
 
 #include "gantttreemodel.h"
 #include <QWizard>
+#include <QSettings>
 
 namespace Ui {
 class AdditionGeneratedWizard;
@@ -26,8 +27,12 @@ private:
     void addTest();
     void addGenerated();
 
+    void saveSettings();
+    void loadSettings();
+
 private:
     Ui::AdditionGeneratedWizard *ui;
+    QSettings _settings;
 };
 
 #endif // ADDITIONGENERATEDWIZARD_H

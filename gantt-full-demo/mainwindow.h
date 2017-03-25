@@ -44,6 +44,10 @@ private slots:
     void on_radioButton_ganttPlayer_toggled(bool checked);
     void on_pushButton_ganttAddItems_clicked();
 
+    void on_pushButton_ganttDump_clicked();
+
+    void on_pushButton_ganttLoad_clicked();
+
 private:
     GanttInfoItem *produceItem(const ItemAdditionDialog *dlg);
 };

@@ -12,13 +12,25 @@
 #include <QPainter>
 
 int GanttTextGraphicsObject::_spacing = 10;
-QFont GanttTextGraphicsObject::_captureFont;
-QFontMetrics GanttTextGraphicsObject::_fontMetrics(GanttTextGraphicsObject::_captureFont);
+long long GanttTextGraphicsObject::objCount = 0;
+QFont *GanttTextGraphicsObject::_captureFont = NULL;
+QFontMetrics *GanttTextGraphicsObject::_fontMetrics = NULL;
 
 GanttTextGraphicsObject::GanttTextGraphicsObject(GanttInfoItem *item, QGraphicsItem *parent)
     : GanttGraphicsObject( item, parent)
 {
+    if (!objCount++) {
+        _captureFont = new QFont();
+        _fontMetrics = new QFontMetrics(*_captureFont);
+    }
+}
 
+GanttTextGraphicsObject::~GanttTextGraphicsObject()
+{
+    if (--objCount<=0) {
+        delete _captureFont;
+        delete _fontMetrics;
+    }
 }
 
 void GanttTextGraphicsObject::paint(QPainter *painter,
@@ -29,7 +41,7 @@ void GanttTextGraphicsObject::paint(QPainter *painter,
         painter->save();
 
         painter->setPen(Qt::black);
-        painter->setFont(_captureFont);
+        painter->setFont(*_captureFont);
         if(!textLeft().isEmpty())
             painter->drawText(textLeftRect(), textLeft(), QTextOption(Qt::AlignCenter));
         if(!textRight().isEmpty())
@@ -48,9 +60,9 @@ QRectF GanttTextGraphicsObject::boundingRect() const
         res.moveTop(0);
 
     if(!textLeft().isEmpty())
-        res.adjust( -_fontMetrics.boundingRect(textLeft()).width() - _spacing, 0, 0, 0);
+        res.adjust( -_fontMetrics->boundingRect(textLeft()).width() - _spacing, 0, 0, 0);
     if(!textRight().isEmpty())
-        res.adjust( 0, 0, _fontMetrics.boundingRect(textRight()).width() + _spacing, 0);
+        res.adjust( 0, 0, _fontMetrics->boundingRect(textRight()).width() + _spacing, 0);
     return res;
 }
 
@@ -68,14 +80,14 @@ QString GanttTextGraphicsObject::textIn() const{
 
 QRect GanttTextGraphicsObject::textLeftRect() const
 {
-    int textWidth = _fontMetrics.boundingRect(textLeft()).width() + 2;
+    int textWidth = _fontMetrics->boundingRect(textLeft()).width() + 2;
     return QRect( -textWidth + shape().controlPointRect().left() - _spacing, 0,
                   textWidth, boundingRect().height());
 }
 
 QRect GanttTextGraphicsObject::textRightRect() const
 {
-    int textWidth = _fontMetrics.boundingRect(textRight()).width() + 2;
+    int textWidth = _fontMetrics->boundingRect(textRight()).width() + 2;
 
     return QRect( shape().controlPointRect().right() + _spacing, 0,
              textWidth, boundingRect().height());

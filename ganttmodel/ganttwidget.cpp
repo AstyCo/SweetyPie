@@ -46,8 +46,6 @@ GanttWidget::GanttWidget(QWidget *parent) :
 GanttWidget::~GanttWidget()
 {
     delete ui;
-    if(_factory)
-        delete _factory;
 }
 
 /*!
@@ -103,6 +101,8 @@ void GanttWidget::setFactory(AbstractGanttFactory *factory)
     if(_factory)
         delete _factory;
     _factory = factory;
+
+    _factory->initialize(_treeInfo);
 }
 
 void GanttWidget::setView(QTreeView *view, bool /*inner*/)

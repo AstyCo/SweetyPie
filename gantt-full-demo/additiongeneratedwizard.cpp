@@ -6,22 +6,28 @@
 #include "extensions/timespan_extension.h"
 
 #include <QIntValidator>
+#include <QSettings>
 
 #define INTRO_PAGE 0
 #define GENERATE_PAGE 1
 
 AdditionGeneratedWizard::AdditionGeneratedWizard(QWidget *parent) :
     QWizard(parent),
-    ui(new Ui::AdditionGeneratedWizard)
+    ui(new Ui::AdditionGeneratedWizard),
+    _settings("AstyCo", "QtGantt")
 {
     ui->setupUi(this);
 
     ui->lineEditEventCount->setValidator(new QIntValidator(1, 10000, ui->lineEditEventCount));
     ui->lineEditMaxNest->setValidator(new QIntValidator(1, 10, ui->lineEditMaxNest));
+
+    loadSettings();
 }
 
 AdditionGeneratedWizard::~AdditionGeneratedWizard()
 {
+    saveSettings();
+
     delete ui;
 }
 
@@ -42,8 +48,8 @@ void AdditionGeneratedWizard::initializePage(int id)
         if (!ui->checkBoxGenerate->isChecked())
             done(QWizard::Accepted);
 
-        ui->dateTimeEditMin->setDateTime(QDateTime::currentDateTimeUtc());
-        ui->dateTimeEditMax->setDateTime(UtcDateTime(QDateTime::currentDateTimeUtc() + TimeSpan(1, 10, 0)).dateTime());
+//        ui->dateTimeEditMin->setDateTime(QDateTime::currentDateTimeUtc());
+//        ui->dateTimeEditMax->setDateTime(UtcDateTime(QDateTime::currentDateTimeUtc() + TimeSpan(1, 10, 0)).dateTime());
     }
 }
 
@@ -270,4 +276,34 @@ void AdditionGeneratedWizard::addGenerated()
             }
         }
     }
+}
+
+void AdditionGeneratedWizard::saveSettings()
+{
+//     store settings
+    _settings.beginGroup("QtGantt_demo");
+        _settings.beginGroup("events_generation");
+        {
+            _settings.setValue("count", ui->lineEditEventCount->text().toInt());
+            _settings.setValue("nest", ui->lineEditMaxNest->text().toInt());
+            _settings.setValue("min_dt", ui->dateTimeEditMin->dateTime());
+            _settings.setValue("max_dt", ui->dateTimeEditMax->dateTime());
+        }
+        _settings.endGroup();
+    _settings.endGroup();
+}
+
+void AdditionGeneratedWizard::loadSettings()
+{
+    // load settings
+    _settings.beginGroup("QtGantt_demo");
+        _settings.beginGroup("events_generation");
+        {
+            ui->lineEditEventCount->setText(QString::number(_settings.value("count", 10).toInt()));
+            ui->lineEditMaxNest->setText(QString::number(_settings.value("nest", 1).toInt()));
+            ui->dateTimeEditMin->setDateTime(_settings.value("min_dt", QDateTime::currentDateTimeUtc()).toDateTime());
+            ui->dateTimeEditMax->setDateTime(_settings.value("max_dt", QDateTime::currentDateTimeUtc().addSecs(60 * 100)).toDateTime());
+        }
+        _settings.endGroup();
+    _settings.endGroup();
 }

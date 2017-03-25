@@ -84,24 +84,12 @@ void GanttInfoTree::onCurrentItemChanged(const GanttInfoItem *item)
 
 GanttInfoItem *GanttInfoTree::infoForIndex(const QModelIndex &index) const
 {
-    if (index.parent().isValid())
-        return infoForIndex(index.parent())->at(index.row());
-    if (index.isValid())
-        return _root->at(index.row());
-    return _root;
+    return _factory->infoForIndex(index);
 }
 
 QModelIndex GanttInfoTree::indexForInfo(const GanttInfoItem *item) const
 {
-    if (!item || !item->parent())
-        return QModelIndex();
-
-    QModelIndex parentIndex = indexForInfo(item->parent());
-    if(!_model->hasIndex(item->row(), 0, parentIndex))
-    {
-        qDebug() << "debug stop here";
-    }
-    return _model->index(item->row(), 0, parentIndex);
+    return _factory->indexForInfo(item);
 }
 
 GanttInfoItem *GanttInfoTree::nextStart(const UtcDateTime &dt) const

@@ -57,12 +57,13 @@ public:
 //    QModelIndex index() const;
 
     QString     title() const;
+    MyUtcDateTimeInterval interval() const;
     UtcDateTime start() const;
     TimeSpan timeSpan() const;
     QColor      color() const;
     UtcDateTime finish() const;
 
-    virtual bool isExpanded() const;
+    bool isExpanded() const;
     bool hasChilds() const;
     bool hasStart() const;
     bool hasDuration() const;

@@ -23,7 +23,7 @@ class GANTTMODELSHARED_EXPORT GanttTextGraphicsObject : public GanttGraphicsObje
 
 public:
     GanttTextGraphicsObject(GanttInfoItem *item,QGraphicsItem *parent = NULL);
-
+    ~GanttTextGraphicsObject();
 
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
     QRectF boundingRect() const;
@@ -38,8 +38,9 @@ private slots:
 
 private:
     static int _spacing;
-    static QFont _captureFont;
-    static QFontMetrics _fontMetrics;
+    static long long objCount;
+    static QFont *_captureFont;
+    static QFontMetrics *_fontMetrics;
 };
 
 #endif // GANTTTEXTGRAPHICSOBJECT_H

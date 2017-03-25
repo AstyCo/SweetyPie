@@ -36,6 +36,7 @@ public:
 
     void connectTreeView(QTreeView *view);
     void disconnectTreeView(QTreeView *view);
+//  (Migrated to GanttFactory)
     GanttInfoItem *infoForIndex(const QModelIndex &index) const;
     QModelIndex indexForInfo(const GanttInfoItem *item) const;
     GanttInfoItem *nextStart(const UtcDateTime &dt) const;

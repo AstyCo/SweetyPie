@@ -20,6 +20,8 @@
 #include "extensions-gui/interfaces/abstractganttfactory.h"
 #include "extensions-gui/interfaces/imodelwrapper.h"
 
+#include <QObject>
+
 /*!
  * \~russian
  * \brief Класс GanttFactory class реализует абстрактные методы класса AbstractGanttFactory class, используя конкретную реализацию IModelWrapper class.
@@ -33,7 +35,7 @@
  * The GanttFactory class realize abstract methods of AbstractGanttFactory class,
  * using concrete realization of IModelWrapper class.
  */
-class GANTTMODELSHARED_EXPORT GanttFactory : public AbstractGanttFactory
+class GANTTMODELSHARED_EXPORT GanttFactory : public QObject, public AbstractGanttFactory
 {
 public:
     enum RegisteredGraphicsObjectType{
@@ -44,16 +46,21 @@ public:
 
 
     // Construtor
-    explicit GanttFactory(IModelWrapper *wrapper);
+    explicit GanttFactory(IModelWrapper *wrapper, QObject *parent = NULL);
     ~GanttFactory();
 
     virtual GanttInfoItem *createInfo(const QModelIndex &index, GanttInfoItem *parent);
     virtual GanttGraphicsObject *createGraphicsObject(GanttInfoItem *info, const QModelIndex &index);
     virtual QAbstractItemModel *model() const;
 
+    virtual GanttInfoItem *infoForIndex(const QModelIndex &index) const;
+    virtual QModelIndex indexForInfo(const GanttInfoItem *item) const;
+
     virtual bool isEvent(const QModelIndex &index) const;
+    virtual void initialize(GanttInfoTree *tree);
 
 private:
+    GanttInfoTree *_treeInfo;
     IModelWrapper *_wrapper;
     static RegisteredGraphicsObjectType readTag(const QString &tag);
 };

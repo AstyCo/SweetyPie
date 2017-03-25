@@ -227,13 +227,16 @@ void GanttScene::onVisItemDestroyed()
 
 void GanttScene::onInfoAboutToBeDeleted()
 {
+    qDebug() << "onInfoAboutToBeDeleted" ;
     GanttInfoItem *info = qobject_cast<GanttInfoItem*>(sender());
     if(!info)
         return;
+    qDebug() << "from" << info->title();
 
     GanttGraphicsObject *graphicsObject = _itemForInfo.value(info, NULL);
 
     if(graphicsObject){
+        qDebug() << "graphicsObject going to be deleted" << info->title();
         _itemForInfo.remove(info);          // clear cache
         _items.removeOne(graphicsObject);   // clear cache
 
@@ -541,9 +544,9 @@ void GanttScene::addInfoItem(GanttInfoItem *parent, int from, int to)
     if(!parent)
         return;
 
-    qDebug() << "scene addinfoitem" << parent->title() << from << to;
-    for (int i=0; i<parent->size(); ++i)
-        qDebug() << parent->title() << tr("at(%1)").arg(i) << parent->at(i)->title();
+//    qDebug() << "scene addinfoitem" << parent->title() << from << to;
+//    for (int i=0; i<parent->size(); ++i)
+//        qDebug() << parent->title() << tr("at(%1)").arg(i) << parent->at(i)->title();
 
     for(int i = from; i <= to; ++i)
         onItemAdded(parent->at(i));
@@ -682,6 +685,7 @@ UtcDateTime GanttScene::posToDt(int pos) const
 
 void GanttScene::onItemAdded(GanttInfoItem *info)
 {
+    qDebug() << "onItemAdded" << info->title();
     if(!info)
         return;
     GanttGraphicsObject *p_object = NULL;
