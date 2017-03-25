@@ -13,6 +13,8 @@ void GanttGraphicsObject::init()
 {
     _current = false;
     _dtline = NULL;
+
+//    connect(m_info.data(), SIGNAL(aboutToBeDeleted()), this, SLOT(deleteLater()));
 }
 
 GanttGraphicsObject::GanttGraphicsObject(GanttInfoItem*item,QGraphicsItem *parent)
@@ -25,8 +27,6 @@ GanttGraphicsObject::GanttGraphicsObject(GanttInfoItem*item,QGraphicsItem *paren
 
 GanttGraphicsObject::~GanttGraphicsObject()
 {
-    if(info())
-        info()->reduceLinkCnt();
 }
 
 GanttInfoItem *GanttGraphicsObject::info() const

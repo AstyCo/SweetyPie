@@ -226,9 +226,8 @@ void GanttWidget::connectSceneWithInfo()
     _scene->setTreeInfo(_treeInfo);
 
     connect(_treeInfo,SIGNAL(currentChanged(GanttInfoItem*)),_scene,SLOT(setCurrentItemByInfo(GanttInfoItem*)));
-    connect(_treeInfo,SIGNAL(treeReset()),_scene,SLOT(onTreeInfoReset()));
+//    connect(_treeInfo,SIGNAL(treeReset()),_scene,SLOT(onTreeInfoReset()));
     connect(_treeInfo,SIGNAL(rowsInserted(GanttInfoItem*,int,int)),_scene,SLOT(addInfoItem(GanttInfoItem*,int,int)));
-
 
     connect(_treeInfo,SIGNAL(endRemoveItems()),_scene,SLOT(updateSceneRect()));
 

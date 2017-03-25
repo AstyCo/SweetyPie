@@ -205,7 +205,7 @@ void GanttScene::wheelEvent(QGraphicsSceneWheelEvent *event)
 
 void GanttScene::onTreeInfoReset()
 {
-//    clear();
+    clear();
     addInfoItem(_treeInfo->root());
     updateIntersections();
     updateSceneRect();
@@ -227,16 +227,16 @@ void GanttScene::onVisItemDestroyed()
 
 void GanttScene::onInfoAboutToBeDeleted()
 {
-    qDebug() << "onInfoAboutToBeDeleted" ;
+//    qDebug() << "onInfoAboutToBeDeleted" ;
     GanttInfoItem *info = qobject_cast<GanttInfoItem*>(sender());
     if(!info)
         return;
-    qDebug() << "from" << info->title();
+//    qDebug() << "from" << info->title();
 
     GanttGraphicsObject *graphicsObject = _itemForInfo.value(info, NULL);
 
     if(graphicsObject){
-        qDebug() << "graphicsObject going to be deleted" << info->title();
+//        qDebug() << "graphicsObject going to be deleted" << info->title();
         _itemForInfo.remove(info);          // clear cache
         _items.removeOne(graphicsObject);   // clear cache
 

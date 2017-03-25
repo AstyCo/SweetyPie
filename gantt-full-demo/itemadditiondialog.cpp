@@ -105,7 +105,7 @@ void ItemAdditionDialog::on_pushButtonColor_clicked()
 
 void ItemAdditionDialog::on_checkBoxInterval_stateChanged(int arg1)
 {
-    qDebug() << "state changed" << arg1;
+//    qDebug() << "state changed" << arg1;
     if (arg1)
         showFinish();
     else

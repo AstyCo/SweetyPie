@@ -98,10 +98,10 @@ void MainWindow::addLast()
 
 void MainWindow::onCustomContextMenuRequested(const QPoint &pos)
 {
-    qDebug() << "onCustomContextMenuRequested";
+//    qDebug() << "onCustomContextMenuRequested";
 
-    qDebug() << "dtforpos" << ui->ganttWidget->dtForPos(pos);
-    qDebug() << "indexforpos" << ui->ganttWidget->indexForPos(pos);
+//    qDebug() << "dtforpos" << ui->ganttWidget->dtForPos(pos);
+//    qDebug() << "indexforpos" << ui->ganttWidget->indexForPos(pos);
     _item = NULL;
     ItemAdditionDialog dlg(this);
     dlg.moveStart(ui->ganttWidget->dtForPos(pos));
@@ -177,7 +177,7 @@ void MainWindow::on_pushButton_ganttAddItems_clicked()
 
 GanttInfoItem *MainWindow::produceItem(const ItemAdditionDialog *dlg)
 {
-    qDebug() << "isDot?" << dlg->isDot() << "duration" << dlg->finish() - dlg->start();
+//    qDebug() << "isDot?" << dlg->isDot() << "duration" << dlg->finish() - dlg->start();
     return new GanttInfoItem(
                 dlg->title(),
                 dlg->start(),
@@ -193,7 +193,7 @@ void MainWindow::on_pushButton_ganttDump_clicked()
                                                     "",
                                                     "Gantt model dump (*.gmdd);;");
     if (!filename.isEmpty()) {
-        qDebug() << "dump fn" << filename;
+//        qDebug() << "dump fn" << filename;
         _model->serialize(filename);
     }
 }
@@ -201,10 +201,10 @@ void MainWindow::on_pushButton_ganttDump_clicked()
 void MainWindow::on_pushButton_ganttLoad_clicked()
 {
     QString filename = QFileDialog::getOpenFileName(this, tr("Загрузка модели"),
-                                                    "",
+                                                    "./",
                                                     "Gantt model dump (*.gmdd);;");
     if (!filename.isEmpty()) {
-        qDebug() << "load fn" << filename;
+//        qDebug() << "load fn" << filename;
         _model->deserialize(filename);
     }
 }

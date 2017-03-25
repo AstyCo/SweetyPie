@@ -47,10 +47,10 @@ GanttGraphicsObject *GanttFactory::createGraphicsObject(GanttInfoItem *info, con
     if(_wrapper){
         switch(readTag(_wrapper->tag(index))){
         case GanttIntervalGraphicsObjectType:
-            qDebug() << "created Interval" << info->title();
+//            qDebug() << "created Interval" << info->title();
             return new GanttIntervalGraphicsObject(info);
         case GanttCalcGraphicsObjectType:
-            qDebug() << "created CalcDt" << info->title();
+//            qDebug() << "created CalcDt" << info->title();
             return new GanttCalcGraphicsObject(info);
         default:
             qWarning("GanttFactory::createGraphicsObject");

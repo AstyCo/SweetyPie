@@ -179,9 +179,9 @@ void GanttInfoTree::reset()
     clear();
     fillByModelIndex();
 
-    emit treeReset();
+//    emit treeReset();
     onAnyAddition();
-    //    qDebug() << "reset -";
+//        qDebug() << "reset -";
 }
 
 //void GanttInfoTree::removeFromHash()
@@ -230,7 +230,7 @@ void GanttInfoTree::onDataChanged(const QModelIndex &/*from*/, const QModelIndex
 
 void GanttInfoTree::onRowsInserted(const QModelIndex &parent, int start, int end)
 {
-    qDebug() << "onRowsIns " << start << " " << end;
+//    qDebug() << "onRowsIns " << start << " " << end;
 //    printTreeR(_root, 0);
 //    reset();
 //    return;
@@ -320,7 +320,7 @@ void GanttInfoTree::fill(GanttInfoItem *node, const QModelIndex &index, int from
         QModelIndex childIndex = _model->index(i,0,index);
         GanttInfoItem *childItem = makeInfoItem(childIndex);
         node->insert(i, childItem);
-        qDebug() << node->title() << "append" << childItem->title();
+//        qDebug() << node->title() << "append" << childItem->title();
     }
     emit rowsInserted(node, from, to);
 }
@@ -438,13 +438,14 @@ void GanttInfoTree::clearLimits()
 void GanttInfoTree::fillByModelIndex(const QModelIndex &parent)
 {
 //    qDebug() << "fillByModelIndex " << parent;
-    if((!parent.isValid() || _model->canFetchMore(parent)) && _model->hasChildren(parent)){
-//        qDebug() << "fill " << parent << _model->rowCount(parent)-1;
+    if((!parent.isValid() || _model->canFetchMore(parent)) && _model->hasChildren(parent)) {
+//        qDebug() << "fill" << parent << _model->rowCount(parent)-1;
         fill(infoForIndex(parent), parent, 0, _model->rowCount(parent) - 1);
 
-        for(int i=0; i < _model->rowCount(parent); ++i)
+        for (int i=0; i < _model->rowCount(parent); ++i)
             fillByModelIndex(_model->index(i, 0, parent));
     }
+//    qDebug() << "end" << parent;
 }
 
 void GanttInfoTree::setLimits(const QPair<UtcDateTime, UtcDateTime> &newLimits)
