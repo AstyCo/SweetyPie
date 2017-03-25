@@ -53,7 +53,6 @@ signals:
     void rowsInserted(GanttInfoItem *parent, int from, int to);
     void endRemoveItems();
     void itemAdded(GanttInfoItem *item);
-    void itemAboutToBeDeleted(GanttInfoItem *item);
     void itemRemoved(GanttInfoItem *item);
     void currentChanged(const QModelIndex &index, QItemSelectionModel::SelectionFlags command);
     void currentChanged(GanttInfoItem *item);

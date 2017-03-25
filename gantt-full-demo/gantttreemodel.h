@@ -48,6 +48,7 @@ public:
     void addInner(GanttInfoItem *item, GanttInfoItem *targetItem);
     void addAfter(GanttInfoItem *item, GanttInfoItem *targetItem);
     void addBefore(GanttInfoItem *item, GanttInfoItem *targetItem);
+    void removeItem(GanttInfoItem *item);
     bool canFetchMore(const QModelIndex &/*parent*/) const{
         return true;
     }

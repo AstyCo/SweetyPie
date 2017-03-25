@@ -82,6 +82,11 @@ void MainWindow::addInner()
     }
 }
 
+void MainWindow::removeItem()
+{
+    _model->removeItem(_item);
+}
+
 void MainWindow::addFirst()
 {
     if (_dlg->exec() == QDialog::Accepted) {
@@ -140,6 +145,10 @@ void MainWindow::onCustomContextMenuRequested(const QPoint &pos)
         QAction action3(QString::fromUtf8("Добавить вложенное событие"), this);
         connect(&action3, SIGNAL(triggered()), this, SLOT(addInner()));
         contextMenu.addAction(&action3);
+
+        QAction action4(QString::fromUtf8("Удалить событие"), this);
+        connect(&action4, SIGNAL(triggered()), this, SLOT(removeItem()));
+        contextMenu.addAction(&action4);
 
 
         contextMenu.exec(ui->ganttWidget->mapPosToGlobal(pos));

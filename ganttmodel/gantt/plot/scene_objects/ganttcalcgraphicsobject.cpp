@@ -55,7 +55,7 @@ void GanttCalcGraphicsObject::init()
         connect(info(), SIGNAL(changed()),this,SLOT(updateItemGeometry()));
         connect(info(), SIGNAL(changed()),this,SLOT(updateToolTip()));
 
-        info()->increaseLinkCnt();
+//        info()->increaseLinkCnt();
     }
 
     setAcceptHoverEvents(true);

@@ -123,10 +123,10 @@ public slots:
     void moveLowerItems();
     void moveLowerItemsBy(int id);
     void updatePos();
-    void increaseLinkCnt();
-    void reduceLinkCnt();
+//    void increaseLinkCnt();
+//    void reduceLinkCnt();
     void deleteInfoItem();
-    void tryDelete();
+//    void tryDelete();
 
 public:
     static QPair<UtcDateTime, UtcDateTime> myMax(
@@ -160,13 +160,13 @@ private:
     bool _expanded; ///< current expansion state
     int _pos;       ///< caches vertical pos
 
-    //@{
-    /** For thread safe */
+//    //@{
+//    /** For thread safe */
 
-    unsigned int _linkCnt;
-    bool _deleted;
-    QMutex _mutex;
-    //@}
+//    unsigned int _linkCnt;
+//    bool _deleted;
+//    QMutex _mutex;
+//    //@}
 };
 
 #endif // GANTTINFOITEM_H

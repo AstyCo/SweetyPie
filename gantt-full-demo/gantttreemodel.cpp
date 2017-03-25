@@ -230,19 +230,20 @@ GanttInfoItem *GanttTreeModel::root() const
 }
 
 
-void deleteFunc(GanttInfoItem* item)
-{
-    if(item->parent())
-    {
-        item->deleteInfoItem();
-    }
-}
+//void deleteFunc(GanttInfoItem* item)
+//{
+//    if(item->parent())
+//    {
+//        item->deleteInfoItem();
+//    }
+//}
 
 void GanttTreeModel::clear()
 {
-    beginRemoveRows(QModelIndex(),0,_root->size());
+    beginRemoveRows(QModelIndex(),0,_root->size()-1);
 
-    callRecursively(_root, &deleteFunc);
+    foreach (GanttInfoItem *item, _root->items())
+        item->deleteInfoItem();
 //    qDebug() << "MODEL m_root size after clear " << m_root->size();
 
     endRemoveRows();
@@ -506,7 +507,19 @@ void GanttTreeModel::addBefore(GanttInfoItem *item, GanttInfoItem *targetItem)
 //        setIndexR(item);
     }
     endInsertRows();
-//    reset();
+    //    reset();
+}
+
+void GanttTreeModel::removeItem(GanttInfoItem *item)
+{
+    if (!item)
+        return;
+    QModelIndex index = indexForInfo(item);
+    if (!index.isValid())
+        return;
+    beginRemoveRows(parent(index), index.row(), index.row());
+    item->deleteInfoItem();
+    endRemoveRows();
 }
 
 GanttInfoItem *GanttTreeModel::itemForName(const QString &title, GanttInfoItem *parent) const
@@ -530,34 +543,6 @@ GanttInfoItem *GanttTreeModel::itemForName(const QString &title, GanttInfoItem *
 //    }
 //}
 
-void deserializeHelper(QDataStream &ds, GanttInfoItem *item, GanttInfoItem *parent)
-{
-    QString title;
-    ds >> title;
-    item->setTitle(title);
-    MyUtcDateTimeInterval interval;
-    ds >> interval;
-    item->setStart(interval.min());
-    item->setTimeSpan(interval.timeSpan());
-    QColor color;
-    ds >> color;
-    item->setColor(color);
-    bool exp;
-    ds >> exp;
-    item->setExpanded(exp);
-    int pos;
-    ds >> pos;
-    item->setPos(pos);
-
-    int childrenCnt;
-    ds >> childrenCnt;
-    for (int i=0; i < childrenCnt; ++i) {
-        GanttInfoItem *child = new GanttInfoItem();
-        deserializeHelper(ds, child, item);
-        item->append(child);
-    }
-}
-
 inline QDataStream &operator<<(QDataStream &ds, const GanttInfoItem &item)
 {
     ds << item.title();
@@ -573,9 +558,32 @@ inline QDataStream &operator<<(QDataStream &ds, const GanttInfoItem &item)
     return ds;
 }
 
-inline QDataStream &operator>>(QDataStream &ds, GanttInfoItem &i)
+inline QDataStream &operator>>(QDataStream &ds, GanttInfoItem &item)
 {
-    deserializeHelper(ds, &i, NULL);
+    QString title;
+    ds >> title;
+    item.setTitle(title);
+    MyUtcDateTimeInterval interval;
+    ds >> interval;
+    item.setStart(interval.min());
+    item.setTimeSpan(interval.timeSpan());
+    QColor color;
+    ds >> color;
+    item.setColor(color);
+    bool exp;
+    ds >> exp;
+    item.setExpanded(exp);
+    int pos;
+    ds >> pos;
+    item.setPos(pos);
+
+    int childrenCnt;
+    ds >> childrenCnt;
+    for (int i=0; i < childrenCnt; ++i) {
+        GanttInfoItem *child = new GanttInfoItem();
+        ds >> *child;
+        item.append(child);
+    }
 
     return ds;
 }

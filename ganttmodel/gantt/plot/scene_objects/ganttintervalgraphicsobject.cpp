@@ -34,7 +34,7 @@ void GanttIntervalGraphicsObject::init()
         connect(info(), SIGNAL(changed()),this,SLOT(updateItemGeometry()));
         connect(info(), SIGNAL(changed()),this,SLOT(updateToolTip()));
 
-        info()->increaseLinkCnt();
+//        info()->increaseLinkCnt();
     }
 
     setZValue(1);

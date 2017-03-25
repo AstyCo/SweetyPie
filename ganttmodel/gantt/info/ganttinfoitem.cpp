@@ -217,8 +217,6 @@ void GanttInfoItem::init()
 {
     _expanded = false;
     _pos = 0;
-    _linkCnt = 0;
-    _deleted = false;
     _parent = NULL;
     _color = Qt::green;
 //    _index = QModelIndex();
@@ -243,6 +241,8 @@ MyUtcDateTimeInterval GanttInfoItem::getInterval() const
 void GanttInfoItem::onChildDeleted()
 {
     GanttInfoItem *item = qobject_cast<GanttInfoItem*>(sender());
+    Q_ASSERT(item);
+//    qDebug() << "onChildDeleted" << item->title();
 
     _items.removeOne(item);
 }
@@ -347,16 +347,16 @@ void GanttInfoItem::setTimeSpan(const TimeSpan &ts)
 //    return _index;
 //}
 
-void GanttInfoItem::increaseLinkCnt()
-{
-    ++_linkCnt;
-}
+//void GanttInfoItem::increaseLinkCnt()
+//{
+//    ++_linkCnt;
+//}
 
-void GanttInfoItem::reduceLinkCnt()
-{
-    --_linkCnt;
-//    tryDelete();
-}
+//void GanttInfoItem::reduceLinkCnt()
+//{
+//    --_linkCnt;
+////    tryDelete();
+//}
 
 QPair<UtcDateTime,UtcDateTime> GanttInfoItem::myMax(
         const QPair<UtcDateTime,UtcDateTime>&f,
@@ -384,13 +384,17 @@ QPair<UtcDateTime,UtcDateTime> GanttInfoItem::myMax(
 void GanttInfoItem::disconnectParent()
 {
     if(_parent){
+        disconnect(_parent, SIGNAL(aboutToBeDeleted()), this, SLOT(deleteInfoItem()));
         disconnect(this,SIGNAL(aboutToBeDeleted()),_parent,SLOT(onChildDeleted()));
     }
 }
 
 void GanttInfoItem::connectParent()
 {
-    connect(this,SIGNAL(aboutToBeDeleted()),_parent,SLOT(onChildDeleted()));
+    if (_parent) {
+        connect(_parent, SIGNAL(aboutToBeDeleted()), this, SLOT(deleteInfoItem()));
+        connect(this, SIGNAL(aboutToBeDeleted()),_parent, SLOT(onChildDeleted()));
+    }
 }
 
 QPair<UtcDateTime,UtcDateTime> GanttInfoItem::getLimits(const GanttInfoItem *root)
@@ -430,7 +434,6 @@ void GanttInfoItem::setParent(GanttInfoItem *parent)
 {
     if(parent == _parent)
         return;
-
     disconnectParent();
     _parent = parent;
     connectParent();
@@ -440,23 +443,29 @@ void GanttInfoItem::setParent(GanttInfoItem *parent)
 
 void GanttInfoItem::deleteInfoItem()
 {
+//    qDebug() << title() << "called delete info item";
     emit aboutToBeDeleted();
-    tryDelete();
+//    foreach (GanttInfoItem *child, _items)
+//        qDebug() << "mychild" << child->title();
+    Q_ASSERT(size() == 0);
+//    tryDelete();
+//    setParent(NULL);
+    deleteLater();
 }
 
-void GanttInfoItem::tryDelete()
-{
-    if(_linkCnt>0)
-        return;
+//void GanttInfoItem::tryDelete()
+//{
+//    if(_linkCnt>0)
+//        return;
 
-    _mutex.lock();
-    if(!_deleted)
-    {
-        this->deleteLater();
-        _deleted = true;
-    }
-    _mutex.unlock();
-}
+//    _mutex.lock();
+//    if(!_deleted)
+//    {
+//        this->deleteLater();
+//        _deleted = true;
+//    }
+//    _mutex.unlock();
+//}
 
 qreal GanttInfoItem::calcPos() const
 {

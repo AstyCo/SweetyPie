@@ -144,24 +144,20 @@ void GanttInfoTree::onCollapsed(const QModelIndex &index)
         node->setExpanded(false);
 }
 
-void deleteInfoItemFunc(GanttInfoItem* item)
-{
-    if(item->parent()){
-        item->deleteInfoItem();
-    }
-}
+//void deleteInfoItemFunc(GanttInfoItem* item)
+//{
+//    if(item->parent()){
+//        item->deleteInfoItem();
+//    }
+//}
 
 void GanttInfoTree::clear()
 {
-    if(_root)
-        callRecursively(_root, &deleteInfoItemFunc);
-
-//    qDebug() << "TREE m_root size after clear " << _root->size();
-//    _root->clear();
+    foreach (GanttInfoItem *item, _root->items())
+        item->deleteInfoItem();
 
     clearLimits();
 
-//    _infoForIndex.clear();  // clears cache
     _infoForStart.clear();  // clears cache
     _infoForFinish.clear(); // clears cache
 
@@ -170,7 +166,7 @@ void GanttInfoTree::clear()
 
 void GanttInfoTree::reset()
 {
-//    qDebug() << "reset +";
+    qDebug() << "reset +";
     if(!_model){
         qWarning("GanttInfoTree called reset w/o model");
         return;
@@ -249,11 +245,15 @@ void GanttInfoTree::onColumnsInserted(const QModelIndex &/*parent*/, int /*start
     reset();
 }
 
-void GanttInfoTree::onRowsRemoved(const QModelIndex &/*parent*/, int /*start*/, int /*end*/)
+void GanttInfoTree::onRowsRemoved(const QModelIndex &parent, int start, int end)
 {
-    /// TODO optimization
-    reset();
+    qDebug() << "onRowsRemoved" << parent << start << end;
+    GanttInfoItem *item = _factory->infoForIndex(parent);
+    for (int i=start; i <= end; ++i) {
+        item->at(start)->deleteInfoItem();
+    }
 
+    item->moveLowerItemsBy(start - 1);
     clearLimits();
     updateLimits();
     emitLimitsChanged();
@@ -275,9 +275,6 @@ void GanttInfoTree::onItemAboutToBeDeleted()
         clearInfoForDtHelper(_infoForStart, item->start(), item);
         clearInfoForDtHelper(_infoForFinish, item->finish(), item);
     }
-
-    if(item)
-        emit itemAboutToBeDeleted(item);
 }
 
 void GanttInfoTree::updateLimits()
