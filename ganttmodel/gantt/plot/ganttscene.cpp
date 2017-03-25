@@ -309,6 +309,7 @@ void GanttScene::clear()
     _items.clear();
     _itemForInfo.clear();
     addPersistentItems();
+    invalidateBackground();
 }
 
 
@@ -685,7 +686,7 @@ UtcDateTime GanttScene::posToDt(int pos) const
 
 void GanttScene::onItemAdded(GanttInfoItem *info)
 {
-    qDebug() << "onItemAdded" << info->title();
+//    qDebug() << "onItemAdded" << info->title();
     if(!info)
         return;
     GanttGraphicsObject *p_object = NULL;
