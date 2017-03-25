@@ -498,7 +498,7 @@ void GanttScene::drawBackgroundExpandedNode(QPainter *painter, GanttInfoItem *no
             }
         }
 
-        drawBackgroundExpandedNodeRect(painter, nest + 1, bgLeft, bgWidth, top, (isLast ? bottom - dy : bottom));
+        drawBackgroundExpandedNodeRect(painter, nest + 1, bgLeft, bgWidth, top, (isLast ? bottom - dy + 1 : bottom));
     }
 }
 
@@ -541,6 +541,10 @@ void GanttScene::addInfoItem(GanttInfoItem *parent, int from, int to)
     if(!parent)
         return;
 
+    qDebug() << "scene addinfoitem" << parent->title() << from << to;
+    for (int i=0; i<parent->size(); ++i)
+        qDebug() << parent->title() << tr("at(%1)").arg(i) << parent->at(i)->title();
+
     for(int i = from; i <= to; ++i)
         onItemAdded(parent->at(i));
 
@@ -560,12 +564,9 @@ void GanttScene::updateIntersectionR(GanttInfoItem *item)
         updateIntersectionR(item->at(i));
 
     if (GanttIntervalGraphicsObject *graphicsObject
-            = qobject_cast<GanttIntervalGraphicsObject*>(itemForInfo(item))) {
+            = qobject_cast<GanttIntervalGraphicsObject*>(itemForInfo(item)))
+    {
         graphicsObject->updateIntersection();
-
-    }
-    else {
-        qCritical("GanttScene::updateIntersection");
     }
 }
 
@@ -686,7 +687,7 @@ void GanttScene::onItemAdded(GanttInfoItem *info)
     GanttGraphicsObject *p_object = NULL;
 
     if(_factory)
-        p_object = _factory->createGraphicsObject(info);
+        p_object = _factory->createGraphicsObject(info, _treeInfo->indexForInfo(info));
     else
         qWarning("GanttScene::onItemAdded _factory is NULL");
 

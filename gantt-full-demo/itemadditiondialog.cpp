@@ -22,6 +22,8 @@ ItemAdditionDialog::ItemAdditionDialog(QWidget *parent) :
             this, SLOT(onBeginChanged(QDateTime)));
     connect(ui->dateTimeEditEnd, SIGNAL(dateTimeChanged(QDateTime)),
             this, SLOT(onEndChanged(QDateTime)));
+
+    hideFinish();
 }
 
 ItemAdditionDialog::~ItemAdditionDialog()

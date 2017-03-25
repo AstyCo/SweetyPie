@@ -102,7 +102,7 @@ void GanttDtCrossObject::updatePaths()
 {
     if(m_scene)
     {
-        QPointF rel = mapFromScene(m_scene->sceneRect().topLeft());
+//        QPointF rel = mapFromScene(m_scene->sceneRect().topLeft());
         QPainterPath linesPath ;
 
 //        linesPath.moveTo(rel.x(),0);

@@ -18,7 +18,7 @@
 extern MGridScene* mem_scene;
 
 MGridInteractiveUnit::MGridInteractiveUnit(MGridScene* scene,QGraphicsItem *parent /*= 0*/)
-    : QGraphicsItem(parent,scene)
+    : QGraphicsItem(parent)
 {
     m_start=0;
     m_length=0;
@@ -27,6 +27,7 @@ MGridInteractiveUnit::MGridInteractiveUnit(MGridScene* scene,QGraphicsItem *pare
     {
         Q_ASSERT(false);
     }
+    m_scene->addItem(this);
 
     m_enabled = false;
 

@@ -118,16 +118,16 @@ QAbstractItemModel *GanttWidget::model() const
     return _treeInfo->model();
 }
 
-UtcDateTime GanttWidget::dtForPos(const QPointF &pos) const
+UtcDateTime GanttWidget::dtForPos(const QPoint &pos) const
 {
     return _scene->posToDt(pos.x());
 }
 
-QModelIndex GanttWidget::indexForPos(const QPointF &pos) const
+QModelIndex GanttWidget::indexForPos(const QPoint &pos) const
 {
-    GanttInfoItem *tmp = _treeInfo->infoForVPos(pos.y());
+    GanttInfoItem *tmp = _treeInfo->infoForVPos(ui->ganttView->mapToScene(pos).y());
     if (tmp)
-        return tmp->index();
+        return _treeInfo->indexForInfo(tmp);
 
     qDebug() << "index not found";
     return QModelIndex();

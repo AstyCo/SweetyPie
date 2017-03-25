@@ -14,6 +14,7 @@
 #include <QKeyEvent>
 #include <QStyleOption>
 #include <QApplication>
+#include <qdrawutil.h>
 
 #include <QDebug>
 

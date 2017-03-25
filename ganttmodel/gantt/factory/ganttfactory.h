@@ -47,11 +47,11 @@ public:
     explicit GanttFactory(IModelWrapper *wrapper);
     ~GanttFactory();
 
-    virtual GanttInfoItem *createInfo(const QModelIndex &index);
-    virtual GanttGraphicsObject *createGraphicsObject(GanttInfoItem *info);
+    virtual GanttInfoItem *createInfo(const QModelIndex &index, GanttInfoItem *parent);
+    virtual GanttGraphicsObject *createGraphicsObject(GanttInfoItem *info, const QModelIndex &index);
     virtual QAbstractItemModel *model() const;
 
-    virtual bool isEvent(GanttInfoItem *info) const;
+    virtual bool isEvent(const QModelIndex &index) const;
 
 private:
     IModelWrapper *_wrapper;

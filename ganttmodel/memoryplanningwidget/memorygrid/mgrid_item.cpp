@@ -14,7 +14,7 @@
 #include <QDebug>
 
 MGridItem::MGridItem(long index,QGraphicsScene *scene,qreal edgeLength,qreal borderWidth,QGraphicsItem *parent/* = 0*/)
-    :  QGraphicsItem(parent,scene)
+    :  QGraphicsItem(parent)
 {
     setIndex(index);
 
@@ -22,11 +22,13 @@ MGridItem::MGridItem(long index,QGraphicsScene *scene,qreal edgeLength,qreal bor
         // NULL if not MemoryUnit*
 
     m_scene = dynamic_cast<MGridScene*>(scene);
+    if (m_scene)
+        m_scene->addItem(this);
 
     setEdgeLength(edgeLength);
     setBorderWidth(borderWidth);
 
-    setAcceptsHoverEvents(true);
+    setAcceptHoverEvents(true);
     enableToolTip();
 
 }

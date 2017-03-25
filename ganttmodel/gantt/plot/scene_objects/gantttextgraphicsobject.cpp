@@ -68,14 +68,14 @@ QString GanttTextGraphicsObject::textIn() const{
 
 QRect GanttTextGraphicsObject::textLeftRect() const
 {
-    int textWidth = _fontMetrics.boundingRect(textLeft()).width();
+    int textWidth = _fontMetrics.boundingRect(textLeft()).width() + 2;
     return QRect( -textWidth + shape().controlPointRect().left() - _spacing, 0,
                   textWidth, boundingRect().height());
 }
 
 QRect GanttTextGraphicsObject::textRightRect() const
 {
-    int textWidth = _fontMetrics.boundingRect(textRight()).width();
+    int textWidth = _fontMetrics.boundingRect(textRight()).width() + 2;
 
     return QRect( shape().controlPointRect().right() + _spacing, 0,
              textWidth, boundingRect().height());

@@ -223,8 +223,8 @@ void MemoryPlanningWidget::setShowButtons(bool flag)
 
 void MemoryPlanningWidget::setShowViews(bool flag)
 {
-    ui->radioButtonGridView->setShown(flag);
-    ui->radioButtonLineView->setShown(flag);
+    ui->radioButtonGridView->setVisible(flag);
+    ui->radioButtonLineView->setVisible(flag);
 }
 
 void MemoryPlanningWidget::setSelectionMode(MGridScene::SelectionMode mode)

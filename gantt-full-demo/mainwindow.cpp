@@ -1,10 +1,6 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <time.h>
-#include <QKeyEvent>
 #include "utcdatetime.h"
 #include "gantt/private_extensions/gantt-lib_global_values.h"
 #include "gantttreemodel.h"
@@ -14,6 +10,12 @@
 #include "itemadditiondialog.h"
 #include "additiongeneratedwizard.h"
 
+#include <stdlib.h>
+#include <stdio.h>
+#include <time.h>
+#include <QKeyEvent>
+#include <QWidgetAction>
+#include <QLabel>
 
 void MainWindow::init()
 {
@@ -71,17 +73,24 @@ void MainWindow::addAfter()
     }
 }
 
+void MainWindow::addInner()
+{
+    if (_dlg->exec() == QDialog::Accepted) {
+        _model->addInner(produceItem(_dlg), _item);
+    }
+}
+
 void MainWindow::addFirst()
 {
     if (_dlg->exec() == QDialog::Accepted) {
-        _model->addAfter(produceItem(_dlg), _item);
+        _model->addBefore(produceItem(_dlg), NULL);
     }
 }
 
 void MainWindow::addLast()
 {
     if (_dlg->exec() == QDialog::Accepted) {
-        _model->addAfter(produceItem(_dlg), _item);
+        _model->addAfter(produceItem(_dlg), NULL);
     }
 }
 
@@ -100,6 +109,7 @@ void MainWindow::onCustomContextMenuRequested(const QPoint &pos)
     QModelIndex index = ui->ganttWidget->indexForPos(pos);
 
     QMenu contextMenu(tr("Context menu"), this);
+
     if (index.isValid()){
         _item = _model->itemForIndex(index);
         if (!_item) {
@@ -107,13 +117,29 @@ void MainWindow::onCustomContextMenuRequested(const QPoint &pos)
             return;
         }
 
-        QAction action1(QString::fromUtf8("Добавить перед %1").arg(_item->title()), this);
+        QLabel *titleLabel = new QLabel(QString::fromUtf8("<<%1>>").arg(_item->title()), &contextMenu);
+        titleLabel->setMargin(5);
+//        titleLabel->setStyleSheet("background-color: #ABABAB");
+        QWidgetAction *titleAction = new QWidgetAction(&contextMenu);
+        titleAction->setDefaultWidget(titleLabel);
+        titleAction->setObjectName("titleAction");
+        titleAction->setEnabled(false);
+        contextMenu.addAction(titleAction);
+        contextMenu.addSeparator();
+
+        QAction action1(QString::fromUtf8("Добавить событие спереди"), this);
         connect(&action1, SIGNAL(triggered()), this, SLOT(addBefore()));
         contextMenu.addAction(&action1);
 
-        QAction action2(QString::fromUtf8("Добавить после %1").arg(_item->title()), this);
+        QAction action2(QString::fromUtf8("Добавить событие после"), this);
         connect(&action2, SIGNAL(triggered()), this, SLOT(addAfter()));
         contextMenu.addAction(&action2);
+
+        QAction action3(QString::fromUtf8("Добавить вложенное событие"), this);
+        connect(&action3, SIGNAL(triggered()), this, SLOT(addInner()));
+        contextMenu.addAction(&action3);
+
+
         contextMenu.exec(ui->ganttWidget->mapPosToGlobal(pos));
     }
     else {
@@ -152,8 +178,8 @@ GanttInfoItem *MainWindow::produceItem(const ItemAdditionDialog *dlg)
     return new GanttInfoItem(
                 dlg->title(),
                 dlg->start(),
-                dlg->finish() - dlg->start(),
-                QModelIndex(),
+                (dlg->isDot() ? TimeSpan() : dlg->finish() - dlg->start()),
+//                QModelIndex(),
                 dlg->color()
                 );
 }

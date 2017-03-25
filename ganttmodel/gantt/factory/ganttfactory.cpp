@@ -28,28 +28,28 @@ GanttFactory::~GanttFactory()
         qWarning("GanttFactory::~GanttFactory");
 }
 
-GanttInfoItem *GanttFactory::createInfo(const QModelIndex &index)
+GanttInfoItem *GanttFactory::createInfo(const QModelIndex &index, GanttInfoItem *parent)
 {
     if(_wrapper){
         return new GanttInfoItem( _wrapper->title(index)
                                   , _wrapper->start(index)
                                   , _wrapper->length(index)
-                                  , index
-                                  , _wrapper->color(index) );
+                                  , _wrapper->color(index)
+                                  , parent);
     }
     qWarning("GanttFactory::createInfo called with NULL _wrapper");
     return NULL;
 }
 
-GanttGraphicsObject *GanttFactory::createGraphicsObject(GanttInfoItem *info)
+GanttGraphicsObject *GanttFactory::createGraphicsObject(GanttInfoItem *info, const QModelIndex &index)
 {
     if(_wrapper){
-        switch(readTag(_wrapper->tag(info->index()))){
+        switch(readTag(_wrapper->tag(index))){
         case GanttIntervalGraphicsObjectType:
-//            qDebug() << "created Interval" << info->title();
+            qDebug() << "created Interval" << info->title();
             return new GanttIntervalGraphicsObject(info);
         case GanttCalcGraphicsObjectType:
-//            qDebug() << "created CalcDt" << info->title();
+            qDebug() << "created CalcDt" << info->title();
             return new GanttCalcGraphicsObject(info);
         default:
             qWarning("GanttFactory::createGraphicsObject");
@@ -67,12 +67,12 @@ QAbstractItemModel *GanttFactory::model() const
     return NULL;
 }
 
-bool GanttFactory::isEvent(GanttInfoItem *info) const
+bool GanttFactory::isEvent(const QModelIndex &index) const
 {
     if(_wrapper)
-        return _wrapper->isEvent(info->index());
+        return _wrapper->isEvent(index);
 
-    return AbstractGanttFactory::isEvent(info);
+    return AbstractGanttFactory::isEvent(index);
 }
 
 GanttFactory::RegisteredGraphicsObjectType GanttFactory::readTag(const QString &tag)

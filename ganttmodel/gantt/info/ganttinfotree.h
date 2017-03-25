@@ -15,7 +15,7 @@
 #include <QAbstractItemModel>
 #include <QTreeView>
 
-#include <QtConcurrentRun>
+//#include <QtConcurrentRun>
 
 /*!
  * \~russian
@@ -37,6 +37,7 @@ public:
     void connectTreeView(QTreeView *view);
     void disconnectTreeView(QTreeView *view);
     GanttInfoItem *infoForIndex(const QModelIndex &index) const;
+    QModelIndex indexForInfo(const GanttInfoItem *item) const;
     GanttInfoItem *nextStart(const UtcDateTime &dt) const;
     GanttInfoItem *prevFinish(const UtcDateTime &dt) const;
 
@@ -71,6 +72,8 @@ public slots:
     void clear();
     void reset();
 private slots:
+//    void removeFromHash();
+//    void addToHash();
     void onDataChanged(const QModelIndex &from, const QModelIndex &to);
     void onRowsInserted(const QModelIndex &parent, int start, int end);
     void onColumnsInserted(const QModelIndex &parent, int start, int end);
@@ -106,7 +109,6 @@ private:
 
     bool _limitsChanged;                                            // caches Limits
     QPair<UtcDateTime, UtcDateTime> _limits;                        // caches Limits
-    QMap<QModelIndex, GanttInfoItem*> _infoForIndex;                // caches
     QMap<UtcDateTime,GanttInfoItem*> _infoForStart, _infoForFinish; // caches
 };
 

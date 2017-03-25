@@ -31,7 +31,7 @@ MGridUnit::MGridUnit(QSharedPointer<KaMemoryPart> memoryPart,QGraphicsScene *sce
 void MGridUnit::initialize()
 {
     setShowBorder(false);
-    setAcceptsHoverEvents(true);
+    setAcceptHoverEvents(true);
     setZValue(1);
 }
 

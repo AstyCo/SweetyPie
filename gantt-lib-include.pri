@@ -21,18 +21,19 @@ unix {
 LIBS += -L$${DEP_PATH_LIBS}
 
 CONFIG(release, debug|release) {
-  LIBS += -lextensions -lextensions-gui -lqwt
+  LIBS += -lextensions -lextensions-gui
+#  LIBS += -lqwt
 } else:CONFIG(debug, debug|release) {
     LIBS += -lextensionsd -lextensions-guid
-  unix {
-    LIBS += -lqwt
-  } else:win32 {
-    LIBS += -lqwtd
-  }
+#  unix {
+#    LIBS += -lqwt
+#  } else:win32 {
+#    LIBS += -lqwtd
+#  }
 }
 
 # qwt
-INCLUDEPATH += $${DEP_PATH_HEADERS}/qwt
+#INCLUDEPATH += $${DEP_PATH_HEADERS}/qwt
 
 INCLUDEPATH += $${DEP_PATH_HEADERS}
 INCLUDEPATH += $${DEP_PATH_HEADERS}/extensions

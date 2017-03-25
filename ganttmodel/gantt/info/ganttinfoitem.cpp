@@ -18,7 +18,7 @@ GanttInfoItem::GanttInfoItem(QObject *parent)
 GanttInfoItem::GanttInfoItem(const QString &title
                              , const UtcDateTime &start
                              , const TimeSpan &ts
-                             , const QModelIndex &index
+//                             , const QModelIndex &index
                              , const QColor &color
                              , GanttInfoItem *parentNode
                              , QObject *parent)
@@ -29,7 +29,7 @@ GanttInfoItem::GanttInfoItem(const QString &title
     setTitle(title);
     setStart(start);
     setTimeSpan(ts);
-    setIndex(index);
+//    setIndex(index);
     setParent(parentNode);
     setColor(color);
 }
@@ -197,6 +197,7 @@ GanttInfoItem *GanttInfoItem::closestNode()
 
 void GanttInfoItem::updatePos()
 {
+    qDebug() << title() << "updatePos";
     setPos(calcPos());
 
     if (!_items.isEmpty()) {
@@ -215,9 +216,9 @@ void GanttInfoItem::init()
     _deleted = false;
     _parent = NULL;
     _color = Qt::green;
-    _index = QModelIndex();
+//    _index = QModelIndex();
 
-    connect(this, SIGNAL(indexChanged()),this,SIGNAL(changed()));
+//    connect(this, SIGNAL(indexChanged()),this,SIGNAL(changed()));
     connect(this, SIGNAL(titleChanged()),this,SIGNAL(changed()));
     connect(this, SIGNAL(parentChanged()),this,SIGNAL(changed()));
     connect(this, SIGNAL(startChanged()),this,SIGNAL(changed()));
@@ -225,8 +226,8 @@ void GanttInfoItem::init()
     connect(this, SIGNAL(colorChanged()),this,SIGNAL(changed()));
     connect(this, SIGNAL(posChanged()),this, SIGNAL(changed()));
 
-    connect(this,SIGNAL(expanded()),this,SLOT(onSelfExpandingChange()));
-    connect(this,SIGNAL(collapsed()),this,SLOT(onSelfExpandingChange()));
+    connect(this,SIGNAL(expanded()),this,SLOT(moveLowerItems()));
+    connect(this,SIGNAL(collapsed()),this,SLOT(moveLowerItems()));
 }
 
 MyUtcDateTimeInterval GanttInfoItem::getInterval() const
@@ -247,17 +248,12 @@ void GanttInfoItem::collapseChilds()
         item->setExpanded(false);
 }
 
-void GanttInfoItem::onSelfExpandingChange()
+void GanttInfoItem::moveLowerItems()
 {
-    onItemExpandingChange(-1);
-//    for(int i = 0; i < size(); ++i)
-//        at(i)->updatePos();
-
-//    if(_parent)
-//        _parent->onItemExpandingChange(this->row());
+    moveLowerItemsBy(-1);
 }
 
-void GanttInfoItem::onItemExpandingChange(int id)
+void GanttInfoItem::moveLowerItemsBy(int id)
 {
     if(id < 0)
         id = -1;
@@ -266,7 +262,7 @@ void GanttInfoItem::onItemExpandingChange(int id)
         at(i)->updatePos();
 
     if(_parent)
-        _parent->onItemExpandingChange(this->row());
+        _parent->moveLowerItemsBy(this->row());
 }
 
 QColor GanttInfoItem::color() const
@@ -341,10 +337,10 @@ void GanttInfoItem::setTimeSpan(const TimeSpan &ts)
 }
 
 
-QModelIndex GanttInfoItem::index() const
-{
-    return _index;
-}
+//QModelIndex GanttInfoItem::index() const
+//{
+//    return _index;
+//}
 
 void GanttInfoItem::increaseLinkCnt()
 {
@@ -415,14 +411,15 @@ bool GanttInfoItem::operator==(const GanttInfoItem &another)
     return _title == another._title;
 }
 
-void GanttInfoItem::setIndex(const QModelIndex &index)
-{
-    if(index == _index)
-        return;
+//void GanttInfoItem::setIndex(const QModelIndex &index)
+//{
+//    if(index == _index)
+//        return;
 
-    _index = index;
-    emit indexChanged();
-}
+//    emit indexAboutToBeChanged();
+//    _index = index;
+//    emit indexChanged();
+//}
 
 void GanttInfoItem::setParent(GanttInfoItem *parent)
 {

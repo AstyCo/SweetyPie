@@ -34,6 +34,7 @@ private:
 private slots:
     void addBefore();
     void addAfter();
+    void addInner();
 
     void addFirst();
     void addLast();

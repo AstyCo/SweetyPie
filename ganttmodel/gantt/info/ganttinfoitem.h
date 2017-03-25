@@ -39,7 +39,7 @@ public:
     GanttInfoItem(const QString &title,
                   const UtcDateTime   &start,
                   const TimeSpan      &ts = TimeSpan(),
-                  const QModelIndex   &index = QModelIndex(),
+//                  const QModelIndex   &index = QModelIndex(),
                   const QColor        &color = Qt::green,
                   GanttInfoItem       *parentNode = NULL,
                   QObject             *parent = NULL);
@@ -54,7 +54,7 @@ public:
     qreal bottom() const;
     void setPos(int pos);
 
-    QModelIndex index() const;
+//    QModelIndex index() const;
 
     QString     title() const;
     UtcDateTime start() const;
@@ -94,7 +94,8 @@ signals:
     void collapsed();
 
     void parentChanged();
-    void indexChanged();
+//    void indexAboutToBeChanged();
+//    void indexChanged();
     void titleChanged();
     void aboutToBeDeleted();
     void startChanged();
@@ -106,7 +107,7 @@ signals:
     void changed();
 
 public slots:
-    void setIndex(const QModelIndex &index);
+//    void setIndex(const QModelIndex &index);
     void setParent(GanttInfoItem *parent);
     void setStart(const UtcDateTime &start);
     void setTimeSpan(const TimeSpan &ts);
@@ -118,6 +119,8 @@ public slots:
     void expand();
     void changeExpanding();
 
+    void moveLowerItems();
+    void moveLowerItemsBy(int id);
     void updatePos();
     void increaseLinkCnt();
     void reduceLinkCnt();
@@ -134,8 +137,6 @@ public:
 private slots:
     void onChildDeleted();
     void collapseChilds();
-    void onSelfExpandingChange();
-    void onItemExpandingChange(int id);
 
 
 private:
@@ -143,7 +144,7 @@ private:
     virtual void connectParent();
 private:
     GanttInfoItem *_parent;         ///< represents parent
-    QModelIndex _index;             ///< info connects to model index
+//    QModelIndex _index;             ///< info connects to model index
 //    InfoType _type;                 ///< proper way to check for whatis
     QList<GanttInfoItem*> _items;   ///< list of child elements
 

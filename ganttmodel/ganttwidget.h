@@ -51,10 +51,10 @@ public:
     QAbstractItemModel *model() const;
 
     /// \return UtcDateTime class время для QPointF class точки в QWidget class координатах
-    UtcDateTime dtForPos(const QPointF &pos) const;
+    UtcDateTime dtForPos(const QPoint &pos) const;
 
     /// \return QModelIndex class индекс элемента текущей модели(GanttWidget::model) для QPointF class точки в QWidget class координатах
-    QModelIndex indexForPos(const QPointF &pos) const;
+    QModelIndex indexForPos(const QPoint &pos) const;
 
     QPoint mapPosToGlobal(const QPoint &pos) const;
 

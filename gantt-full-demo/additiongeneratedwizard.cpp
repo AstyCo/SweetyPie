@@ -247,7 +247,7 @@ void AdditionGeneratedWizard::addGenerated()
                         QString::fromUtf8("событие %1").arg(++eventNumber),
                         start + minCoef * ts,
                         (isDot ? TimeSpan() : ts * (maxCoef-minCoef)),
-                        QModelIndex(),
+//                        QModelIndex(),
                         QColor::fromRgb(qrand()%255,qrand()%255,qrand()%255)
                         );
 

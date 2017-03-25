@@ -45,6 +45,7 @@ public:
     void addNode(GanttInfoItem *node);
 //    void addItems(GanttInfoItem* item, bool inner = false);
     void insertItem(GanttInfoItem *item, GanttInfoItem *parent);
+    void addInner(GanttInfoItem *item, GanttInfoItem *targetItem);
     void addAfter(GanttInfoItem *item, GanttInfoItem *targetItem);
     void addBefore(GanttInfoItem *item, GanttInfoItem *targetItem);
     bool canFetchMore(const QModelIndex &/*parent*/) const{
@@ -69,11 +70,12 @@ signals:
 
 public slots:
     void clear();
-//    void reset();
 
 private:
-
-    void setIndex(GanttInfoItem* item);
+    GanttInfoItem *infoForIndex(const QModelIndex &index) const;
+    QModelIndex indexForInfo(const GanttInfoItem *item) const;
+//    void setIndexR(GanttInfoItem* item);
+//    void setIndex(GanttInfoItem* item);
     GanttInfoItem *itemForNameHelper(const QString& iGanttTitle, GanttInfoItem *node) const;
 
 private:

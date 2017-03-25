@@ -4,7 +4,7 @@
 #
 #-------------------------------------------------
 
-QT       += core gui
+QT       += core gui widgets
 
 TEMPLATE = lib
 
@@ -18,14 +18,14 @@ include(../gantt-lib-include.pri)
 
 
 SOURCES += \
-    curvedetailsgroupbox.cpp \
-    plotinterval.cpp \
-    chartsgroupwidget.cpp \
-    chartactionstoolbar.cpp \
-    plotkeyeventhandler.cpp \
-    chartsettingsdlg.cpp \
-    chartsettings.cpp \
-    plotnavigator.cpp \
+#    curvedetailsgroupbox.cpp \
+#    plotinterval.cpp \
+#    chartsgroupwidget.cpp \
+#    chartactionstoolbar.cpp \
+#    plotkeyeventhandler.cpp \
+#    chartsettingsdlg.cpp \
+#    chartsettings.cpp \
+#    plotnavigator.cpp \
     memoryplanningwidget/memoryview.cpp \
     memoryplanningwidget/memoryplanningwidget.cpp \
     memoryplanningwidget/memorygrid/mgrid_interactiveunit.cpp \
@@ -37,13 +37,13 @@ SOURCES += \
     memoryplanningwidget/memoryline/mline_picker.cpp \
     memoryplanningwidget/memoryline/mline_scene.cpp \
     memoryplanningwidget/kamemorylegend.cpp \
-    charttimexywidget.cpp \
-    chartxywidget.cpp \
-    chartintervalselectionwidget.cpp \
-    chartintervalselector.cpp \
+#    charttimexywidget.cpp \
+#    chartxywidget.cpp \
+#    chartintervalselectionwidget.cpp \
+#    chartintervalselector.cpp \
     dtintervalwidget/dtintervalwidget.cpp \
-    chartpointselector.cpp \
-    curveindex.cpp \
+#    chartpointselector.cpp \
+#    curveindex.cpp \
     extensions/dtline.cpp \
     extensions/intervalslider.cpp \
     extensions/intervalunion.cpp \
@@ -74,14 +74,14 @@ SOURCES += \
 
 
 HEADERS += \
-    curvedetailsgroupbox.h \
-    plotinterval.h \
-    chartsgroupwidget.h \
-    chartactionstoolbar.h \
-    plotkeyeventhandler.h \
-    chartsettingsdlg.h \
-    chartsettings.h \
-    plotnavigator.h \
+#    curvedetailsgroupbox.h \
+#    plotinterval.h \
+#    chartsgroupwidget.h \
+#    chartactionstoolbar.h \
+#    plotkeyeventhandler.h \
+#    chartsettingsdlg.h \
+#    chartsettings.h \
+#    plotnavigator.h \
     memoryplanningwidget/memoryline/mline_abstractpart.h \
     memoryplanningwidget/memoryline/mline_picker.h \
     memoryplanningwidget/memoryline/mline_graphicspart.h \
@@ -95,13 +95,13 @@ HEADERS += \
     memoryplanningwidget/memory_globalvalues.h \
     memoryplanningwidget/kamemorylegend.h \
     ganttproject_global.h \
-    charttimexywidget.h \
-    chartxywidget.h \
-    chartintervalselectionwidget.h \
-    chartintervalselector.h \
+#    charttimexywidget.h \
+#    chartxywidget.h \
+#    chartintervalselectionwidget.h \
+#    chartintervalselector.h \
     dtintervalwidget/dtintervalwidget.h \
-    chartpointselector.h \
-    curveindex.h \
+#    chartpointselector.h \
+#    curveindex.h \
     extensions/dtline.h \
     extensions/intervalslider.h \
     extensions/intervalunion.h \
@@ -137,12 +137,12 @@ RESOURCES += \
     images.qrc
 
 FORMS += \
-    curvedetailsgroupbox.ui \
-    chartsgroupwidget.ui \
-    chartsettingsdlg.ui \
+#    curvedetailsgroupbox.ui \
+#    chartsgroupwidget.ui \
+#    chartsettingsdlg.ui \
     memoryplanningwidget/memoryplanningwidget.ui \
-    chartxywidget.ui \
-    chartintervalselectionwidget.ui \
+#    chartxywidget.ui \
+#    chartintervalselectionwidget.ui \
     dtintervalwidget/dtintervalwidget.ui \
     gantt/player/ganttplayercontrol.ui \
     ganttwidget.ui
