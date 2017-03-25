@@ -39,7 +39,7 @@
        <attribute name="title">
         <string>Gantt</string>
        </attribute>
-       <layout class="QVBoxLayout" name="verticalLayout">
+       <layout class="QVBoxLayout" name="verticalLayout" stretch="1,0">
         <property name="spacing">
          <number>0</number>
         </property>
@@ -56,34 +56,21 @@
          <number>0</number>
         </property>
         <item>
-         <widget class="QSplitter" name="splitter_2">
+         <widget class="QSplitter" name="splitter">
           <property name="orientation">
-           <enum>Qt::Vertical</enum>
+           <enum>Qt::Horizontal</enum>
           </property>
           <property name="handleWidth">
            <number>1</number>
           </property>
-          <widget class="QWidget" name="widget" native="true">
-           <property name="styleSheet">
-            <string notr="true">background-color: green;</string>
+          <widget class="QTreeView" name="treeView"/>
+          <widget class="GanttWidget" name="ganttWidget" native="true">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
            </property>
-          </widget>
-          <widget class="QSplitter" name="splitter">
-           <property name="orientation">
-            <enum>Qt::Horizontal</enum>
-           </property>
-           <property name="handleWidth">
-            <number>1</number>
-           </property>
-           <widget class="QTreeView" name="treeView"/>
-           <widget class="GanttWidget" name="ganttWidget" native="true">
-            <property name="sizePolicy">
-             <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
-              <horstretch>0</horstretch>
-              <verstretch>0</verstretch>
-             </sizepolicy>
-            </property>
-           </widget>
           </widget>
          </widget>
         </item>
@@ -127,13 +114,6 @@
            <widget class="QPushButton" name="pushButton_ganttClear">
             <property name="text">
              <string>Очистить</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QPushButton" name="pushButton_ganttAddItem">
-            <property name="text">
-             <string>Добавить событие</string>
             </property>
            </widget>
           </item>

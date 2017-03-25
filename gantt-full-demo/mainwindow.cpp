@@ -26,14 +26,12 @@ void MainWindow::init()
 
     ui->ganttWidget->setFactory(new GanttFactory(new ModelWrapper(_model)));
 
-//    ui->treeView->set
-
-//    ui->treeView->setSelectionMode(QAbstractItemView::ExtendedSelection);
-//    ui->treeView->setSelectionBehavior(QAbstractItemView::SelectRows);
     ui->ganttWidget->setView(ui->treeView);
 
     connect(ui->ganttWidget, SIGNAL(customContextMenuRequested(QPoint)),
             this, SLOT(onCustomContextMenuRequested(QPoint)));
+
+    setWindowIcon(QIcon(":/images/gantt-chart.png"));
 }
 
 MainWindow::MainWindow(QWidget *parent) :

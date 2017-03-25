@@ -12,11 +12,13 @@
 #define GENERATE_PAGE 1
 
 AdditionGeneratedWizard::AdditionGeneratedWizard(QWidget *parent) :
-    QWizard(parent),
+    QWizard(parent, Qt::Dialog | Qt::WindowTitleHint),
     ui(new Ui::AdditionGeneratedWizard),
     _settings("AstyCo", "QtGantt")
 {
     ui->setupUi(this);
+
+    setWindowTitle(QString::fromUtf8("Добавление событий"));
 
     ui->lineEditEventCount->setValidator(new QIntValidator(1, 10000, ui->lineEditEventCount));
     ui->lineEditMaxNest->setValidator(new QIntValidator(1, 10, ui->lineEditMaxNest));
@@ -43,13 +45,20 @@ AdditionGeneratedWizard::~AdditionGeneratedWizard()
 void AdditionGeneratedWizard::initializePage(int id)
 {
     QWizard::initializePage(id);
+    switch(id) {
+    case GENERATE_PAGE:
+        currentPage()->setTitle(QString::fromUtf8("Генерация событий"));
+        break;
+    case INTRO_PAGE:
+        currentPage()->setTitle(QString::fromUtf8("Добавление событий"));
+        break;
+    default:
+        break;
+    }
 
-    if (currentId() == GENERATE_PAGE) {
+    if (id == GENERATE_PAGE) {
         if (!ui->checkBoxGenerate->isChecked())
             done(QWizard::Accepted);
-
-//        ui->dateTimeEditMin->setDateTime(QDateTime::currentDateTimeUtc());
-//        ui->dateTimeEditMax->setDateTime(UtcDateTime(QDateTime::currentDateTimeUtc() + TimeSpan(1, 10, 0)).dateTime());
     }
 }
 
