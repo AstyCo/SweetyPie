@@ -38,8 +38,16 @@ class GANTTMODELSHARED_EXPORT GanttWidget : public QWidget
 public:
     explicit GanttWidget(QWidget *parent = 0);
     ~GanttWidget();
-
+    /*!
+     * \brief setCurrentDt устанавливает текущее время бегунка плеера
+     * \param dt
+     */
     void setCurrentDt(const UtcDateTime &dt);
+    /*!
+     * \brief setPlayerSpeeds устанавливает минимальный и максимальный множители воспроизведения
+     * \param minMultiply
+     * \param maxMultiply
+     */
     void setPlayerSpeeds(qreal minMultiply, qreal maxMultiply);///< Устанавливает минимальную и максимальную скорости воспроизведения
     /// \return Плеер отображен?
     bool player() const;
@@ -56,6 +64,11 @@ public:
     /// \return QModelIndex class индекс элемента текущей модели(GanttWidget::model) для QPointF class точки в QWidget class координатах
     QModelIndex indexForPos(const QPoint &pos) const;
 
+    /*!
+     * \brief mapPosToGlobal переводит координаты из координат сцены в глобальные
+     * \param pos
+     * \return
+     */
     QPoint mapPosToGlobal(const QPoint &pos) const;
 
 

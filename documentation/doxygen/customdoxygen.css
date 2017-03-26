@@ -1,0 +1,30 @@
+
+.the_footer{
+	padding: 10px;
+	color: #FFFFFF;
+}
+.the_footer {
+	padding-top: 15px;
+	padding-bottom: 15px;
+	text-align: center;
+	vertical-align: middle;
+	background-color: #404040;
+}
+
+div.the_markdown {
+	width: 80%;
+	margin-left: auto;
+	margin-right: auto;
+}
+
+img[alt=user] {
+	width : 60%;
+}
+
+img[alt=diagram] {
+	width : 60%;
+}
+
+img[alt=classdiagram] {
+	width: 80%;
+}
